@@ -87,6 +87,8 @@ def main(repoids=None):
             print 'Run as root to get all dependencies'
 
     unresolved = {}
+    # Cache resolved dependencies for speed
+    resolved = {}
     
     print 'Checking Dependencies'
     for pkg in my.pkgSack:
@@ -94,6 +96,8 @@ def main(repoids=None):
             if req.startswith('rpmlib'): continue # ignore rpmlib deps
             
             ver = evrTupletoVer((reqe, reqv, reqr))
+            if resolved.has_key((req,flags,ver)):
+                continue
             try:
                 resolve_sack = my.whatProvides(req, flags, ver)
             except yum.Errors.RepoError, e:
@@ -103,6 +107,8 @@ def main(repoids=None):
                 if not unresolved.has_key(pkg):
                     unresolved[pkg] = []
                 unresolved[pkg].append((req, flags, ver))
+            else:
+                resolved[(req,flags,ver)] = 1
     
 
     num = len(my.pkgSack)
