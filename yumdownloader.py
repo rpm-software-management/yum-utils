@@ -74,7 +74,8 @@ def main():
         for download in packages:
             repo = my.repos.getRepo(download.repoid)
             remote = download.returnSimple('relativepath')
-            local = os.path.join(opts.destdir, remote)
+            local = os.path.basename(remote)
+            local = os.path.join(opts.destdir, local)
             if (os.path.exists(local) and 
                 str(os.path.getsize(local)) == download.returnSimple('packagesize')):
                 my.errorlog(0,"%s already exists and appears to be complete" % local)
