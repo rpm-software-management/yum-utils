@@ -1,0 +1,10 @@
+
+# IF any of these rpms are updated, the yum-updateonboot init script will
+# reboot immediately after the yum update.  To keep yum-updateonboot from
+# rebooting the system, comment this line out.
+#REBOOT_RPMS="kernel kernel-smp"
+
+# A list of groups that should be updated at boot.  For each group mentioned
+# yum-updateonboot will call 'yum -y groupupdate'  Since group names tend to
+# have spaces in them, used a semi-colon to separate the group names
+#GROUPLIST="My Group;MyOtherGroup;Some_Group;My Group 4"

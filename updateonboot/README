@@ -1,0 +1,23 @@
+This script yum update on boot.  This allows machines that have been turned
+off for an extended amount of time to become secure immediately, instead of
+waiting until the next early morning cron job.
+
+To install this, copy yum-updateonboot.init to /etc/init.d/yum-updateonboot
+and copy yum-updateonboot.sysconfig to /etc/sysconfig/yum-updateonboot
+After copying the files, run: /sbin/chkconfig --add yum-updateonboot
+
+There are a couple of configuration options in /etc/sysconfig/yum-updateonboot
+
+REBOOT_RPMS - any rpms listed in this variable will have their version and
+              release numbers checked before and after the updates.  If there
+	      is any change in those numbers, or in the number of installed
+	      packages with that name, the init script will immediately reboot
+	      the system.  This is intended to catch kernel updates and
+	      immediately boot into the new kernel, instead of having to later
+	      schedule a downtime to do it.
+
+GROUPLIST -   This is a list of groups that the init script will call
+              'yum groupupdate' on (its called after the 'yum update' and
+	      before the last check of rpm versions for REBOOT_RPMS).  This
+	      way you will also install any updates to yum groups that you
+	      may have in your local repositories.

@@ -1,0 +1,85 @@
+#! /bin/bash
+#
+# yum-updateonboot Updates rpms on the system at boot
+#
+# chkconfig: 2345 25 75
+# description: Runs 'yum update' at boot.  Also calls 'yum groupinstall' for \
+#              specified groups
+#
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# Copyright 2005 Duke University
+# Written by Sean Dilda <sean@duke.edu>
+
+# Source function library.
+. /etc/init.d/functions
+
+if [ ! -f /etc/sysconfig/yum-updateonboot ]; then
+    exit 0
+fi
+
+. /etc/sysconfig/yum-updateonboot
+
+
+# See how we were called.
+case "$1" in
+  start)
+  
+	if [ "x$REBOOT_RPMS" != "x" ] ;then
+	    TMP1=`/bin/mktemp /tmp/yum-update.XXXXXX`
+	    TMP2=`/bin/mktemp /tmp/yum-update.XXXXXX`
+	    rpm -q $REBOOT_RPMS > $TMP1
+	fi
+	echo -n "Updating RPMS on system: "
+	yum -y update &> /dev/null && success || failure
+	echo
+	OLD_IFS=$IFS
+	IFS=";"
+	for group in $GROUPLIST ; do
+	    IFS=$OLD_IFS
+	    echo -n $"Updating RPMS in group $group: "
+	    yum -y groupupdate "$group" &> /dev/null && success || failure
+	    echo
+	done
+	IFS=$OLD_IFS
+	if [ "x$REBOOT_RPMS" != "x" ] ;then
+	    rpm -q $REBOOT_RPMS > $TMP2
+	    if ! diff $TMP1 $TMP2 &> /dev/null; then 
+		rm -f $TMP1
+		rm -f $TMP2
+		echo "Critical RPMs were updated.. rebooting now"
+		/sbin/reboot
+	    fi
+	    rm -f $TMP1
+	    rm -f $TMP2
+	fi
+	
+        ;;
+  stop)
+        ;;
+  status)
+	;;
+  restart|reload)
+        cd "$CWD"
+	$0 stop
+	$0 start
+	;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit 0
