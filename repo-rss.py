@@ -132,7 +132,11 @@ class RepoRSS:
         # build up changelog
         changelog = ''
         cnt = 0
-        for e in pkg.changelog:
+        if (pkg.changelog != None):
+            where = pkg.changelog
+        else:
+            where = pkg.returnChangelog()
+        for e in where:
             cnt += 1
             if cnt > 3: 
                 changelog += '...'
