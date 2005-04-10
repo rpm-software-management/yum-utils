@@ -23,6 +23,7 @@ from urlgrabber.progress import TextMeter
 from yum.logger import Logger
 from yum.packages import parsePackages, returnBestPackages
 from optparse import OptionParser
+from urlparse import urljoin
 
 def initYum():
     my = yum.YumBase()
@@ -44,6 +45,8 @@ def parseArgs():
     parser = OptionParser(usage=usage)
     parser.add_option("--destdir", default=".", dest="destdir",
       help='destination directory (defaults to current directory)')
+    parser.add_option("--urls", default=False, dest="urls", action="store_true",
+      help='just list the urls it would download instead of downloading')
     (opts, args) = parser.parse_args()
     if len(args) < 1: 
         parser.print_help()
@@ -74,6 +77,10 @@ def main():
         for download in packages:
             repo = my.repos.getRepo(download.repoid)
             remote = download.returnSimple('relativepath')
+            if opts.urls:
+                url = urljoin(repo.urls[0],remote)
+                my.log(0, '%s' % url)
+                continue
             local = os.path.basename(remote)
             local = os.path.join(opts.destdir, local)
             if (os.path.exists(local) and 
