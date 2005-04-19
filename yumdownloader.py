@@ -47,6 +47,8 @@ def parseArgs():
       help='destination directory (defaults to current directory)')
     parser.add_option("--urls", default=False, dest="urls", action="store_true",
       help='just list the urls it would download instead of downloading')
+    parser.add_option("--resolve", default=False, dest="resolve", action="store_true",
+      help='resolve dependencies and download required packages')
     (opts, args) = parser.parse_args()
     if len(args) < 1: 
         parser.print_help()
@@ -55,7 +57,6 @@ def parseArgs():
 
 def main():
     (opts, args) = parseArgs()
-    #self.doRpmDBSetup()
     my = initYum()
     avail = my.pkgSack.returnPackages()
     toDownload = {}
@@ -71,6 +72,26 @@ def main():
             toDownload.setdefault(newpkg.name,[]).append(newpkg.pkgtup)
 
     toDownload = returnBestPackages(toDownload)
+    # If the user supplies to --resolve flag, resolve dependencies for
+    # all packages
+    # note this might require root access because the headers need to be
+    # downloaded into the cachedir (is there a way around this)
+    if opts.resolve:
+        my.doTsSetup()
+        my.localPackages = []
+        # Act as if we were to install the packages in toDownload
+        for x in toDownload:
+            po = my.getPackageObject(x)
+            my.tsInfo.addInstall(po)
+            my.localPackages.append(po)
+        # Resolve dependencies
+        my.resolveDeps()
+        # Add newly added packages to the toDownload list
+        for x in my.tsInfo.getMembers():
+            pkgtup = x.pkgtup
+            if not pkgtup in toDownload:
+                toDownload.append(pkgtup)
+        
     for pkg in toDownload:
         n,a,e,v,r = pkg
         packages =  my.pkgSack.searchNevra(n,e,v,r,a)
