@@ -26,11 +26,13 @@
 #
 
 import yum
+import os
 import sys
 import rpm
 from rpmUtils import miscutils
 from yum.logger import Logger
 from optparse import OptionParser
+from yum.packages import YumInstalledPackage
 
 def initYum():
     my = yum.YumBase()
@@ -45,6 +47,7 @@ def initYum():
     my.doTsSetup()
     my.doSackSetup()
     my.doRpmDBSetup()
+    my.localPackages = []
     return my
 
 # Get a list of all requirements in the local rpmdb
@@ -108,8 +111,12 @@ def parseArgs():
       help='List leaf nodes in the local RPM database')
     parser.add_option("--all", default=False, dest="all",action="store_true",
       help='When listing leaf nodes also list leaf nodes that are not libraries')
+    parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
+      help="Remove old kernels")
+    parser.add_option("--count",default=2,dest="kernelcount",action="store",
+      help="Number of kernels to keep on the system (default 2)")
     (opts, args) = parser.parse_args()
-    if not (opts.problems or opts.leaves) or (opts.problems and opts.leaves):
+    if not (opts.problems or opts.leaves or opts.kernels) or (opts.problems and opts.leaves):
         parser.print_help()
         print "Please specify either --problems or --leaves"
         sys.exit(0)
@@ -126,16 +133,99 @@ def listLeaves(pkgs,provsomething,all):
             if name.find('lib') == 0 or all:
                 print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
+# Return a list of all installed kernels, sorted newst to oldest
+def getKernels(my):
+    kernlist = []
+    for tup in my.rpmdb.getPkgList():
+        (n,a,e,v,r) = tup
+        if (n == 'kernel'):
+            kernlist.append(tup)
+    kernlist.sort(sortPackages)
+    kernlist.reverse()
+    return kernlist
+
+# Sort package tuples on epoch version release
+def sortPackages(pkg1,pkg2):
+    return miscutils.compareEVR((pkg1[2:]),(pkg2[2:]))
+
+def progress(what, bytes, total, h, user):
+    pass
+    #if what == rpm.RPMCALLBACK_UNINST_STOP:
+    #    print "Removing: %s" % h 
+
+def userconfirm():
+    """gets a yes or no from the user, defaults to No"""
+
+    while 1:
+        choice = raw_input('Is this ok [y/N]: ')
+        if len(choice) == 0 or choice[0] in ['Y', 'y', 'N','n']:
+            break
+
+    if len(choice) == 0 or choice[0] not in ['y', 'Y']:
+        return 0
+    else:
+        return 1
+
+# Remove old kernels, keep at most count kernels (and always keep the running
+# kernel)
+def removeKernels(my,count):
+    if count < 1:
+        print "Error should keep at least 1 kernel!"
+        sys.exit(100)
+    kernels = getKernels(my)
+    runningkernel = os.uname()[2]
+    (kver,krel) = runningkernel.split('-')
+    if len(kernels) < count:
+        print "There are only %s kernels installed of maximum %s kernels, nothing to be done" % (len(kernels),count)
+        return
+    remove = kernels[count:]
+    toremove = []
+    # Remove running kernel from remove list
+    for kernel in remove:
+        (n,a,e,v,r) = kernel
+        if (v == kver and r == krel):
+            print "Not removing kernel %s-%s because it is the running kernel" % (kver,krel)
+        else:
+            toremove.append(kernel)
+    if len(kernels) - len(toremove) < 1:
+        print "Error all kernel rpms are set to be removed"
+        sys.exit(100)
+    if len(toremove) < 1:
+        print "No kernels to remove"
+        return
+    
+    print "I will remove the following %s kernel(s):" % (len(toremove))
+    for kernel in toremove:
+        (n,a,e,v,r) = kernel
+        print "%s-%s" % (v,r) 
+
+    if (not userconfirm()):
+        sys.exit(0)
+
+    for kernel in toremove:
+        hdr = my.rpmdb.returnHeaderByTuple(kernel)[0]
+        po = YumInstalledPackage(hdr)
+        my.tsInfo.addErase(po)
+
+    # Now perform the action transaction
+    my.populateTs()
+    my.ts.check()
+    my.ts.order()
+    my.ts.run(progress,'')
+    
+    
 def main():
     (opts, args) = parseArgs()
     my = initYum()
+    if (opts.kernels):
+        removeKernels(my,int(opts.kernelcount))
+        sys.exit(0)
     print "Reading local RPM database"
     pkgs = getLocalRequires(my)
     print "Processing all local requires"
     provsomething = buildProviderList(my,pkgs,opts.problems)
     if (opts.leaves):
         listLeaves(pkgs,provsomething,opts.all)
-    
     
 if __name__ == '__main__':
     main()

@@ -1,1 +1,25 @@
-yum-utils  - utils that work around the yum python module
+-- Introduction --
+
+Yum-utils is a collection of utilities, plugins and examples related to
+the yum package manager. 
+
+If you have created an utility related to yum or if you encounter any problems
+using these utilities, feel free to send an e-mail to the yum mailing list:
+https://lists.linux.duke.edu/mailman/listinfo/yum
+
+-- Authors --
+
+Various people have made a contribution to this collection:
+
+- Gijs Hollestelle
+Maintainer of yum-utils, author of yumdownloader and package-cleanup 
+
+- Seth Vidal
+Maintainer of yum, author of repo-closure, repo-manage and repo-rss
+
+- Panu Matilainen 
+Author of repoquery
+
+- Sean Dilda
+Author of the update on boot init scripts
+
