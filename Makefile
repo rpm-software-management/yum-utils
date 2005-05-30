@@ -13,6 +13,7 @@ install:
 	install -m 755 repoquery.py $(DESTDIR)/usr/bin/repoquery
 	install -m 755 repo-rss.py $(DESTDIR)/usr/bin/repo-rss
 	install -m 755 yumdownloader.py $(DESTDIR)/usr/bin/yumdownloader
+	install -m 755 yum-builddep.py $(DESTDIR)/usr/bin/yum-builddep
 
 archive:
 	@rm -rf ${PKGNAME}-%{VERSION}.tar.gz
