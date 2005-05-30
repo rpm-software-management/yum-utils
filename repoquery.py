@@ -237,6 +237,7 @@ def main(args):
     parser.add_option("-i", "--info", default=0, action="store_true")
     parser.add_option("--qf", "--queryformat", dest="queryformat")
     parser.add_option("--range", default=":", dest="range")
+    parser.add_option("", "--repoid", default=[], action="append")
     # dummy for rpmq compatibility
     parser.add_option("-q", "--query", default=0, action="store_true")
     parser.add_option("-a", "--all", default=0, action="store_true")
@@ -286,6 +287,13 @@ def main(args):
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
     repoq.doConfigSetup()
+    if len(opts.repoid) > 0:
+        for repo in repoq.repos.findRepos('*'):
+            if repo.id not in opts.repoid:
+                repo.disable()
+            else:
+                repo.enable()
+
     repoq.doRepoSetup()
     
     repoq.doSackSetup(archlist=archlist)
