@@ -55,6 +55,7 @@ fi
 %{_bindir}/repoquery
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
+%{_bindir}/yum-builddep
 
 %files -n yum-updateonboot
 %defattr(-, root, root)
