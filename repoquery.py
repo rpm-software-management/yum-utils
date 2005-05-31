@@ -27,6 +27,8 @@ from optparse import OptionParser
 
 import yum
 import yum.config
+import yum.Errors
+import repomd.mdErrors
 
 version = "0.0.6"
 
@@ -194,8 +196,12 @@ class YumBaseQuery(yum.YumBase):
         setattr(self.pkgSack.pc, "qf", qf)
 
     # dont log anything..
-    def log(self, level, message):
+    def log(self, value, msg):
         pass
+
+    def errorlog(self, value, msg):
+        if not self.options.quiet:
+            print >> sys.stderr, msg
 
     def returnItems(self):
         if self.options.group:
@@ -208,15 +214,38 @@ class YumBaseQuery(yum.YumBase):
         else:
             return self.pkgSack.returnNewestByNameArch()
 
+    def returnNewestByName(self, name):
+        pkgs = []
+        try:
+            pkgs = self.pkgSack.returnNewestByName(name)
+        except repomd.mdErrors.PackageSackError, err:
+            self.errorlog(0, err)
+        return pkgs
+
+    def returnPackageByDep(self, depstring):
+        provider = []
+        try:
+            provider.append(yum.YumBase.returnPackageByDep(self, depstring))
+        except yum.Errors.YumBaseError, err:
+            self.errorlog(0, "No package provides %s" % depstring)
+        return provider
+
     def matchPkgs(self, regexs):
         if not regexs:
             return self.returnItems()
     
         pkgs = []
+        notfound = {}
+
         for pkg in self.returnItems():
             for expr in regexs:
                 if pkg.name == expr or fnmatch.fnmatch("%s" % pkg, expr):
                     pkgs.append(pkg)
+                else:
+                    notfound[expr] = None
+
+        for expr in notfound.keys():
+            self.errorlog(0, 'No match found for %s' % expr)
 
         return pkgs
 
@@ -240,25 +269,25 @@ class YumBaseQuery(yum.YumBase):
         return grps
 
     def whatprovides(self, name, **kw):
-        return [self.returnPackageByDep(name)]
+        return self.returnPackageByDep(name)
 
     def whatrequires(self, name, **kw):
-        pkgs = []
+        pkgs = {}
         provs = [name]
                 
         if self.options.alldeps:
-            for pkg in self.pkgSack.returnNewestByName(name):
+            for pkg in self.returnNewestByName(name):
                 provs.extend(pkg._prco("provides"))
 
         for prov in provs:
             for pkg in self.pkgSack.searchRequires(prov):
-                pkgs.append(pkg)
-        return pkgs
+                pkgs[pkg.pkgtup] = pkg
+        return pkgs.values()
 
     def requires(self, name, **kw):
         pkgs = {}
         
-        for pkg in self.pkgSack.returnNewestByName(name):
+        for pkg in self.returnNewestByName(name):
             for req in pkg._prco("requires"):
                 for res in self.whatprovides(req):
                     pkgs[res.name] = res
@@ -266,7 +295,7 @@ class YumBaseQuery(yum.YumBase):
 
     def location(self, name):
         loc = []
-        for pkg in self.pkgSack.returnNewestByName(name):
+        for pkg in self.returnNewestByName(name):
             repo = self.repos.getRepo(pkg.simple['repoid'])
             loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
@@ -332,6 +361,8 @@ def main(args):
     parser.add_option("", "--repoid", default=[], action="append")
     parser.add_option("-v", "--version", default=0, action="store_true",
                       help="show program version and exit")
+    parser.add_option("--quiet", default=0, action="store_true", 
+                      help="quiet (no output to stderr)")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
