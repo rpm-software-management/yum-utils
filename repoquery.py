@@ -63,74 +63,79 @@ def rpmevr(e, v, r):
         rt = "-%s" % r
     return "%s%s%s" % (et, vt, rt)
 
-# Runtime extensions to YumAvailablePackage class
-def pkgGetitem(self, item):
-    res = None
-    try:
-        res = self.returnSimple(item)
-    except KeyError:
-        if item == "license":
-            res = " ".join(self.licenses)
-    return res
+class pkgQuery:
+    def __init__(self, pkg, qf):
+        self.pkg = pkg
+        self.qf = qf
+        self.name = pkg.name
+    
+    def __getitem__(self, item):
+        res = None
+        try:
+            res = self.pkg.returnSimple(item)
+        except KeyError:
+            if item == "license":
+                res = " ".join(self.licenses)
+        return res
 
-def pkgDoQuery(self, method, *args, **kw):
-    if std_qf.has_key(method):
-        self.qf = std_qf[method]
-        return self.queryformat()
-    else:
-        return getattr(self, method)(*args, **kw)
-
-def pkgPrco(self, what, **kw):
-    rpdict = {}
-    for rptup in self.returnPrco(what):
-        (rpn, rpf, (rp,rpv,rpr)) = rptup
-        # rpmlib deps should be handled on their own
-        if rpn[:6] == 'rpmlib':
-            continue
-        if rpf:
-            rpdict["%s %s %s" % (rpn, flags[rpf], rpmevr(rp,rpv,rpr))] = None
+    def doQuery(self, method, *args, **kw):
+        if std_qf.has_key(method):
+            self.qf = std_qf[method]
+            return self.queryformat()
         else:
-            rpdict[rpn] = None
-    return rpdict.keys()
+            return getattr(self, method)(*args, **kw)
 
-# these return formatted strings, not lists..
-def fmtQueryformat(self):
+    def _prco(self, what, **kw):
+        rpdict = {}
+        for rptup in self.pkg.returnPrco(what):
+            (rpn, rpf, (rp,rpv,rpr)) = rptup
+            # rpmlib deps should be handled on their own
+            if rpn[:6] == 'rpmlib':
+                continue
+            if rpf:
+                rpdict["%s %s %s" % (rpn, flags[rpf], rpmevr(rp,rpv,rpr))] = None
+            else:
+                rpdict[rpn] = None
+        return rpdict.keys()
 
-    if not self.qf:
-        qf = std_qf["nevra"]
-    else:
-        qf = self.qf
+    # these return formatted strings, not lists..
+    def queryformat(self):
 
-    qf = qf.replace("\\n", "\n")
-    pattern = re.compile('%{(\w*?)}')
-    fmt = re.sub(pattern, r'%(\1)s', qf)
-    return fmt % self
+        if not self.qf:
+            qf = std_qf["nevra"]
+        else:
+            qf = self.qf
 
-def fmtList(self, **kw):
-    fdict = {}
-    for file in self.returnFileEntries():
-        fdict[file] = None
-    files = fdict.keys()
-    files.sort()
-    return "\n".join(files)
+        qf = qf.replace("\\n", "\n")
+        pattern = re.compile('%{(\w*?)}')
+        fmt = re.sub(pattern, r'%(\1)s', qf)
+        return fmt % self
 
-def fmtChangelog(self, **kw):
-    changelog = []
-    for date, author, message in self.returnChangelog():
-        changelog.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
-    return "\n".join(changelog)
+    def list(self, **kw):
+        fdict = {}
+        for file in self.pkg.returnFileEntries():
+            fdict[file] = None
+        files = fdict.keys()
+        files.sort()
+        return "\n".join(files)
 
-def fmtObsoletes(self, **kw):
-    return "\n".join(self._prco("obsoletes"))
+    def changelog(self, **kw):
+        changelog = []
+        for date, author, message in self.pkg.returnChangelog():
+            changelog.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
+        return "\n".join(changelog)
 
-def fmtProvides(self, **kw):
-    return "\n".join(self._prco("provides", **kw))
+    def obsoletes(self, **kw):
+        return "\n".join(self.pkg._prco("obsoletes"))
 
-def fmtRequires(self, **kw):
-    return "\n".join(self._prco("requires", **kw))
+    def provides(self, **kw):
+        return "\n".join(self.pkg._prco("provides", **kw))
 
-def fmtConflicts(self, **kw):
-    return "\n".join(self._prco("conflicts", **kw))
+    def requires(self, **kw):
+        return "\n".join(self.pkg._prco("requires", **kw))
+
+    def conflicts(self, **kw):
+        return "\n".join(self.pkg._prco("conflicts", **kw))
 
 class groupQuery:
     def __init__(self, groupinfo, name, grouppkgs="required"):
@@ -177,24 +182,6 @@ class YumBaseQuery(yum.YumBase):
         self.pkgops = pkgops
         self.sackops = sackops
 
-    def extendPkgClass(self):
-        setattr(self.pkgSack.pc, "__getitem__", pkgGetitem)
-        setattr(self.pkgSack.pc, "__str__", fmtQueryformat)
-        setattr(self.pkgSack.pc, "__repr__", fmtQueryformat)
-        setattr(self.pkgSack.pc, "_prco", pkgPrco)
-        setattr(self.pkgSack.pc, "doQuery", pkgDoQuery)
-        setattr(self.pkgSack.pc, "queryformat", fmtQueryformat)
-        setattr(self.pkgSack.pc, "list", fmtList)
-        setattr(self.pkgSack.pc, "requires", fmtRequires)
-        setattr(self.pkgSack.pc, "provides", fmtProvides)
-        setattr(self.pkgSack.pc, "conflicts", fmtConflicts)
-        setattr(self.pkgSack.pc, "obsoletes", fmtObsoletes)
-        # XXX there's already "changelog" attribute in pkg class
-        setattr(self.pkgSack.pc, "xchangelog", fmtChangelog)
-
-        qf = self.options.queryformat or std_qf["nevra"]
-        setattr(self.pkgSack.pc, "qf", qf)
-
     # dont log anything..
     def log(self, value, msg):
         pass
@@ -202,6 +189,14 @@ class YumBaseQuery(yum.YumBase):
     def errorlog(self, value, msg):
         if not self.options.quiet:
             print >> sys.stderr, msg
+
+    def queryPkgFactory(self, pkgs):
+        qf = self.options.queryformat or std_qf["nevra"]
+        qpkgs = []
+        for pkg in pkgs:
+            qpkg = pkgQuery(pkg, qf)
+            qpkgs.append(qpkg)
+        return qpkgs
 
     def returnItems(self):
         if self.options.group:
@@ -212,7 +207,7 @@ class YumBaseQuery(yum.YumBase):
                 grps.append(grp)
             return grps
         else:
-            return self.pkgSack.returnNewestByNameArch()
+            return self.queryPkgFactory(self.pkgSack.returnNewestByNameArch())
 
     def returnNewestByName(self, name):
         pkgs = []
@@ -220,7 +215,7 @@ class YumBaseQuery(yum.YumBase):
             pkgs = self.pkgSack.returnNewestByName(name)
         except repomd.mdErrors.PackageSackError, err:
             self.errorlog(0, err)
-        return pkgs
+        return self.queryPkgFactory(pkgs)
 
     def returnPackageByDep(self, depstring):
         provider = []
@@ -228,7 +223,7 @@ class YumBaseQuery(yum.YumBase):
             provider.append(yum.YumBase.returnPackageByDep(self, depstring))
         except yum.Errors.YumBaseError, err:
             self.errorlog(0, "No package provides %s" % depstring)
-        return provider
+        return self.queryPkgFactory(provider)
 
     def matchPkgs(self, regexs):
         if not regexs:
@@ -244,8 +239,10 @@ class YumBaseQuery(yum.YumBase):
                 else:
                     notfound[expr] = None
 
-        for expr in notfound.keys():
-            self.errorlog(0, 'No match found for %s' % expr)
+        # This catches too many innocent victims which aren't packages at all
+        # so disabling for now
+        #for expr in notfound.keys():
+        #    self.errorlog(0, 'No match found for %s' % expr)
 
         return pkgs
 
@@ -294,9 +291,10 @@ class YumBaseQuery(yum.YumBase):
         return pkgs.values()
 
     def location(self, name):
+        print "XXXXX", name
         loc = []
         for pkg in self.returnNewestByName(name):
-            repo = self.repos.getRepo(pkg.simple['repoid'])
+            repo = self.repos.getRepo(pkg['repoid'])
             loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
 
@@ -363,6 +361,8 @@ def main(args):
                       help="show program version and exit")
     parser.add_option("--quiet", default=0, action="store_true", 
                       help="quiet (no output to stderr)")
+    parser.add_option("-C", "--cache", default=0, action="store_true",
+                      help="run from cache only")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
@@ -422,9 +422,9 @@ def main(args):
     repoq = YumBaseQuery(pkgops, sackops, opts)
     repoq.doConfigSetup()
     
-    if os.geteuid() != 0:
+    if os.geteuid() != 0 or opts.cache:
         repoq.conf.setConfigOption('cache', 1)
-        repoq.errorlog(0, 'Not running as root, might not be able to import all of cache.')
+        repoq.errorlog(0, 'Running from cache, results might be out of date.')
     
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
@@ -444,7 +444,6 @@ def main(args):
         repoq.doTsSetup()
         repoq.doGroupSetup()
 
-    repoq.extendPkgClass()
     repoq.runQuery(regexs)
 
 if __name__ == "__main__":
