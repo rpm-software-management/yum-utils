@@ -356,7 +356,8 @@ def main(args):
     parser.add_option("--grouppkgs", default="required", dest="grouppkgs",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
-    parser.add_option("", "--repoid", default=[], action="append")
+    parser.add_option("", "--repoid", default=[], action="append",
+                      help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-v", "--version", default=0, action="store_true",
                       help="show program version and exit")
     parser.add_option("--quiet", default=0, action="store_true", 
