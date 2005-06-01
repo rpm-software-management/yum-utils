@@ -291,7 +291,6 @@ class YumBaseQuery(yum.YumBase):
         return pkgs.values()
 
     def location(self, name):
-        print "XXXXX", name
         loc = []
         for pkg in self.returnNewestByName(name):
             repo = self.repos.getRepo(pkg['repoid'])

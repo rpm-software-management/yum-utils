@@ -14,9 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import sys
+
+sys.path.insert(0, '/usr/share/yum-cli')
+
 import yum
 import yum.Errors
-import sys
 import os
 import output
 from urlgrabber.progress import TextMeter
@@ -25,7 +28,7 @@ from yum.packages import parsePackages, returnBestPackages
 from optparse import OptionParser
 from urlparse import urljoin
 
-def initYum():
+def initYum(source=False):
     my = yum.YumBase()
     my.doConfigSetup()
     my.conf.setConfigOption('uid', os.geteuid())
@@ -36,8 +39,13 @@ def initYum():
     file_object =sys.stdout)
     my.repos.callback = output.CacheProgressCallback(my.log,
     my.errorlog, my.filelog)
+
     my.doRepoSetup()
-    my.doSackSetup()
+    archlist = None
+    if source:
+        archlist = ['src']
+
+    my.doSackSetup(archlist=archlist)
     return my
 
 def parseArgs():
@@ -49,6 +57,8 @@ def parseArgs():
       help='just list the urls it would download instead of downloading')
     parser.add_option("--resolve", default=False, dest="resolve", action="store_true",
       help='resolve dependencies and download required packages')
+    parser.add_option("--source", default=False, dest="source", action="store_true",
+      help='operate on source packages')
     (opts, args) = parser.parse_args()
     if len(args) < 1: 
         parser.print_help()
@@ -57,7 +67,7 @@ def parseArgs():
 
 def main():
     (opts, args) = parseArgs()
-    my = initYum()
+    my = initYum(opts.source)
     avail = my.pkgSack.returnPackages()
     toDownload = {}
 
@@ -71,7 +81,11 @@ def main():
         for newpkg in installable:
             toDownload.setdefault(newpkg.name,[]).append(newpkg.pkgtup)
 
-    toDownload = returnBestPackages(toDownload)
+    if opts.source:
+        toDownload = returnBestPackages(toDownload, 'src')
+    else:
+        toDownload = returnBestPackages(toDownload)
+        
     # If the user supplies to --resolve flag, resolve dependencies for
     # all packages
     # note this might require root access because the headers need to be
