@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.1
+Version: 0.2
 Release: 1
 License: GPL
 Group: Development/Tools
@@ -64,6 +64,9 @@ fi
 %{_initrddir}/yum-updateonboot
 
 %changelog
+* Wed Jun  1 2005 Seth Vidal <skvidal@phy.duke.edu>
+- 0.2
+
 * Mon May 23 2005 Panu Matilainen <pmatilai@laiskiainen.org>
 - add yum-updateboot subpackage
 
