@@ -7,6 +7,31 @@ If you have created an utility related to yum or if you encounter any problems
 using these utilities, feel free to send an e-mail to the yum mailing list:
 https://lists.linux.duke.edu/mailman/listinfo/yum
 
+-- Description of the utilities --
+
+package-cleanup: 
+Check for unneeded packages and dependency problems in the system.
+
+repoclosure:
+Check for dependency problems in repositories.
+
+repomanage:
+Look up oldest or newest packages in a directory. Can be used for cleaning
+up repositories for example.
+
+repoquery:
+Query packages and groups in repositories similarly to rpmquery.
+
+repo-rss:
+Generate RSS feed from repositories.
+
+yum-builddep:
+Install build dependencies of source RPMS.
+
+yumdownloader:
+Download packages (and optionally their dependencies) to arbitrary 
+directories without installing them.
+
 -- Authors --
 
 Various people have made a contribution to this collection:
