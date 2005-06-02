@@ -22,6 +22,7 @@ import re
 import fnmatch
 import time
 import os
+import exceptions
 
 from optparse import OptionParser
 
@@ -30,7 +31,7 @@ import yum.config
 import yum.Errors
 import repomd.mdErrors
 
-version = "0.0.6"
+version = "0.0.7"
 
 flags = { 'EQ':'=', 'LT':'<', 'LE':'<=', 'GT':'>', 'GE':'>=', 'None':' '}
 
@@ -63,6 +64,11 @@ def rpmevr(e, v, r):
         rt = "-%s" % r
     return "%s%s%s" % (et, vt, rt)
 
+class queryError(exceptions.Exception):
+    def __init__(self, msg):
+        exceptions.Exception.__init__(self)
+        self.msg = msg
+
 class pkgQuery:
     def __init__(self, pkg, qf):
         self.pkg = pkg
@@ -70,20 +76,29 @@ class pkgQuery:
         self.name = pkg.name
     
     def __getitem__(self, item):
+        if hasattr(self, "fmt_%s" % item):
+            return getattr(self, "fmt_%s" % item)()
         res = None
         try:
             res = self.pkg.returnSimple(item)
         except KeyError:
             if item == "license":
                 res = " ".join(self.licenses)
+            else:
+                raise queryError("Invalid querytag: %s" % item)
         return res
+
+    def __str__(self):
+        return self.fmt_queryformat()
 
     def doQuery(self, method, *args, **kw):
         if std_qf.has_key(method):
             self.qf = std_qf[method]
-            return self.queryformat()
+            return self.fmt_queryformat()
+        elif hasattr(self, "fmt_%s" % method):
+            return getattr(self, "fmt_%s" % method)(*args, **kw)
         else:
-            return getattr(self, method)(*args, **kw)
+            raise queryError("Invalid package query: %s" % method)
 
     def _prco(self, what, **kw):
         rpdict = {}
@@ -99,7 +114,7 @@ class pkgQuery:
         return rpdict.keys()
 
     # these return formatted strings, not lists..
-    def queryformat(self):
+    def fmt_queryformat(self):
 
         if not self.qf:
             qf = std_qf["nevra"]
@@ -111,7 +126,7 @@ class pkgQuery:
         fmt = re.sub(pattern, r'%(\1)s', qf)
         return fmt % self
 
-    def list(self, **kw):
+    def fmt_list(self, **kw):
         fdict = {}
         for file in self.pkg.returnFileEntries():
             fdict[file] = None
@@ -119,23 +134,23 @@ class pkgQuery:
         files.sort()
         return "\n".join(files)
 
-    def changelog(self, **kw):
+    def fmt_changelog(self, **kw):
         changelog = []
         for date, author, message in self.pkg.returnChangelog():
             changelog.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
         return "\n".join(changelog)
 
-    def obsoletes(self, **kw):
-        return "\n".join(self.pkg._prco("obsoletes"))
+    def fmt_obsoletes(self, **kw):
+        return "\n".join(self._prco("obsoletes"))
 
-    def provides(self, **kw):
-        return "\n".join(self.pkg._prco("provides", **kw))
+    def fmt_provides(self, **kw):
+        return "\n".join(self._prco("provides"))
 
-    def requires(self, **kw):
-        return "\n".join(self.pkg._prco("requires", **kw))
+    def fmt_requires(self, **kw):
+        return "\n".join(self._prco("requires"))
 
-    def conflicts(self, **kw):
-        return "\n".join(self.pkg._prco("conflicts", **kw))
+    def fmt_conflicts(self, **kw):
+        return "\n".join(self._prco("conflicts"))
 
 class groupQuery:
     def __init__(self, groupinfo, name, grouppkgs="required"):
@@ -145,12 +160,15 @@ class groupQuery:
         self.group = groupinfo.group_by_id[name]
 
     def doQuery(self, method, *args, **kw):
-        return "\n".join(getattr(self, method)(*args, **kw))
+        if hasattr(self, "fmt_%s" % method):
+            return "\n".join(getattr(self, "fmt_%s" % method)(*args, **kw))
+        else:
+            raise queryError("Invalid group query: %s" % method)
 
-    def nevra(self):
+    def fmt_nevra(self):
         return ["%s - %s" % (self.group.id, self.group.name)]
 
-    def list(self):
+    def fmt_list(self):
         pkgs = []
         for t in self.grouppkgs.split(','):
             if t == "required":
@@ -168,10 +186,10 @@ class groupQuery:
             
         return pkgs
         
-    def requires(self):
+    def fmt_requires(self):
         return self.groupInfo.requiredGroups(self.name)
 
-    def info(self):
+    def fmt_info(self):
         return ["%s:\n\n%s\n" % (self.group.name, self.group.description)]
 
 class YumBaseQuery(yum.YumBase):
@@ -234,7 +252,7 @@ class YumBaseQuery(yum.YumBase):
 
         for pkg in self.returnItems():
             for expr in regexs:
-                if pkg.name == expr or fnmatch.fnmatch("%s" % pkg, expr):
+                if pkg.name == expr or fnmatch.fnmatch("%s" % pkg.name, expr):
                     pkgs.append(pkg)
                 else:
                     notfound[expr] = None
@@ -250,10 +268,16 @@ class YumBaseQuery(yum.YumBase):
         pkgs = self.matchPkgs(items)
         for pkg in pkgs:
             for oper in self.pkgops:
-                print pkg.doQuery(oper)
+                try:
+                    print pkg.doQuery(oper)
+                except queryError, e:
+                    self.errorlog(0, e.msg)
         for prco in items:
             for oper in self.sackops:
-                for p in self.doQuery(oper, prco): print p
+                try:
+                    for p in self.doQuery(oper, prco): print p
+                except queryError, e:
+                    self.errorlog(0, e.msg)
 
     def doQuery(self, method, *args, **kw):
         return getattr(self, method)(*args, **kw)
@@ -391,7 +415,7 @@ def main(args):
         pkgops.append("conflicts")
     if opts.changelog:
         needother = 1
-        pkgops.append("xchangelog")
+        pkgops.append("changelog")
     if opts.list:
         if not opts.group:
             needfiles = 1
