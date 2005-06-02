@@ -1,0 +1,3 @@
+This is a directory of plugins to be used with yum 2.3.X and above. They may
+not all work at all times but they are good examples to start from for
+writing your own.
