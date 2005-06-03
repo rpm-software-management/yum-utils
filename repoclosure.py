@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -t
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,12 +49,15 @@ def evrTupletoVer(tuple):
     return val
     
 def parseArgs():
-    usage = "usage: %s [-c <config file>] [-a <arch>] [repoid] [repoid2...]" % sys.argv[0]
+    usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
     parser = OptionParser(usage=usage)
-    parser.add_option("-c", default='/etc/yum.conf', dest="config",
+    parser.add_option("-c", "--config", default='/etc/yum.conf', dest="config",
         help='config file to use (defaults to /etc/yum.conf)')
-    parser.add_option("-a", default=None, dest="arch",
+    parser.add_option("-a", "--arch", default=None, dest="arch",
         help='check as if running the specified arch (default: current arch)')
+    parser.add_option("-r", "--repoid", default=[], dest="repoids", action='append',
+        help="specify repoids to query, can be specified multiple times (default is all enabled)")
+
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -65,8 +68,8 @@ class YumQuiet(yum.YumBase):
     def log(self, value, msg):
         pass
 
-def main(args):
-    (opts, repoids) = parseArgs()
+def main():
+    (opts, cruft) = parseArgs()
     my = YumQuiet()
     my.doConfigSetup(fn = opts.config)
     if hasattr(my.repos, 'sqlite'):
@@ -77,9 +80,9 @@ def main(args):
         my.conf.setConfigOption('cache', 1)
         print 'Not running as root, might not be able to import all of cache'
 
-    if repoids:
+    if opts.repoids:
         for repo in my.repos.repos.values():
-            if repo.id not in repoids:
+            if repo.id not in opts.repoids:
                 repo.disable()
             else:
                 repo.enable()
@@ -145,10 +148,5 @@ def main(args):
             print '     %s' % req
     
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        repos = None
-    else:
-        repos = sys.argv[1:]
-    
-    main(repos)
+    main()
 
