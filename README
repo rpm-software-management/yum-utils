@@ -3,9 +3,15 @@
 Yum-utils is a collection of utilities, plugins and examples related to
 the yum package manager. 
 
-If you have created an utility related to yum or if you encounter any problems
-using these utilities, feel free to send an e-mail to the yum mailing list:
+If you encounter any problems using these utilities feel free to send 
+an e-mail to the yum mailing list: 
 https://lists.linux.duke.edu/mailman/listinfo/yum
+
+If you have created an utility related to yum and you'd like to look
+into getting it included into this set please e-mail the yum-devel 
+mailing list:
+https://lists.linux.duke.edu/mailman/listinfo/yum-devel
+
 
 -- Description of the utilities --
 
@@ -40,10 +46,10 @@ Various people have made a contribution to this collection:
 Maintainer of yum-utils, author of yumdownloader and package-cleanup 
 
 - Seth Vidal
-Maintainer of yum, author of repo-closure, repo-manage and repo-rss
+Maintainer of yum, author of repoclosure, repomanage and repo-rss
 
 - Panu Matilainen 
-Author of repoquery
+Author of repoquery, yum-builddep
 
 - Sean Dilda
 Author of the update on boot init scripts
