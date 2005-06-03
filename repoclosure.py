@@ -25,6 +25,8 @@ import yum
 import yum.Errors
 import sys
 import os
+from optparse import OptionParser
+import rpmUtils.arch
 
 flagsdict = {'GT':'>', 'LT':'<', 'EQ': '=', 'GE':'>=', 'LE':'<='}
 
@@ -46,7 +48,15 @@ def evrTupletoVer(tuple):
     
     return val
     
-    
+def parseArgs():
+    usage = "usage: %s [-c <config file>] [-a <arch>] [repoid] [repoid2...]" % sys.argv[0]
+    parser = OptionParser(usage=usage)
+    parser.add_option("-c", default='/etc/yum.conf', dest="config",
+        help='config file to use (defaults to /etc/yum.conf)')
+    parser.add_option("-a", default=None, dest="arch",
+        help='check as if running the specified arch (default: current arch)')
+    (opts, args) = parser.parse_args()
+    return (opts, args)
 
 class YumQuiet(yum.YumBase):
     def __init__(self):
@@ -55,10 +65,10 @@ class YumQuiet(yum.YumBase):
     def log(self, value, msg):
         pass
 
-def main(repoids=None):
-
+def main(args):
+    (opts, repoids) = parseArgs()
     my = YumQuiet()
-    my.doConfigSetup()
+    my.doConfigSetup(fn = opts.config)
     if hasattr(my.repos, 'sqlite'):
         my.repos.sqlite = False
         my.repos._selectSackType()
@@ -67,7 +77,7 @@ def main(repoids=None):
         my.conf.setConfigOption('cache', 1)
         print 'Not running as root, might not be able to import all of cache'
 
-    if repoids is not None:
+    if repoids:
         for repo in my.repos.repos.values():
             if repo.id not in repoids:
                 repo.disable()
@@ -76,7 +86,7 @@ def main(repoids=None):
 
     my.doRepoSetup()
     print 'Reading in repository metadata - please wait....'
-    my.doSackSetup()
+    my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
     for repo in my.repos.listEnabled():
             
         try:
