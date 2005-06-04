@@ -7,7 +7,7 @@ Group: Development/Tools
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}root
 BuildArch: noarch
-Requires: python, yum >= 2.3.2
+Requires: python, yum >= 2.3.2, rpm, rpm-python
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
