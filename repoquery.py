@@ -29,6 +29,7 @@ from optparse import OptionParser
 import yum
 import yum.config
 import yum.Errors
+import yum.packages
 import repomd.mdErrors
 
 version = "0.0.7"
@@ -225,7 +226,7 @@ class YumBaseQuery(yum.YumBase):
                 grps.append(grp)
             return grps
         else:
-            return self.queryPkgFactory(self.pkgSack.returnNewestByNameArch())
+            return self.queryPkgFactory(self.pkgSack.returnPackages())
 
     def returnNewestByName(self, name):
         pkgs = []
@@ -243,26 +244,19 @@ class YumBaseQuery(yum.YumBase):
             self.errorlog(0, "No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
 
-    def matchPkgs(self, regexs):
-        if not regexs:
+    def matchPkgs(self, items):
+        if not items:
             return self.returnItems()
-    
+        
         pkgs = []
         notfound = {}
+        
+        exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(),
+                                           items, casematch=1)
+        pkgs = exact + match
+        notfound = unmatch
 
-        for pkg in self.returnItems():
-            for expr in regexs:
-                if pkg.name == expr or fnmatch.fnmatch("%s" % pkg.name, expr):
-                    pkgs.append(pkg)
-                else:
-                    notfound[expr] = None
-
-        # This catches too many innocent victims which aren't packages at all
-        # so disabling for now
-        #for expr in notfound.keys():
-        #    self.errorlog(0, 'No match found for %s' % expr)
-
-        return pkgs
+        return self.queryPkgFactory(pkgs)
 
     def runQuery(self, items):
         pkgs = self.matchPkgs(items)
