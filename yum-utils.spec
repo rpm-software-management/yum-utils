@@ -1,13 +1,14 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
 Version: 0.2
-Release: 1
+Release: 2
 License: GPL
 Group: Development/Tools
-Source: %{name}-%{version}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}root
+Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
+URL: http://linux.duke.edu/yum/download/yum-utils/
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python, yum >= 2.3.2, rpm, rpm-python
+Requires: python, yum >= 2.3.2
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -30,12 +31,12 @@ waiting until the next early morning cron job.
 %setup -q
 
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %post -n yum-updateonboot
 /sbin/chkconfig --add yum-updateonboot >/dev/null 2>&1 || :;
