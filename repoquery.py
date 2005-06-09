@@ -297,7 +297,7 @@ class YumBaseQuery(yum.YumBase):
         for prov in provs:
             for pkg in self.pkgSack.searchRequires(prov):
                 pkgs[pkg.pkgtup] = pkg
-        return pkgs.values()
+        return self.queryPkgFactory(pkgs.values())
 
     def requires(self, name, **kw):
         pkgs = {}
@@ -394,8 +394,6 @@ def main(args):
     pkgops = []
     sackops = []
     archlist = None
-    if opts.queryformat:
-        pkgops.append("queryformat")
     if opts.requires:
         if opts.resolve:
             sackops.append("requires")
@@ -435,7 +433,7 @@ def main(args):
         needgroup = 1
 
     if opts.nevra or (len(pkgops) == 0 and len(sackops) == 0):
-        pkgops.append("nevra")
+        pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
     repoq.doConfigSetup()
