@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
+import sys, os
 
 sys.path.insert(0, '/usr/share/yum-cli')
 import cli
@@ -26,7 +26,13 @@ from yum.logger import Logger
 def main(args):
     base = cli.YumBaseCli()
     base.doConfigSetup()
+    base.conf.setConfigOption('uid', os.geteuid())
+        
     base.log = Logger(threshold=base.conf.getConfigOption('debuglevel'), file_object =sys.stdout)
+
+    if base.conf.getConfigOption('uid') != 0:
+        base.errorlog(0, "You must be root to install packages")
+        sys.exit(1)
 
     archlist = rpmUtils.arch.getArchList() + ['src']
     base.doRepoSetup(dosack=0)
