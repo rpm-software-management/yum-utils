@@ -389,7 +389,7 @@ def main(args):
 
     if len(regexs) < 1 and not opts.all:
         parser.print_help()
-        sys.exit(0)
+        sys.exit(1)
 
     pkgops = []
     sackops = []
@@ -453,14 +453,18 @@ def main(args):
 
     repoq.doRepoSetup()
     
-    repoq.doSackSetup(archlist=archlist)
-    if needfiles:
-        repoq.repos.populateSack(with='filelists')
-    if needother:
-        repoq.repos.populateSack(with='otherdata')
-    if needgroup:
-        repoq.doTsSetup()
-        repoq.doGroupSetup()
+    try:
+        repoq.doSackSetup(archlist=archlist)
+        if needfiles:
+            repoq.repos.populateSack(with='filelists')
+        if needother:
+            repoq.repos.populateSack(with='otherdata')
+        if needgroup:
+            repoq.doTsSetup()
+            repoq.doGroupSetup()
+    except yum.Errors.RepoError, e:
+        repoq.errorlog(1, e)
+        sys.exit(1)
 
     repoq.runQuery(regexs)
 
