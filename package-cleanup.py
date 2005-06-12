@@ -29,7 +29,7 @@ import yum
 import os
 import sys
 import rpm
-from rpmUtils import miscutils
+from rpmUtils import miscutils, transaction
 from yum.logger import Logger
 from optparse import OptionParser
 from yum.packages import YumInstalledPackage
@@ -122,16 +122,15 @@ def parseArgs():
         sys.exit(0)
     return (opts, args)
 
-def listLeaves(pkgs,provsomething,all):
+def listLeaves(all):
     # Any installed packages that are not in provsomething don't provide 
     # anything required by the rest of the system and are therefore leave nodes
-    for pkg in pkgs:
-        if (not provsomething.has_key(pkg)):
-            name = pkg[0]
-            if name in ['gpg-pubkey']:
-                continue
-            if name.find('lib') == 0 or all:
-                print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
+    ts = transaction.initReadOnlyTransaction()
+    leaves = ts.returnLeafNodes()
+    for pkg in leaves:
+        name=pkg[0]
+        if name.startswith('lib') or all:
+            print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
 # Return a list of all installed kernels, sorted newst to oldest
 def getKernels(my):
@@ -220,12 +219,14 @@ def main():
     if (opts.kernels):
         removeKernels(my,int(opts.kernelcount))
         sys.exit(0)
+    if (opts.leaves):
+        listLeaves(opts.all)
+        sys.exit(0)
+
     print "Reading local RPM database"
     pkgs = getLocalRequires(my)
     print "Processing all local requires"
     provsomething = buildProviderList(my,pkgs,opts.problems)
-    if (opts.leaves):
-        listLeaves(pkgs,provsomething,opts.all)
     
 if __name__ == '__main__':
     main()
