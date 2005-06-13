@@ -124,7 +124,26 @@ def getKernels(my):
     kernlist.reverse()
     return kernlist
 
+# List all kernel devel packages that either belong to kernel versions that
+# are no longer installed or to kernel version that are in the removelist
+def getOldKernelDevel(my,kernels,removelist):
+    devellist = []
+    for tup in my.rpmdb.returnTupleByKeyword(name='kernel-devel'):
+        # For all kernel-devel packages see if there is a matching kernel
+        # in kernels but not in removelist
+        keep = False
+        for kernel in kernels:
+            if kernel in removelist:
+                continue
+            (kname,karch,kepoch,kver,krel) = kernel
+            (dname,darch,depoch,dver,drel) = tup
+            if (karch,kepoch,kver,krel) == (darch,depoch,dver,drel):
+                keep = True
+        if not keep:
+            devellist.append(tup)
+    return devellist
 
+    
 def sortPackages(pkg1,pkg2):
     """sort pkgtuples by evr"""
     return miscutils.compareEVR((pkg1[2:]),(pkg2[2:]))
@@ -147,7 +166,7 @@ def userconfirm():
     else:            
         return True
     
-def removeKernels(my, count, confirmed):
+def removeKernels(my, count, confirmed, keepdevel):
     """Remove old kernels, keep at most count kernels (and always keep the running
      kernel"""
 
@@ -158,9 +177,7 @@ def removeKernels(my, count, confirmed):
     kernels = getKernels(my)
     runningkernel = os.uname()[2]
     (kver,krel) = runningkernel.split('-')
-    if len(kernels) < count:
-        print "There are only %s kernels installed of maximum %s kernels, nothing to be done" % (len(kernels),count)
-        return
+    
     remove = kernels[count:]
     toremove = []
     
@@ -171,17 +188,25 @@ def removeKernels(my, count, confirmed):
             print "Not removing kernel %s-%s because it is the running kernel" % (kver,krel)
         else:
             toremove.append(kernel)
+    
     if len(kernels) - len(toremove) < 1:
         print "Error all kernel rpms are set to be removed"
         sys.exit(100)
+        
+    # Now extend the list with all kernel-devel pacakges that either
+    # have no matching kernel installed or belong to a kernel that is to
+    # be removed
+    if not keepdevel: 
+        toremove.extend(getOldKernelDevel(my,kernels,toremove))
+
     if len(toremove) < 1:
-        print "No kernels to remove"
+        print "No kernel related packages to remove"
         return
-    
-    print "I will remove the following %s kernel(s):" % len(toremove)
+
+    print "I will remove the following %s kernel related packages:" % len(toremove)
     for kernel in toremove:
         (n,a,e,v,r) = kernel
-        print "%s-%s" % (v,r) 
+        print "%s-%s-%s" % (n,v,r) 
 
     if not confirmed:
         if not userconfirm():
@@ -198,6 +223,10 @@ def removeKernels(my, count, confirmed):
     my.ts.order()
     my.ts.run(progress,'')
     
+# Returns True if exactly one value in the list evaluates to True
+def exactlyOne(l):
+    return len(filter(None, l)) == 1
+    
 # Parse command line options
 def parseArgs():
     parser = OptionParser()
@@ -212,13 +241,16 @@ def parseArgs():
     parser.add_option("-y", default=False, dest="confirmed",action="store_true",
       help='Agree to anything asked')
     parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
-      help="Remove old kernels")
+      help="Remove old kernel and kernel-devel packages")
     parser.add_option("--count",default=2,dest="kernelcount",action="store",
-      help="Number of kernels to keep on the system (default 2)")
+      help="Number of kernel packages to keep on the system (default 2)")
+    parser.add_option("--keepdevel",default=False,dest="keepdevel",action="store_true",
+      help="Do not remove kernel-devel packages when removing kernels")
+
     (opts, args) = parser.parse_args()
-    if not (opts.problems or opts.leaves or opts.kernels) or (opts.problems and opts.leaves):
+    if not exactlyOne((opts.problems,opts.leaves,opts.kernels)): 
         parser.print_help()
-        print "Please specify either --problems or --leaves"
+        print "Please specify either --problems, --leaves or --oldkernels"
         sys.exit(0)
     return (opts, args)
     
@@ -232,7 +264,7 @@ def main():
         if os.geteuid() != 0:
             print "Error: Cannot remove kernels as a user, must be root"
             sys.exit(1)
-        removeKernels(my, opts.kernelcount, opts.confirmed)
+        removeKernels(my, opts.kernelcount, opts.confirmed, opts.keepdevel)
         sys.exit(0)
     
     if (opts.leaves):
