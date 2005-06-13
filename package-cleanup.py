@@ -34,6 +34,7 @@ from yum.logger import Logger
 from optparse import OptionParser
 from yum.packages import YumInstalledPackage
 
+
 def initYum():
     my = yum.YumBase()
     my.doConfigSetup()
@@ -43,7 +44,6 @@ def initYum():
     for repo in my.repos.listEnabled():
         my.repos.disableRepo(repo.id)
 
-    print "Setting up yum"
     my.doTsSetup()
     my.doSackSetup()
     my.doRpmDBSetup()
@@ -53,15 +53,14 @@ def initYum():
 # Get a list of all requirements in the local rpmdb
 def getLocalRequires(my):
     pkgs = {}
-    for tup in my.rpmdb.getPkgList():
-        headerlist = my.rpmdb.returnHeaderByTuple(tup)
-        for header in headerlist:
-            requires = zip(
-                header[rpm.RPMTAG_REQUIRENAME],
-                header[rpm.RPMTAG_REQUIREFLAGS],
-                header[rpm.RPMTAG_REQUIREVERSION],
-            )
-            pkgs[tup] = requires
+    for header in my.rpmdb.getHdrList():
+        tup = my.rpmdb._hdr2pkgTuple(header)
+        requires = zip(
+            header[rpm.RPMTAG_REQUIRENAME],
+            header[rpm.RPMTAG_REQUIREFLAGS],
+            header[rpm.RPMTAG_REQUIREVERSION],
+        )
+        pkgs[tup] = requires
     return pkgs
 
 # Resolve all dependencies in pkgs and build a dictionary of packages
@@ -102,29 +101,10 @@ def buildProviderList(my,pkgs,reportProblems):
         print "No problems found"
     return provsomething
 
-# Parse command line options
-def parseArgs():
-    parser = OptionParser()
-    parser.add_option("--problems", default=False, dest="problems", action="store_true",
-      help='List dependency problems in the local RPM database')
-    parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
-      help='List leaf nodes in the local RPM database')
-    parser.add_option("--all", default=False, dest="all",action="store_true",
-      help='When listing leaf nodes also list leaf nodes that are not libraries')
-    parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
-      help="Remove old kernels")
-    parser.add_option("--count",default=2,dest="kernelcount",action="store",
-      help="Number of kernels to keep on the system (default 2)")
-    (opts, args) = parser.parse_args()
-    if not (opts.problems or opts.leaves or opts.kernels) or (opts.problems and opts.leaves):
-        parser.print_help()
-        print "Please specify either --problems or --leaves"
-        sys.exit(0)
-    return (opts, args)
 
 def listLeaves(all):
-    # Any installed packages that are not in provsomething don't provide 
-    # anything required by the rest of the system and are therefore leave nodes
+    """return a packagtuple of any installed packages that
+       are not required by any other package on the system"""
     ts = transaction.initReadOnlyTransaction()
     leaves = ts.returnLeafNodes()
     for pkg in leaves:
@@ -132,19 +112,19 @@ def listLeaves(all):
         if name.startswith('lib') or all:
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
-# Return a list of all installed kernels, sorted newst to oldest
+
 def getKernels(my):
+    """return a list of all installed kernels, sorted newest to oldest"""
     kernlist = []
-    for tup in my.rpmdb.getPkgList():
-        (n,a,e,v,r) = tup
-        if (n == 'kernel'):
-            kernlist.append(tup)
+    for tup in my.rpmdb.returnTupleByKeyword(name='kernel'):
+        kernlist.append(tup)
     kernlist.sort(sortPackages)
     kernlist.reverse()
     return kernlist
 
-# Sort package tuples on epoch version release
+
 def sortPackages(pkg1,pkg2):
+    """sort pkgtuples by evr"""
     return miscutils.compareEVR((pkg1[2:]),(pkg2[2:]))
 
 def progress(what, bytes, total, h, user):
@@ -154,20 +134,21 @@ def progress(what, bytes, total, h, user):
 
 def userconfirm():
     """gets a yes or no from the user, defaults to No"""
-
-    while 1:
+    while True:            
         choice = raw_input('Is this ok [y/N]: ')
-        if len(choice) == 0 or choice[0] in ['Y', 'y', 'N','n']:
+        choice = choice.lower()
+        if len(choice) == 0 or choice[0] in ['y', 'n']:
             break
 
-    if len(choice) == 0 or choice[0] not in ['y', 'Y']:
-        return 0
-    else:
-        return 1
-
+    if len(choice) == 0 or choice[0] != 'y':
+        return False
+    else:            
+        return True
+    
 # Remove old kernels, keep at most count kernels (and always keep the running
 # kernel)
-def removeKernels(my,count):
+def removeKernels(my, count):
+    count = int(count)
     if count < 1:
         print "Error should keep at least 1 kernel!"
         sys.exit(100)
@@ -193,7 +174,7 @@ def removeKernels(my,count):
         print "No kernels to remove"
         return
     
-    print "I will remove the following %s kernel(s):" % (len(toremove))
+    print "I will remove the following %s kernel(s):" % len(toremove)
     for kernel in toremove:
         (n,a,e,v,r) = kernel
         print "%s-%s" % (v,r) 
@@ -212,20 +193,47 @@ def removeKernels(my,count):
     my.ts.order()
     my.ts.run(progress,'')
     
+# Parse command line options
+def parseArgs():
+    parser = OptionParser()
+    parser.add_option("--problems", default=False, dest="problems", action="store_true",
+      help='List dependency problems in the local RPM database')
+    parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
+      help='List leaf nodes in the local RPM database')
+    parser.add_option("--all", default=False, dest="all",action="store_true",
+      help='When listing leaf nodes also list leaf nodes that are not libraries')
+    parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
+      help='Print out nothing unecessary')
+    parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
+      help="Remove old kernels")
+    parser.add_option("--count",default=2,dest="kernelcount",action="store",
+      help="Number of kernels to keep on the system (default 2)")
+    (opts, args) = parser.parse_args()
+    if not (opts.problems or opts.leaves or opts.kernels) or (opts.problems and opts.leaves):
+        parser.print_help()
+        print "Please specify either --problems or --leaves"
+        sys.exit(0)
+    return (opts, args)
     
 def main():
     (opts, args) = parseArgs()
+    if not opts.quiet:
+        print "Setting up yum"
     my = initYum()
+    
     if (opts.kernels):
-        removeKernels(my,int(opts.kernelcount))
+        removeKernels(my, opts.kernelcount)
         sys.exit(0)
+    
     if (opts.leaves):
         listLeaves(opts.all)
         sys.exit(0)
 
-    print "Reading local RPM database"
+    if not opts.quiet:
+        print "Reading local RPM database"
     pkgs = getLocalRequires(my)
-    print "Processing all local requires"
+    if not opts.quiet:
+        print "Processing all local requires"
     provsomething = buildProviderList(my,pkgs,opts.problems)
     
 if __name__ == '__main__':
