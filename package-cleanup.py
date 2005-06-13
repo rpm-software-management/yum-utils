@@ -147,7 +147,7 @@ def userconfirm():
     else:            
         return True
     
-def removeKernels(my, count):
+def removeKernels(my, count, confirmed):
     """Remove old kernels, keep at most count kernels (and always keep the running
      kernel"""
 
@@ -183,8 +183,9 @@ def removeKernels(my, count):
         (n,a,e,v,r) = kernel
         print "%s-%s" % (v,r) 
 
-    if (not userconfirm()):
-        sys.exit(0)
+    if not confirmed:
+        if not userconfirm():
+            sys.exit(0)
 
     for kernel in toremove:
         hdr = my.rpmdb.returnHeaderByTuple(kernel)[0]
@@ -208,6 +209,8 @@ def parseArgs():
       help='When listing leaf nodes also list leaf nodes that are not libraries')
     parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
       help='Print out nothing unecessary')
+    parser.add_option("-y", default=False, dest="confirmed",action="store_true",
+      help='Agree to anything asked')
     parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
       help="Remove old kernels")
     parser.add_option("--count",default=2,dest="kernelcount",action="store",
@@ -226,7 +229,10 @@ def main():
     my = initYum()
     
     if (opts.kernels):
-        removeKernels(my, opts.kernelcount)
+        if os.geteuid() != 0:
+            print "Error: Cannot remove kernels as a user, must be root"
+            sys.exit(1)
+        removeKernels(my, opts.kernelcount, opts.confirmed)
         sys.exit(0)
     
     if (opts.leaves):
