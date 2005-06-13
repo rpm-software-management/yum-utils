@@ -81,7 +81,11 @@ def returnHdr(ts, package):
     
 def hdr2pkgTuple(hdr):
     name = hdr['name']
-    arch = hdr['arch']
+    if hdr[rpm.RPMTAG_SOURCEPACKAGE] == 1:
+        arch = 'src'
+    else:
+        arch = hdr['arch']
+
     ver = str(hdr['version']) # convert these to strings to be sure
     rel = str(hdr['release'])
     epoch = hdr['epoch']
