@@ -50,8 +50,9 @@ def initYum():
     my.localPackages = []
     return my
 
-# Get a list of all requirements in the local rpmdb
+
 def getLocalRequires(my):
+    """Get a list of all requirements in the local rpmdb"""
     pkgs = {}
     for header in my.rpmdb.getHdrList():
         tup = my.rpmdb._hdr2pkgTuple(header)
@@ -63,9 +64,10 @@ def getLocalRequires(my):
         pkgs[tup] = requires
     return pkgs
 
-# Resolve all dependencies in pkgs and build a dictionary of packages
-# that provide something for a package other than itself
-def buildProviderList(my,pkgs,reportProblems):
+def buildProviderList(my, pkgs, reportProblems):
+    """Resolve all dependencies in pkgs and build a dictionary of packages
+     that provide something for a package other than itself"""
+
     errors = False
     providers = {} # To speed depsolving, don't recheck deps that have 
                    # already been checked
@@ -77,13 +79,13 @@ def buildProviderList(my,pkgs,reportProblems):
             rflags = flags & 15
             if req.startswith('rpmlib'): continue # ignore rpmlib deps
             
-            if (not providers.has_key((req,rflags,ver))):
+            if not providers.has_key((req,rflags,ver)):
                 resolve_sack = my.rpmdb.whatProvides(req,rflags,ver)
             else:
                 resolve_sack = providers[(req,rflags,ver)]
                 
             if len(resolve_sack) < 1 and reportProblems:
-                if (not errors):
+                if not errors:
                     print "Missing dependencies:"
                 errors = True
                 print "Package %s requires %s" % (pkg[0],
@@ -97,7 +99,7 @@ def buildProviderList(my,pkgs,reportProblems):
                 # Store the resolve_sack so that we can re-use it if another
                 # package has the same requirement
                 providers[(req,rflags,ver)] = resolve_sack
-    if (not errors and reportProblems):
+    if not errors and reportProblems:
         print "No problems found"
     return provsomething
 
@@ -145,9 +147,10 @@ def userconfirm():
     else:            
         return True
     
-# Remove old kernels, keep at most count kernels (and always keep the running
-# kernel)
 def removeKernels(my, count):
+    """Remove old kernels, keep at most count kernels (and always keep the running
+     kernel"""
+
     count = int(count)
     if count < 1:
         print "Error should keep at least 1 kernel!"
@@ -160,6 +163,7 @@ def removeKernels(my, count):
         return
     remove = kernels[count:]
     toremove = []
+    
     # Remove running kernel from remove list
     for kernel in remove:
         (n,a,e,v,r) = kernel
