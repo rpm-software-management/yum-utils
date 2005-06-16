@@ -9,5 +9,4 @@ def postreposetup_hook(conduit):
     conf = conduit.getConf()
     if opts.tsflags:
         flags = opts.tsflags.split(',')
-        print flags
         conf.setConfigOption('tsflags', flags)
