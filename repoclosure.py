@@ -25,12 +25,56 @@ import yum
 import yum.Errors
 import sys
 import os
+from stat import *
+import pwd
+import glob
+
 from optparse import OptionParser
+import tempfile
 import rpmUtils.arch
+from yum.constants import *
+tmpdir='/var/tmp'
 
-flagsdict = {'GT':'>', 'LT':'<', 'EQ': '=', 'GE':'>=', 'LE':'<='}
+def getCacheDir():
+    """return a path to a valid and safe cachedir - only used when not running
+       as root or when --tempcache is set"""
+    
+    uid = os.geteuid()
+    try:
+        usertup = pwd.getpwuid(uid)
+        username = usertup[0]
+    except KeyError:
+        return None # if it returns None then, well, it's bollocksed
 
+    # check for /var/tmp/yum-username-* - 
+    prefix = 'yum-%s-' % username    
+    dirpath = '%s/%s*' % (tmpdir, prefix)
+    cachedirs = glob.glob(dirpath)
+    
+    for thisdir in cachedirs:
+    # if one exists take the first one
+    # check if it is:
+        # 0. is a dir        
+        if not os.path.isdir(thisdir):
+            continue
+            
+        stats = os.stat(thisdir)
+        # 1. owned by the user        
+        if stats[4] != uid:
+            continue
+        
+        # 2. 0700
+        if S_IMODE(stats[0]) != 448:
+            continue
+        
+        # it made it through the gauntlet!
+        return thisdir
 
+    
+    # make the dir (tempfile.mkdtemp())
+    cachedir = tempfile.mkdtemp(prefix=prefix, dir=tmpdir)
+    return cachedir
+    
 def evrTupletoVer(tuple):
     """convert and evr tuple to a version string, return None if nothing
        to convert"""
@@ -51,13 +95,17 @@ def evrTupletoVer(tuple):
 def parseArgs():
     usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
     parser = OptionParser(usage=usage)
-    parser.add_option("-c", "--config", default='/etc/yum.conf', dest="config",
+    parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
-    parser.add_option("-a", "--arch", default=None, dest="arch",
+    parser.add_option("-a", "--arch", default=None,
         help='check as if running the specified arch (default: current arch)')
-    parser.add_option("-r", "--repoid", default=[], dest="repoids", action='append',
-        help="specify repoids to query, can be specified multiple times (default is all enabled)")
-
+    parser.add_option("-r", "--repoid", default=[], action='append',
+        help="specify repo ids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("-t", "--tempcache", default=False, action="store_true", 
+        help="Use a temp dir for storing/accessing yum-cache")
+    parser.add_option("-q", "--quiet", default=0, action="store_true", 
+                      help="quiet (no output to stderr)")
+        
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -76,19 +124,24 @@ def main():
         my.repos.sqlite = False
         my.repos._selectSackType()
 
-    if os.geteuid() != 0:
-        my.conf.setConfigOption('cache', 1)
-        print 'Not running as root, might not be able to import all of cache'
-
-    if opts.repoids:
+    if opts.repoid:
         for repo in my.repos.repos.values():
-            if repo.id not in opts.repoids:
+            if repo.id not in opts.repoid:
                 repo.disable()
             else:
                 repo.enable()
 
+    if os.geteuid() != 0 or opts.tempcache:
+        cachedir = getCacheDir()
+        if cachedir is None:
+            print "Error: Could not make cachedir, exiting"
+            sys.exit(50)
+            
+        my.repos.setCacheDir(cachedir)
+        
     my.doRepoSetup()
-    print 'Reading in repository metadata - please wait....'
+    if not opts.quiet:
+        print 'Reading in repository metadata - please wait....'
     my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
     for repo in my.repos.listEnabled():
             
@@ -103,7 +156,9 @@ def main():
     # Cache resolved dependencies for speed
     resolved = {}
     
-    print 'Checking Dependencies'
+    if not opts.quiet:
+        print 'Checking Dependencies'
+        
     for pkg in my.pkgSack:
         for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
             if req.startswith('rpmlib'): continue # ignore rpmlib deps
@@ -126,11 +181,12 @@ def main():
 
     num = len(my.pkgSack)
     repos = my.repos.listEnabled()
-    
-    print 'Repos looked at: %s' % len(repos)
-    for repo in repos:
-        print '   %s' % repo
-    print 'Num Packages in Repos: %s' % num
+
+    if not opts.quiet:
+        print 'Repos looked at: %s' % len(repos)
+        for repo in repos:
+            print '   %s' % repo
+        print 'Num Packages in Repos: %s' % num
     
     
     pkgs = unresolved.keys()
@@ -140,7 +196,7 @@ def main():
         for (n, f, v) in unresolved[pkg]:
             req = '%s' % n
             if f: 
-                flag = flagsdict[f]
+                flag = LETTERFLAGS[f]
                 req = '%s %s'% (req, flag)
             if v:
                 req = '%s %s' % (req, v)
