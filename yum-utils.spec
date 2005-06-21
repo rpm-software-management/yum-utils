@@ -50,6 +50,7 @@ fi
 %files
 %defattr(-, root, root)
 %doc README 
+%doc COPYING
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
@@ -65,6 +66,9 @@ fi
 %{_initrddir}/yum-updateonboot
 
 %changelog
+* Tue Jun  21 2005 Gijs Hollestelle <gijs@gewis.nl>
+- Added missing GPL COPYING file
+
 * Wed Jun  1 2005 Seth Vidal <skvidal@phy.duke.edu>
 - 0.2
 
