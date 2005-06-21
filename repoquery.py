@@ -31,14 +31,17 @@ import yum.config
 import yum.Errors
 import yum.packages
 import repomd.mdErrors
+from rpmUtils.arch import getArchList
 
-version = "0.0.7"
+version = "0.0.8"
 
 flags = { 'EQ':'=', 'LT':'<', 'LE':'<=', 'GT':'>', 'GE':'>=', 'None':' '}
 
 std_qf = { 
 'nvr': '%{name}-%{version}-%{release}',
 'nevra': '%{name}-%{epoch}:%{version}-%{release}.%{arch}',
+'envra': '%{epoch}:%{name}-%{version}-%{release}.%{arch}',
+'source': '%{sourcerpm}',
 'info': """
 Name        : %{name}
 Version     : %{version}
@@ -166,6 +169,10 @@ class groupQuery:
         else:
             raise queryError("Invalid group query: %s" % method)
 
+    # XXX temporary hack to make --group -a query work
+    def fmt_queryformat(self):
+        return self.fmt_nevra()
+
     def fmt_nevra(self):
         return ["%s - %s" % (self.group.id, self.group.name)]
 
@@ -217,21 +224,11 @@ class YumBaseQuery(yum.YumBase):
             qpkgs.append(qpkg)
         return qpkgs
 
-    def returnItems(self):
-        if self.options.group:
-            grps = []
-            for name in self.groupInfo.grouplist:
-                grp = groupQuery(self.groupInfo, name, 
-                                 grouppkgs = self.options.grouppkgs)
-                grps.append(grp)
-            return grps
-        else:
-            return self.queryPkgFactory(self.pkgSack.returnPackages())
-
     def returnNewestByName(self, name):
         pkgs = []
         try:
-            pkgs = self.pkgSack.returnNewestByName(name)
+            exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), [name], casematch=1)
+            pkgs = exact + match
         except repomd.mdErrors.PackageSackError, err:
             self.errorlog(0, err)
         return self.queryPkgFactory(pkgs)
@@ -244,9 +241,28 @@ class YumBaseQuery(yum.YumBase):
             self.errorlog(0, "No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
 
+    def returnGroups(self):
+        grps = []
+        for name in self.groupInfo.grouplist:
+            grp = groupQuery(self.groupInfo, name, 
+                             grouppkgs = self.options.grouppkgs)
+            grps.append(grp)
+        return grps
+
+    def matchGroups(self, items):
+        if not items:
+            return self.returnGroups()
+        grps = []
+        for grp in self.returnGroups():
+            for expr in items:
+                if grp.name == expr or fnmatch.fnmatch("%s" % grp.name, expr):
+                    grps.append(grp)
+        return grps
+                    
+            
     def matchPkgs(self, items):
         if not items:
-            return self.returnItems()
+            return self.queryPkgFactory(self.pkgSack.returnPackages())
         
         pkgs = []
         notfound = {}
@@ -259,7 +275,11 @@ class YumBaseQuery(yum.YumBase):
         return self.queryPkgFactory(pkgs)
 
     def runQuery(self, items):
-        pkgs = self.matchPkgs(items)
+        if self.options.group:
+            pkgs = self.matchGroups(items)
+        else:
+            pkgs = self.matchPkgs(items)
+
         for pkg in pkgs:
             for oper in self.pkgops:
                 try:
@@ -354,7 +374,9 @@ def main(args):
     parser.add_option("--location", default=0, action="store_true",
                       help="show download URL for this package")
     parser.add_option("--nevra", default=0, action="store_true",
-                      help="show name, epoch, version, release, architecture info of package")
+                      help="show name-epoch:version-release.architecture info of package")
+    parser.add_option("--envra", default=0, action="store_true",
+                      help="show epoch:name-version-release.architecture info of package")
     parser.add_option("--nvr", default=0, action="store_true",
                       help="show name, version, release info of package")
     parser.add_option("-s", "--source", default=0, action="store_true",
@@ -414,10 +436,12 @@ def main(args):
         pkgops.append("list")
     if opts.info:
         pkgops.append("info")
+    if opts.envra:
+        pkgops.append("envra")
     if opts.nvr:
         pkgops.append("nvr")
     if opts.source:
-        archlist = ['src']
+        pkgops.append("source")
     if opts.whatrequires:
         sackops.append("whatrequires")
     if opts.whatprovides:
@@ -450,6 +474,12 @@ def main(args):
                 repo.enable()
 
     repoq.doRepoSetup()
+
+    for exp in regexs:
+        if exp.endswith('.src'):
+            archlist = getArchList()
+            archlist.append('src')
+            break
     
     try:
         repoq.doSackSetup(archlist=archlist)
