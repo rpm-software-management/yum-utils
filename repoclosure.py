@@ -33,12 +33,13 @@ from optparse import OptionParser
 import tempfile
 import rpmUtils.arch
 from yum.constants import *
-tmpdir='/var/tmp'
+
 
 def getCacheDir():
     """return a path to a valid and safe cachedir - only used when not running
        as root or when --tempcache is set"""
     
+    tmpdir='/var/tmp'
     uid = os.geteuid()
     try:
         usertup = pwd.getpwuid(uid)
@@ -52,25 +53,11 @@ def getCacheDir():
     cachedirs = glob.glob(dirpath)
     
     for thisdir in cachedirs:
-    # if one exists take the first one
-    # check if it is:
-        # 0. is a dir        
-        if not os.path.isdir(thisdir):
-            continue
-            
-        stats = os.stat(thisdir)
-        # 1. owned by the user        
-        if stats[4] != uid:
-            continue
-        
-        # 2. 0700
-        if S_IMODE(stats[0]) != 448:
-            continue
-        
-        # it made it through the gauntlet!
-        return thisdir
+        stats = os.stat(thisdir)        
+        if S_ISDIR(stats[0]) and S_IMODE(stats[0]) == 448 and stats[4] == uid:
+            print thisdir
+            return thisdir
 
-    
     # make the dir (tempfile.mkdtemp())
     cachedir = tempfile.mkdtemp(prefix=prefix, dir=tmpdir)
     return cachedir
