@@ -53,7 +53,7 @@ def getCacheDir():
     cachedirs = glob.glob(dirpath)
     
     for thisdir in cachedirs:
-        stats = os.stat(thisdir)        
+        stats = os.lstat(thisdir)        
         if S_ISDIR(stats[0]) and S_IMODE(stats[0]) == 448 and stats[4] == uid:
             print thisdir
             return thisdir
@@ -192,4 +192,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
