@@ -1,3 +1,26 @@
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# by Panu Matilainen <pmatilai@laiskiainen.org>
+#
+# TODO: 
+# - In posttrans we could get the changelogs from rpmdb thus avoiding
+#   the costly 'otherdata' import but it would be nice to be able to present
+#   the changelogs (optionally) *before* the y/n prompt and for that the import
+#   would be needed anyway.
+
+
 import time
 from yum.packages import YumInstalledPackage
 from rpmUtils.miscutils import splitFilename
@@ -5,14 +28,7 @@ from rpmUtils.miscutils import splitFilename
 requires_api_version = '2.1'
 
 origpkgs = {}
-
-# TODO: 
-# - In posttrans we could get the changelogs from rpmdb thus avoiding
-#   the costly 'otherdata' import but it would be nice to be able to present
-#   the changelogs (optionally) *before* the y/n prompt and for that the import
-#   would be needed anyway.
-# - Add support to mail the changelogs to given address
-# - Add cli-option for turning this on/off 
+changelog = 0
 
 def changelog_delta(pkg, olddate):
     out = []
@@ -25,11 +41,23 @@ def srpmname(pkg):
     n,v,r,e,a = splitFilename(pkg.returnSimple('sourcerpm'))
     return n
 
+def config_hook(conduit):
+    parser = conduit.getOptParser()
+    parser.add_option('--changelog', action='store_true', 
+                      help='Show changelog delta of updated packages')
+
 def postreposetup_hook(conduit):
+    global changelog
+    opts, args = conduit.getCmdLine()
+    changelog = opts.changelog
+
     repos = conduit.getRepos()
     repos.populateSack(with='otherdata')
 
 def pretrans_hook(conduit):
+    if not changelog: 
+        return
+
     # Find currently installed versions of packages we're about to update
     ts = conduit.getTsInfo()
     rpmdb = conduit.getRpmDB()
@@ -42,6 +70,9 @@ def pretrans_hook(conduit):
                 origpkgs[n] = times[0]
 
 def posttrans_hook(conduit):
+    if not changelog:
+        return
+
     # Group by src.rpm name, not binary to avoid showing duplicate changelogs
     # for subpackages
     srpms = {}
@@ -61,4 +92,5 @@ def posttrans_hook(conduit):
                 rpms.append("%s" % rpm)
             conduit.info(2, ", ".join(rpms))
             for line in changelog_delta(srpms[name][0], origpkgs[name]):
-                conduit.info(2, line)
+                conduit.info(2, "%s\n" % line)
+
