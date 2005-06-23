@@ -20,48 +20,18 @@
 #   dependencies in all packages for resolution. Print out the list of
 #   packages with unresolved dependencies
 
+import sys
+import os
 
 import yum
 import yum.Errors
-import sys
-import os
-from stat import *
-import pwd
-import glob
-
+from yum.misc import getCacheDir
 from optparse import OptionParser
-import tempfile
 import rpmUtils.arch
 from yum.constants import *
 
 
-def getCacheDir():
-    """return a path to a valid and safe cachedir - only used when not running
-       as root or when --tempcache is set"""
-    
-    tmpdir='/var/tmp'
-    uid = os.geteuid()
-    try:
-        usertup = pwd.getpwuid(uid)
-        username = usertup[0]
-    except KeyError:
-        return None # if it returns None then, well, it's bollocksed
 
-    # check for /var/tmp/yum-username-* - 
-    prefix = 'yum-%s-' % username    
-    dirpath = '%s/%s*' % (tmpdir, prefix)
-    cachedirs = glob.glob(dirpath)
-    
-    for thisdir in cachedirs:
-        stats = os.lstat(thisdir)        
-        if S_ISDIR(stats[0]) and S_IMODE(stats[0]) == 448 and stats[4] == uid:
-            print thisdir
-            return thisdir
-
-    # make the dir (tempfile.mkdtemp())
-    cachedir = tempfile.mkdtemp(prefix=prefix, dir=tmpdir)
-    return cachedir
-    
 def evrTupletoVer(tuple):
     """convert and evr tuple to a version string, return None if nothing
        to convert"""
@@ -96,21 +66,71 @@ def parseArgs():
     (opts, args) = parser.parse_args()
     return (opts, args)
 
-class YumQuiet(yum.YumBase):
-    def __init__(self):
+class RepoClosure(yum.YumBase):
+    def __init__(self, arch = None, config = "/etc/yum.conf"):
         yum.YumBase.__init__(self)
+
+        self.arch = arch
+        self.doConfigSetup(fn = config)
+        if hasattr(self.repos, 'sqlite'):
+            self.repos.sqlite = False
+            self.repos._selectSackType()
+    
+    def evrTupletoVer(self,tuple):
+        """convert and evr tuple to a version string, return None if nothing
+        to convert"""
+    
+        e, v,r = tuple
+
+        if v is None:
+            return None
+    
+        val = ''
+        if e is not None:
+            val = '%s:%s' % (e, v)
+    
+        if r is not None:
+            val = '%s-%s' % (val, r)
+    
+        return val
+    
+    def readMetadata(self):
+        self.doRepoSetup()
+        self.doSackSetup(rpmUtils.arch.getArchList(self.arch))
+        for repo in self.repos.listEnabled():
+            self.repos.populateSack(which=[repo.id], with='filelists')
+
+    def getBrokenDeps(self):
+        unresolved = {}
+        resolved = {}
+        for pkg in self.pkgSack:
+            for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
+                if req.startswith('rpmlib'): continue # ignore rpmlib deps
+            
+                ver = self.evrTupletoVer((reqe, reqv, reqr))
+                if resolved.has_key((req,flags,ver)):
+                    continue
+                try:
+                    resolve_sack = self.whatProvides(req, flags, ver)
+                except yum.Errors.RepoError, e:
+                    pass
+            
+                if len(resolve_sack) < 1:
+                    if not unresolved.has_key(pkg):
+                        unresolved[pkg] = []
+                    unresolved[pkg].append((req, flags, ver))
+                else:
+                    resolved[(req,flags,ver)] = 1
+        return unresolved
+    
     
     def log(self, value, msg):
         pass
 
 def main():
     (opts, cruft) = parseArgs()
-    my = YumQuiet()
-    my.doConfigSetup(fn = opts.config)
-    if hasattr(my.repos, 'sqlite'):
-        my.repos.sqlite = False
-        my.repos._selectSackType()
-
+    my = RepoClosure(arch = opts.arch, config = opts.config)
+    
     if opts.repoid:
         for repo in my.repos.repos.values():
             if repo.id not in opts.repoid:
@@ -125,47 +145,21 @@ def main():
             sys.exit(50)
             
         my.repos.setCacheDir(cachedir)
-        
-    my.doRepoSetup()
+
     if not opts.quiet:
         print 'Reading in repository metadata - please wait....'
-    my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
-    for repo in my.repos.listEnabled():
-            
-        try:
-            my.repos.populateSack(which=[repo.id], with='filelists')
-        except yum.Errors.RepoError, e:
-            print 'Filelists not available for repo: %s' % repo
-            print 'Some dependencies may not be complete for this repository'
-            print 'Run as root to get all dependencies'
 
-    unresolved = {}
-    # Cache resolved dependencies for speed
-    resolved = {}
-    
+    try:
+        my.readMetadata()
+    except yum.Errors.RepoError, e:
+        print 'Filelists not available for repo: %s' % repo
+        print 'Some dependencies may not be complete for this repository'
+        print 'Run as root to get all dependencies or use -t to enable a user temp cache'
+
     if not opts.quiet:
         print 'Checking Dependencies'
-        
-    for pkg in my.pkgSack:
-        for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
-            if req.startswith('rpmlib'): continue # ignore rpmlib deps
-            
-            ver = evrTupletoVer((reqe, reqv, reqr))
-            if resolved.has_key((req,flags,ver)):
-                continue
-            try:
-                resolve_sack = my.whatProvides(req, flags, ver)
-            except yum.Errors.RepoError, e:
-                pass
-            
-            if len(resolve_sack) < 1:
-                if not unresolved.has_key(pkg):
-                    unresolved[pkg] = []
-                unresolved[pkg].append((req, flags, ver))
-            else:
-                resolved[(req,flags,ver)] = 1
-    
 
+    baddeps = my.getBrokenDeps()
     num = len(my.pkgSack)
     repos = my.repos.listEnabled()
 
@@ -175,12 +169,11 @@ def main():
             print '   %s' % repo
         print 'Num Packages in Repos: %s' % num
     
-    
-    pkgs = unresolved.keys()
+    pkgs = baddeps.keys()
     pkgs.sort()
     for pkg in pkgs:
         print 'package: %s from %s\n  unresolved deps: ' % (pkg, pkg.repoid)
-        for (n, f, v) in unresolved[pkg]:
+        for (n, f, v) in baddeps[pkg]:
             req = '%s' % n
             if f: 
                 flag = LETTERFLAGS[f]
@@ -189,6 +182,7 @@ def main():
                 req = '%s %s' % (req, v)
             
             print '     %s' % req
-    
+
 if __name__ == "__main__":
     main()
+        
