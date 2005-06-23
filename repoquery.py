@@ -233,10 +233,10 @@ class YumBaseQuery(yum.YumBase):
             self.errorlog(0, err)
         return self.queryPkgFactory(pkgs)
 
-    def returnPackageByDep(self, depstring):
+    def returnPackagesByDep(self, depstring):
         provider = []
         try:
-            provider.append(yum.YumBase.returnPackageByDep(self, depstring))
+            provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
         except yum.Errors.YumBaseError, err:
             self.errorlog(0, "No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
