@@ -32,6 +32,7 @@ import yum.Errors
 import yum.packages
 import repomd.mdErrors
 from rpmUtils.arch import getArchList
+from yum.misc import getCacheDir
 
 version = "0.0.8"
 
@@ -403,6 +404,8 @@ def main(args):
                       help="quiet (no output to stderr)")
     parser.add_option("-C", "--cache", default=0, action="store_true",
                       help="run from cache only")
+    parser.add_option("--tempcache", default=0, action="store_true",
+                      help="use private cache (default when used as non-root)")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
@@ -462,9 +465,16 @@ def main(args):
     repoq = YumBaseQuery(pkgops, sackops, opts)
     repoq.doConfigSetup()
     
-    if os.geteuid() != 0 or opts.cache:
+    if os.geteuid() != 0 or opts.tempcache:
+        cachedir = getCacheDir()
+        if cachedir is None:
+            repoq.errorlog("0, Error: Could not make cachedir, exiting")
+            sys.exit(50)
+        repoq.repos.setCacheDir(cachedir)
+
+    if opts.cache:
         repoq.conf.setConfigOption('cache', 1)
-        repoq.errorlog(0, 'Running from cache, results might be out of date.')
+        repoq.errorlog(0, 'Running from cache, results might be incomplete.')
     
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
