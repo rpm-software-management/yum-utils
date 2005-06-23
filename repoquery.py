@@ -304,7 +304,7 @@ class YumBaseQuery(yum.YumBase):
         return grps
 
     def whatprovides(self, name, **kw):
-        return self.returnPackageByDep(name)
+        return self.returnPackagesByDep(name)
 
     def whatrequires(self, name, **kw):
         pkgs = {}
