@@ -32,8 +32,8 @@ changelog = 0
 
 def changelog_delta(pkg, olddate):
     out = []
-    for date, author, message in pkg.returnChangelog()[:5]:
-        if date > olddate:
+    for date, author, message in pkg.returnChangelog():
+        if int(date) > olddate:
             out.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
     return out
 
