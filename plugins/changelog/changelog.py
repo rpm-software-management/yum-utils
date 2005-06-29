@@ -15,15 +15,13 @@
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 #
 # TODO: 
-# - In posttrans we could get the changelogs from rpmdb thus avoiding
-#   the costly 'otherdata' import but it would be nice to be able to present
-#   the changelogs (optionally) *before* the y/n prompt and for that the import
-#   would be needed anyway.
-
+# - In 'pre' mode we could get the changelogs from rpmdb thus avoiding
+#   the costly 'otherdata' import.
 
 import time
 from yum.packages import YumInstalledPackage
 from rpmUtils.miscutils import splitFilename
+from yum.constants import *
 
 requires_api_version = '2.1'
 
@@ -41,10 +39,34 @@ def srpmname(pkg):
     n,v,r,e,a = splitFilename(pkg.returnSimple('sourcerpm'))
     return n
 
+def show_changes(conduit, msg):
+    # Group by src.rpm name, not binary to avoid showing duplicate changelogs
+    # for subpackages
+    srpms = {}
+    ts = conduit.getTsInfo()
+    for tsmem in ts.getMembers():
+        name = srpmname(tsmem.po)
+        if srpms.has_key(name):
+            srpms[name].append(tsmem.po)
+        else:
+            srpms[name] = [tsmem.po]
+
+    conduit.info(2, "\n%s\n" % msg)
+    for name in srpms.keys():
+        rpms = []
+        if origpkgs.has_key(name):
+            for rpm in srpms[name]:
+                rpms.append("%s" % rpm)
+            conduit.info(2, ", ".join(rpms))
+            for line in changelog_delta(srpms[name][0], origpkgs[name]):
+                conduit.info(2, "%s\n" % line)
+
 def config_hook(conduit):
     parser = conduit.getOptParser()
     parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
+
+    conduit.registerOpt('when', PLUG_OPT_STRING, PLUG_OPT_WHERE_MAIN, 'post')
 
 def postreposetup_hook(conduit):
     global changelog
@@ -54,7 +76,7 @@ def postreposetup_hook(conduit):
     repos = conduit.getRepos()
     repos.populateSack(with='otherdata')
 
-def pretrans_hook(conduit):
+def postresolve_hook(conduit):
     if not changelog: 
         return
 
@@ -69,28 +91,14 @@ def pretrans_hook(conduit):
                 n,v,r,e,a = splitFilename(hdr['sourcerpm'])
                 origpkgs[n] = times[0]
 
+    if conduit.confString('main', 'when', default='post') == 'pre':
+        show_changes(conduit, 'Changes in packages about to be updated:')
+
 def posttrans_hook(conduit):
-    if not changelog:
+    if not changelog: 
         return
 
-    # Group by src.rpm name, not binary to avoid showing duplicate changelogs
-    # for subpackages
-    srpms = {}
-    ts = conduit.getTsInfo()
-    for tsmem in ts.getMembers():
-        name = srpmname(tsmem.po)
-        if srpms.has_key(name):
-            srpms[name].append(tsmem.po)
-        else:
-            srpms[name] = [tsmem.po]
+    if conduit.confString('main', 'when', default='post') == "post":
+        show_changes(conduit, 'Changes in updated packages:')
 
-    conduit.info(2, "\nChanges in updated packages:\n")
-    for name in srpms.keys():
-        rpms = []
-        if origpkgs.has_key(name):
-            for rpm in srpms[name]:
-                rpms.append("%s" % rpm)
-            conduit.info(2, ", ".join(rpms))
-            for line in changelog_delta(srpms[name][0], origpkgs[name]):
-                conduit.info(2, "%s\n" % line)
 
