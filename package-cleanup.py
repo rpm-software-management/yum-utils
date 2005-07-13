@@ -33,16 +33,19 @@ from rpmUtils import miscutils, transaction
 from yum.logger import Logger
 from optparse import OptionParser
 from yum.packages import YumInstalledPackage
+from yum import Errors
 
-
-def initYum():
+def initYum(opts):
     my = yum.YumBase()
     my.doConfigSetup()
     my.log = Logger(threshold=my.conf.getConfigOption('debuglevel'), 
     file_object =sys.stdout)
-    # Disable all enabled repositories
-    for repo in my.repos.listEnabled():
-        my.repos.disableRepo(repo.id)
+    if opts.orphans:
+        my.doRepoSetup()
+    else:
+        # Disable all enabled repositories
+        for repo in my.repos.listEnabled():
+            my.repos.disableRepo(repo.id)
 
     my.doTsSetup()
     my.doSackSetup()
@@ -114,6 +117,17 @@ def listLeaves(all):
         if name.startswith('lib') or all:
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
+def listOrphans(my):
+    installed = my.rpmdb.getPkgList()
+    for pkgtup in installed:
+        (n,a,e,v,r) = pkgtup
+        if n == "gpg-pubkey":
+            continue
+
+        try:
+            po = my.getPackageObject(pkgtup)
+        except Errors.DepError:
+            print "%s-%s-%s.%s" % (n, v, r, a)
 
 def getKernels(my):
     """return a list of all installed kernels, sorted newest to oldest"""
@@ -236,6 +250,8 @@ def parseArgs():
       help='List leaf nodes in the local RPM database')
     parser.add_option("--all", default=False, dest="all",action="store_true",
       help='When listing leaf nodes also list leaf nodes that are not libraries')
+    parser.add_option("--orphans", default=False, dest="orphans",action="store_true",
+      help='List installed packages which are not available from currenly configured repositories.')
     parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
       help='Print out nothing unecessary')
     parser.add_option("-y", default=False, dest="confirmed",action="store_true",
@@ -248,9 +264,9 @@ def parseArgs():
       help="Do not remove kernel-devel packages when removing kernels")
 
     (opts, args) = parser.parse_args()
-    if not exactlyOne((opts.problems,opts.leaves,opts.kernels)): 
+    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans)): 
         parser.print_help()
-        print "Please specify either --problems, --leaves or --oldkernels"
+        print "Please specify either --problems, --leaves, --orphans or --oldkernels"
         sys.exit(0)
     return (opts, args)
     
@@ -258,7 +274,7 @@ def main():
     (opts, args) = parseArgs()
     if not opts.quiet:
         print "Setting up yum"
-    my = initYum()
+    my = initYum(opts)
     
     if (opts.kernels):
         if os.geteuid() != 0:
@@ -269,6 +285,10 @@ def main():
     
     if (opts.leaves):
         listLeaves(opts.all)
+        sys.exit(0)
+
+    if (opts.orphans):
+        listOrphans(my)
         sys.exit(0)
 
     if not opts.quiet:
