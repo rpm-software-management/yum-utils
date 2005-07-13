@@ -17,12 +17,12 @@
 
 import yum
 import yum.Errors
+from yum.misc import getCacheDir
 import sys
 import os
 import libxml2
 import time
 from optparse import OptionParser
-
 
 class YumQuiet(yum.YumBase):
     def __init__(self):
@@ -174,9 +174,12 @@ def main(options, args):
     repoids = args
     my = YumQuiet()
     my.doConfigSetup()
-    if os.geteuid() != 0:
-        my.conf.setConfigOption('cache', 1)
-        print 'Not running as root, might not be able to import all of cache'
+    if os.geteuid() != 0 or options.tempcache:
+        cachedir = getCacheDir()
+        if cachedir is None:
+            print "Error: Could not make cachedir, exiting"
+            sys.exit(50)
+        my.repos.setCacheDir(cachedir)
 
     if len(repoids) > 0:
         for repo in my.repos.repos.values():
@@ -236,6 +239,9 @@ if __name__ == "__main__":
                       help='description of feed: %default')
     parser.add_option('-r', action='store', type='int', dest='days', default=3,
                       help='most recent (in days): %default')
+    parser.add_option("--tempcache", default=False, action="store_true",
+                      help="Use a temp dir for storing/accessing yum-cache")
+
     (options, args) = parser.parse_args()
 
     main(options, args)
