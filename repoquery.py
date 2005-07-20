@@ -107,7 +107,11 @@ class pkgQuery:
         tmp = item.split(':')
         if len(tmp) > 1:
             item = tmp[0]
-            convert = convertmap[tmp[1]]
+            conv = tmp[1]
+            if convertmap.has_key(conv):
+                convert = convertmap[conv]
+            else:
+                raise queryError("Invalid conversion: %s" % conv)
 
         try:
             res = self.pkg.returnSimple(item)
