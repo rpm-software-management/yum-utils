@@ -34,7 +34,7 @@ import repomd.mdErrors
 from rpmUtils.arch import getArchList
 from yum.misc import getCacheDir
 
-version = "0.0.8"
+version = "0.0.9"
 
 flags = { 'EQ':'=', 'LT':'<', 'LE':'<=', 'GT':'>', 'GE':'>=', 'None':' '}
 
@@ -56,6 +56,14 @@ Repository  : %{repoid}
 Summary     : %{summary}
 Description :\n%{description}""",
 }
+
+querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
+              'description', 'packager', 'url', 'buildhost', 'sourcerpm',
+              'vendor', 'group', 'license', 'buildtime', 'filetime',
+              'installedsize', 'archivesize', 'packagesize', 'repoid', 
+              'requires', 'provides', 'conflicts', 'obsoletes',
+              'relativepath', 'hdrstart', 'hdrend', 'id',
+            ]
 
 def rpmevr(e, v, r):
     et = ""
@@ -127,6 +135,7 @@ class pkgQuery:
             qf = self.qf
 
         qf = qf.replace("\\n", "\n")
+        qf = qf.replace("\\t", "\t")
         pattern = re.compile('%{(\w*?)}')
         fmt = re.sub(pattern, r'%(\1)s', qf)
         return fmt % self
@@ -406,10 +415,17 @@ def main(args):
                       help="run from cache only")
     parser.add_option("--tempcache", default=0, action="store_true",
                       help="use private cache (default when used as non-root)")
+    parser.add_option("--querytags", default=0, action="store_true",
+                      help="list available tags in queryformat queries")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
         print "Repoquery version %s" % version
+        sys.exit(0)
+    if opts.querytags:
+        querytags.sort()
+        for tag in querytags:
+            print tag
         sys.exit(0)
 
     if len(regexs) < 1 and not opts.all:
