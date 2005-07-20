@@ -96,7 +96,7 @@ class pkgQuery:
             res = self.pkg.returnSimple(item)
         except KeyError:
             if item == "license":
-                res = " ".join(self.licenses)
+                res = ", ".join(self.pkg.licenses)
             else:
                 raise queryError("Invalid querytag: %s" % item)
         return res
