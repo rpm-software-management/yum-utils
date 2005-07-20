@@ -65,6 +65,16 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'relativepath', 'hdrstart', 'hdrend', 'id',
             ]
 
+def sec2date(timestr):
+    return time.ctime(int(timestr))
+
+def sec2day(timestr):
+    return time.strftime("%a %b %d %Y", time.gmtime(int(timestr)))
+
+convertmap = { 'date': sec2date,
+               'day':  sec2day,
+             }
+
 def rpmevr(e, v, r):
     et = ""
     vt = ""
@@ -92,6 +102,13 @@ class pkgQuery:
         if hasattr(self, "fmt_%s" % item):
             return getattr(self, "fmt_%s" % item)()
         res = None
+        convert = None
+
+        tmp = item.split(':')
+        if len(tmp) > 1:
+            item = tmp[0]
+            convert = convertmap[tmp[1]]
+
         try:
             res = self.pkg.returnSimple(item)
         except KeyError:
@@ -99,6 +116,8 @@ class pkgQuery:
                 res = ", ".join(self.pkg.licenses)
             else:
                 raise queryError("Invalid querytag: %s" % item)
+        if convert:
+            res = convert(res)
         return res
 
     def __str__(self):
@@ -136,8 +155,8 @@ class pkgQuery:
 
         qf = qf.replace("\\n", "\n")
         qf = qf.replace("\\t", "\t")
-        pattern = re.compile('%{(\w*?)}')
-        fmt = re.sub(pattern, r'%(\1)s', qf)
+        pattern = re.compile('%([-\d]*?){([:\w]*?)}')
+        fmt = re.sub(pattern, r'%(\2)\1s', qf)
         return fmt % self
 
     def fmt_list(self, **kw):
@@ -151,7 +170,7 @@ class pkgQuery:
     def fmt_changelog(self, **kw):
         changelog = []
         for date, author, message in self.pkg.returnChangelog():
-            changelog.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
+            changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
         return "\n".join(changelog)
 
     def fmt_obsoletes(self, **kw):
