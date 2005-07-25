@@ -17,9 +17,11 @@
 
 from yum.constants import *
 from yum.plugins import PluginYumExit
+from yum.plugins import TYPE_CORE
 from rpmUtils.miscutils import splitFilename, compareEVR
 
 requires_api_version = '2.1'
+plugin_type = (TYPE_CORE,)
 
 def config_hook(conduit):
     conduit.registerOpt('locklist', PLUG_OPT_STRING, PLUG_OPT_WHERE_MAIN, '')

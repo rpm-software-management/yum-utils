@@ -22,8 +22,10 @@ import time
 from yum.packages import YumInstalledPackage
 from rpmUtils.miscutils import splitFilename
 from yum.constants import *
+from yum.plugins import TYPE_INTERFACE
 
 requires_api_version = '2.1'
+plugin_type = (TYPE_INTERFACE,)
 
 origpkgs = {}
 changelog = 0

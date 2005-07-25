@@ -14,7 +14,10 @@
 #
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 
+from yum.plugins import TYPE_INTERFACE
+
 requires_api_version = '2.1'
+plugin_type = (TYPE_INTERFACE,)
 
 def init_hook(conduit):
     parser = conduit.getOptParser()
