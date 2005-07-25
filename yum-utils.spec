@@ -1,14 +1,14 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.2
-Release: 2
+Version: 0.3
+Release: 1
 License: GPL
 Group: Development/Tools
 Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python, yum >= 2.3.2
+Requires: python, yum >= 2.3.4
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -27,6 +27,15 @@ Runs yum update on system boot. This allows machines that have been turned
 off for an extended amount of time to become secure immediately, instead of
 waiting until the next early morning cron job.
 
+%package -n yum-changelog
+Summary: Yum plugin for viewing package changelogs before/after updating
+Group: System Environment/Base
+Requires: yum >= 2.3.4
+
+%description -n yum-changelog
+This plugin adds a command line option to allow viewing package changelog 
+deltas before or after updating packages.
+
 %prep
 %setup -q
 
@@ -34,6 +43,16 @@ waiting until the next early morning cron job.
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
+
+# only changelog plugin for now...
+plugins="changelog"
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
+
+cd plugins
+for plug in $plugins; do
+    install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
+    install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -51,6 +70,7 @@ fi
 %defattr(-, root, root)
 %doc README 
 %doc COPYING
+%doc plugins/
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
@@ -65,7 +85,18 @@ fi
 %{_sysconfdir}/sysconfig/yum-updateonboot
 %{_initrddir}/yum-updateonboot
 
+%files -n yum-changelog
+%defattr(-, root, root)
+%{_sysconfdir}/yum/pluginconf.d
+/usr/lib/yum-plugins
+
 %changelog
+* Mon Jul 25 2005 Panu Matilainen <pmatilai@laiskiainen.org>
+- bump version to 0.3
+- add yum-changelog subpackage
+- add plugins as documentation to the main package
+- require yum >= 2.3.4 (for getCacheDir)
+
 * Tue Jun  21 2005 Gijs Hollestelle <gijs@gewis.nl>
 - Added missing GPL COPYING file
 
