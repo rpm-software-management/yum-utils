@@ -34,7 +34,7 @@ import repomd.mdErrors
 from rpmUtils.arch import getArchList
 from yum.misc import getCacheDir
 
-version = "0.0.9"
+version = "0.0.10"
 
 flags = { 'EQ':'=', 'LT':'<', 'LE':'<=', 'GT':'>', 'GE':'>=', 'None':' '}
 
@@ -260,12 +260,25 @@ class YumBaseQuery(yum.YumBase):
     def returnNewestByName(self, name):
         pkgs = []
         try:
-            exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), [name], casematch=1)
+            exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
             pkgs = exact + match
         except repomd.mdErrors.PackageSackError, err:
             self.errorlog(0, err)
         return self.queryPkgFactory(pkgs)
 
+    def returnPkgList(self):
+        what = self.options.pkgnarrow
+        ygh = self.doPackageLists(what)
+
+        if what == "all":
+            return ygh.available + ygh.installed
+        
+        if hasattr(ygh, what):
+            return getattr(ygh, what)
+        else:
+            self.errorlog(1, "Unknown pkgnarrow method: %s" % what)
+            return []
+    
     def returnPackagesByDep(self, depstring):
         provider = []
         try:
@@ -295,7 +308,7 @@ class YumBaseQuery(yum.YumBase):
             
     def matchPkgs(self, items):
         if not items:
-            return self.queryPkgFactory(self.pkgSack.returnPackages())
+            return self.queryPkgFactory(self.returnPkgList())
         
         pkgs = []
         notfound = {}
@@ -423,12 +436,16 @@ def main(args):
     parser.add_option("--whatrequires", default=0, action="store_true",
                       help="query what package(s) require a capability")
     # group stuff
-    parser.add_option("--group", default=0, action="store_true", 
+    parser.add_option("-g", "--group", default=0, action="store_true", 
                       help="query groups instead of packages")
     parser.add_option("--grouppkgs", default="required", dest="grouppkgs",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
-    parser.add_option("", "--repoid", default=[], action="append",
+    parser.add_option("--pkgnarrow", default="all", dest="pkgnarrow",
+                      help="query only installed/available/recent/updates packages")
+    parser.add_option("--show-dupes", default=0, action="store_true",
+                      help="show all versions of packages")
+    parser.add_option("--repoid", default=[], action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-v", "--version", default=0, action="store_true",
                       help="show program version and exit")
@@ -514,6 +531,9 @@ def main(args):
     if opts.cache:
         repoq.conf.setConfigOption('cache', 1)
         repoq.errorlog(0, 'Running from cache, results might be incomplete.')
+
+    if opts.show_dupes:
+        repoq.conf.setConfigOption('showdupesfromrepos', 1)
     
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
@@ -532,12 +552,12 @@ def main(args):
     
     try:
         repoq.doSackSetup(archlist=archlist)
+        repoq.doTsSetup()
         if needfiles:
             repoq.repos.populateSack(with='filelists')
         if needother:
             repoq.repos.populateSack(with='otherdata')
         if needgroup:
-            repoq.doTsSetup()
             repoq.doGroupSetup()
     except yum.Errors.RepoError, e:
         repoq.errorlog(1, e)
