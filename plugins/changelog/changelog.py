@@ -75,8 +75,9 @@ def postreposetup_hook(conduit):
     opts, args = conduit.getCmdLine()
     changelog = opts.changelog
 
-    repos = conduit.getRepos()
-    repos.populateSack(with='otherdata')
+    if changelog:
+        repos = conduit.getRepos()
+        repos.populateSack(with='otherdata')
 
 def postresolve_hook(conduit):
     if not changelog: 
