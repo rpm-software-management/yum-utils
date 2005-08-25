@@ -313,7 +313,7 @@ class YumBaseQuery(yum.YumBase):
         pkgs = []
         notfound = {}
         
-        exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(),
+        exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(),
                                            items, casematch=1)
         pkgs = exact + match
         notfound = unmatch
