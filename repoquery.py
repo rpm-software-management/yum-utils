@@ -32,9 +32,10 @@ import yum.Errors
 import yum.packages
 import repomd.mdErrors
 from rpmUtils.arch import getArchList
+from rpmUtils.miscutils import formatRequire
 from yum.misc import getCacheDir
 
-version = "0.0.10"
+version = "0.0.11"
 
 flags = { 'EQ':'=', 'LT':'<', 'LE':'<=', 'GT':'>', 'GE':'>=', 'None':' '}
 
@@ -92,11 +93,13 @@ class queryError(exceptions.Exception):
         exceptions.Exception.__init__(self)
         self.msg = msg
 
+# abstract class
 class pkgQuery:
     def __init__(self, pkg, qf):
         self.pkg = pkg
         self.qf = qf
         self.name = pkg.name
+        self.classname = None
     
     def __getitem__(self, item):
         if hasattr(self, "fmt_%s" % item):
@@ -113,13 +116,15 @@ class pkgQuery:
             else:
                 raise queryError("Invalid conversion: %s" % conv)
 
+        # this construct is the way it is because pkg.licenses isn't
+        # populated before calling pkg.returnSimple() ?!
         try:
             res = self.pkg.returnSimple(item)
         except KeyError:
             if item == "license":
                 res = ", ".join(self.pkg.licenses)
             else:
-                raise queryError("Invalid querytag: %s" % item)
+                raise queryError("Invalid querytag '%s' for %s" % (item, self.classname))
         if convert:
             res = convert(res)
         return res
@@ -136,20 +141,6 @@ class pkgQuery:
         else:
             raise queryError("Invalid package query: %s" % method)
 
-    def _prco(self, what, **kw):
-        rpdict = {}
-        for rptup in self.pkg.returnPrco(what):
-            (rpn, rpf, (rp,rpv,rpr)) = rptup
-            # rpmlib deps should be handled on their own
-            if rpn[:6] == 'rpmlib':
-                continue
-            if rpf:
-                rpdict["%s %s %s" % (rpn, flags[rpf], rpmevr(rp,rpv,rpr))] = None
-            else:
-                rpdict[rpn] = None
-        return rpdict.keys()
-
-    # these return formatted strings, not lists..
     def fmt_queryformat(self):
 
         if not self.qf:
@@ -162,6 +153,35 @@ class pkgQuery:
         pattern = re.compile('%([-\d]*?){([:\w]*?)}')
         fmt = re.sub(pattern, r'%(\2)\1s', qf)
         return fmt % self
+
+    def fmt_requires(self, **kw):
+        return "\n".join(self.prco('requires'))
+
+    def fmt_provides(self, **kw):
+        return "\n".join(self.prco('provides'))
+
+    def fmt_conflicts(self, **kw):
+        return "\n".join(self.prco('conflicts'))
+
+    def fmt_obsoletes(self, **kw):
+        return "\n".join(self.prco('obsoletes'))
+
+class repoPkgQuery(pkgQuery):
+    def __init__(self, pkg, qf):
+        pkgQuery.__init__(self, pkg, qf)
+        self.classname = 'repo pkg'
+
+    def prco(self, what, **kw):
+        rpdict = {}
+        for rptup in self.pkg.returnPrco(what):
+            (rpn, rpf, (rp,rpv,rpr)) = rptup
+            if rpn.startswith('rpmlib'):
+                continue
+            rpdict[self.pkg.prcoPrintable(rptup)] = None
+    
+        rplist = rpdict.keys()
+        rplist.sort()
+        return rplist
 
     def fmt_list(self, **kw):
         fdict = {}
@@ -177,17 +197,56 @@ class pkgQuery:
             changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
         return "\n".join(changelog)
 
-    def fmt_obsoletes(self, **kw):
-        return "\n".join(self._prco("obsoletes"))
+class instPkgQuery(pkgQuery):
+    # hmm, thought there'd be more things in need of mapping to rpm names :)
+    tagmap = { 'installedsize': 'size',
+             }
 
-    def fmt_provides(self, **kw):
-        return "\n".join(self._prco("provides"))
+    def __init__(self, pkg, qf):
+        pkgQuery.__init__(self, pkg, qf)
+        self.classname = 'installed pkg'
 
-    def fmt_requires(self, **kw):
-        return "\n".join(self._prco("requires"))
+    def __getitem__(self, item):
+        if self.tagmap.has_key(item):
+            return self.pkg.tagByName(self.tagmap[item])
+        else:
+            return pkgQuery.__getitem__(self, item)
+            
+    def prco(self, what, **kw):
+        prcodict = {}
+        # rpm names are without the trailing s :)
+        what = what[:-1]
 
-    def fmt_conflicts(self, **kw):
-        return "\n".join(self._prco("conflicts"))
+        names = self.pkg.tagByName('%sname' % what)
+        flags = self.pkg.tagByName('%sflags' % what)
+        ver = self.pkg.tagByName('%sversion' % what)
+        if names is not None:
+            for (n, f, v) in zip(names, flags, ver):
+                req = formatRequire(n, v, f)
+                # filter out rpmlib deps
+                if n.startswith('rpmlib'):
+                    continue
+                prcodict[req] = None
+
+        prcolist = prcodict.keys()
+        prcolist.sort()
+        return prcolist
+    
+    def fmt_list(self, **kw):
+        return "\n".join(self.pkg.tagByName('filenames'))
+
+    def fmt_changelog(self, **kw):
+        changelog = []
+        times = self.pkg.tagByName('changelogtime')
+        names = self.pkg.tagByName('changelogname')
+        texts = self.pkg.tagByName('changelogtext')
+        if times is not None:
+            tmplst = zip(times, names, texts)
+
+            for date, author, message in zip(times, names, texts):
+                changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
+        return "\n".join(changelog)
+
 
 class groupQuery:
     def __init__(self, groupinfo, name, grouppkgs="required"):
@@ -253,11 +312,14 @@ class YumBaseQuery(yum.YumBase):
         qf = self.options.queryformat or std_qf["nevra"]
         qpkgs = []
         for pkg in pkgs:
-            qpkg = pkgQuery(pkg, qf)
+            if isinstance(pkg, yum.packages.YumInstalledPackage):
+                qpkg = instPkgQuery(pkg, qf)
+            else:
+                qpkg = repoPkgQuery(pkg, qf)
             qpkgs.append(qpkg)
         return qpkgs
 
-    def returnNewestByName(self, name):
+    def returnByName(self, name):
         pkgs = []
         try:
             exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
@@ -267,17 +329,26 @@ class YumBaseQuery(yum.YumBase):
         return self.queryPkgFactory(pkgs)
 
     def returnPkgList(self):
-        what = self.options.pkgnarrow
-        ygh = self.doPackageLists(what)
 
-        if what == "all":
-            return ygh.available + ygh.installed
-        
-        if hasattr(ygh, what):
-            return getattr(ygh, what)
+        pkgs = []
+        if self.options.pkgnarrow == "repos":
+            if self.conf.showdupesfromrepos:
+                pkgs = self.pkgSack.returnPackages()
+            else:
+                pkgs = self.pkgSack.returnNewestByNameArch()
+
         else:
-            self.errorlog(1, "Unknown pkgnarrow method: %s" % what)
-            return []
+            what = self.options.pkgnarrow
+            ygh = self.doPackageLists(what)
+
+            if what == "all":
+                pkgs = ygh.available + ygh.installed
+            elif hasattr(ygh, what):
+                pkgs = getattr(ygh, what)
+            else:
+                self.errorlog(1, "Unknown pkgnarrow method: %s" % what)
+
+        return pkgs
     
     def returnPackagesByDep(self, depstring):
         provider = []
@@ -340,43 +411,43 @@ class YumBaseQuery(yum.YumBase):
                     self.errorlog(0, e.msg)
 
     def doQuery(self, method, *args, **kw):
-        return getattr(self, method)(*args, **kw)
+        return getattr(self, "fmt_%s" % method)(*args, **kw)
 
-    def groupmember(self, name, **kw):
+    def fmt_groupmember(self, name, **kw):
         grps = []
         for id in self.groupInfo.grouplist:
             if name in self.groupInfo.allPkgs(id):
                 grps.append(id)
         return grps
 
-    def whatprovides(self, name, **kw):
+    def fmt_whatprovides(self, name, **kw):
         return self.returnPackagesByDep(name)
 
-    def whatrequires(self, name, **kw):
+    def fmt_whatrequires(self, name, **kw):
         pkgs = {}
         provs = [name]
                 
         if self.options.alldeps:
-            for pkg in self.returnNewestByName(name):
-                provs.extend(pkg._prco("provides"))
+            for pkg in self.returnByName(name):
+                provs.extend(pkg.prco("provides"))
 
         for prov in provs:
             for pkg in self.pkgSack.searchRequires(prov):
                 pkgs[pkg.pkgtup] = pkg
         return self.queryPkgFactory(pkgs.values())
 
-    def requires(self, name, **kw):
+    def fmt_requires(self, name, **kw):
         pkgs = {}
         
-        for pkg in self.returnNewestByName(name):
-            for req in pkg._prco("requires"):
+        for pkg in self.returnByName(name):
+            for req in pkg.prco("requires"):
                 for res in self.whatprovides(req):
                     pkgs[res.name] = res
         return pkgs.values()
 
-    def location(self, name):
+    def fmt_location(self, name):
         loc = []
-        for pkg in self.returnNewestByName(name):
+        for pkg in self.returnByName(name):
             repo = self.repos.getRepo(pkg['repoid'])
             loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
@@ -441,8 +512,8 @@ def main(args):
     parser.add_option("--grouppkgs", default="required", dest="grouppkgs",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
-    parser.add_option("--pkgnarrow", default="all", dest="pkgnarrow",
-                      help="query only installed/available/recent/updates packages")
+    parser.add_option("--pkgnarrow", default="repos", dest="pkgnarrow",
+                      help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
     parser.add_option("--show-dupes", default=0, action="store_true",
                       help="show all versions of packages")
     parser.add_option("--repoid", default=[], action="append",
