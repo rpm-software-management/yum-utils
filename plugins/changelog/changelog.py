@@ -65,7 +65,8 @@ def show_changes(conduit, msg):
 
 def config_hook(conduit):
     parser = conduit.getOptParser()
-    parser.add_option('--changelog', action='store_true', 
+    if parser:
+        parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
 
     conduit.registerOpt('when', PLUG_OPT_STRING, PLUG_OPT_WHERE_MAIN, 'post')
@@ -73,7 +74,8 @@ def config_hook(conduit):
 def postreposetup_hook(conduit):
     global changelog
     opts, args = conduit.getCmdLine()
-    changelog = opts.changelog
+    if opts:
+        changelog = opts.changelog
 
     if changelog:
         repos = conduit.getRepos()
