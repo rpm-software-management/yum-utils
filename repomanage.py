@@ -141,10 +141,13 @@ def parseargs(args):
     options['output'] = 'new'
     options['passed'] = []
     options['space'] = 0
+    options['keep'] = 1 # number of newest items to keep 
+                        # (defaults to single newest but it could be newest N)
     try:
-        gopts, argsleft = getopt.getopt(args, 'onhs', ['space', 'new', 'old', 'help'])
+        gopts, argsleft = getopt.getopt(args, 'onhsk:', ['keep=','space', 
+                                                       'new', 'old', 'help'])
     except getopt.error, e:
-        errorprint(_('Options Error: %s.') % e)
+        errorprint('Options Error: %s.' % e)
         usage()
         sys.exit(1)
     
@@ -171,6 +174,8 @@ def parseargs(args):
                     options['passed'].append('new')
             elif arg in ['-s', '--space']:
                 options['space'] = 1
+            elif arg in ['-k', '--keep']:
+                options['keep'] = int(a)
                 
             
     except ValueError, e:
@@ -190,19 +195,33 @@ def parseargs(args):
         directory = argsleft[0]
     
     return options, directory
+
+def sortByEVR(evr1, evr2):
+    """sorts a list of evr tuples"""
     
+    rc = compareEVR(evr1, evr2)
+    if rc == 0:
+        return 0
+    if rc < 0:
+        return -1
+    if rc > 0:
+        return 1
+
+
 def main(args):
     options, mydir = parseargs(args)
     rpmList = []
     rpmList = getFileList(mydir, '.rpm', rpmList)
     verfile = {}
-    naver = {}
+    pkgdict = {} # hold all of them - put them in (n,a) = [(e,v,r),(e1,v1,r1)]
+    
+    keepnum = options['keep']*(-1) # the number of items to keep
     
     if len(rpmList) == 0:
         errorprint('No files to process')
         sys.exit(1)
     
-    
+
     ts = rpm.TransactionSet()
     for pkg in rpmList:
         try:
@@ -215,38 +234,46 @@ def main(args):
         (n,a,e,v,r) = pkgtuple
         del hdr
         
+        if not pkgdict.has_key((n,a)):
+            pkgdict[(n,a)] = []
+        pkgdict[(n,a)].append((e,v,r))
+        
         if not verfile.has_key(pkgtuple):
             verfile[pkgtuple] = []
         verfile[pkgtuple].append(pkg)
         
-        if not naver.has_key((n,a)):
-            naver[(n,a)] = (e,v,r)
-            continue
-        
-        (e2, v2, r2) = naver[(n,a)] # the current champion
-        rc = compareEVR((e,v,r), (e2,v2,r2))
-        if rc == 0:
-            continue
-        if rc < 0:
-            continue
-        if rc > 0:
-            naver[(n,a)] = (e,v,r)
-    
+        for natup in pkgdict.keys():
+            evrlist = pkgdict[natup]
+            if len(evrlist) > 1:
+                evrlist.sort(sortByEVR)
+                pkgdict[natup] = evrlist
+                
     del ts
+
     # now we have our dicts - we can return whatever by iterating over them
-    # just print newests
     
     outputpackages = []
     if options['output'] == 'new':
-    
-        for (n,a) in naver.keys():
-            (e,v,r) = naver[(n,a)]
-            for pkg in verfile[(n,a,e,v,r)]:
-                outputpackages.append(pkg)
+        for (n,a) in pkgdict.keys():
+
+
+            evrlist = pkgdict[(n,a)]
+            if len(evrlist) < abs(keepnum):
+                newevrs = evrlist
+            else:
+                newevrs = evrlist[keepnum:]
+            for (e,v,r) in newevrs:
+                for pkg in verfile[(n,a,e,v,r)]:
+                    outputpackages.append(pkg)
    
     if options['output'] == 'old':
-        for (n,a,e,v,r) in verfile.keys():
-            if (e,v,r) != naver[(n,a,)]:
+        for (n,a) in pkgdict.keys():
+            evrlist = pkgdict[(n,a)]
+            if len(evrlist) < abs(keepnum):
+                continue
+ 
+            oldevrs = evrlist[:keepnum]
+            for (e,v,r) in oldevrs:
                 for pkg in verfile[(n,a,e,v,r)]:
                     outputpackages.append(pkg)
     
@@ -264,6 +291,7 @@ def usage():
       -o --old - print the older packages
       -n --new - print the newest packages
       -s --space - space separated output, not newline
+      -k --keep - newest N packages to keep - defaults to 1
       -h --help - duh
     By default it will output the full path to the newest packages in the path.
         """
