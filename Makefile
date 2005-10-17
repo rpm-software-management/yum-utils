@@ -1,3 +1,4 @@
+SUBDIRS = docs
 PKGNAME = yum-utils
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
@@ -14,6 +15,8 @@ install:
 	install -m 755 repo-rss.py $(DESTDIR)/usr/bin/repo-rss
 	install -m 755 yumdownloader.py $(DESTDIR)/usr/bin/yumdownloader
 	install -m 755 yum-builddep.py $(DESTDIR)/usr/bin/yum-builddep
+
+	for d in $(SUBDIRS); do make DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
 
 archive:
 	@rm -rf ${PKGNAME}-%{VERSION}.tar.gz

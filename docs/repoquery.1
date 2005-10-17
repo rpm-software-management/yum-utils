@@ -1,0 +1,183 @@
+.\" repoquery 
+.TH "repoquery" "1" "2005 Oct 17" "Panu Matilainen" ""
+.SH "NAME"
+repoquery
+.SH "SYNOPSIS"
+\fBrepoquery\fP [options] <item ...>
+.br
+\fBrepoquery\fP -a [options] 
+.SH "DESCRIPTION"
+.PP 
+\fBrepoquery\fP is a program for querying information from YUM repositories
+similarly to rpm queries.
+.PP 
+.SH "GENERAL OPTIONS"
+.IP "\fB\-\-querytags\fP"
+List valid queryformat tags and exit..
+.IP "\fB\-v, \-\-version\fP" 
+Report program version and exit.
+.IP "\fB\-\-repoid=<repo>\fP"
+Specify which repository to query. Using this option disables all repositories
+not explicitly enabled with --repoid option (can be used multiple times). By
+default repoquery uses whatever repositories are enabled in YUM configuration.
+.IP "\fB\-q\fP"
+For rpmquery compatibility, doesn't do anything.
+.IP "\fB\-h, \-\-help\fP"
+Help; display a help message and then quit\&.
+.IP "\fB\-\-quiet\fP" 
+Run quietly: no warnings printed to stderr.
+.IP "\fB\-C\fP" 
+Tells repoquery to run entirely from YUM cache - does not download any metadata
+or update the cache. Queries in this mode can fail or give partial/incorrect
+results if the cache isn't fully populated beforehand with eg "yum makecache".
+.IP "\fB\-\-tempcache\fP"
+Create and use a private cache instead of the main YUM cache. This is used
+by default when run as non-root user.
+
+.PP 
+.SH "PACKAGE QUERY OPTIONS" 
+.IP "\fB\-i, \-\-info\fP"
+Show general information about package similarly to "rpm -qi"
+.IP "\fB\-l, \-\-list\fP"
+List files in package.
+.IP "\fB\-\-requires\fP"
+List package dependencies.
+.IP "\fB\-\-resolve\fP"
+When used with --requires, resolve capabilities to originating packages.
+.IP "\fB\-\-provides\fP"
+List capabilities package provides.
+.IP "\fB\-\-obsoletes\fP"
+List capabilities obsoleted by package.
+.IP "\fB\-\-conflicts\fP"
+List capabilities conflicting with package.
+.IP "\fB\-\-changelog\fP"
+List package changelog.
+.IP "\fB\-\-location\fP"
+Show a location where the package could be downloaded from.
+For example: \fBwget `repoquery --location yum`\fP
+.IP "\fB\-s, \-\-source\fP"
+Show package source RPM name. 
+.IP "\fB\-\-groupmember PACKAGE\fP"
+List the repodata groups (yumgroups.xml) belongs to (if any).
+.IP "\fB\-\-nvr\fP"
+Use name-version-release output format (rpm query default)
+.IP "\fB\-\-nevra\fP"
+Use name-epoch:version-release.architecture output format (default)
+.IP "\fB\-\-envra\fP"
+Use epoch:name-version-release.architecture output format 
+(easier to parse than nevra)
+.IP "\fB\--qf=FORMAT, \-\-queryformat=FORMAT\fP"
+Specify custom output format for queries.
+.PP 
+
+.SH "PACKAGE SELECTION OPTIONS" 
+.IP "\fB\-a\fP"
+Query all available packages.
+.IP "\fB\-f, \-\-file FILE\fP"
+Query package owning FILE.
+.IP "\fB\-\-whatprovides CAPABILITY\fP"
+Query all packages that provide CAPABILITY.
+.IP "\fB\-\-whatrequires CAPABILITY\fP"
+Query all packages that require CAPABILITY.
+.IP "\fB\-\-alldeps\fP"
+When used with --whatrequires, use both automatic and manual dependencies
+for the query.
+.IP "\fB\-\-pkgnarrow=WHAT\fP"
+Limit what packages are considered for the query. Valid values for WHAT are:
+installed, available, recent, updates, extras, all and repository (default).
+.IP "\fB\-\-show-dupes\fP"
+Query all versions of package. By default only newest packages are
+considered.
+
+.PP
+.SH "GROUP QUERY OPTIONS" 
+.PP
+.IP "\fB\-i, \-\-info\fP"
+Show general information about group.
+.IP "\fB\-l, \-\-list\fP"
+List packages belonging to (required by) group.
+.IP "\fB\-\-grouppkgs=WHAT\fP"
+Specify what type of packages are queried from groups. Valid values for WHAT
+are all, mandatory, default, optional.
+.IP "\fB\-\-requires\fP"
+List groups required by group.
+.PP
+.SH "GROUP SELECTION OPTIONS" 
+.PP
+.IP "\fB\-a\fP"
+Query all available groups.
+.IP "\fB\-g\fP"
+Query groups instead of packages.
+.PP
+
+.SH "EXAMPLES"
+.IP "List all packages whose name contains 'perl':"
+\fBrepoquery '*perl*'\fP
+.IP "List all packages depending on openssl:"
+\fBrepoquery --whatrequires --alldeps openssl\fP 
+.IP "List all package names and the repository they come from, nicely formatted:"
+\fBrepoquery -a --qf "%-20{repoid} %{name}"\fP
+.IP "List name and summary of all available updates (if any), nicely formatted:"
+\fBrepoquery -a --pkgnarrow=updates --qf "%{name}:\\n%{summary}\\n"\fP
+.IP "List optional packages in base group:"
+\fBrepoquery -g --grouppkgs=optional -l base\fP
+.IP "List build requirements from 'anaconda' source rpm:"
+\fBrepoquery --requires anaconda.src\fP
+.\"TODO: Add more examples...
+
+.PP
+.SH "MISC"
+.IP "\fBSpecifying package names\fP"
+A package can be referred to in all queries with any 
+of the following:
+.IP
+.br
+\fBname\fP
+.br
+\fBname.arch\fP
+.br
+\fBname-ver\fP
+.br
+\fBname-ver-rel\fP
+.br
+\fBname-ver-rel.arch\fP
+.br
+\fBname-epoch:ver-rel.arch\fP
+.br
+\fBepoch:name-ver-rel.arch\fP
+.IP
+For example: \fBrepoquery -l kernel-2.4.1-10.i686\fP
+.br
+Additionally wildcards (shell-style globs) can be used.
+
+.PP 
+.SH "FILES"
+As repoquery uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+.\"http://linux.duke.edu/yum-utils/
+http://linux.duke.edu/yum/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There of course aren't any bugs, but if you find any, they should be sent
+to the mailing list: yum@lists.linux.duke.edu or filed in bugzilla.
+.fi
