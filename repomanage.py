@@ -27,7 +27,7 @@ import fnmatch
 import types
 import string
 import getopt
-
+from yum import misc
 from exceptions import Exception
 
 
@@ -245,6 +245,7 @@ def main(args):
         for natup in pkgdict.keys():
             evrlist = pkgdict[natup]
             if len(evrlist) > 1:
+                evrlist = misc.unique(evrlist)
                 evrlist.sort(sortByEVR)
                 pkgdict[natup] = evrlist
                 
@@ -255,13 +256,13 @@ def main(args):
     outputpackages = []
     if options['output'] == 'new':
         for (n,a) in pkgdict.keys():
-
-
             evrlist = pkgdict[(n,a)]
+            
             if len(evrlist) < abs(keepnum):
                 newevrs = evrlist
             else:
                 newevrs = evrlist[keepnum:]
+            
             for (e,v,r) in newevrs:
                 for pkg in verfile[(n,a,e,v,r)]:
                     outputpackages.append(pkg)
@@ -269,6 +270,7 @@ def main(args):
     if options['output'] == 'old':
         for (n,a) in pkgdict.keys():
             evrlist = pkgdict[(n,a)]
+            
             if len(evrlist) < abs(keepnum):
                 continue
  
