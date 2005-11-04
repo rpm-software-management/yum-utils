@@ -37,7 +37,7 @@ from yum import Errors
 
 def initYum(opts):
     my = yum.YumBase()
-    my.doConfigSetup()
+    my.doConfigSetup(opts.conffile)
     my.log = Logger(threshold=my.conf.getConfigOption('debuglevel'), 
     file_object =sys.stdout)
     if opts.orphans:
@@ -262,6 +262,8 @@ def parseArgs():
       help="Number of kernel packages to keep on the system (default 2)")
     parser.add_option("--keepdevel",default=False,dest="keepdevel",action="store_true",
       help="Do not remove kernel-devel packages when removing kernels")
+    parser.add_option("-c", dest="conffile", action="store",
+                default='/etc/yum.conf', help="config file location")
 
     (opts, args) = parser.parse_args()
     if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans)): 
