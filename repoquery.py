@@ -528,6 +528,8 @@ def main(args):
                       help="use private cache (default when used as non-root)")
     parser.add_option("--querytags", default=0, action="store_true",
                       help="list available tags in queryformat queries")
+    parser.add_option("-c", dest="conffile", action="store",
+                      default='/etc/yum.conf', help="config file location")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
@@ -590,7 +592,7 @@ def main(args):
         pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
-    repoq.doConfigSetup()
+    repoq.doConfigSetup(opts.conffile)
     
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
