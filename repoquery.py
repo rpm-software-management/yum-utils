@@ -185,8 +185,9 @@ class repoPkgQuery(pkgQuery):
 
     def fmt_list(self, **kw):
         fdict = {}
-        for file in self.pkg.returnFileEntries():
-            fdict[file] = None
+        for ftype in self.pkg.returnFileTypes():
+            for file in self.pkg.returnFileEntries(ftype):
+                fdict[file] = None
         files = fdict.keys()
         files.sort()
         return "\n".join(files)
@@ -432,7 +433,10 @@ class YumBaseQuery(yum.YumBase):
                 provs.extend(pkg.prco("provides"))
 
         for prov in provs:
-            for pkg in self.pkgSack.searchRequires(prov):
+            # Only look at the providing name, not the whole version. This 
+            # might occasionally give some false positives but that's 
+            # better than missing ones which it had previously
+            for pkg in self.pkgSack.searchRequires(prov.split()[0]):
                 pkgs[pkg.pkgtup] = pkg
         return self.queryPkgFactory(pkgs.values())
 
