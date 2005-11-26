@@ -143,7 +143,7 @@ def parseargs(args):
                         # (defaults to single newest but it could be newest N)
     options['nocheck'] = 0
     try:
-        gopts, argsleft = getopt.getopt(args, 'onhskc:', ['keep=','space', 
+        gopts, argsleft = getopt.getopt(args, 'onhsck:', ['keep=','space', 
                                               'nocheck', 'new', 'old', 'help'])
     except getopt.error, e:
         errorprint('Options Error: %s.' % e)
