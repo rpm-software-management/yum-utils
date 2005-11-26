@@ -68,14 +68,12 @@ def returnHdr(ts, package):
         fdno = os.open(package, os.O_RDONLY)
     except OSError, e:
         raise Error, "Error opening file %s" % package
-    ts.setVSFlags(~(rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
     try:
         hdr = ts.hdrFromFdno(fdno)
     except rpm.error, e:
         raise Error, "Error opening package %s" % package
     if type(hdr) != rpm.hdr:
         raise Error, "Error opening package %s" % package
-    ts.setVSFlags(0)
     os.close(fdno)
     return hdr
     
@@ -143,9 +141,10 @@ def parseargs(args):
     options['space'] = 0
     options['keep'] = 1 # number of newest items to keep 
                         # (defaults to single newest but it could be newest N)
+    options['nocheck'] = 0
     try:
-        gopts, argsleft = getopt.getopt(args, 'onhsk:', ['keep=','space', 
-                                                       'new', 'old', 'help'])
+        gopts, argsleft = getopt.getopt(args, 'onhskc:', ['keep=','space', 
+                                              'nocheck', 'new', 'old', 'help'])
     except getopt.error, e:
         errorprint('Options Error: %s.' % e)
         usage()
@@ -176,6 +175,8 @@ def parseargs(args):
                 options['space'] = 1
             elif arg in ['-k', '--keep']:
                 options['keep'] = int(a)
+            elif arg in ['-c', '--nocheck']:
+                options['nocheck'] = 1
                 
             
     except ValueError, e:
@@ -223,6 +224,10 @@ def main(args):
     
 
     ts = rpm.TransactionSet()
+    if options['nocheck']:
+        ts.setVSFlags(~(rpm._RPMVSF_NOPAYLOAD))
+    else:
+        ts.setVSFlags(~(rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
     for pkg in rpmList:
         try:
             hdr = returnHdr(ts, pkg)
@@ -294,6 +299,7 @@ def usage():
       -n --new - print the newest packages
       -s --space - space separated output, not newline
       -k --keep - newest N packages to keep - defaults to 1
+      -c --nocheck - do not check package payload signatures/digests
       -h --help - duh
     By default it will output the full path to the newest packages in the path.
         """
