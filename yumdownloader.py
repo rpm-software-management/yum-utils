@@ -25,6 +25,7 @@ import output
 from urlgrabber.progress import TextMeter
 from yum.logger import Logger
 from yum.packages import parsePackages, returnBestPackages
+from yum.misc import getCacheDir
 from optparse import OptionParser
 from urlparse import urljoin
 
@@ -33,7 +34,11 @@ def initYum(source=False):
     my.doConfigSetup()
     my.conf.setConfigOption('uid', os.geteuid())
     if my.conf.getConfigOption('uid') != 0:
-        my.conf.setConfigOption('cache', 1)
+        cachedir = getCacheDir()
+        if cachedir is None:
+            print "Error: Could not make cachedir, exiting"
+            sys.exit(50)
+        my.repos.setCacheDir(cachedir)
     my.repos.setProgressBar(TextMeter(fo=sys.stdout))
     my.log = Logger(threshold=my.conf.getConfigOption('debuglevel'), 
     file_object =sys.stdout)
