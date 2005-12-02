@@ -29,7 +29,7 @@ from yum.misc import getCacheDir
 from optparse import OptionParser
 import rpmUtils.arch
 from yum.constants import *
-
+from repomd.packageSack import ListPackageSack
 
 
 def evrTupletoVer(tuple):
@@ -108,6 +108,9 @@ class RepoClosure(yum.YumBase):
             pkgs = self.pkgSack.returnNewestByNameArch()
         else:
             pkgs = self.pkgSack
+
+        mypkgSack = ListPackageSack(pkgs)
+        pkgtuplist = mypkgSack.simplePkgList()
         
         for pkg in pkgs:
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
@@ -125,8 +128,22 @@ class RepoClosure(yum.YumBase):
                     if not unresolved.has_key(pkg):
                         unresolved[pkg] = []
                     unresolved[pkg].append((req, flags, ver))
-                else:
-                    resolved[(req,flags,ver)] = 1
+                    continue
+                    
+                if newest:
+                    resolved_by_newest = False
+                    for po in resolve_sack:# look through and make sure all our answers are newest-only
+                        if po.pkgtup in pkgtuplist:
+                            resolved_by_newest = True
+                            break
+
+                    if resolved_by_newest:                    
+                        resolved[(req,flags,ver)] = 1
+                    else:
+                        if not unresolved.has_key(pkg):
+                            unresolved[pkg] = []
+                        unresolved[pkg].append((req, flags, ver))                        
+                        
         return unresolved
     
     
