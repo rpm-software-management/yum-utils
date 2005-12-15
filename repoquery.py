@@ -296,7 +296,6 @@ class groupQuery:
 class YumBaseQuery(yum.YumBase):
     def __init__(self, pkgops = [], sackops = [], options = None):
         yum.YumBase.__init__(self)
-        self.conf = yum.config.yumconf()
         self.options = options
         self.pkgops = pkgops
         self.sackops = sackops
