@@ -19,6 +19,8 @@ from yum.constants import *
 from yum.plugins import PluginYumExit
 from yum.plugins import TYPE_CORE
 from rpmUtils.miscutils import splitFilename, compareEVR
+import urlgrabber
+import urlgrabber.grabber
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
@@ -29,19 +31,23 @@ def config_hook(conduit):
 def exclude_hook(conduit):
     conduit.info(2, 'Reading version lock configuration')
     locklist = []
+    location = conduit.confString('main', 'locklist')
+    if not location:
+        raise PluginYumExit('Locklist not set')
     try:
-        llfile = open(conduit.confString('main', 'locklist'))
+        llfile = urlgrabber.urlopen(location)
         for line in llfile.readlines():
+            if line.startswith('#') or line.strip() == '':
+                continue
             locklist.append(line.rstrip())
         llfile.close()
-    except IOError:
-        raise PluginYumExit('Unable to read version lock configuration')
+    except urlgrabber.grabber.URLGrabError, e:
+        raise PluginYumExit('Unable to read version lock configuration: %s' % e)
 
     pkgs = conduit.getPackages()
     locked = {}
     for pkg in locklist:
-        # Arch doesn't matter but splitFilename wants it so fake it...
-        (n, v, r, e, a) = splitFilename("%s.arch" % pkg)
+        (n, v, r, e, a) = splitFilename("%s" % pkg)
         if e == '': 
             e = '0'
         locked[n] = (e, v, r) 
