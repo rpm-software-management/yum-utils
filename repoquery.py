@@ -439,6 +439,18 @@ class YumBaseQuery(yum.YumBase):
                 pkgs[pkg.pkgtup] = pkg
         return self.queryPkgFactory(pkgs.values())
 
+    def fmt_whatobsoletes(self, name, **kw):
+        pkgs = []
+        for pkg in self.pkgSack.searchObsoletes(name):
+            pkgs.append(pkg)
+        return self.queryPkgFactory(pkgs)
+            
+    def fmt_whatconflicts(self, name, **kw):
+        pkgs = []
+        for pkg in self.pkgSack.searchConflicts(name):
+            pkgs.append(pkg)
+        return self.queryPkgFactory(pkgs)
+
     def fmt_requires(self, name, **kw):
         pkgs = {}
         
@@ -509,6 +521,10 @@ def main(args):
                       help="query what package(s) provide a capability")
     parser.add_option("--whatrequires", default=0, action="store_true",
                       help="query what package(s) require a capability")
+    parser.add_option("--whatobsoletes", default=0, action="store_true",
+                      help="query what package(s) obsolete a capability")
+    parser.add_option("--whatconflicts", default=0, action="store_true",
+                      help="query what package(s) conflicts with a capability")
     # group stuff
     parser.add_option("-g", "--group", default=0, action="store_true", 
                       help="query groups instead of packages")
@@ -581,6 +597,10 @@ def main(args):
         sackops.append("whatrequires")
     if opts.whatprovides:
         sackops.append("whatprovides")
+    if opts.whatobsoletes:
+        sackops.append("whatobsoletes")
+    if opts.whatconflicts:
+        sackops.append("whatconflicts")
     if opts.file:
         sackops.append("whatprovides")
     if opts.location:
