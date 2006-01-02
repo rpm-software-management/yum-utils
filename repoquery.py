@@ -329,7 +329,6 @@ class YumBaseQuery(yum.YumBase):
         return self.queryPkgFactory(pkgs)
 
     def returnPkgList(self):
-
         pkgs = []
         if self.options.pkgnarrow == "repos":
             if self.conf.showdupesfromrepos:
@@ -367,8 +366,6 @@ class YumBaseQuery(yum.YumBase):
         return grps
 
     def matchGroups(self, items):
-        if not items:
-            return self.returnGroups()
         grps = []
         for grp in self.returnGroups():
             for expr in items:
@@ -376,11 +373,7 @@ class YumBaseQuery(yum.YumBase):
                     grps.append(grp)
         return grps
                     
-            
     def matchPkgs(self, items):
-        if not items:
-            return self.queryPkgFactory(self.returnPkgList())
-        
         pkgs = []
         notfound = {}
         
@@ -560,9 +553,12 @@ def main(args):
             print tag
         sys.exit(0)
 
-    if len(regexs) < 1 and not opts.all:
-        parser.print_help()
-        sys.exit(1)
+    if len(regexs) < 1:
+        if opts.all:
+            regexs = ['*']
+        else:
+            parser.print_help()
+            sys.exit(1)
 
     pkgops = []
     sackops = []
