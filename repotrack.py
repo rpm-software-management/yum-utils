@@ -29,52 +29,51 @@
 
 import os
 import sys
-import time
+from optparse import OptionParser
+from urlparse import urljoin
+
 
 import yum
 import yum.Errors
 from yum.misc import getCacheDir
 from yum.constants import *
 from yum.packages import parsePackages
-
-output_dir = '/tmp/repotrack_dir'
-user_pkg_list = ['mplayer', 'mplayerplug-in', 'yum']
-enabled_repos = ['livna', 'livna-testing']
+from repomd.packageSack import ListPackageSack
 
 class RepoTrack(yum.YumBase):
-    def __init__(self, config = "/etc/yum.conf"):
+    def __init__(self, opts):
         yum.YumBase.__init__(self)
-
-
-    def findDeps(self, pkg_object_list):
+        self.opts = opts
+        
+    def log(self, num, msg):
+        if num < 3 and not self.opts.quiet:
+            print msg
+    
+    def findDeps(self, po):
         """Return the dependencies for a given package, as well
            possible solutions for those dependencies.
            
            Returns the deps as a dict  of:
-             packageobject = [reqs] = [list of satisfying pkgs]"""
+            dict[reqs] = [list of satisfying pkgs]"""
         
-        results = {}
-    
-        for pkg in pkg_object_list:
-            results[pkg] = {} 
-            reqs = pkg.returnPrco('requires');
-            reqs.sort()
-            pkgresults = results[pkg] # shorthand so we don't have to do the
-                                      # double bracket thing
+   
+        reqs = po.returnPrco('requires');
+        reqs.sort()
+        pkgresults = {}
+        
+        for req in reqs:
+            (r,f,v) = req
+            if r.startswith('rpmlib('):
+                continue
             
-            for req in reqs:
-                (r,f,v) = req
-                if r.startswith('rpmlib('):
-                    continue
-                
-                satisfiers = []
-    
-                for po in self.whatProvides(r, f, v):
-                    satisfiers.append(po)
-    
-                pkgresults[req] = satisfiers
+            satisfiers = []
+
+            for po in self.whatProvides(r, f, v):
+                satisfiers.append(po)
+
+            pkgresults[req] = satisfiers
         
-        return results
+        return pkgresults
     
 
 def more_to_check(unprocessed_pkgs):
@@ -84,25 +83,41 @@ def more_to_check(unprocessed_pkgs):
     
     return False
 
+def parseArgs():
+    usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
+    parser = OptionParser(usage=usage)
+    parser.add_option("-c", "--config", default='/etc/yum.conf',
+        help='config file to use (defaults to /etc/yum.conf)')
+    parser.add_option("-a", "--arch", default=None,
+        help='check as if running the specified arch (default: current arch)')
+    parser.add_option("-r", "--repoid", default=[], action='append',
+        help="specify repo ids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("-t", "--tempcache", default=False, action="store_true", 
+        help="Use a temp dir for storing/accessing yum-cache")
+    parser.add_option("-p", "--download_path", dest='destdir', 
+        default=os.getcwd(), help="Path to download packages to")
+    parser.add_option("-u", "--urls", default=False, action="store_true", 
+        help="Just list urls of what would be downloaded, don't download")
+    parser.add_option("-n", "--newest", default=False, action="store_true", 
+        help="Only download/list newest packages")
+    parser.add_option("-q", "--quiet", default=False, action="store_true", 
+        help="Output as little as possible")
+        
+    (opts, args) = parser.parse_args()
+    return (opts, args)
+
 
 def main():
-# setup yum basics
-# read in repo info
-# find all its deps using findDeps()
-# set the download path to output_dir
-# download and gpg/sha checksum them
-# output list of things that actually got downloaded.
+# TODO/FIXME
+# gpg/sha checksum them
 
-
-# arguments to take: arch, repos, package names to track, yum config file,
-#                    download or list urls
-
-
-    my = RepoTrack()
-    my.doConfigSetup()
+    (opts, user_pkg_list) = parseArgs()
+    
+    my = RepoTrack(opts=opts)
+    my.doConfigSetup(fn=opts.config)
     
     # do the happy tmpdir thing if we're not root
-    if os.geteuid() != 0:
+    if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
             print "Error: Could not make cachedir, exiting"
@@ -111,7 +126,7 @@ def main():
         my.repos.setCacheDir(cachedir)
 
     for repo in my.repos.repos.values():
-        if repo.id not in enabled_repos:
+        if repo.id not in opts.repoid:
             repo.disable()
         else:
             repo.enable()
@@ -126,10 +141,14 @@ def main():
     
     avail = my.pkgSack.returnPackages()
     for item in user_pkg_list:
-        print item
         exactmatch, matched, unmatched = parsePackages(avail, [item])
-        pkg_list.extend(my.bestPackagesFromList(exactmatch+matched))
-    
+        pkg_list.extend(exactmatch)
+        pkg_list.extend(matched)
+        this_sack = ListPackageSack()
+        this_sack.addList(pkg_list)
+        pkg_list = this_sack.returnNewestByNameArch()
+        del this_sack
+        
     for po in pkg_list:
         unprocessed_pkgs[po.pkgtup] = po
     
@@ -143,23 +162,47 @@ def main():
             po = unprocessed_pkgs[pkgtup]
             final_pkgs[po.pkgtup] = po
             
-            deps_dict = my.findDeps([ po ])
+            deps_dict = my.findDeps(po)
             unprocessed_pkgs[po.pkgtup] = None
-            for deps_po in deps_dict.keys():
-                for req in deps_dict[deps_po].keys():
-                    best_res = my.bestPackagesFromList(deps_dict[deps_po][req])
-                    for res in best_res:
-                        if res is not None:
-                            if not unprocessed_pkgs.has_key(res.pkgtup):
-                                unprocessed_pkgs[res.pkgtup] = res
-        
-        for pkgtup in unprocessed_pkgs.keys():
-            if unprocessed_pkgs[pkgtup] is not None:
-                print unprocessed_pkgs[pkgtup]
+            for req in deps_dict.keys():
+                this_sack = ListPackageSack()
+                this_sack.addList(deps_dict[req])
+                pkg_list = this_sack.returnNewestByNameArch()
+                del this_sack
 
+                for res in pkg_list:
+                    if res is not None:
+                        if not unprocessed_pkgs.has_key(res.pkgtup):
+                            unprocessed_pkgs[res.pkgtup] = res
+    
+    
+    
+    download_list = final_pkgs.values()
+    if opts.newest:
+        this_sack = ListPackageSack()
+        this_sack.addList(download_list)
+        download_list = this_sack.returnNewestByNameArch()
         
-    for po in final_pkgs.values():
-        print po
+    
+    for pkg in download_list:
+        repo = my.repos.getRepo(pkg.repoid)
+        remote = pkg.returnSimple('relativepath')
+        if opts.urls:
+            url = urljoin(repo.urls[0],remote)
+            print '%s' % url
+            continue
+        local = os.path.basename(remote)
+        local = os.path.join(opts.destdir, local)
+        if (os.path.exists(local) and 
+            str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+            if not opts.quiet:
+                my.errorlog(0,"%s already exists and appears to be complete" % local)
+            continue
+        # Disable cache otherwise things won't download
+        repo.cache = 0
+        my.log(2, 'Downloading %s' % os.path.basename(remote))
+        repo.get(relative=remote, local=local)
+
 
 if __name__ == "__main__":
     main()
