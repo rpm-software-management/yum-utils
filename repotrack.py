@@ -35,7 +35,7 @@ from urlparse import urljoin
 
 import yum
 import yum.Errors
-from yum.misc import getCacheDir
+from yum.misc import getCacheDir, sortPkgObj
 from yum.constants import *
 from yum.packages import parsePackages
 from repomd.packageSack import ListPackageSack
@@ -84,12 +84,12 @@ def more_to_check(unprocessed_pkgs):
     return False
 
 def parseArgs():
-    usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
+    usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
-    parser.add_option("-a", "--arch", default=None,
-        help='check as if running the specified arch (default: current arch)')
+#    parser.add_option("-a", "--arch", default=None,
+#        help='check as if running the specified arch (default: current arch)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
@@ -98,8 +98,8 @@ def parseArgs():
         default=os.getcwd(), help="Path to download packages to")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
         help="Just list urls of what would be downloaded, don't download")
-    parser.add_option("-n", "--newest", default=False, action="store_true", 
-        help="Only download/list newest packages")
+    parser.add_option("-n", "--newest", default=True, action="store_false", 
+        help="Toggle downloading only the newest packages(defaults to newest-only)")
     parser.add_option("-q", "--quiet", default=False, action="store_true", 
         help="Output as little as possible")
         
@@ -110,9 +110,26 @@ def parseArgs():
 def main():
 # TODO/FIXME
 # gpg/sha checksum them
+# make -a do something
+# does it make more sense for -n to be the default?
 
     (opts, user_pkg_list) = parseArgs()
     
+    if len(user_pkg_list) == 0:
+        print >> sys.stderr, "Error: no packages specified to parse"
+        sys.exit(1)
+        
+    if not os.path.exists(opts.destdir) and not opts.urls:
+        try:
+            os.makedirs(opts.destdir)
+        except OSError, e:
+            print >> sys.stderr, "Error: Cannot create destination dir %s" % opts.destdir
+            sys.exit(1)
+    
+    if not os.access(opts.destdir, os.W_OK):
+        print >> sys.stderr, "Error: Cannot write to  destination dir %s" % opts.destdir
+        sys.exit(1)
+        
     my = RepoTrack(opts=opts)
     my.doConfigSetup(fn=opts.config)
     
@@ -120,17 +137,26 @@ def main():
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
-            print "Error: Could not make cachedir, exiting"
+            print >> sys.stderr, "Error: Could not make cachedir, exiting"
             sys.exit(50)
             
         my.repos.setCacheDir(cachedir)
 
-    for repo in my.repos.repos.values():
-        if repo.id not in opts.repoid:
+    if len(opts.repoid) > 0:
+        myrepos = []
+        
+        # find the ones we want
+        for glob in opts.repoid:
+            myrepos.extend(my.repos.findRepos(glob))
+        
+        # disable them all
+        for repo in my.repos.repos.values():
             repo.disable()
-        else:
+        
+        # enable the ones we like
+        for repo in myrepos:
             repo.enable()
-    
+
     my.doRepoSetup()    
     my.doSackSetup()
     
@@ -144,10 +170,15 @@ def main():
         exactmatch, matched, unmatched = parsePackages(avail, [item])
         pkg_list.extend(exactmatch)
         pkg_list.extend(matched)
-        this_sack = ListPackageSack()
-        this_sack.addList(pkg_list)
-        pkg_list = this_sack.returnNewestByNameArch()
-        del this_sack
+        if opts.newest:
+            this_sack = ListPackageSack()
+            this_sack.addList(pkg_list)
+            pkg_list = this_sack.returnNewestByNameArch()
+            del this_sack
+    
+    if len(pkg_list) == 0:
+        print >> sys.stderr, "Nothing found to download matching packages specified"
+        sys.exit(1)
         
     for po in pkg_list:
         unprocessed_pkgs[po.pkgtup] = po
@@ -165,10 +196,12 @@ def main():
             deps_dict = my.findDeps(po)
             unprocessed_pkgs[po.pkgtup] = None
             for req in deps_dict.keys():
-                this_sack = ListPackageSack()
-                this_sack.addList(deps_dict[req])
-                pkg_list = this_sack.returnNewestByNameArch()
-                del this_sack
+                pkg_list = deps_dict[req]
+                if opts.newest:
+                    this_sack = ListPackageSack()
+                    this_sack.addList(pkg_list)
+                    pkg_list = this_sack.returnNewestByNameArch()
+                    del this_sack
 
                 for res in pkg_list:
                     if res is not None:
@@ -183,7 +216,7 @@ def main():
         this_sack.addList(download_list)
         download_list = this_sack.returnNewestByNameArch()
         
-    
+    download_list.sort(sortPkgObj)
     for pkg in download_list:
         repo = my.repos.getRepo(pkg.repoid)
         remote = pkg.returnSimple('relativepath')
