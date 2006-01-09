@@ -15,17 +15,11 @@
 # (c) 2005 seth vidal skvidal at phy.duke.edu
 
 
-# specify list of repos or default in yum.conf
-# specify list of pkgs - default to *
-# download latest set + any deps to a specified dir
-# alternatively:
-# repomanage repo
-# createrepo repo
-# repoview repo
-# email some address the list of new/updated packages.
-
-# need to keep state of current repo to know what's 'new' and when to download things
-# arch should be specified or default to system arch.
+# helps partially track a repo. Let's you download a package + all of its
+# deps from any set of repos.
+# use: so you can keep current on any given pkg + its deps from another
+#      repo w/o enabling that repo in your yum configuration by default
+#      also for making partial mirrors that traverse dependencies.
 
 import os
 import sys
@@ -111,7 +105,6 @@ def main():
 # TODO/FIXME
 # gpg/sha checksum them
 # make -a do something
-# does it make more sense for -n to be the default?
 
     (opts, user_pkg_list) = parseArgs()
     
