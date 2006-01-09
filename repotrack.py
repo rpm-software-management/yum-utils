@@ -29,11 +29,21 @@ from urlparse import urljoin
 
 import yum
 import yum.Errors
-from yum.misc import getCacheDir, sortPkgObj
+from yum.misc import getCacheDir
 from yum.constants import *
 from yum.packages import parsePackages
 from repomd.packageSack import ListPackageSack
 
+# for yum 2.4.X compat
+def sortPkgObj(pkg1 ,pkg2):
+    """sorts a list of yum package objects by name"""
+    if pkg1.name > pkg2.name:
+        return 1
+    elif pkg1.name == pkg2.name:
+        return 0
+    else:
+        return -1
+        
 class RepoTrack(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
@@ -119,7 +129,7 @@ def main():
             print >> sys.stderr, "Error: Cannot create destination dir %s" % opts.destdir
             sys.exit(1)
     
-    if not os.access(opts.destdir, os.W_OK):
+    if not os.access(opts.destdir, os.W_OK) and not opts.urls:
         print >> sys.stderr, "Error: Cannot write to  destination dir %s" % opts.destdir
         sys.exit(1)
         
