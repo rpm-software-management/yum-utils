@@ -40,7 +40,8 @@ def find_kmodules(availpkgs, provides, kernels):
         for kern in kernels:
             for prov in provides:
                 if pkg.name == "%s-%s" % (prov, kunamer(kern)):
-                    matches.append(pkg)
+                    if pkg.arch == kern.arch:
+                        matches.append(pkg)
     return unique(matches)
 
 def preresolve_hook(conduit):
