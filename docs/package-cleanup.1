@@ -1,0 +1,83 @@
+.\" package-cleanup 
+.TH "package-cleanup" "1" "2005 Nov 3" "Gijs Hollestelle" ""
+.SH "NAME"
+package-cleanup
+.SH "SYNOPSIS"
+\fBpackage-cleanup\fP [options] <item ...>
+.SH "DESCRIPTION"
+.PP 
+\fBpackage-cleanup\fP is a program for cleaning up the locally-installed RPMs.
+.PP 
+.SH "GENERAL OPTIONS"
+.IP "\fB\-v, \-\-version\fP" 
+Report program version and exit.
+.IP "\fB\-h, \-\-help\fP"
+Help; display a help message and then quit\&.
+.IP "\fB\-q, \-\-quiet\fP" 
+Print out nothing unecessary.
+.IP "\fB\-y\fP" 
+Agree to anything asked.
+.IP "\fB\-c <config file>\fP"
+Use alternative config file (default is /etc/yum.conf).
+.IP "\fB\-\-problems\fP"
+List dependency problems in the local RPM database.
+.IP "\fB\-\-leaves\fP"
+List leaf nodes in the local RPM database.  Leaf nodes are RPMs that
+are not relied upon by any other RPM.
+.IP "\fB\-\-problems\fP"
+List dependency problems in the local RPM database.
+.IP "\fB\-\-orphans\fP"
+List installed packages which are not available from currenly configured
+repositories.
+.IP "\fB\-\-oldkernels\fP"
+Remove old kernel and kernel-devel packages.
+.PP 
+.SH "LEAVES OPTIONS" 
+.IP "\fB\-\-all\fP"
+When listing leaf nodes also list leaf nodes that are
+not libraries.
+.PP 
+.SH "OLDKERNELS OPTIONS" 
+.IP "\fB\-\-count <COUNT>\fP"
+Number of kernel packages to keep on the system (default 2)
+.IP "\fB\-\-keepdevel\fP"
+Do not remove kernel-devel packages when removing kernels
+
+.SH "EXAMPLES"
+.IP "List all dependency problems:"
+\fBpackage-cleanup --problems\fP
+.IP "List all packages that are not in any Yum repository:"
+\fBpackage-cleanup --orphans\fP 
+.IP "Remove old kernels keeping 3 and leaving old kernel-devel packages installed:"
+\fBpackage-cleanup --oldkernels --count=3 --keepdevel\fP
+.PP 
+.SH "FILES"
+As package-cleanup uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+.\"http://linux.duke.edu/yum-utils/
+http://linux.duke.edu/yum/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There of course aren't any bugs, but if you find any, they should be sent
+to the mailing list: yum@lists.linux.duke.edu or filed in bugzilla.
+.fi

@@ -7,3 +7,4 @@ clean:
 install:
 	mkdir -p $(DESTDIR)/usr/share/man/man1
 	install -m 644 repoquery.1 $(DESTDIR)/usr/share/man/man1/repoquery.1
+	install -m 644 package-cleanup.1 $(DESTDIR)/usr/share/man/man1/package-cleanup.1
