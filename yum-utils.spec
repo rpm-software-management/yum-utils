@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.3.1
+Version: 0.4
 Release: 1
 License: GPL
 Group: Development/Tools
@@ -36,6 +36,15 @@ Requires: yum >= 2.3.4
 This plugin adds a command line option to allow viewing package changelog 
 deltas before or after updating packages.
 
+%package -n yum-fastestmirror
+Summary: Yum plugin which chooses fastest repository from a mirrorlist
+Group: System Environment/Base
+Requires: yum >= 2.3.4
+
+%description -n yum-fastestmirror
+This plugin sorts each repository's mirrorlist by connection speed
+prior to downloading packages.
+
 %prep
 %setup -q
 
@@ -45,7 +54,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # only changelog plugin for now...
-plugins="changelog"
+plugins="changelog fastestmirror"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -75,6 +84,7 @@ fi
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
 %{_bindir}/repoquery
+%{_bindir}/repo-graph
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
@@ -83,15 +93,24 @@ fi
 %files -n yum-updateonboot
 %defattr(-, root, root)
 %doc updateonboot/README
-%{_sysconfdir}/sysconfig/yum-updateonboot
+%config(noreplace) %{_sysconfdir}/sysconfig/yum-updateonboot
 %{_initrddir}/yum-updateonboot
 
 %files -n yum-changelog
 %defattr(-, root, root)
-%{_sysconfdir}/yum/pluginconf.d
-/usr/lib/yum-plugins
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
+/usr/lib/yum-plugins/changelog.py
+
+%files -n yum-fastestmirror
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
+/usr/lib/yum-plugins/fastestmirror.py
 
 %changelog
+* Tue Jan 10 2006 Brian Long <brilong@cisco.com>
+- bump version to 0.4
+- add yum-fastestmirror subpackage
+
 * Mon Oct 17 2005 Panu Matilainen <pmatilai@laiskiainen.org>
 - add repoquery man page
 

@@ -48,8 +48,8 @@ class yumQuiet(yum.YumBase):
                 maxdeps=len(deps[pkg])
 
             # color calculations lifted from rpmgraph 
-            h=0.4+(0.6/23*len(deps[pkg]))
-            s=h
+            h=0.5+(0.6/23*len(deps[pkg]))
+            s=h+0.1
             b=1.0
             
             print '"%s" [color="%s %s %s"];' % (pkg, h, s, b)
