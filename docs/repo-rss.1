@@ -1,0 +1,62 @@
+.\" repo-rss
+.TH "repo-rss" "1" "2005" "Seth Vidal" ""
+.SH "NAME"
+repo-rss
+.SH "SYNOPSIS"
+\fBrepo-rss\fP [options] repoid1 [repoid2...]
+.SH "DESCRIPTION"
+.PP 
+\fBrepo-rss\fP is a program for generating RSS feeds for one or more
+Yum repositories.
+.PP 
+.SH "GENERAL OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Help; display a help message and then quit\&.
+.IP "\fB\-f <file>\fP" 
+Specify the file to which the RSS will be written.  Default is repo-rss.xml.
+.IP "\fB\-l <link>\fP" 
+Specify the URL to the RSS feed.  Default is http://linux.duke.edu/projects/yum/.
+.IP "\fB\-t <title>\fP"
+Specify the title for the RSS feed.  Default is "RSS Repository - Recent Packages".
+.IP "\fB\-d <description>\fP"
+Specify the description of the RSS feed.  Default is "Most recent packages in Repositories".
+.IP "\fB\-r <days>\fP"
+Specify the number of days to consider most recent.  Default is 3.
+.IP "\fB\-\-tempcache\fP"
+Enable the use of a temporary directory for the yum cache.  This is enabled by
+default for non-root users.
+
+.SH "EXAMPLES"
+.IP "Generate an RSS for the updates-released repository and save it as updates-release.xml:"
+\fBrepo-rss -f updates-released.xml updates-released\fP
+.PP 
+.SH "FILES"
+As repo-rss uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+.\"http://linux.duke.edu/yum-utils/
+http://linux.duke.edu/yum/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There of course aren't any bugs, but if you find any, they should be sent
+to the mailing list: yum@lists.linux.duke.edu or filed in bugzilla.
+.fi

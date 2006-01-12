@@ -1,0 +1,46 @@
+.\" yum-builddep
+.TH "yum-builddep" "1" "2005 July 17" "Panu Matilainen" ""
+.SH "NAME"
+yum-builddep
+.SH "SYNOPSIS"
+\fByum-builddep\fP package
+.SH "DESCRIPTION"
+.PP 
+\fByum-builddep\fP is a program which installs the RPMs needed to build
+the specified package.  The source RPM for the specified package must
+be available in the Yum repository or it can be a local source RPM file.
+.PP 
+.SH "EXAMPLES"
+.IP "Download and install all the RPMs needed to build the kernel RPM:"
+\fByum-builddep kernel\fP
+.PP 
+.SH "FILES"
+As yum-builddep uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+.\"http://linux.duke.edu/yum-utils/
+http://linux.duke.edu/yum/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There of course aren't any bugs, but if you find any, they should be sent
+to the mailing list: yum@lists.linux.duke.edu or filed in bugzilla.
+.fi
