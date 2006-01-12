@@ -32,23 +32,6 @@ from yum.constants import *
 from repomd.packageSack import ListPackageSack
 
 
-def evrTupletoVer(tuple):
-    """convert and evr tuple to a version string, return None if nothing
-       to convert"""
-    
-    e, v,r = tuple
-    if v is None:
-        return None
-    
-    val = ''
-    if e is not None:
-        val = '%s:%s' % (e, v)
-    
-    if r is not None:
-        val = '%s-%s' % (val, r)
-    
-    return val
-    
 def parseArgs():
     usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
     parser = OptionParser(usage=usage)
