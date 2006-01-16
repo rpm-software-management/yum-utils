@@ -89,6 +89,10 @@ Query all packages that require CAPABILITY.
 .IP "\fB\-\-alldeps\fP"
 When used with --whatrequires, use both automatic and manual dependencies
 for the query.
+.IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
+Limit the query to packages of given architecture(s). Valid values are all
+architectures known to rpm/yum such as 'i386' and 'src' for
+source RPMS.
 .IP "\fB\-\-pkgnarrow=WHAT\fP"
 Limit what packages are considered for the query. Valid values for WHAT are:
 installed, available, recent, updates, extras, all and repository (default).
@@ -130,6 +134,9 @@ Query groups instead of packages.
 \fBrepoquery -g --grouppkgs=optional -l base\fP
 .IP "List build requirements from 'anaconda' source rpm:"
 \fBrepoquery --requires anaconda.src\fP
+.IP "List packages which BuildRequire gail-devel"
+\fBrepoquery --archlist=src --whatrequires gail-devel\fP
+
 .\"TODO: Add more examples...
 
 .PP

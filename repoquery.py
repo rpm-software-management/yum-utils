@@ -524,6 +524,8 @@ def main(args):
     parser.add_option("--grouppkgs", default="required", dest="grouppkgs",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
+    parser.add_option("--archlist", dest="archlist", 
+                      help="only query packages of certain architecture(s)")
     parser.add_option("--pkgnarrow", default="repos", dest="pkgnarrow",
                       help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
     parser.add_option("--show-dupes", default=0, action="store_true",
@@ -626,7 +628,7 @@ def main(args):
 
     if opts.show_dupes:
         repoq.conf.setConfigOption('showdupesfromrepos', 1)
-    
+
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
             if repo.id not in opts.repoid:
@@ -636,12 +638,15 @@ def main(args):
 
     repoq.doRepoSetup()
 
-    for exp in regexs:
-        if exp.endswith('.src'):
-            archlist = getArchList()
-            archlist.append('src')
-            break
-    
+    if opts.archlist:
+        archlist = opts.archlist.split(',')
+    else:
+        for exp in regexs:
+            if exp.endswith('.src'):
+                archlist = getArchList()
+                archlist.append('src')
+                break
+
     try:
         repoq.doSackSetup(archlist=archlist)
         repoq.doTsSetup()
