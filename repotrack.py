@@ -223,17 +223,20 @@ def main():
     for pkg in download_list:
         repo = my.repos.getRepo(pkg.repoid)
         remote = pkg.returnSimple('relativepath')
-        if opts.urls:
-            url = urljoin(repo.urls[0],remote)
-            print '%s' % url
-            continue
         local = os.path.basename(remote)
         local = os.path.join(opts.destdir, local)
         if (os.path.exists(local) and 
             str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+            
             if not opts.quiet:
                 my.errorlog(0,"%s already exists and appears to be complete" % local)
             continue
+
+        if opts.urls:
+            url = urljoin(repo.urls[0],remote)
+            print '%s' % url
+            continue
+
         # Disable cache otherwise things won't download
         repo.cache = 0
         my.log(2, 'Downloading %s' % os.path.basename(remote))
