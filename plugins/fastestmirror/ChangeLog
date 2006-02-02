@@ -1,0 +1,17 @@
+* Feb 02 2006 Luke Macken <lmacken@redhat.com> - 0.2.3
+- Added 'maxhostfileage' option to specify how many days to keep the hostfile
+
+* Nov 26 2005 Luke Macken <lmacken@redhat.com> - 0.2.2
+- Merge Panu's persistent changes to cache timings
+- Add 'hostfilepath' as configuration string
+
+* Nov 26 2005 Karanbir Singh <kbsingh@centos.org> - 0.2.1
+- Work out the mirror URL type and do something worthwhile with it
+- Test for non standard ports, if used.
+- file:// url's will always be timed = 0
+
+* Nov 16 2005 Luke Macken <lmacken@redhat.com> - 0.2
+- Throttle mirrors before metadata download (thanks to Panu)
+
+* Aug 12 2005 Luke Macken <lmacken@redhat.com> - 0.1
+- Initial release

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.2
+# Version: 0.2.3
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to metadata download.
@@ -14,7 +14,8 @@
 #   enabled=1
 #   verbose=1
 #   socket_timeout=3
-#   hostfilepath=/var/cache/yum/timedhosts.txt
+#   hostfilepath=/var/cache/yum/timedhosts
+#   maxhostfileage=10
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,28 +27,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# Changes
-#  * Nov 26 2005 Luke Macken <lmacken@redhat.com> - 0.2.2
-#   - Merge Panu's persistent changes to cache timings
-#   - Add 'hostfilepath' as configuration string
-#  * Nov 26 2005 Karanbir Singh <kbsingh@centos.org> - 0.2.1
-#   - Work out the mirror URL type and do something worthwhile with it
-#   - Test for non standard ports, if used.
-#   - file:// url's will always be timed = 0
-#  * Nov 16 2005 Luke Macken <lmacken@redhat.com> - 0.2
-#   - Throttle mirrors before metadata download (thanks to Panu)
-#  * Aug 12 2005 Luke Macken <lmacken@redhat.com> - 0.1
-#   - Initial release
-#
 # (C) Copyright 2005 Luke Macken <lmacken@redhat.com>
 #
 
+import os
 import sys
 import time
 import socket
-import urlparse
-import threading
 import string
+import urlparse
+import datetime
+import threading
 
 from yum.plugins import TYPE_INTERFACE, TYPE_CORE
 from yum.plugins import PluginYumExit
@@ -59,18 +49,24 @@ verbose = False
 socket_timeout = 3
 timedhosts = {}
 hostfilepath = ''
+maxhostfileage = 10
 
 def init_hook(conduit):
-    global verbose, socket_timeout, hostfilepath
+    global verbose, socket_timeout, hostfilepath, maxhostfileage
     verbose = conduit.confBool('main', 'verbose', default=False)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
-            default='/var/cache/yum/timedhosts.txt')
+            default='/var/cache/yum/timedhosts')
+    maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
 
 def postreposetup_hook(conduit):
-    read_timedhosts()
+    global hostfilepath, maxhostfileage
+    if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
+        conduit.info(2, "Loading mirror speeds from cached hostfile")
+        read_timedhosts()
+    else:
+        conduit.info(2, "Determining fastest mirrors")
     repomirrors = {}
-    conduit.info(2, "Determining fastest mirrors")
     repos = conduit.getRepos()
     for repo in repos.listEnabled():
         if not repomirrors.has_key(str(repo)):
@@ -98,6 +94,11 @@ def write_timedhosts():
     for host in timedhosts.keys():
         hostfile.write('%s %s\n' % (host, timedhosts[host]))
     hostfile.close()
+
+def get_hostfile_age():
+    global hostfilepath
+    timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(hostfilepath))
+    return (datetime.datetime.now() - timestamp).days
 
 class FastestMirror:
 
