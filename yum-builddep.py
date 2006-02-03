@@ -44,23 +44,24 @@ def main(args):
 
     for arg in args:
         if arg.endswith(".src.rpm"):
-            srpm = yum.packages.YumLocalPackage(ts, arg)
+            srpms = [yum.packages.YumLocalPackage(ts, arg)]
         else:
             try:
-                srpm = base.pkgSack.returnNewestByNameArch((arg, 'src'))
+                srpms = base.pkgSack.returnNewestByNameArch((arg, 'src'))
             except repomd.mdErrors.PackageSackError, e:
                 base.errorlog(0, "Error: %s" % e)
                 sys.exit(1)
 
-        for dep in srpm.requiresList():
-            if dep.startswith("rpmlib("): continue
-            try:
-                pkg = base.returnPackageByDep(dep)
-                if not base.rpmdb.installed(name=pkg.name):
-                    base.tsInfo.addInstall(pkg)
-            except repomd.mdErrors.PackageSackError, e:
-                base.errorlog(0, "Error: %s" % e)
-                sys.exit(1)
+        for srpm in srpms:
+            for dep in srpm.requiresList():
+                if dep.startswith("rpmlib("): continue
+                try:
+                    pkg = base.returnPackageByDep(dep)
+                    if not base.rpmdb.installed(name=pkg.name):
+                        base.tsInfo.addInstall(pkg)
+                except repomd.mdErrors.PackageSackError, e:
+                    base.errorlog(0, "Error: %s" % e)
+                    sys.exit(1)
                     
     (result, resultmsgs) = base.buildTransaction()
     if len(base.tsInfo) == 0:
