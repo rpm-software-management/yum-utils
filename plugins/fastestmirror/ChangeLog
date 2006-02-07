@@ -1,3 +1,6 @@
+* Feb 06 2006 Luke Macken <lmacken@redhat.com> - 0.2.4
+- Only write the timedhost file if we've re-pinged the mirrors
+
 * Feb 02 2006 Luke Macken <lmacken@redhat.com> - 0.2.3
 - Added 'maxhostfileage' option to specify how many days to keep the hostfile
 

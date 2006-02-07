@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.3
+# Version: 0.2.4
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to metadata download.
@@ -50,18 +50,21 @@ socket_timeout = 3
 timedhosts = {}
 hostfilepath = ''
 maxhostfileage = 10
+loadcache = False
 
 def init_hook(conduit):
-    global verbose, socket_timeout, hostfilepath, maxhostfileage
+    global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
     verbose = conduit.confBool('main', 'verbose', default=False)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
             default='/var/cache/yum/timedhosts')
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
+    if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
+        loadcache = True
 
 def postreposetup_hook(conduit):
-    global hostfilepath, maxhostfileage
-    if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
+    global loadcache
+    if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
     else:
@@ -75,7 +78,8 @@ def postreposetup_hook(conduit):
         repo.set('failovermethod', 'priority')
         repo.check()
         repo.setupGrab()
-    write_timedhosts()
+    if not loadcache:
+        write_timedhosts()
 
 def read_timedhosts():
     global timedhosts
