@@ -70,13 +70,8 @@ class RepoTrack(yum.YumBase):
             if r.startswith('rpmlib('):
                 continue
             
-            satisfiers = []
+            pkgresults[req] = list(self.whatProvides(r, f, v))
 
-            for po in self.whatProvides(r, f, v):
-                satisfiers.append(po)
-
-            pkgresults[req] = satisfiers
-        
         return pkgresults
     
 
