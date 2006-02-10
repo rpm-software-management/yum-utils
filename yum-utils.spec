@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.4
+Version: 0.5
 Release: 1
 License: GPL
 Group: Development/Tools
@@ -84,6 +84,7 @@ fi
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
 %{_bindir}/repoquery
+%{_bindir}/repotrack
 %{_bindir}/repo-graph
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
@@ -107,6 +108,10 @@ fi
 /usr/lib/yum-plugins/fastestmirror.py
 
 %changelog
+* Fri Feb 10 2006 Seth Vidal <skvidal@linux.duke.edu>
+- added repotrack to utils
+- bumped version for 2.5.X-compatible release
+
 * Tue Jan 10 2006 Brian Long <brilong@cisco.com>
 - bump version to 0.4
 - add yum-fastestmirror subpackage
