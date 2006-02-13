@@ -1,0 +1,15 @@
+Plugin for Yum to handle kernel modules as described by the Fedora Extras
+packaging standards.
+
+    http://www.fedoraproject.org/wiki/Extras/KernelModuleProposal
+
+To Do
+=====
+   *) Install kernel module for all avaliable kernels
+   *) Pin kernel until modules for new kernel are available
+
+Folks, feel free to patch and add suggestions.  It will only help FE kernel
+module infrastructure develope faster.
+
+Jack Neely <jjneely@gmail.com> -- 2/13/2006
+
