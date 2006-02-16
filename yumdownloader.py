@@ -24,7 +24,7 @@ import os
 import output
 from urlgrabber.progress import TextMeter
 from yum.logger import Logger
-from yum.packages import parsePackages, returnBestPackages
+from yum.packages import parsePackages
 from yum.misc import getCacheDir
 from optparse import OptionParser
 from urlparse import urljoin
@@ -74,7 +74,7 @@ def main():
     (opts, args) = parseArgs()
     my = initYum(opts.source)
     avail = my.pkgSack.returnPackages()
-    toDownload = {}
+    toDownload = []
 
     packages = args
     for pkg in packages:
@@ -84,12 +84,12 @@ def main():
             my.errorlog(0, 'No Match for argument %s' % pkg)
             continue
         for newpkg in installable:
-            toDownload.setdefault(newpkg.name,[]).append(newpkg.pkgtup)
+            toDownload.append(newpkg)
 
     if opts.source:
-        toDownload = returnBestPackages(toDownload, 'src')
+        toDownload = my.bestPackagesFromList(toDownload, 'src')
     else:
-        toDownload = returnBestPackages(toDownload)
+        toDownload = my.bestPackagesFromList(toDownload)
         
     # If the user supplies to --resolve flag, resolve dependencies for
     # all packages
@@ -99,20 +99,18 @@ def main():
         my.doTsSetup()
         my.localPackages = []
         # Act as if we were to install the packages in toDownload
-        for x in toDownload:
-            po = my.getPackageObject(x)
+        for po in toDownload:
             my.tsInfo.addInstall(po)
             my.localPackages.append(po)
         # Resolve dependencies
         my.resolveDeps()
         # Add newly added packages to the toDownload list
-        for x in my.tsInfo.getMembers():
-            pkgtup = x.pkgtup
-            if not pkgtup in toDownload:
-                toDownload.append(pkgtup)
+        for pkg in my.tsInfo.getMembers():
+            if not pkg in toDownload:
+                toDownload.append(pkg)
         
     for pkg in toDownload:
-        n,a,e,v,r = pkg
+        n,a,e,v,r = pkg.pkgtup
         packages =  my.pkgSack.searchNevra(n,e,v,r,a)
         for download in packages:
             repo = my.repos.getRepo(download.repoid)
