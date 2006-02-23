@@ -8,7 +8,7 @@ Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python, yum >= 2.3.4
+Requires: python, yum >= 2.5.1
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -39,7 +39,7 @@ deltas before or after updating packages.
 %package -n yum-fastestmirror
 Summary: Yum plugin which chooses fastest repository from a mirrorlist
 Group: System Environment/Base
-Requires: yum >= 2.3.4
+Requires: yum >= 2.4.1
 
 %description -n yum-fastestmirror
 This plugin sorts each repository's mirrorlist by connection speed
@@ -108,6 +108,9 @@ fi
 /usr/lib/yum-plugins/fastestmirror.py
 
 %changelog
+* Thu Feb 23 2006 Seth Vidal <skvidal at linux.duke.edu>
+-  changed some of the yum version dependencies
+
 * Fri Feb 10 2006 Seth Vidal <skvidal@linux.duke.edu>
 - added repotrack to utils
 - bumped version for 2.5.X-compatible release
