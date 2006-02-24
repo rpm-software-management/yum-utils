@@ -38,7 +38,7 @@ from yum import Errors
 def initYum(opts):
     my = yum.YumBase()
     my.doConfigSetup(opts.conffile)
-    my.log = Logger(threshold=my.conf.getConfigOption('debuglevel'), 
+    my.log = Logger(threshold=my.conf.debuglevel, 
     file_object =sys.stdout)
     if opts.orphans:
         my.doRepoSetup()
@@ -106,6 +106,45 @@ def buildProviderList(my, pkgs, reportProblems):
         print "No problems found"
     return provsomething
 
+def findDupes(my):
+    """takes a yum base object prints out a list of package duplicates.
+       These typically happen when an update transaction is left half-completed"""
+       
+    # iterate rpmdb.pkglist
+    # put each package into name.arch dicts with lists as the po
+    # look for any keys with a > 1 length list of pos where the name
+    # of the package is not kernel and/or does not provide a kernel-module
+    pkgdict = {}
+    refined = {}
+    dupes = []
+    
+    for (n,a,e,v,r) in my.rpmdb.pkglists:
+        if not pkgdict.has_key((n,a)):
+            pkgdict[(n,a)] = []
+        pkgdict[(n,a)].append((e,v,r))
+    
+    for (n,a) in pkgdict.keys():
+        if len(pkgdict[(n,a)]) > 1:
+            refined[(n,a)] = pkgdict[(n,a)]
+    
+    del pkgdict
+    
+    for (n,a) in refined.keys():
+        for (e,v,r) in refined[(n,a)]:
+            po = my.getInstalledPackageObject((n,a,e,v,r))
+            if po.name.startswith('kernel'):
+               continue
+            if po.name == 'gpg-pubkey':
+                continue
+            dupes.append(po)
+
+    for pkg in dupes:
+        if pkg.epoch != '0':
+            print '%s:%s-%s-%s.%s' % (pkg.epoch, pkg.name, pkg.ver, pkg.rel, pkg.arch)
+        else:
+            print '%s-%s-%s.%s' % (pkg.name, pkg.ver, pkg.rel, pkg.arch)
+
+        
 
 def listLeaves(all):
     """return a packagtuple of any installed packages that
@@ -256,6 +295,8 @@ def parseArgs():
       help='Print out nothing unecessary')
     parser.add_option("-y", default=False, dest="confirmed",action="store_true",
       help='Agree to anything asked')
+    parser.add_option("-d", "--dupes", default=False, dest="dupes", action="store_true",
+      help='Scan for duplicates in your rpmdb')
     parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
       help="Remove old kernel and kernel-devel packages")
     parser.add_option("--count",default=2,dest="kernelcount",action="store",
@@ -266,7 +307,7 @@ def parseArgs():
                 default='/etc/yum.conf', help="config file location")
 
     (opts, args) = parser.parse_args()
-    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans)): 
+    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans, opts.dupes)): 
         parser.print_help()
         print "Please specify either --problems, --leaves, --orphans or --oldkernels"
         sys.exit(0)
@@ -293,6 +334,10 @@ def main():
         listOrphans(my)
         sys.exit(0)
 
+    if opts.dupes:
+        findDupes(my)
+        sys.exit(0)
+        
     if not opts.quiet:
         print "Reading local RPM database"
     pkgs = getLocalRequires(my)
