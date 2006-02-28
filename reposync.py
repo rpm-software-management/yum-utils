@@ -21,6 +21,7 @@
 #     make it work with mirrorlists (silly, really)
 #     man page
 #     more useful docs
+#     deal nicely with a package changing but not changing names (ie: replacement)
 
 import os
 import sys
