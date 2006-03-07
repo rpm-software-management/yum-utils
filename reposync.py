@@ -16,12 +16,17 @@
 
 # sync all or the newest packages from a repo to the local path
 # TODO:
-#     have it copy over the metadata + groups files into the path, too
 #     have it print out list of changes
 #     make it work with mirrorlists (silly, really)
-#     man page
-#     more useful docs
+#     man page/more useful docs
 #     deal nicely with a package changing but not changing names (ie: replacement)
+
+# criteria
+# if a package is not the same and smaller then reget it
+# if a package is not the same and larger, delete it and get it again
+# always replace metadata files if they're not the same.
+
+
 
 import os
 import sys
