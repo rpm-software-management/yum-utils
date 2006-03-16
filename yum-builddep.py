@@ -22,8 +22,22 @@ import yum
 import rpmUtils
 import repomd.mdErrors
 from yum.logger import Logger
+from optparse import OptionParser
 
-def main(args):
+def parseArgs():
+    usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
+    parser = OptionParser(usage=usage)
+    parser.add_option("--repoid", default=[], dest="repos", action="append", 
+      help='operate on a specific repo, can be specified multiple times', 
+      metavar='[repo]')
+    (opts, args) = parser.parse_args()
+    if len(args) < 1: 
+        parser.print_help()
+        sys.exit(0)
+    return (opts, args)
+
+def main():
+    opts, args = parseArgs()
     base = cli.YumBaseCli()
     base.doConfigSetup()
     base.conf.setConfigOption('uid', os.geteuid())
@@ -33,6 +47,13 @@ def main(args):
     if base.conf.getConfigOption('uid') != 0:
         base.errorlog(0, "You must be root to install packages")
         sys.exit(1)
+
+    if len(opts.repos) > 0:
+        for repo in base.repos.findRepos('*'):
+            if repo.id not in opts.repos:
+                repo.disable()
+            else:
+                repo.enable()
 
     archlist = rpmUtils.arch.getArchList() + ['src']
     base.doRepoSetup(dosack=0)
@@ -73,6 +94,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
                 
 # vim:sw=4:sts=4:expandtab              
