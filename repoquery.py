@@ -102,6 +102,7 @@ class pkgQuery:
         self.classname = None
     
     def __getitem__(self, item):
+        item = item.lower()
         if hasattr(self, "fmt_%s" % item):
             return getattr(self, "fmt_%s" % item)()
         res = None
