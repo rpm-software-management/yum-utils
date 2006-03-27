@@ -188,7 +188,9 @@ class repoPkgQuery(pkgQuery):
         fdict = {}
         for ftype in self.pkg.returnFileTypes():
             for file in self.pkg.returnFileEntries(ftype):
-                fdict[file] = None
+                # workaround for yum returning double leading slashes on some 
+                # directories - posix allows that but it looks a bit odd
+                fdict[os.path.normpath('//%s' % file)] = None
         files = fdict.keys()
         files.sort()
         return "\n".join(files)
