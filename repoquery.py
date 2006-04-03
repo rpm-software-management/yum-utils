@@ -253,11 +253,11 @@ class instPkgQuery(pkgQuery):
 
 
 class groupQuery:
-    def __init__(self, groupinfo, name, grouppkgs="required"):
-        self.groupInfo = groupinfo
+    def __init__(self, group, grouppkgs="required"):
         self.grouppkgs = grouppkgs
-        self.name = name
-        self.group = groupinfo.group_by_id[name]
+        self.id = group.groupid
+        self.name = group.name
+        self.group = group
 
     def doQuery(self, method, *args, **kw):
         if hasattr(self, "fmt_%s" % method):
@@ -270,31 +270,29 @@ class groupQuery:
         return self.fmt_nevra()
 
     def fmt_nevra(self):
-        return ["%s - %s" % (self.group.id, self.group.name)]
+        return ["%s - %s" % (self.id, self.name)]
 
     def fmt_list(self):
         pkgs = []
         for t in self.grouppkgs.split(','):
-            if t == "required":
-                pkgs.extend(self.groupInfo.requiredPkgs(self.name))
-            elif t == "mandatory":
-                pkgs.extend(self.groupInfo.mandatory_pkgs[self.name])
+            if t == "mandatory":
+                pkgs.extend(self.group.mandatory_packages)
             elif t == "default":
-                pkgs.extend(self.groupInfo.default_pkgs[self.name])
+                pkgs.extend(self.group.default_packages)
             elif t == "optional":
-                pkgs.extend(self.groupInfo.optional_pkgs[self.name])
+                pkgs.extend(self.group.optional_packages)
             elif t == "all":
-                pkgs.extend(self.groupInfo.allPkgs(self.name))
+                pkgs.extend(self.group.packages)
             else:
                 raise "Unknown group package type %s" % t
             
         return pkgs
         
     def fmt_requires(self):
-        return self.groupInfo.requiredGroups(self.name)
+        return self.group.mandatory_packages
 
     def fmt_info(self):
-        return ["%s:\n\n%s\n" % (self.group.name, self.group.description)]
+        return ["%s:\n\n%s\n" % (self.name, self.group.description)]
 
 class YumBaseQuery(yum.YumBase):
     def __init__(self, pkgops = [], sackops = [], options = None):
@@ -362,9 +360,8 @@ class YumBaseQuery(yum.YumBase):
 
     def returnGroups(self):
         grps = []
-        for name in self.groupInfo.grouplist:
-            grp = groupQuery(self.groupInfo, name, 
-                             grouppkgs = self.options.grouppkgs)
+        for group in self.comps.get_groups():
+            grp = groupQuery(group, grouppkgs = self.options.grouppkgs)
             grps.append(grp)
         return grps
 
@@ -373,6 +370,8 @@ class YumBaseQuery(yum.YumBase):
         for grp in self.returnGroups():
             for expr in items:
                 if grp.name == expr or fnmatch.fnmatch("%s" % grp.name, expr):
+                    grps.append(grp)
+                elif grp.id == expr or fnmatch.fnmatch("%s" % grp.id, expr):
                     grps.append(grp)
         return grps
                     
@@ -411,9 +410,9 @@ class YumBaseQuery(yum.YumBase):
 
     def fmt_groupmember(self, name, **kw):
         grps = []
-        for id in self.groupInfo.grouplist:
-            if name in self.groupInfo.allPkgs(id):
-                grps.append(id)
+        for group in self.comps.get_groups():
+            if name in group.packages:
+                grps.append(group.groupid)
         return grps
 
     def fmt_whatprovides(self, name, **kw):
@@ -524,7 +523,7 @@ def main(args):
     # group stuff
     parser.add_option("-g", "--group", default=0, action="store_true", 
                       help="query groups instead of packages")
-    parser.add_option("--grouppkgs", default="required", dest="grouppkgs",
+    parser.add_option("--grouppkgs", default="default", dest="grouppkgs",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
     parser.add_option("--archlist", dest="archlist", 
