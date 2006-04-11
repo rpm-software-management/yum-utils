@@ -1,3 +1,5 @@
+#!/usr/bin/python -tt
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -62,7 +64,7 @@ class RepoSync(yum.YumBase):
 
 
 def parseArgs():
-    usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
+    usage = "usage: %s [options]" % sys.argv[0]
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
@@ -76,8 +78,8 @@ def parseArgs():
         default=os.getcwd(), help="Path to download packages to")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
         help="Just list urls of what would be downloaded, don't download")
-    parser.add_option("-n", "--newest", default=True, action="store_false", 
-        help="Toggle downloading only the newest packages(defaults to newest-only)")
+    parser.add_option("--all-versions", dest='allversions', default=False, action="store_true", 
+        help="Download all versions of all packages, not just newest per-repo")
     parser.add_option("-q", "--quiet", default=False, action="store_true", 
         help="Output as little as possible")
         
@@ -130,38 +132,52 @@ def main():
         for repo in myrepos:
             repo.enable()
 
-    my.doRepoSetup()    
+    my.doRepoSetup()
     my.doSackSetup()
     
     download_list = []
     
-    if opts.newest:
-        download_list = my.pkgSack.returnNewestByNameArch()
-    else:
-        download_list = list(my.pkgSack)
-        
-    download_list.sort(sortPkgObj)
-    for pkg in download_list:
-        repo = my.repos.getRepo(pkg.repoid)
-        remote = pkg.returnSimple('relativepath')
-        local = os.path.basename(remote)
-        local = os.path.join(opts.destdir, local)
-        if (os.path.exists(local) and 
-            str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+
+    for repo in my.repos.listEnabled():
+        local_repo_path = opts.destdir + '/' + repo.id
             
-            if not opts.quiet:
-                my.errorlog(0,"%s already exists and appears to be complete" % local)
-            continue
-
-        if opts.urls:
-            url = urljoin(repo.urls[0],remote)
-            print '%s' % url
-            continue
-
-        # Disable cache otherwise things won't download
-        repo.cache = 0
-        my.log(2, 'Downloading %s' % os.path.basename(remote))
-        repo.get(relative=remote, local=local)
+        reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
+            
+        if opts.allversions:
+            download_list = list(reposack)
+        else:
+            download_list = reposack.returnNewestByNameArch()
+        
+        download_list.sort(sortPkgObj)
+        for pkg in download_list:
+            repo = my.repos.getRepo(pkg.repoid)
+            remote = pkg.returnSimple('relativepath')
+            local = os.path.basename(remote)
+            local = os.path.join(local_repo_path, local)
+            if (os.path.exists(local) and 
+                str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+                
+                if not opts.quiet:
+                    my.errorlog(0,"%s already exists and appears to be complete" % local)
+                continue
+    
+            if opts.urls:
+                url = urljoin(repo.urls[0],remote)
+                print '%s' % url
+                continue
+    
+            # make sure the repo subdir is here before we go on.
+            if not os.path.exists(local_repo_path):
+                try:
+                    os.makedirs(local_repo_path)
+                except IOError, e:
+                    my.errorlog(0, "Could not make repo subdir: %s" % e)
+                    sys.exit(1)
+            
+            # Disable cache otherwise things won't download            
+            repo.cache = 0
+            my.log(2, 'Downloading %s' % os.path.basename(remote))
+            repo.get(relative=remote, local=local)
 
 
 if __name__ == "__main__":
