@@ -29,28 +29,21 @@ from yum.misc import getCacheDir
 from optparse import OptionParser
 from urlparse import urljoin
 
-def initYum(source=False):
+def initYum():
     my = yum.YumBase()
     my.doConfigSetup()
-    my.conf.setConfigOption('uid', os.geteuid())
-    if my.conf.getConfigOption('uid') != 0:
+    my.conf.uid = os.geteuid()
+    if my.conf.uid != 0:
         cachedir = getCacheDir()
         if cachedir is None:
             print "Error: Could not make cachedir, exiting"
             sys.exit(50)
         my.repos.setCacheDir(cachedir)
     my.repos.setProgressBar(TextMeter(fo=sys.stdout))
-    my.log = Logger(threshold=my.conf.getConfigOption('debuglevel'), 
-    file_object =sys.stdout)
+    my.log = Logger(threshold=my.conf.debuglevel, file_object =sys.stdout)
     my.repos.callback = output.CacheProgressCallback(my.log,
     my.errorlog, my.filelog)
 
-    my.doRepoSetup()
-    archlist = None
-    if source:
-        archlist = ['src']
-
-    my.doSackSetup(archlist=archlist)
     return my
 
 def parseArgs():
@@ -64,6 +57,9 @@ def parseArgs():
       help='resolve dependencies and download required packages')
     parser.add_option("--source", default=False, dest="source", action="store_true",
       help='operate on source packages')
+    parser.add_option("-e","--enablerepo", default=[], action="append", dest="repo",
+      help='enable repository')
+
     (opts, args) = parser.parse_args()
     if len(args) < 1: 
         parser.print_help()
@@ -72,7 +68,30 @@ def parseArgs():
 
 def main():
     (opts, args) = parseArgs()
-    my = initYum(opts.source)
+    my = initYum()
+
+    if len(opts.repo) > 0:
+        myrepos = []
+        
+        # find the ones we want
+        for glob in opts.repo:
+            myrepos.extend(my.repos.findRepos(glob))
+        
+        # disable them all
+        for repo in my.repos.repos.values():
+            repo.disable()
+        
+        # enable the ones we like
+        for repo in myrepos:
+            repo.enable()
+    
+    my.doRepoSetup()
+    archlist = None
+    if opts.source:
+        archlist = ['src']
+
+    my.doSackSetup(archlist=archlist)
+
     avail = my.pkgSack.returnPackages()
     toDownload = []
 
