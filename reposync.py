@@ -78,8 +78,8 @@ def parseArgs():
         default=os.getcwd(), help="Path to download packages to")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
         help="Just list urls of what would be downloaded, don't download")
-    parser.add_option("--all-versions", dest='allversions', default=False, action="store_true", 
-        help="Download all versions of all packages, not just newest per-repo")
+    parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true", 
+        help="Download only newest packages per-repo")
     parser.add_option("-q", "--quiet", default=False, action="store_true", 
         help="Output as little as possible")
         
@@ -143,17 +143,20 @@ def main():
             
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
             
-        if opts.allversions:
-            download_list = list(reposack)
-        else:
+        if opts.newest:
             download_list = reposack.returnNewestByNameArch()
+        else:
+            download_list = list(reposack)
         
         download_list.sort(sortPkgObj)
         for pkg in download_list:
             repo = my.repos.getRepo(pkg.repoid)
             remote = pkg.returnSimple('relativepath')
-            local = os.path.basename(remote)
-            local = os.path.join(local_repo_path, local)
+            local = local_repo_path + '/' + remote
+            localdir = os.path.dirname(local)
+            if not os.path.exists(localdir):
+                os.makedirs(localdir)
+
             if (os.path.exists(local) and 
                 str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
                 
