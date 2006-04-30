@@ -45,6 +45,53 @@ Requires: yum >= 2.4.1
 This plugin sorts each repository's mirrorlist by connection speed
 prior to downloading packages.
 
+%package -n yum-fedorakmod
+Summary: Yum plugin to handle fedora kernel modules.
+Group: System Environment/Base
+Requires: yum >= 2.6.0
+
+%description -n yum-fedorakmod
+Plugin for Yum to handle installation of kmod-foo type of kernel modules, when new kernel versions 
+are installed.
+kmod-foo kernel modules is described by the Fedora Extras packaging standards.
+
+%package -n yum-protectbase
+Summary: Yum plugin to protect packages from certain repositories.
+Group: System Environment/Base
+Requires: yum >= 2.4.1
+
+%description -n yum-protectbase
+This plugin allows certain repositories to be protected. Packages in the
+protected repositories can't be overridden by packages in non-protected
+repositories even if the non-protected repo has a later version.
+
+%package -n yum-versionlock
+Summary: Yum plugin to lock specified packages from being updated
+Group: System Environment/Base
+Requires: yum >= 2.4.1
+
+%description -n yum-versionlock
+This plugin allows certain packages specified in a file to be protected from being updated by 
+newer versions.
+
+%package -n yum-tsflags
+Summary: Yum plugin to add tsflags by a commandline option
+Group: System Environment/Base
+Requires: yum >= 2.4.1
+
+%description -n yum-tsflags
+This plugin 
+
+%package -n yum-kernel-module
+Summary: Yum plugin to handle kernel-module-foo type of kernel module
+Group: System Environment/Base
+Requires: yum >= 2.4.1
+
+%description -n yum-kernel-module
+This plugin handle installation of kernel-module-foo type of kernel modules when new version of 
+kernels are installed.
+
+
 %prep
 %setup -q
 
@@ -53,8 +100,8 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
-# only changelog plugin for now...
-plugins="changelog fastestmirror"
+# Plugins to install
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -101,14 +148,48 @@ fi
 %files -n yum-changelog
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
-/usr/lib/yum-plugins/changelog.py
+/usr/lib/yum-plugins/changelog.*
 
 %files -n yum-fastestmirror
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
-/usr/lib/yum-plugins/fastestmirror.py
+/usr/lib/yum-plugins/fastestmirror.*
+
+%files -n yum-fedorakmod
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fedorakmod.conf
+/usr/lib/yum-plugins/fedorakmod.*
+
+%files -n yum-protectbase
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protectbase.conf
+/usr/lib/yum-plugins/protectbase.*
+
+%files -n yum-versionlock
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
+/usr/lib/yum-plugins/versionlock.*
+
+%files -n yum-tsflags
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
+/usr/lib/yum-plugins/tsflags.*
+
+%files -n yum-kernel-module
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/kernel-module.conf
+/usr/lib/yum-plugins/kernel-module.*
+
 
 %changelog
+* Fri Apr 28 2006 Tim Lauridsen <tla@rasmil.dk>
+- added yum-fedorakmod plugin subpackage
+- added yum-protectbase plugin subpackage.
+- added yum-versionlock plugin subpackage.
+- added yum-tsflags plugin subpackage.
+- added yum-kernel-module plugin subpackage
+- changed .py to .* in files sections for plugin subpackages to build rpms without error.
+ 
 * Sat Apr 29 2006 Seth Vidal <skvidal at linux.duke.edu>
 - add reposync
 
