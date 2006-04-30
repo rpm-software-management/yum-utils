@@ -85,6 +85,7 @@ fi
 %{_bindir}/repomanage
 %{_bindir}/repoquery
 %{_bindir}/repotrack
+%{_bindir}/reposync
 %{_bindir}/repo-graph
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
@@ -108,6 +109,9 @@ fi
 /usr/lib/yum-plugins/fastestmirror.py
 
 %changelog
+* Sat Apr 29 2006 Seth Vidal <skvidal at linux.duke.edu>
+- add reposync
+
 * Thu Feb 23 2006 Seth Vidal <skvidal at linux.duke.edu>
 -  changed some of the yum version dependencies
 
