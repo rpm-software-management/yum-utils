@@ -64,7 +64,13 @@ class RepoSync(yum.YumBase):
 
 
 def parseArgs():
-    usage = "usage: %s [options]" % sys.argv[0]
+    usage = """
+    Reposync is used to synchronize a remote yum repository to a local 
+    directory using yum to retrieve the packages.
+    
+    %s [options]
+    """ % sys.argv[0]
+
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
@@ -75,7 +81,7 @@ def parseArgs():
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
         help="Use a temp dir for storing/accessing yum-cache")
     parser.add_option("-p", "--download_path", dest='destdir', 
-        default=os.getcwd(), help="Path to download packages to")
+        default=os.getcwd(), help="Path to download packages to: defaults to current dir")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
         help="Just list urls of what would be downloaded, don't download")
     parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true", 
