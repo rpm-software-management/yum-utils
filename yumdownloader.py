@@ -93,23 +93,27 @@ def main():
     my.doSackSetup(archlist=archlist)
 
     avail = my.pkgSack.returnPackages()
+
     toDownload = []
 
     packages = args
     for pkg in packages:
+        toActOn = []
         exactmatch, matched, unmatched = parsePackages(avail, [pkg])
         installable = yum.misc.unique(exactmatch + matched)
         if len(unmatched) > 0: # if we get back anything in unmatched, it fails
             my.errorlog(0, 'No Match for argument %s' % pkg)
             continue
         for newpkg in installable:
-            toDownload.append(newpkg)
-
-    if opts.source:
-        toDownload = my.bestPackagesFromList(toDownload, 'src')
-    else:
-        toDownload = my.bestPackagesFromList(toDownload)
+            toActOn.append(newpkg)
         
+
+        if toActOn:
+            if opts.source:
+                toDownload.extend(my.bestPackagesFromList(toActOn, 'src'))
+            else:
+                toDownload.extend(my.bestPackagesFromList(toActOn))
+    
     # If the user supplies to --resolve flag, resolve dependencies for
     # all packages
     # note this might require root access because the headers need to be
