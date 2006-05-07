@@ -201,6 +201,9 @@ fi
 - added yum-downloadonly plugin
 - fix minor item in tsflags description
 
+* Sat Apr 29 2006 Seth Vidal <skvidal at linux.duke.edu>
+- add reposync
+
 * Fri Apr 28 2006 Tim Lauridsen <tla@rasmil.dk>
 - added yum-fedorakmod plugin subpackage
 - added yum-protectbase plugin subpackage.
@@ -208,9 +211,6 @@ fi
 - added yum-tsflags plugin subpackage.
 - added yum-kernel-module plugin subpackage
 - changed .py to .* in files sections for plugin subpackages to build rpms without error.
- 
-* Sat Apr 29 2006 Seth Vidal <skvidal at linux.duke.edu>
-- add reposync
 
 * Thu Feb 23 2006 Seth Vidal <skvidal at linux.duke.edu>
 -  changed some of the yum version dependencies
