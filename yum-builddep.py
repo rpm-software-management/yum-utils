@@ -40,11 +40,11 @@ def main():
     opts, args = parseArgs()
     base = cli.YumBaseCli()
     base.doConfigSetup()
-    base.conf.setConfigOption('uid', os.geteuid())
+    base.conf.uid = os.geteuid()
         
-    base.log = Logger(threshold=base.conf.getConfigOption('debuglevel'), file_object =sys.stdout)
+    base.log = Logger(threshold=base.conf.debuglevel, file_object =sys.stdout)
 
-    if base.conf.getConfigOption('uid') != 0:
+    if base.conf.uid != 0:
         base.errorlog(0, "You must be root to install packages")
         sys.exit(1)
 
