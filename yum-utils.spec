@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.5
+Version: 0.6
 Release: 1
 License: GPL
 Group: Development/Tools
@@ -80,7 +80,8 @@ Group: System Environment/Base
 Requires: yum >= 2.4.1
 
 %description -n yum-tsflags
-This plugin 
+This plugin allows you to specify optional transaction flags on the yum
+command line
 
 %package -n yum-kernel-module
 Summary: Yum plugin to handle kernel-module-foo type of kernel module
@@ -92,6 +93,15 @@ This plugin handle installation of kernel-module-foo type of kernel modules when
 kernels are installed.
 
 
+%package -n yum-downloadonly
+Summary: Yum plugin to add downloadonly command option
+Group: System Environment/Base
+Requires: yum >= 2.4.1
+
+%description -n yum-downloadonly
+This plugin adds a --downloadonly flag to yum so that yum will only download
+the packages and not install/update them.
+
 %prep
 %setup -q
 
@@ -101,7 +111,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -180,8 +190,17 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/kernel-module.conf
 /usr/lib/yum-plugins/kernel-module.*
 
+%files -n yum-downloadonly
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
+/usr/lib/yum-plugins/downloadonly.*
 
 %changelog
+* Sat May  6 2006 Seth Vidal <skvidal at linux.duke.edu>
+- bump version number
+- added yum-downloadonly plugin
+- fix minor item in tsflags description
+
 * Fri Apr 28 2006 Tim Lauridsen <tla@rasmil.dk>
 - added yum-fedorakmod plugin subpackage
 - added yum-protectbase plugin subpackage.
