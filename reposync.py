@@ -41,6 +41,7 @@ from yum.misc import getCacheDir
 from yum.constants import *
 from yum.packages import parsePackages
 from repomd.packageSack import ListPackageSack
+import rpmUtils.arch
 
 # for yum 2.4.X compat
 def sortPkgObj(pkg1 ,pkg2):
@@ -56,6 +57,7 @@ class RepoSync(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
         self.opts = opts
+        self.arch = opts.arch
         
     def log(self, num, msg):
         if num < 3 and not self.opts.quiet:
@@ -74,8 +76,8 @@ def parseArgs():
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
-#    parser.add_option("-a", "--arch", default=None,
-#        help='check as if running the specified arch (default: current arch)')
+    parser.add_option("-a", "--arch", default=None,
+        help='check as if running the specified arch (default: current arch)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
@@ -96,8 +98,6 @@ def parseArgs():
 def main():
 # TODO/FIXME
 # gpg/sha checksum them
-# make -a do something
-
     (opts, junk) = parseArgs()
     
     if not os.path.exists(opts.destdir) and not opts.urls:
@@ -139,7 +139,7 @@ def main():
             repo.enable()
 
     my.doRepoSetup()
-    my.doSackSetup()
+    my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
     
     download_list = []
     
