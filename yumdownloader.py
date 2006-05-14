@@ -22,6 +22,7 @@ import yum
 import yum.Errors
 import os
 import output
+import rpmUtils.arch
 from urlgrabber.progress import TextMeter
 from yum.logger import Logger
 from yum.packages import parsePackages
@@ -88,7 +89,7 @@ def main():
     my.doRepoSetup()
     archlist = None
     if opts.source:
-        archlist = ['src']
+        archlist = rpmUtils.arch.getArchList() + ['src']
 
     my.doSackSetup(archlist=archlist)
 
@@ -104,9 +105,30 @@ def main():
         if len(unmatched) > 0: # if we get back anything in unmatched, it fails
             my.errorlog(0, 'No Match for argument %s' % pkg)
             continue
+
         for newpkg in installable:
-            toActOn.append(newpkg)
-        
+            # This is to fix Bug 469
+            # If there are matches to the package argument given but there
+            # are no source packages, this can be caused because the
+            # source rpm this is built from has a different name
+            # for example: nscd is built from the glibc source rpm
+            # We find this name by parsing the sourcerpm filename
+            # (this is ugly but it appears to work)
+            # And finding a package with arch src and the same
+            # ver and rel as the binary package
+            # That should be the source package
+            # Note we do not use the epoch to search as the epoch for the
+            # source rpm might be different from the binary rpm (see
+            # for example mod_ssl)
+            if opts.source and newpkg.arch != 'src':
+                name = newpkg.returnSimple('sourcerpm').rsplit('-',2)[0]
+                src = my.pkgSack.searchNevra(name=name, arch = 'src',
+                  ver = newpkg.version,
+                  rel = newpkg.release
+                )
+                toActOn.extend(src)
+            else:
+                toActOn.append(newpkg)
 
         if toActOn:
             if opts.source:
