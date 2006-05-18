@@ -22,6 +22,8 @@
 #     make it work with mirrorlists (silly, really)
 #     man page/more useful docs
 #     deal nicely with a package changing but not changing names (ie: replacement)
+#     maybe have it iterate the dir, if it exists, and delete files not listed
+#     in a repo
 
 # criteria
 # if a package is not the same and smaller then reget it
@@ -57,7 +59,6 @@ class RepoSync(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
         self.opts = opts
-        self.arch = opts.arch
         
     def log(self, num, msg):
         if num < 3 and not self.opts.quiet:
@@ -77,7 +78,7 @@ def parseArgs():
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
     parser.add_option("-a", "--arch", default=None,
-        help='check as if running the specified arch (default: current arch)')
+        help='act as if running the specified arch (default: current arch, note: does not override $releasever)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
