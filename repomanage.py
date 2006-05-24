@@ -30,6 +30,8 @@ import getopt
 from yum import misc
 from exceptions import Exception
 
+from optparse import OptionParser
+
 
 class Error(Exception):
     def __init__(self, args=None):
@@ -133,69 +135,43 @@ def trimRpms(rpms, excludeGlobs):
     return rpms
 
 
-
 def parseargs(args):
-    options = {}
-    options['output'] = 'new'
-    options['passed'] = []
-    options['space'] = 0
-    options['keep'] = 1 # number of newest items to keep 
-                        # (defaults to single newest but it could be newest N)
-    options['nocheck'] = 0
-    try:
-        gopts, argsleft = getopt.getopt(args, 'onhsck:', ['keep=','space', 
-                                              'nocheck', 'new', 'old', 'help'])
-    except getopt.error, e:
-        errorprint('Options Error: %s.' % e)
-        usage()
-        sys.exit(1)
+    usage = "repomanage [--old] [--new] path."
+    parser = OptionParser(usage=usage)
     
-    try: 
-        for arg,a in gopts:    
-            if arg in ['-h','--help']:
-                usage()
-                sys.exit(0)
-            elif arg in ['-o', '--old']:
-                options['output'] = 'old'
-                if 'new' in options['passed']:
-                    errorprint('\nPass either --old or --new, not both!\n')
-                    usage()
-                    sys.exit(1)
-                else:
-                    options['passed'].append('old')
-            elif arg in ['-n', '--new']:
-                options['output'] = 'new'
-                if 'old' in options['passed']:
-                    errorprint('\nPass either --old or --new, not both!\n')
-                    usage()
-                    sys.exit(1)
-                else:
-                    options['passed'].append('new')
-            elif arg in ['-s', '--space']:
-                options['space'] = 1
-            elif arg in ['-k', '--keep']:
-                options['keep'] = int(a)
-            elif arg in ['-c', '--nocheck']:
-                options['nocheck'] = 1
-                
-            
-    except ValueError, e:
-        errorprint(_('Options Error: %s') % e)
-        usage()
-        sys.exit(1)
+    # new is only used to make sure that the user is not trying to get both 
+    # new and old, after this old and not old will be used. 
+    # (default = not old = new)
+    parser.add_option("-o", "--old", default=False, action="store_true",
+      help='print the older packages')
+    parser.add_option("-n", "--new", default=False, action="store_true",
+      help='print the newest packages')
+    parser.add_option("-s", "--space", default=False, action="store_true",
+      help='space separated output, not newline')
+    parser.add_option("-k", "--keep", default=1, dest='keep', action="store",
+      help='newest N packages to keep - defaults to 1')
+    parser.add_option("-c", "--nocheck", default=0, action="store_true", 
+      help='do not check package paload signatures/digests')
     
-    if len(argsleft) > 1:
+    (opts, args)= parser.parse_args()
+    
+    
+    if opts.new and opts.old:
+        errorprint('\nPass either --old or --new, not both!\n')
+        parser.print_help()
+        sys.exit(1)
+        
+    if len(args) > 1:
         errorprint('Error: Only one directory allowed per run.')
-        usage()
+        parser.print_help()
         sys.exit(1)
-    elif len(argsleft) == 0:
+        
+    if len(args) < 1:
         errorprint('Error: Must specify a directory to index.')
-        usage()
+        parser.print_help()
         sys.exit(1)
-    else:
-        directory = argsleft[0]
-    
-    return options, directory
+        
+    return (opts, args)
 
 def sortByEVR(evr1, evr2):
     """sorts a list of evr tuples"""
@@ -210,13 +186,17 @@ def sortByEVR(evr1, evr2):
 
 
 def main(args):
-    options, mydir = parseargs(args)
+    
+    (options, args) = parseargs(args)
+    mydir = args[0]
+
+    
     rpmList = []
     rpmList = getFileList(mydir, '.rpm', rpmList)
     verfile = {}
     pkgdict = {} # hold all of them - put them in (n,a) = [(e,v,r),(e1,v1,r1)]
     
-    keepnum = options['keep']*(-1) # the number of items to keep
+    keepnum = int(options.keep)*(-1) # the number of items to keep
     
     if len(rpmList) == 0:
         errorprint('No files to process')
@@ -224,7 +204,7 @@ def main(args):
     
 
     ts = rpm.TransactionSet()
-    if options['nocheck']:
+    if options.nocheck:
         ts.setVSFlags(~(rpm._RPMVSF_NOPAYLOAD))
     else:
         ts.setVSFlags(~(rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
@@ -259,7 +239,9 @@ def main(args):
     # now we have our dicts - we can return whatever by iterating over them
     
     outputpackages = []
-    if options['output'] == 'new':
+    
+    #if new
+    if not options.old:
         for (n,a) in pkgdict.keys():
             evrlist = pkgdict[(n,a)]
             
@@ -272,7 +254,7 @@ def main(args):
                 for pkg in verfile[(n,a,e,v,r)]:
                     outputpackages.append(pkg)
    
-    if options['output'] == 'old':
+    if options.old:
         for (n,a) in pkgdict.keys():
             evrlist = pkgdict[(n,a)]
             
@@ -286,7 +268,7 @@ def main(args):
     
     outputpackages.sort()
     for pkg in outputpackages:
-        if options['space']:
+        if options.space:
             print '%s' % pkg,
         else:
             print pkg
