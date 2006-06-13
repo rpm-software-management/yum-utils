@@ -30,7 +30,6 @@ import yum
 import yum.config
 import yum.Errors
 import yum.packages
-import repomd.mdErrors
 from rpmUtils.arch import getArchList
 from rpmUtils.miscutils import formatRequire
 from yum.misc import getCacheDir
@@ -325,7 +324,7 @@ class YumBaseQuery(yum.YumBase):
         try:
             exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
             pkgs = exact + match
-        except repomd.mdErrors.PackageSackError, err:
+        except yum.Errors.PackageSackError, err:
             self.errorlog(0, err)
         return self.queryPkgFactory(pkgs)
 
@@ -615,7 +614,8 @@ def main(args):
         pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
-    repoq.doConfigSetup(opts.conffile)
+    repoq.doStartupConfig(fn=opts.conffile)
+    repoq.doConfigSetup()
     
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
