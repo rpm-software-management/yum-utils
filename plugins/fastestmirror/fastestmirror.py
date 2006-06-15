@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.4
+# Version: 0.2.5
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to metadata download.
@@ -39,11 +39,11 @@ import urlparse
 import datetime
 import threading
 
-from yum.plugins import TYPE_INTERFACE, TYPE_CORE
+from yum.plugins import TYPE_INTERACTIVE, TYPE_CORE
 from yum.plugins import PluginYumExit
 
 requires_api_version = '2.1'
-plugin_type = (TYPE_INTERFACE, TYPE_CORE)
+plugin_type = (TYPE_INTERACTIVE, TYPE_CORE)
 
 verbose = False
 socket_timeout = 3
@@ -74,8 +74,8 @@ def postreposetup_hook(conduit):
     for repo in repos.listEnabled():
         if not repomirrors.has_key(str(repo)):
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
-        repo.set('urls', repomirrors[str(repo)])
-        repo.set('failovermethod', 'priority')
+        repo.urls = repomirrors[str(repo)]
+        repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
     if not loadcache:
