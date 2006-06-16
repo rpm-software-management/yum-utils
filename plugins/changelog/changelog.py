@@ -19,9 +19,7 @@
 #   the costly 'otherdata' import.
 
 import time
-from yum.packages import YumInstalledPackage
 from rpmUtils.miscutils import splitFilename
-from yum.constants import *
 from yum.plugins import TYPE_INTERFACE
 
 requires_api_version = '2.1'
@@ -68,8 +66,6 @@ def config_hook(conduit):
     if parser:
         parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
-
-    conduit.registerOpt('when', PLUG_OPT_STRING, PLUG_OPT_WHERE_MAIN, 'post')
 
 def postreposetup_hook(conduit):
     global changelog
