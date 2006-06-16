@@ -15,7 +15,6 @@
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 #
 
-from yum.constants import *
 from yum.plugins import PluginYumExit
 from yum.plugins import TYPE_CORE
 from rpmUtils.miscutils import splitFilename, compareEVR
@@ -24,9 +23,6 @@ import urlgrabber.grabber
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
-
-def config_hook(conduit):
-    conduit.registerOpt('locklist', PLUG_OPT_STRING, PLUG_OPT_WHERE_MAIN, '')
 
 def exclude_hook(conduit):
     conduit.info(2, 'Reading version lock configuration')
