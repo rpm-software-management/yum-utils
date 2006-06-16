@@ -4,20 +4,21 @@ protected repositories can't be overridden by packages in non-protected
 repositories even if the non-protected repo has a later version.
 
 This is mainly useful for preventing 3rd party repositories from interfering
-with packages from base, updates, extras and livna.
+with packages from core, updates, extras and livna.
 
-Enable the plugin and add 'protect=1' to the config of all repos you want to
+Enable the plugin and add 'protect=yes' to the config of all repos you want to
 protect.
 '''
 
-from yum.constants import *
 from yum.plugins import TYPE_CORE
+from yum import config 
 
-requires_api_version = '2.1'
+requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
 
 def config_hook(conduit):
-    conduit.registerOpt('protect', PLUG_OPT_BOOL, PLUG_OPT_WHERE_REPO, False)
+    config.YumConf.protect = config.BoolOption(False)
+    config.RepoConf.protect = config.Inherit(config.YumConf.protect)
 
 def exclude_hook(conduit):
     cnt = 0
