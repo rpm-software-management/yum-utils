@@ -141,6 +141,9 @@ class pkgQuery:
         else:
             raise queryError("Invalid package query: %s" % method)
 
+    def isSource(self):
+        return self["arch"] == "src"
+
     def fmt_queryformat(self):
 
         if not self.qf:
@@ -392,6 +395,8 @@ class YumBaseQuery(yum.YumBase):
         srpms = []
         for name in items:
             for pkg in self.returnByName(name):
+                if pkg.isSource(): 
+                    continue
                 src = pkg["sourcerpm"][:-4]
                 srpms.extend(self.returnByName(src))
         return srpms
