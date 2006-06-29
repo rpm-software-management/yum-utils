@@ -166,6 +166,9 @@ class pkgQuery:
     def fmt_obsoletes(self, **kw):
         return "\n".join(self.prco('obsoletes'))
 
+    def fmt_list(self, **kw):
+        return "\n".join(self.files())
+
 class repoPkgQuery(pkgQuery):
     def __init__(self, pkg, qf):
         pkgQuery.__init__(self, pkg, qf)
@@ -183,7 +186,7 @@ class repoPkgQuery(pkgQuery):
         rplist.sort()
         return rplist
 
-    def fmt_list(self, **kw):
+    def files(self, **kw):
         fdict = {}
         for ftype in self.pkg.returnFileTypes():
             for file in self.pkg.returnFileEntries(ftype):
@@ -192,7 +195,7 @@ class repoPkgQuery(pkgQuery):
                 fdict[os.path.normpath('//%s' % file)] = None
         files = fdict.keys()
         files.sort()
-        return "\n".join(files)
+        return files
 
     def fmt_changelog(self, **kw):
         changelog = []
@@ -235,8 +238,8 @@ class instPkgQuery(pkgQuery):
         prcolist.sort()
         return prcolist
     
-    def fmt_list(self, **kw):
-        return "\n".join(self.pkg.tagByName('filenames'))
+    def files(self, **kw):
+        return self.pkg.tagByName('filenames')
 
     def fmt_changelog(self, **kw):
         changelog = []
@@ -424,6 +427,7 @@ class YumBaseQuery(yum.YumBase):
         if self.options.alldeps:
             for pkg in self.returnByName(name):
                 provs.extend(pkg.prco("provides"))
+                provs.extend(pkg.files())
 
         for prov in provs:
             # Only look at the providing name, not the whole version. This 
@@ -584,6 +588,8 @@ def main(args):
         if not opts.group:
             needfiles = 1
         pkgops.append("list")
+    if opts.alldeps:
+        needfiles = 1
     if opts.info:
         pkgops.append("info")
     if opts.envra:
