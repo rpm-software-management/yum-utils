@@ -351,7 +351,7 @@ class YumBaseQuery(yum.YumBase):
                 self.errorlog(1, "Unknown pkgnarrow method: %s" % what)
 
         return pkgs
-    
+
     def returnPackagesByDep(self, depstring):
         provider = []
         try:
@@ -388,11 +388,22 @@ class YumBaseQuery(yum.YumBase):
 
         return self.queryPkgFactory(pkgs)
 
+    def matchSrcPkgs(self, items):
+        srpms = []
+        for name in items:
+            for pkg in self.returnByName(name):
+                src = pkg["sourcerpm"][:-4]
+                srpms.extend(self.returnByName(src))
+        return srpms
+    
     def runQuery(self, items):
         if self.options.group:
             pkgs = self.matchGroups(items)
         else:
-            pkgs = self.matchPkgs(items)
+            if self.options.srpm:
+                pkgs = self.matchSrcPkgs(items)
+            else:
+                pkgs = self.matchPkgs(items)
 
         for pkg in pkgs:
             for oper in self.pkgops:
@@ -470,6 +481,7 @@ def main(args):
     needfiles = 0
     needother = 0
     needgroup = 0
+    needsource = 0
 
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -511,6 +523,8 @@ def main(args):
                       help="show name, version, release info of package")
     parser.add_option("-s", "--source", default=0, action="store_true",
                       help="show package source RPM name")
+    parser.add_option("--srpm", default=0, action="store_true",
+                      help="operate on corresponding source RPM")
     parser.add_option("--resolve", default=0, action="store_true",
                       help="resolve capabilities to originating package(s)")
     parser.add_option("--alldeps", default=0, action="store_true",
@@ -598,6 +612,8 @@ def main(args):
         pkgops.append("nvr")
     if opts.source:
         pkgops.append("source")
+    if opts.srpm:
+        needsource = 1
     if opts.whatrequires:
         sackops.append("whatrequires")
     if opts.whatprovides:
@@ -646,14 +662,16 @@ def main(args):
 
     repoq.doRepoSetup()
 
+    for exp in regexs:
+        if exp.endswith('.src'):
+            needsource = 1
+            break
+
     if opts.archlist:
         archlist = opts.archlist.split(',')
-    else:
-        for exp in regexs:
-            if exp.endswith('.src'):
-                archlist = getArchList()
-                archlist.append('src')
-                break
+    elif needsource:
+        archlist = getArchList()
+        archlist.append('src')
 
     try:
         repoq.doSackSetup(archlist=archlist)
