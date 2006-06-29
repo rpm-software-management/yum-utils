@@ -20,7 +20,7 @@ sys.path.insert(0, '/usr/share/yum-cli')
 import cli
 import yum
 import rpmUtils
-import repomd.mdErrors
+import yum.Errors
 from yum.logger import Logger
 from optparse import OptionParser
 
@@ -69,7 +69,7 @@ def main():
         else:
             try:
                 srpms = base.pkgSack.returnNewestByNameArch((arg, 'src'))
-            except repomd.mdErrors.PackageSackError, e:
+            except yum.Errors.PackageSackError, e:
                 base.errorlog(0, "Error: %s" % e)
                 sys.exit(1)
 
@@ -80,7 +80,7 @@ def main():
                     pkg = base.returnPackageByDep(dep)
                     if not base.rpmdb.installed(name=pkg.name):
                         base.tsInfo.addInstall(pkg)
-                except repomd.mdErrors.PackageSackError, e:
+                except yum.Errors.PackageSackError, e:
                     base.errorlog(0, "Error: %s" % e)
                     sys.exit(1)
                     

@@ -29,7 +29,7 @@ from yum.misc import getCacheDir
 from optparse import OptionParser
 import rpmUtils.arch
 from yum.constants import *
-from repomd.packageSack import ListPackageSack
+from yum.packageSack import ListPackageSack
 
 
 def parseArgs():

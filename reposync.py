@@ -42,7 +42,7 @@ import yum.Errors
 from yum.misc import getCacheDir
 from yum.constants import *
 from yum.packages import parsePackages
-from repomd.packageSack import ListPackageSack
+from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 
 # for yum 2.4.X compat
