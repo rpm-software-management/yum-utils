@@ -20,10 +20,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-import rpm
 from sets import Set
 
-from rpmUtils.miscutils import *
+import rpmUtils
 from yum import packages
 from yum.constants import TS_INSTALL
 from yum.plugins import TYPE_CORE, PluginYumExit
@@ -34,56 +33,12 @@ plugin_type = (TYPE_CORE,)
 kernelProvides = Set([ "kernel-%s" % a for a in rpmUtils.arch.arches.keys() ])
         
 
-def flagToString(flags):
-    # <shoving something pointy in my eye>
-    if flags & rpm.RPMSENSE_EQUAL & rpm.RPMSENSE_GREATER:
-        return 'GE'
-    if flags & rpm.RPMSENSE_EQUAL & rpm.RPMSENSE_LESS:
-        return 'LE'
-    if flags & rpm.RPMSENSE_EQUAL:
-        return 'EQ'
-    if flags & rpm.RPMSENSE_GREATER:
-        return 'GT'
-    if flags & rpm.RPMSENSE_LESS:
-        return 'LT'
-    # </shoving something pointy in my eye>
-
-    # Umm...now I'm screwed
-    return flags
-
-
-def populatePrco(po, hdr):
-    "Populate the package object with the needed PRCO interface."
-    # Apperently, Yum actually never takes the hdr object and uses it
-    # to populate the prco information
-
-    # prco['foo'] looks like (name, flag, (e,v,r))
-    for tag in ['OBSOLETE', 'CONFLICT', 'REQUIRE', 'PROVIDE']:
-        name = hdr[getattr(rpm, 'RPMTAG_%sNAME' % tag)]
-
-        list = hdr[getattr(rpm, 'RPMTAG_%sFLAGS' % tag)]
-        flag = [ flagToString(i) for i in list ]
-
-        list = hdr[getattr(rpm, 'RPMTAG_%sVERSION' % tag)]
-        vers = [ stringToVersion(i) for i in list ]
-
-        prcotype = tag.lower() + 's'
-        if name is not None:
-            po.prco[prcotype] = zip(name, flag, vers)
-        else:
-            po.prco[prcotype] = []
-
-    return po
-
-
 def package(c, tuple):
     rpmdb = c.getRpmDB()
 
     # XXX: When RPM leaves dup NEVRA's??
     hdr = rpmdb.returnHeaderByTuple(tuple)[0]
     po = packages.YumInstalledPackage(hdr)
-    populatePrco(po, hdr)
-
     return po
 
     
