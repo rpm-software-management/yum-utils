@@ -136,7 +136,7 @@ fi
 %defattr(-, root, root)
 %doc README 
 %doc COPYING
-%doc plugins/
+%doc plugins/README
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
@@ -196,6 +196,9 @@ fi
 /usr/lib/yum-plugins/downloadonly.*
 
 %changelog
+* Sun Aug 13 2006 Seth Vidal <skvidal at linux.duke.edu>
+- fix the plugins/ doc issue
+
 * Sat May  6 2006 Seth Vidal <skvidal at linux.duke.edu>
 - bump version number
 - added yum-downloadonly plugin
