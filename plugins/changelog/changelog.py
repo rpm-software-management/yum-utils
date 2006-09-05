@@ -90,7 +90,11 @@ def postresolve_hook(conduit):
                 # store the latest date in changelog entries
                 times = hdr['changelogtime']
                 n,v,r,e,a = splitFilename(hdr['sourcerpm'])
-                origpkgs[n] = times[0]
+                if len(times) == 0:
+                    # deal with packages without changelog
+                    origpkgs[n] = 0 
+                else:
+                    origpkgs[n] = times[0]
 
     if conduit.confString('main', 'when', default='post') == 'pre':
         show_changes(conduit, 'Changes in packages about to be updated:')
