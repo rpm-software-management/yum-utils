@@ -24,26 +24,25 @@ import os
 import output
 import rpmUtils.arch
 from urlgrabber.progress import TextMeter
-from yum.logger import Logger
+import logging
 from yum.packages import parsePackages
 from yum.misc import getCacheDir
 from optparse import OptionParser
 from urlparse import urljoin
 
 def initYum():
+    global logger
     my = yum.YumBase()
-    my.doConfigSetup()
+    my.doConfigSetup(init_plugins=False) # init yum, without plugins
     my.conf.uid = os.geteuid()
     if my.conf.uid != 0:
         cachedir = getCacheDir()
         if cachedir is None:
-            print "Error: Could not make cachedir, exiting"
+            logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
         my.repos.setCacheDir(cachedir)
     my.repos.setProgressBar(TextMeter(fo=sys.stdout))
-    my.log = Logger(threshold=my.conf.debuglevel, file_object =sys.stdout)
-    my.repos.callback = output.CacheProgressCallback(my.log,
-    my.errorlog, my.filelog)
+    my.repos.callback = output.CacheProgressCallback()
 
     return my
 
@@ -68,6 +67,8 @@ def parseArgs():
     return (opts, args)
 
 def main():
+    global logger
+    logger = logging.getLogger("yum.verbose.yumdownloader")
     (opts, args) = parseArgs()
     my = initYum()
 
@@ -168,11 +169,12 @@ def main():
             local = os.path.join(opts.destdir, local)
             if (os.path.exists(local) and 
                 str(os.path.getsize(local)) == download.returnSimple('packagesize')):
-                my.errorlog(0,"%s already exists and appears to be complete" % local)
+                logger.error("%s already exists and appears to be complete" % local)
                 continue
             # Disable cache otherwise things won't download
             repo.cache = 0
-            repo.get(relative=remote, local=local)
+            download.localpath = local # Hack: to set the localpath we want.
+            repo.getPackage(download)
 
 if __name__ == '__main__':
     main()
