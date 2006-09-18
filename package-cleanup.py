@@ -29,17 +29,15 @@ import yum
 import os
 import sys
 import rpm
+
 from rpmUtils import miscutils, transaction
-from yum.logger import Logger
 from optparse import OptionParser
 from yum.packages import YumInstalledPackage
 from yum import Errors
 
 def initYum(opts):
     my = yum.YumBase()
-    my.doConfigSetup(opts.conffile)
-    my.log = Logger(threshold=my.conf.debuglevel, 
-    file_object =sys.stdout)
+    my.doConfigSetup(opts.conffile,init_plugins=False)
     if opts.orphans:
         my.doRepoSetup()
     else:
@@ -57,8 +55,9 @@ def initYum(opts):
 def getLocalRequires(my):
     """Get a list of all requirements in the local rpmdb"""
     pkgs = {}
-    for header in my.rpmdb.getHdrList():
-        tup = my.rpmdb._hdr2pkgTuple(header)
+    for po in my.rpmdb.returnPackages():
+        tup = po.pkgtup
+        header= po.hdr
         requires = zip(
             header[rpm.RPMTAG_REQUIRENAME],
             header[rpm.RPMTAG_REQUIREFLAGS],
@@ -118,7 +117,7 @@ def findDupes(my):
     refined = {}
     dupes = []
     
-    for (n,a,e,v,r) in my.rpmdb.pkglists:
+    for (n,a,e,v,r) in my.rpmdb.simplePkgList():
         if not pkgdict.has_key((n,a)):
             pkgdict[(n,a)] = []
         pkgdict[(n,a)].append((e,v,r))
@@ -157,7 +156,7 @@ def listLeaves(all):
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
 def listOrphans(my):
-    installed = my.rpmdb.getPkgList()
+    installed = my.rpmdb.simplePkgList()
     for pkgtup in installed:
         (n,a,e,v,r) = pkgtup
         if n == "gpg-pubkey":
