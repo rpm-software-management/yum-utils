@@ -21,7 +21,7 @@ import cli
 import yum
 import rpmUtils
 import yum.Errors
-from yum.logger import Logger
+import logging
 from optparse import OptionParser
 
 def parseArgs():
@@ -37,15 +37,14 @@ def parseArgs():
     return (opts, args)
 
 def main():
+    logger = logging.getLogger("yum.verbose.yumbuilddep")
     opts, args = parseArgs()
     base = cli.YumBaseCli()
-    base.doConfigSetup()
+    base.doConfigSetup(init_plugins=False)  # init yum, without plugins
     base.conf.uid = os.geteuid()
         
-    base.log = Logger(threshold=base.conf.debuglevel, file_object =sys.stdout)
-
     if base.conf.uid != 0:
-        base.errorlog(0, "You must be root to install packages")
+        logger.info("You must be root to install packages")
         sys.exit(1)
 
     if len(opts.repos) > 0:
@@ -70,7 +69,7 @@ def main():
             try:
                 srpms = base.pkgSack.returnNewestByNameArch((arg, 'src'))
             except yum.Errors.PackageSackError, e:
-                base.errorlog(0, "Error: %s" % e)
+                logger.error("Error: %s" % e)
                 sys.exit(1)
 
         for srpm in srpms:
@@ -81,12 +80,12 @@ def main():
                     if not base.rpmdb.installed(name=pkg.name):
                         base.tsInfo.addInstall(pkg)
                 except yum.Errors.PackageSackError, e:
-                    base.errorlog(0, "Error: %s" % e)
+                    logger.error("Error: %s" % e)
                     sys.exit(1)
                     
     (result, resultmsgs) = base.buildTransaction()
     if len(base.tsInfo) == 0:
-        base.log(0, "Nothing to do")
+        logger.info("Nothing to do")
     else: 
         base.listTransaction()
         base.doTransaction()
