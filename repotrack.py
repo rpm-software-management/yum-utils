@@ -25,6 +25,7 @@ import os
 import sys
 from optparse import OptionParser
 from urlparse import urljoin
+import logging
 
 
 import yum
@@ -47,12 +48,9 @@ def sortPkgObj(pkg1 ,pkg2):
 class RepoTrack(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
+        self.logger = logging.getLogger("yum.verbose.repotrack")
         self.opts = opts
-        
-    def log(self, num, msg):
-        if num < 3 and not self.opts.quiet:
-            print msg
-    
+           
     def findDeps(self, po):
         """Return the dependencies for a given package, as well
            possible solutions for those dependencies.
@@ -129,7 +127,7 @@ def main():
         sys.exit(1)
         
     my = RepoTrack(opts=opts)
-    my.doConfigSetup(fn=opts.config)
+    my.doConfigSetup(fn=opts.config,init_plugins=False) # init yum, without plugins
     
     # do the happy tmpdir thing if we're not root
     if os.geteuid() != 0 or opts.tempcache:
@@ -224,7 +222,7 @@ def main():
             str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
             
             if not opts.quiet:
-                my.errorlog(0,"%s already exists and appears to be complete" % local)
+                my.logger.info("%s already exists and appears to be complete" % local)
             continue
 
         if opts.urls:
@@ -234,8 +232,10 @@ def main():
 
         # Disable cache otherwise things won't download
         repo.cache = 0
-        my.log(2, 'Downloading %s' % os.path.basename(remote))
-        repo.get(relative=remote, local=local)
+        if not opts.quiet:        
+            my.logger.info('Downloading %s' % os.path.basename(remote))
+        pkg.localpath = local # Hack: to set the localpath to what we want.
+        repo.getPackage(pkg)
 
 
 if __name__ == "__main__":
