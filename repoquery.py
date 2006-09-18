@@ -26,6 +26,7 @@ import exceptions
 
 from optparse import OptionParser
 
+import logging
 import yum
 import yum.config
 import yum.Errors
@@ -302,17 +303,10 @@ class groupQuery:
 class YumBaseQuery(yum.YumBase):
     def __init__(self, pkgops = [], sackops = [], options = None):
         yum.YumBase.__init__(self)
+        self.logger = logging.getLogger("yum.verbose.repoquery")
         self.options = options
         self.pkgops = pkgops
         self.sackops = sackops
-
-    # dont log anything..
-    def log(self, value, msg):
-        pass
-
-    def errorlog(self, value, msg):
-        if not self.options.quiet:
-            print >> sys.stderr, msg
 
     def queryPkgFactory(self, pkgs):
         qf = self.options.queryformat or std_qf["nevra"]
@@ -331,7 +325,7 @@ class YumBaseQuery(yum.YumBase):
             exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
             pkgs = exact + match
         except yum.Errors.PackageSackError, err:
-            self.errorlog(0, err)
+            self.logger.error(err)
         return self.queryPkgFactory(pkgs)
 
     def returnPkgList(self):
@@ -351,7 +345,7 @@ class YumBaseQuery(yum.YumBase):
             elif hasattr(ygh, what):
                 pkgs = getattr(ygh, what)
             else:
-                self.errorlog(1, "Unknown pkgnarrow method: %s" % what)
+                self.logger.error("Unknown pkgnarrow method: %s" % what)
 
         return pkgs
 
@@ -360,7 +354,7 @@ class YumBaseQuery(yum.YumBase):
         try:
             provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
         except yum.Errors.YumBaseError, err:
-            self.errorlog(0, "No package provides %s" % depstring)
+            self.logger.error("No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
 
     def returnGroups(self):
@@ -415,13 +409,13 @@ class YumBaseQuery(yum.YumBase):
                 try:
                     print pkg.doQuery(oper)
                 except queryError, e:
-                    self.errorlog(0, e.msg)
+                    self.logger.error( e.msg)
         for prco in items:
             for oper in self.sackops:
                 try:
                     for p in self.doQuery(oper, prco): print p
                 except queryError, e:
-                    self.errorlog(0, e.msg)
+                    self.logger.error( e.msg)
 
     def doQuery(self, method, *args, **kw):
         return getattr(self, "fmt_%s" % method)(*args, **kw)
@@ -646,16 +640,16 @@ def main(args):
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
-            repoq.errorlog("0, Error: Could not make cachedir, exiting")
+            repoq.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
         repoq.repos.setCacheDir(cachedir)
 
     if opts.cache:
-        repoq.conf.setConfigOption('cache', 1)
-        repoq.errorlog(0, 'Running from cache, results might be incomplete.')
+        repoq.conf.setattr('cache', 1)
+        repoq.logger.error('Running from cache, results might be incomplete.')
 
     if opts.show_dupes:
-        repoq.conf.setConfigOption('showdupesfromrepos', 1)
+        repoq.conf.setattr('showdupesfromrepos', 1)
 
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
@@ -687,7 +681,7 @@ def main(args):
         if needgroup:
             repoq.doGroupSetup()
     except yum.Errors.RepoError, e:
-        repoq.errorlog(1, e)
+        repoq.logger.error( e)
         sys.exit(1)
 
     repoq.runQuery(regexs)
