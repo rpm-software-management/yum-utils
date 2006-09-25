@@ -33,8 +33,6 @@ node[style="filled"];
 """
 
 class yumQuiet(yum.YumBase):
-    def log(self, level, msg):
-        pass
 
     def doDot(self, header):
         maxdeps = 0
@@ -106,7 +104,7 @@ if __name__ == '__main__':
     (opts, args) = parser.parse_args()
 
     my = yumQuiet()
-    my.doConfigSetup(opts.conffile)
+    my.doConfigSetup(opts.conffile, init_plugins=False)
     cachedir = getCacheDir()
     my.repos.setCacheDir(cachedir)
 
