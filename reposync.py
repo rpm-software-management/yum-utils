@@ -34,7 +34,6 @@
 
 import os
 import sys
-sys.path.insert(0, '/usr/share/yum-cvs')
 
 from optparse import OptionParser
 from urlparse import urljoin
