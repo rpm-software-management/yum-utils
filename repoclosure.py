@@ -23,6 +23,7 @@
 import sys
 import os
 
+import logging
 import yum
 import yum.Errors
 from yum.misc import getCacheDir
@@ -30,7 +31,6 @@ from optparse import OptionParser
 import rpmUtils.arch
 from yum.constants import *
 from yum.packageSack import ListPackageSack
-
 
 def parseArgs():
     usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
@@ -53,9 +53,9 @@ def parseArgs():
 class RepoClosure(yum.YumBase):
     def __init__(self, arch = None, config = "/etc/yum.conf"):
         yum.YumBase.__init__(self)
-
+        self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.arch = arch
-        self.doConfigSetup(fn = config)
+        self.doConfigSetup(fn = config,init_plugins=False)
         if hasattr(self.repos, 'sqlite'):
             self.repos.sqlite = False
             self.repos._selectSackType()
@@ -129,9 +129,6 @@ class RepoClosure(yum.YumBase):
                         
         return unresolved
     
-    
-    def log(self, value, msg):
-        pass
 
 def main():
     (opts, cruft) = parseArgs()
@@ -147,23 +144,23 @@ def main():
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
-            print "Error: Could not make cachedir, exiting"
+            my.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
             
         my.repos.setCacheDir(cachedir)
 
     if not opts.quiet:
-        print 'Reading in repository metadata - please wait....'
+        my.logger.info('Reading in repository metadata - please wait....')
 
     try:
         my.readMetadata()
     except yum.Errors.RepoError, e:
-        print 'Filelists not available for repo: %s' % repo
-        print 'Some dependencies may not be complete for this repository'
-        print 'Run as root to get all dependencies or use -t to enable a user temp cache'
+        my.logger.info('Filelists not available for repo: %s' % repo)
+        my.logger.info('Some dependencies may not be complete for this repository')
+        my.logger.info('Run as root to get all dependencies or use -t to enable a user temp cache')
 
     if not opts.quiet:
-        print 'Checking Dependencies'
+        my.logger.info('Checking Dependencies')
 
     baddeps = my.getBrokenDeps(opts.newest)
     if opts.newest:
@@ -174,15 +171,15 @@ def main():
     repos = my.repos.listEnabled()
 
     if not opts.quiet:
-        print 'Repos looked at: %s' % len(repos)
+        my.logger.info('Repos looked at: %s' % len(repos))
         for repo in repos:
-            print '   %s' % repo
-        print 'Num Packages in Repos: %s' % num
+            my.logger.info('   %s' % repo)
+        my.logger.info('Num Packages in Repos: %s' % num)
     
     pkgs = baddeps.keys()
     pkgs.sort()
     for pkg in pkgs:
-        print 'package: %s from %s\n  unresolved deps: ' % (pkg, pkg.repoid)
+        my.logger.info('package: %s from %s\n  unresolved deps: ' % (pkg, pkg.repoid))
         for (n, f, v) in baddeps[pkg]:
             req = '%s' % n
             if f: 
@@ -191,7 +188,7 @@ def main():
             if v:
                 req = '%s %s' % (req, v)
             
-            print '     %s' % req
+            my.logger.info('     %s' % req)
 
 if __name__ == "__main__":
     main()
