@@ -104,7 +104,7 @@ def main():
         exactmatch, matched, unmatched = parsePackages(avail, [pkg])
         installable = yum.misc.unique(exactmatch + matched)
         if len(unmatched) > 0: # if we get back anything in unmatched, it fails
-            my.errorlog(0, 'No Match for argument %s' % pkg)
+            logger.error('No Match for argument %s' % pkg)
             continue
 
         for newpkg in installable:
