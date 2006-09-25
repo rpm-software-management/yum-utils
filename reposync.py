@@ -34,6 +34,8 @@
 
 import os
 import sys
+sys.path.insert(0, '/usr/share/yum-cvs')
+
 from optparse import OptionParser
 from urlparse import urljoin
 
@@ -44,6 +46,7 @@ from yum.constants import *
 from yum.packages import parsePackages
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
+import logging
 
 # for yum 2.4.X compat
 def sortPkgObj(pkg1 ,pkg2):
@@ -58,13 +61,8 @@ def sortPkgObj(pkg1 ,pkg2):
 class RepoSync(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
+        self.logger = logging.getLogger('yum.verbose.reposync')
         self.opts = opts
-        
-    def log(self, num, msg):
-        if num < 3 and not self.opts.quiet:
-            print msg
-    
-
 
 def parseArgs():
     usage = """
@@ -113,7 +111,7 @@ def main():
         sys.exit(1)
         
     my = RepoSync(opts=opts)
-    my.doConfigSetup(fn=opts.config)
+    my.doConfigSetup(fn=opts.config, init_plugins=False)
     
     # do the happy tmpdir thing if we're not root
     if os.geteuid() != 0 or opts.tempcache:
@@ -168,7 +166,7 @@ def main():
                 str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
                 
                 if not opts.quiet:
-                    my.errorlog(0,"%s already exists and appears to be complete" % local)
+                    my.logger.error("%s already exists and appears to be complete" % local)
                 continue
     
             if opts.urls:
@@ -181,13 +179,16 @@ def main():
                 try:
                     os.makedirs(local_repo_path)
                 except IOError, e:
-                    my.errorlog(0, "Could not make repo subdir: %s" % e)
+                    my.logger.error("Could not make repo subdir: %s" % e)
                     sys.exit(1)
             
             # Disable cache otherwise things won't download            
             repo.cache = 0
-            my.log(2, 'Downloading %s' % os.path.basename(remote))
-            repo.get(relative=remote, local=local)
+            if not opts.quiet:
+                my.logger.info( 'Downloading %s' % os.path.basename(remote))
+            pkg.localpath = local # Hack: to set the localpath we want.
+            repo.getPackage(pkg)
+            
 
 
 if __name__ == "__main__":
