@@ -28,9 +28,6 @@ class YumQuiet(yum.YumBase):
     def __init__(self):
         yum.YumBase.__init__(self)
     
-    def log(self, value, msg):
-        pass
-
     def getRecent(self, days=1):
         """return most recent packages from sack"""
 
@@ -173,7 +170,7 @@ def main(options, args):
     days = options.days
     repoids = args
     my = YumQuiet()
-    my.doConfigSetup()
+    my.doConfigSetup(init_plugins=False)
     if os.geteuid() != 0 or options.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
