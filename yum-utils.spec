@@ -111,6 +111,15 @@ Requires: yum > 2.9.5
 This plugin adds a --allow-downgrade flag to yum to make it possible to
 manually downgrade packages to specific versions.
 
+%package -n yum-skip-broken
+Summary: Yum plugin to handle skiping packages with dependency problems
+Group: System Environment/Base
+Requires: yum > 2.6.0
+
+%description -n yum-skip-broken
+This plugin adds a --ignore-broken to yum to make it possible to
+check packages for dependency problems and skip the one with problems.
+
 %prep
 %setup -q
 
@@ -120,7 +129,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -209,7 +218,15 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/allowdowngrade.conf
 /usr/lib/yum-plugins/allowdowngrade.*
 
+%files -n yum-skip-broken
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/skip-broken.conf
+/usr/lib/yum-plugins/skip-broken.*
+
 %changelog
+* Wed Sep 27 2006 Tim Lauridsen <tla@rasmil.dk>
+- added skip-broken plugin
+
 * Tue Sep 05 2006 Panu Matilainen <pmatilai@laiskianen.org>
 - added allowdowngrade plugin
 
