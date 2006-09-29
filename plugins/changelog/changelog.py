@@ -22,7 +22,7 @@ import time
 from rpmUtils.miscutils import splitFilename
 from yum.plugins import TYPE_INTERFACE
 
-requires_api_version = '2.1'
+requires_api_version = '2.5'
 plugin_type = (TYPE_INTERFACE,)
 
 origpkgs = {}
@@ -85,16 +85,15 @@ def postresolve_hook(conduit):
     ts = conduit.getTsInfo()
     rpmdb = conduit.getRpmDB()
     for tsmem in ts.getMembers():
-        for pkgtup in rpmdb.returnTupleByKeyword(name=tsmem.po.name, arch=tsmem.po.arch):
-            for hdr in rpmdb.returnHeaderByTuple(pkgtup):
-                # store the latest date in changelog entries
-                times = hdr['changelogtime']
-                n,v,r,e,a = splitFilename(hdr['sourcerpm'])
-                if len(times) == 0:
-                    # deal with packages without changelog
-                    origpkgs[n] = 0 
-                else:
-                    origpkgs[n] = times[0]
+        for po in rpmdb.searchNevra(name=tsmem.po.name, arch=tsmem.po.arch):
+            hdr = po.hdr
+            times = hdr['changelogtime']
+            n,v,r,e,a = splitFilename(hdr['sourcerpm'])
+            if len(times) == 0:
+                # deal with packages without changelog
+                origpkgs[n] = 0 
+            else:
+                origpkgs[n] = times[0]
 
     if conduit.confString('main', 'when', default='post') == 'pre':
         show_changes(conduit, 'Changes in packages about to be updated:')
