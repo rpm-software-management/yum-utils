@@ -20,10 +20,10 @@
 
 import time
 from rpmUtils.miscutils import splitFilename
-from yum.plugins import TYPE_INTERFACE
+from yum.plugins import TYPE_INTERACTIVE
 
 requires_api_version = '2.5'
-plugin_type = (TYPE_INTERFACE,)
+plugin_type = (TYPE_INTERACTIVE,)
 
 origpkgs = {}
 changelog = 0
