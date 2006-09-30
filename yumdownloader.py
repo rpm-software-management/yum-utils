@@ -163,7 +163,7 @@ def main():
             remote = download.returnSimple('relativepath')
             if opts.urls:
                 url = urljoin(repo.urls[0],remote)
-                my.log(0, '%s' % url)
+                logger.info('%s' % url)
                 continue
             local = os.path.basename(remote)
             local = os.path.join(opts.destdir, local)
