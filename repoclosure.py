@@ -37,8 +37,11 @@ def parseArgs():
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
-    parser.add_option("-a", "--arch", default=None,
-        help='check as if running the specified arch (default: current arch)')
+    parser.add_option("-a", "--arch", default=[], action='append',
+        help='check packages of the given archs, can be specified multiple ' +
+             'times (default: current arch)')
+    parser.add_option("-b", "--builddeps", default=False, action="store_true",
+        help='check build dependencies only (needs source repos enabled)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
@@ -51,10 +54,11 @@ def parseArgs():
     return (opts, args)
 
 class RepoClosure(yum.YumBase):
-    def __init__(self, arch = None, config = "/etc/yum.conf"):
+    def __init__(self, arch = [], config = "/etc/yum.conf", builddeps = False):
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.arch = arch
+        self.builddeps = builddeps
         self.doConfigSetup(fn = config,init_plugins=False)
         if hasattr(self.repos, 'sqlite'):
             self.repos.sqlite = False
@@ -80,7 +84,15 @@ class RepoClosure(yum.YumBase):
     
     def readMetadata(self):
         self.doRepoSetup()
-        self.doSackSetup(rpmUtils.arch.getArchList(self.arch))
+        archs = []
+        if not self.arch:
+            archs.extend(rpmUtils.arch.getArchList())
+        else:
+            for arch in self.arch:
+                archs.extend(rpmUtils.arch.getArchList(arch))
+        if self.builddeps and 'src' not in archs:
+            archs.append('src')
+        self.doSackSetup(archs)
         for repo in self.repos.listEnabled():
             self.repos.populateSack(which=[repo.id], with='filelists')
 
@@ -95,6 +107,9 @@ class RepoClosure(yum.YumBase):
         mypkgSack = ListPackageSack(pkgs)
         pkgtuplist = mypkgSack.simplePkgList()
         
+        if self.builddeps:
+            pkgs = filter(lambda x: x.arch == 'src', pkgs)
+
         for pkg in pkgs:
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
@@ -132,7 +147,7 @@ class RepoClosure(yum.YumBase):
 
 def main():
     (opts, cruft) = parseArgs()
-    my = RepoClosure(arch = opts.arch, config = opts.config)
+    my = RepoClosure(arch = opts.arch, config = opts.config, builddeps = opts.builddeps)
     
     if opts.repoid:
         for repo in my.repos.repos.values():
