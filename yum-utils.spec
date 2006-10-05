@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 0.6
+Version: 1.0
 Release: 1
 License: GPL
 Group: Development/Tools
@@ -8,7 +8,7 @@ Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python, yum >= 2.5.1
+Requires: python >= 2.4 , yum >= 3.0
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -18,7 +18,7 @@ more powerful to use.
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
 Group: System Environment/Base
-Requires: python, yum >= 2.3.2
+Requires: python, yum >= 2.4
 Requires(pre): chkconfig
 Requires(post): chkconfig
 
@@ -30,7 +30,7 @@ waiting until the next early morning cron job.
 %package -n yum-changelog
 Summary: Yum plugin for viewing package changelogs before/after updating
 Group: System Environment/Base
-Requires: yum >= 2.3.4
+Requires: yum >= 3.0
 
 %description -n yum-changelog
 This plugin adds a command line option to allow viewing package changelog 
@@ -39,7 +39,7 @@ deltas before or after updating packages.
 %package -n yum-fastestmirror
 Summary: Yum plugin which chooses fastest repository from a mirrorlist
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-fastestmirror
 This plugin sorts each repository's mirrorlist by connection speed
@@ -48,7 +48,7 @@ prior to downloading packages.
 %package -n yum-fedorakmod
 Summary: Yum plugin to handle fedora kernel modules.
 Group: System Environment/Base
-Requires: yum >= 2.6.0
+Requires: yum >= 3.0
 
 %description -n yum-fedorakmod
 Plugin for Yum to handle installation of kmod-foo type of kernel modules, when new kernel versions 
@@ -58,7 +58,7 @@ kmod-foo kernel modules is described by the Fedora Extras packaging standards.
 %package -n yum-protectbase
 Summary: Yum plugin to protect packages from certain repositories.
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-protectbase
 This plugin allows certain repositories to be protected. Packages in the
@@ -68,7 +68,7 @@ repositories even if the non-protected repo has a later version.
 %package -n yum-versionlock
 Summary: Yum plugin to lock specified packages from being updated
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-versionlock
 This plugin allows certain packages specified in a file to be protected from being updated by 
@@ -77,7 +77,7 @@ newer versions.
 %package -n yum-tsflags
 Summary: Yum plugin to add tsflags by a commandline option
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-tsflags
 This plugin allows you to specify optional transaction flags on the yum
@@ -86,7 +86,7 @@ command line
 %package -n yum-kernel-module
 Summary: Yum plugin to handle kernel-module-foo type of kernel module
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-kernel-module
 This plugin handle installation of kernel-module-foo type of kernel modules when new version of 
@@ -96,7 +96,7 @@ kernels are installed.
 %package -n yum-downloadonly
 Summary: Yum plugin to add downloadonly command option
 Group: System Environment/Base
-Requires: yum >= 2.4.1
+Requires: yum >= 3.0
 
 %description -n yum-downloadonly
 This plugin adds a --downloadonly flag to yum so that yum will only download
@@ -105,7 +105,7 @@ the packages and not install/update them.
 %package -n yum-allowdowngrade
 Summary: Yum plugin to enable manual downgrading of packages
 Group: System Environment/Base
-Requires: yum > 2.9.5
+Requires: yum > 3.0
 
 %description -n yum-allowdowngrade
 This plugin adds a --allow-downgrade flag to yum to make it possible to
@@ -114,7 +114,7 @@ manually downgrade packages to specific versions.
 %package -n yum-skip-broken
 Summary: Yum plugin to handle skiping packages with dependency problems
 Group: System Environment/Base
-Requires: yum > 2.6.0
+Requires: yum > 3.0
 
 %description -n yum-skip-broken
 This plugin adds a --ignore-broken to yum to make it possible to
@@ -224,6 +224,10 @@ fi
 /usr/lib/yum-plugins/skip-broken.*
 
 %changelog
+* Wed Oct  4 2006 Seth Vidal <skvidal at linux.duke.edu>
+- mark it as 1.0
+- change requires for the packages to yum 3.0
+
 * Wed Sep 27 2006 Tim Lauridsen <tla@rasmil.dk>
 - added skip-broken plugin
 
