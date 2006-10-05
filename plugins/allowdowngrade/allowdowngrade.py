@@ -14,11 +14,11 @@
 #
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 
-from yum.plugins import TYPE_INTERFACE
+from yum.plugins import TYPE_INTERACTIVE
 from rpm import RPMPROB_FILTER_OLDPACKAGE 
 
 requires_api_version = '2.4'
-plugin_type = (TYPE_INTERFACE,)
+plugin_type = (TYPE_INTERACTIVE,)
 
 def config_hook(conduit):
     parser = conduit.getOptParser()

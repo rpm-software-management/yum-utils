@@ -16,10 +16,10 @@
 #
 # by Menno Smits
 
-from yum.plugins import PluginYumExit, TYPE_INTERFACE
+from yum.plugins import PluginYumExit, TYPE_INTERACTIVE
 
 requires_api_version = '2.0'
-plugin_type = (TYPE_INTERFACE,)
+plugin_type = (TYPE_INTERACTIVE,)
 
 def config_hook(conduit):
    parser = conduit.getOptParser()
