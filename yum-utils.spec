@@ -105,7 +105,7 @@ the packages and not install/update them.
 %package -n yum-allowdowngrade
 Summary: Yum plugin to enable manual downgrading of packages
 Group: System Environment/Base
-Requires: yum > 3.0
+Requires: yum >= 3.0
 
 %description -n yum-allowdowngrade
 This plugin adds a --allow-downgrade flag to yum to make it possible to
@@ -114,7 +114,7 @@ manually downgrade packages to specific versions.
 %package -n yum-skip-broken
 Summary: Yum plugin to handle skiping packages with dependency problems
 Group: System Environment/Base
-Requires: yum > 3.0
+Requires: yum >= 3.0
 
 %description -n yum-skip-broken
 This plugin adds a --ignore-broken to yum to make it possible to
