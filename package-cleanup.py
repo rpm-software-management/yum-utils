@@ -170,8 +170,8 @@ def listOrphans(my):
 def getKernels(my):
     """return a list of all installed kernels, sorted newest to oldest"""
     kernlist = []
-    for tup in my.rpmdb.returnTupleByKeyword(name='kernel'):
-        kernlist.append(tup)
+    for po in my.rpmdb.searchNevra(name='kernel'):
+        kernlist.append(po.pkgtup)
     kernlist.sort(sortPackages)
     kernlist.reverse()
     return kernlist
@@ -180,9 +180,10 @@ def getKernels(my):
 # are no longer installed or to kernel version that are in the removelist
 def getOldKernelDevel(my,kernels,removelist):
     devellist = []
-    for tup in my.rpmdb.returnTupleByKeyword(name='kernel-devel'):
+    for po in my.rpmdb.searchNevra(name='kernel-devel'):
         # For all kernel-devel packages see if there is a matching kernel
         # in kernels but not in removelist
+        tup = po.pkgtup
         keep = False
         for kernel in kernels:
             if kernel in removelist:
