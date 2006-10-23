@@ -1,3 +1,8 @@
+* Oct 23 2006 Luke Macken <lmacken@redhat.com> - 0.2.6
+- Make the instructions less misleading
+- Support TYPE_INTERFACE for API_VERSION <= 2.3
+- Remove cached mirror list in the clean_hook
+
 * Jun 14 2006 Luke Macken <lmacken@redhat.com> - 0.2.5
 - Use new yum 2.9.0 api
 
