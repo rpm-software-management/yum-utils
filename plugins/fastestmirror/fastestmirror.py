@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.5
+# Version: 0.2.6
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
-# mirrorlist by connection speed prior to metadata download.
+# mirrorlist by connection speed prior to download.
 #
 # To install this plugin, just drop it into /usr/lib/yum-plugins, and
-# make sure you have 'plugins=1' in your /etc/yum.conf.
+# make sure you have 'plugins=1' in your /etc/yum.conf.  You also need to
+# create the following configuration file, if not installed through an RPM:
 #
-# Configuration Options
-# /etc/yum/pluginconf.d/fastestmirror.conf:
+#  /etc/yum/pluginconf.d/fastestmirror.conf:
 #   [main]
 #   enabled=1
 #   verbose=1
@@ -39,11 +39,12 @@ import urlparse
 import datetime
 import threading
 
-from yum.plugins import TYPE_INTERACTIVE, TYPE_CORE
-from yum.plugins import PluginYumExit
+from yum.plugins import TYPE_INTERACTIVE, TYPE_CORE, API_VERSION
+from yum.plugins import TYPE_INTERFACE, PluginYumExit
 
-requires_api_version = '2.1'
-plugin_type = (TYPE_INTERACTIVE, TYPE_CORE)
+requires_api_version = '2.5'
+plugin_type = (API_VERSION <= 2.3 and TYPE_INTERFACE or TYPE_INTERACTIVE,
+               TYPE_CORE)
 
 verbose = False
 socket_timeout = 3
@@ -61,6 +62,11 @@ def init_hook(conduit):
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
         loadcache = True
+
+def clean_hook(conduit):
+    if os.path.exists(hostfilepath):
+        conduit.info(2, "Cleaning up list of fastest mirrors")
+        os.unlink(hostfilepath)
 
 def postreposetup_hook(conduit):
     global loadcache
