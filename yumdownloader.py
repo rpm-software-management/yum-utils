@@ -50,6 +50,8 @@ def initYum():
 def parseArgs():
     usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
     parser = OptionParser(usage=usage)
+    parser.add_option("-c", "--config", default='/etc/yum.conf',
+      help='config file to use (defaults to /etc/yum.conf)')
     parser.add_option("--destdir", default=".", dest="destdir",
       help='destination directory (defaults to current directory)')
     parser.add_option("--urls", default=False, dest="urls", action="store_true",
@@ -72,6 +74,7 @@ def main():
     logger = logging.getLogger("yum.verbose.yumdownloader")
     (opts, args) = parseArgs()
     my = initYum()
+    my.doConfigSetup(fn=opts.config)
 
     if len(opts.repo) > 0:
         myrepos = []
