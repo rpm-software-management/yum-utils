@@ -21,6 +21,7 @@ sys.path.insert(0, '/usr/share/yum-cli')
 import yum
 import yum.Errors
 import os
+import shutil
 import output
 import rpmUtils.arch
 from urlgrabber.progress import TextMeter
@@ -174,7 +175,14 @@ def main():
             # Disable cache otherwise things won't download
             repo.cache = 0
             download.localpath = local # Hack: to set the localpath we want.
-            repo.getPackage(download)
+            path = repo.getPackage(download)
+
+            if not os.path.exists(local) or not os.path.samefile(path, local):
+                progress = TextMeter()
+                progress.start(basename=os.path.basename(local),
+                               size=os.stat(path).st_size)
+                shutil.copy2(path, local)
+                progress.end(progress.size)
 
 if __name__ == '__main__':
     main()

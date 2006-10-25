@@ -23,6 +23,7 @@
 
 import os
 import sys
+import shutil
 from optparse import OptionParser
 from urlparse import urljoin
 import logging
@@ -235,8 +236,10 @@ def main():
         if not opts.quiet:        
             my.logger.info('Downloading %s' % os.path.basename(remote))
         pkg.localpath = local # Hack: to set the localpath to what we want.
-        repo.getPackage(pkg)
+        path = repo.getPackage(pkg)
 
+        if not os.path.exists(local) or not os.path.samefile(path, local):
+            shutil.copy2(path, local)
 
 if __name__ == "__main__":
     main()
