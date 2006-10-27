@@ -1,0 +1,14 @@
+* Fri Oct 27 Tim Lauridsen <tla@rasmil.dk> - 0.0.4
+- made code to work with current yum API and yum 2.4.x API
+- Added output of exclude packages when yum -d3 is used
+
+* Tue May 9 Daniel de Kok <danieldk@pobox.com> - 0.0.3
+- Correct a loop operation (s/continue/break/).
+- Add a bit more documentation.
+
+* Mon May 8 Daniel de Kok <danieldk@pobox.com> - 0.0.2
+- Add the 'check_obsoletes' option, which forces priority protection of
+  obsoleted packages.
+
+* Sun May 7 Daniel de Kok <danieldk@pobox.com> - 0.0.1
+- Initial release

@@ -1,0 +1,50 @@
+priorities
+----------
+
+* Introduction *
+
+This plugins is inspired by the protectbase plugin, and enables/disables
+packages based on a repository priority.
+
+* Enabling the plugin *
+
+You can install this plugin by copying it to /usr/lib/yum-plugins. To
+enable this plugin, make sure that you have 'plugins=1' in /etc/yum.conf,
+and create the file /etc/yum/pluginconf.d/priorities.conf with the
+following content:
+
+[main]
+enabled=1
+
+If you also want the plugin to protect high-priority repositories against
+obsoletes in low-priority repositories, enable the 'check_obsoletes' bool:
+
+check_obsoletes=1
+
+* Setting repository priorities *
+
+You can add priorities to repositories by adding the line:
+
+priority=N
+
+to the repository entry, where N is an integer number. The default
+priority for repositories is 99. The repositories with the lowest
+number have the highest priority.
+
+* Bugs *
+
+Please report errors to Daniel de Kok <danieldk@pobox.com>
+
+* License *
+
+Copyright (c) 2006 Daniel de Kok
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
