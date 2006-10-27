@@ -120,6 +120,16 @@ Requires: yum >= 3.0
 This plugin adds a --ignore-broken to yum to make it possible to
 check packages for dependency problems and skip the one with problems.
 
+%package -n yum-priorities
+Summary: plugin to give priorities to packages from different repos 
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-priorities
+This plugin allows repositories to have different priorities. 
+Packages in a repository with a lower priority can't be overridden by packages
+from a repository with a higher priority even if repo has a later version.
+
 %prep
 %setup -q
 
@@ -129,7 +139,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -223,7 +233,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/skip-broken.conf
 /usr/lib/yum-plugins/skip-broken.*
 
+%files -n yum-priorities
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
+/usr/lib/yum-plugins/priorities.*
+
+
 %changelog
+* Fri Oct 27 2006 Tim Lauridsen <tla@rasmil.dk>
+- Added priorities plugin written by Daniel de Kok <danieldk at pobox.com> 
+
 * Wed Oct  4 2006 Seth Vidal <skvidal at linux.duke.edu>
 - mark it as 1.0
 - change requires for the packages to yum 3.0
