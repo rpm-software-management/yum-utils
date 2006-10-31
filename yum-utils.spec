@@ -240,6 +240,9 @@ fi
 
 
 %changelog
+* Tue Oct 31 2006 Tim Lauridsen <tla@rasmil.dk>
+- mark it as 1.0.1
+
 * Fri Oct 27 2006 Tim Lauridsen <tla@rasmil.dk>
 - Added priorities plugin written by Daniel de Kok <danieldk at pobox.com> 
 
