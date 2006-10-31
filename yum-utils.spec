@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.0
+Version: 1.0.1
 Release: 1
 License: GPL
 Group: Development/Tools

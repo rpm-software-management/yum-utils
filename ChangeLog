@@ -1,955 +1,1021 @@
-2006-10-04 23:18  skvidal
+2006-10-27 09:17  timlau
 
-	* yum-utils.spec: 
-	- mark as 1.0 - update reqs to require yum 3.0 - since most of them
-	do anyway
+	* yum-utils.spec: Added priorities plugin to spec file
 
-2006-10-01 23:52  skvidal
+2006-10-27 09:13  timlau
+
+	* plugins/priorities/: ChangeLog, README, priorities.conf,
+	  priorities.py: Added priorities plugin.
+
+2006-10-25 05:29  skvidal
+
+	* yumdownloader.py: merge Earl Sammons' patch to add a -c option to
+	  yumdownloader
+
+2006-10-25 05:27  skvidal
+
+	* reposync.py, repotrack.py, yumdownloader.py:
+	  check in patch from Mark McLoughlin to fix handling of local
+	  repos in reposync, repotrack and yumdownloader.
+
+2006-10-23 19:37  lmacken
+
+	* plugins/fastestmirror/ChangeLog: 0.2.6
+
+2006-10-23 02:11  lmacken
+
+	* plugins/fastestmirror/fastestmirror.py:
+	  0.2.6 - Make the instructions less misleading - Support
+	  TYPE_INTERFACE for API_VERSION <= 2.3 - Remove cached mirror list
+	  in the clean_hook
+
+2006-10-09 08:39  timlau
+
+	* package-cleanup.py: fixed some deprecation warnings using the
+	  '--oldkernels' option.  Use searchNevra() insted of
+	  returnTuplebyKeyword()
+
+2006-10-05 13:33  timlau
+
+	* plugins/: allowdowngrade/allowdowngrade.py,
+	  downloadonly/downloadonly.py: TYPE_INTERFACE -> TYPE_INTERACTIVE
+
+2006-10-05 11:46  skvidal
+
+	* yum-utils.spec: fix requires
+
+2006-10-05 03:18  skvidal
+
+	* ChangeLog:
+	  Add a changelog, finally.
+
+2006-10-05 03:18  skvidal
+
+	* yum-utils.spec:
+	  - mark as 1.0 - update reqs to require yum 3.0 - since most of
+	  them do anyway
+
+2006-10-02 03:52  skvidal
 
 	* repoclosure.py: merge Ville's patch to handle alternative arches
-	better and deal with build dep closure, too.
+	  better and deal with build dep closure, too.
 
-2006-09-30 01:29  timlau
+2006-09-30 05:29  timlau
 
 	* yumdownloader.py: my.log -> logger.info
 
-2006-09-29 08:50  timlau
+2006-09-29 12:50  timlau
 
 	* plugins/changelog/changelog.py: changed plugin type from
-	TYPE_INTERFACE to TYPE_INTERACTIVE too avoid deprecation warnings.
+	  TYPE_INTERFACE to TYPE_INTERACTIVE too avoid deprecation
+	  warnings.
 
-2006-09-29 07:51  timlau
+2006-09-29 11:51  timlau
 
 	* plugins/changelog/changelog.py: fixed plugin to work with current
-	API without deprecation warnings
+	  API without deprecation warnings
 
-2006-09-27 09:36  timlau
+2006-09-27 13:36  timlau
 
 	* yum-utils.spec: Added skip-broken plugin to yum-utils specfile.
 
-2006-09-25 09:42  timlau
+2006-09-25 13:42  timlau
 
 	* reposync.py: removed debug line, Thanks Menno :-)
 
-2006-09-25 09:36  timlau
+2006-09-25 13:36  timlau
 
 	* reposync.py: fixed reposync to work with the latest yum API
-	(2.9.x)
+	  (2.9.x)
 
-2006-09-25 02:57  timlau
+2006-09-25 13:04  timlau
+
+	* plugins/skip-broken/: skip-broken.conf: changed skip-broken.conf
+	  CVS property to ASCII
+
+2006-09-25 13:03  timlau
+
+	* plugins/skip-broken/: skip-broken.conf, skip-broken.py: Initial
+	  import of the skip-broken plugin A plugin there adds an option to
+	  yum to skip packages with dependency problems.
+
+2006-09-25 06:57  timlau
 
 	* repo-rss.py: Chnages to make it work with the new Yum API (2.9.x)
 
-2006-09-25 02:56  timlau
+2006-09-25 06:56  timlau
 
 	* repo-graph.py: Changes to make it work with the new yum API
-	(2.9.x)
+	  (2.9.x)
 
-2006-09-25 02:52  timlau
+2006-09-25 06:52  timlau
 
 	* repoclosure.py: make it work with new Yum API (2.9.x) and
-	replaced print statements with python logging.
+	  replaced print statements with python logging.
 
-2006-09-25 02:44  timlau
+2006-09-25 06:44  timlau
 
 	* yumdownloader.py: a my.errorlog -> logger.error fix by Andreas
-	Hanke
+	  Hanke
 
-2006-09-19 11:13  slack
+2006-09-19 15:13  slack
 
 	* plugins/fedorakmod/: README, fedorakmod.py: Current fedorakmod
-	pluging work.  Most of the agreed upon functionality is there and
-	the plugin should be easily extendable.  There seems to be a Yum
-	bug that's preventing installing a given kmod for all installed
-	kernels to work properly.  Attempting to track that down.
+	  pluging work.  Most of the agreed upon functionality is there and
+	  the plugin should be easily extendable.  There seems to be a Yum
+	  bug that's preventing installing a given kmod for all installed
+	  kernels to work properly.  Attempting to track that down.
 
-2006-09-18 12:06  katzj
+2006-09-18 16:06  katzj
 
 	* repotrack.py: api fixes from tim
 
-2006-09-18 11:43  katzj
+2006-09-18 15:43  katzj
 
 	* package-cleanup.py: api change fixes from tim
 
-2006-09-18 11:43  katzj
+2006-09-18 15:43  katzj
 
 	* repoquery.py: patch from tim for api changes
 
-2006-09-18 11:40  katzj
+2006-09-18 15:40  katzj
 
 	* yumdownloader.py: api fixes from tim
 
-2006-09-18 11:31  katzj
+2006-09-18 15:31  katzj
 
 	* yum-builddep.py: tim's fix for api changes
 
-2006-09-06 01:24  pmatilai
+2006-09-06 05:24  pmatilai
 
 	* plugins/versionlock/versionlock.conf: - disable versionlock
-	plugin by default
+	  plugin by default
 
-2006-09-05 15:05  pmatilai
+2006-09-05 19:05  pmatilai
 
 	* yum-utils.spec: - actually install allowdowngrade plugin to
-	buildroot, duh
+	  buildroot, duh
 
-2006-09-05 14:53  pmatilai
+2006-09-05 18:53  pmatilai
 
-	* yum-utils.spec, plugins/changelog/changelog.py: - add
-	allowdowngrade plugin - fix traceback in changelog plugin if
-	package has no changelog
+	* yum-utils.spec, plugins/allowdowngrade/allowdowngrade.conf,
+	  plugins/allowdowngrade/allowdowngrade.py,
+	  plugins/changelog/changelog.py: - add allowdowngrade plugin - fix
+	  traceback in changelog plugin if package has no changelog
 
-2006-08-13 17:27  skvidal
+2006-08-13 21:27  skvidal
 
 	* yum-utils.spec: fix the plugins/doc issue
 
-2006-07-20 12:39  slack
+2006-07-20 16:39  slack
 
 	* plugins/fedorakmod/: fedorakmod.conf, fedorakmod.py: Make
-	pinkernels default to off.
+	  pinkernels default to off.
 
-2006-07-07 13:53  katzj
+2006-07-07 17:53  katzj
 
 	* repoquery.py: fix for config api changes
 
-2006-07-05 13:54  slack
+2006-07-05 17:54  slack
 
 	* plugins/fedorakmod/: README, fedorakmod.conf, fedorakmod.py:
-	Refactor so that additional functionality can easily be added in. 
-	Implement pinning of kernels based on availability of kernel
-	modules.
+	  Refactor so that additional functionality can easily be added in.
+	  Implement pinning of kernels based on availability of kernel
+	  modules.
 
-2006-07-03 17:28  slack
+2006-07-03 21:28  slack
 
 	* plugins/fedorakmod/fedorakmod.py: Update to the latest Fedora
-	Extras Kernel Module specs and the latest Yum API.
+	  Extras Kernel Module specs and the latest Yum API.
 
-2006-06-29 11:15  pmatilai
+2006-06-29 15:15  pmatilai
 
 	* repoquery.py: - dont try to lookup source rpms of source rpms...
 
-2006-06-29 10:57  pmatilai
+2006-06-29 14:57  pmatilai
 
 	* repoclosure.py, reposync.py, repotrack.py, yum-builddep.py: -
-	convert repoclosure, reposync, repotrack and yum-builddep to new
-	API
+	  convert repoclosure, reposync, repotrack and yum-builddep to new
+	  API
 
-2006-06-29 07:24  pmatilai
+2006-06-29 11:24  pmatilai
 
 	* repoquery.py: - new --srpm option for automatically locating the
-	source rpm of a given	package and operating on it
+	  source rpm of a given   package and operating on it
 
-2006-06-29 05:54  pmatilai
+2006-06-29 09:54  pmatilai
 
 	* repoquery.py: - add files() method to querypkg, use it for
-	fmt_list() - with --alldeps, look through files as well for
-	depending packages
+	  fmt_list() - with --alldeps, look through files as well for
+	  depending packages
 
-2006-06-16 10:45  mjs
+2006-06-16 14:45  mjs
 
 	* plugins/changelog/changelog.py: - removed registerOpt() usage.
-	This is only required when adding options to   Yum's own
-	configuration files. It is not required for the plugin's own  
-	configuration files.  - removed unused imports
+	  This is only required when adding options to	 Yum's own
+	  configuration files. It is not required for the plugin's own
+	  configuration files.	- removed unused imports
 
-2006-06-16 10:41  mjs
+2006-06-16 14:41  mjs
 
 	* plugins/versionlock/versionlock.py: - changed to UNIX line
-	endings (has DOS line endings) - removed config_hook() and use of
-	registerOpt(). registerOpt() is only for   adding options to Yum's
-	main configuration files. It is not required for the   plugin's own
-	configuration file.
+	  endings (has DOS line endings) - removed config_hook() and use of
+	  registerOpt(). registerOpt() is only for   adding options to
+	  Yum's main configuration files. It is not required for the
+	  plugin's own configuration file.
 
-2006-06-16 10:33  mjs
+2006-06-16 14:33  mjs
 
 	* plugins/protectbase/protectbase.py: Added GPL header, author
-	contact note and docstrings.
+	  contact note and docstrings.
 
-2006-06-16 10:21  mjs
+2006-06-16 14:21  mjs
 
 	* plugins/protectbase/protectbase.py: Updated to use new style
-	option definitions.
+	  option definitions.
 
-2006-06-14 22:24  lmacken
+2006-06-15 02:24  lmacken
 
 	* plugins/fastestmirror/: ChangeLog, fastestmirror.py: * Jun 14
-	2006 Luke Macken <lmacken@redhat.com> - 0.2.5 - Use new yum 2.9.0
-	api
+	  2006 Luke Macken <lmacken@redhat.com> - 0.2.5 - Use new yum 2.9.0
+	  api
 
-2006-06-13 11:23  pnasrat
+2006-06-13 15:23  pnasrat
 
 	* repoquery.py: new yum api
 
-2006-05-24 11:40  skvidal
+2006-05-24 15:40  skvidal
 
-	* repomanage.py: 
-	- merge Nurdin Premji's patch to optparse-ize repomange.  - fix
-	minor bug in patch keeping -k from working
+	* repomanage.py:
+	  - merge Nurdin Premji's patch to optparse-ize repomange.  - fix
+	  minor bug in patch keeping -k from working
 
-2006-05-18 12:06  skvidal
+2006-05-18 16:06  skvidal
 
-	* reposync.py: 
-	make -a do something quasi-correct
+	* reposync.py:
+	  make -a do something quasi-correct
 
-2006-05-14 10:08  gijs
+2006-05-14 14:08  gijs
 
 	* yumdownloader.py: Fix bug #469: Make yumdownloader download the
-	correct source rpm if the provided package is a subpackage of
-	another package. For example yumdownloader --source mod_ssl now
-	downloads the httpd src rpm.
+	  correct source rpm if the provided package is a subpackage of
+	  another package. For example yumdownloader --source mod_ssl now
+	  downloads the httpd src rpm.
 
-2006-05-07 22:50  skvidal
+2006-05-08 02:50  skvidal
 
-	* reposync.py: 
-	make reposync -a work
+	* reposync.py:
+	  make reposync -a work
 
-2006-05-06 21:53  skvidal
+2006-05-07 01:53  skvidal
 
 	* README: update readme for reposync and repotrack
 
-2006-05-06 21:47  skvidal
+2006-05-07 01:47  skvidal
 
 	* yum-utils.spec: fix changelog order
 
-2006-05-06 21:44  skvidal
+2006-05-07 01:44  skvidal
 
-	* reposync.py: 
-	clean up the --help output of reposync
+	* reposync.py:
+	  clean up the --help output of reposync
 
-2006-05-06 21:36  skvidal
+2006-05-07 01:36  skvidal
 
-	* yumdownloader.py: 
-	fix multiple packages specified on cli
+	* yumdownloader.py:
+	  fix multiple packages specified on cli
 
-2006-05-06 21:20  skvidal
+2006-05-07 01:20  skvidal
 
-	* yum-builddep.py: 
-	get rid of setConfig and getConfig to kill deprecation warnings
+	* yum-builddep.py:
+	  get rid of setConfig and getConfig to kill deprecation warnings
 
-2006-05-06 20:50  skvidal
+2006-05-07 00:50  skvidal
 
-	* yum-utils.spec: 
-	add downloadonly subpkg
+	* yum-utils.spec:
+	  add downloadonly subpkg
 
-2006-05-06 20:45  skvidal
+2006-05-07 00:45  skvidal
 
-	* plugins/downloadonly/: downloadonly.conf, downloadonly.py: 
-	added downloadonly plugin to yum-utils
+	* plugins/downloadonly/: downloadonly.conf, downloadonly.py:
+	  added downloadonly plugin to yum-utils
 
-2006-04-29 23:34  skvidal
+2006-04-30 03:34  skvidal
 
-	* yum-utils.spec: 
-	add in patch to split out each of the plugins into a separate pkg
+	* yum-utils.spec:
+	  add in patch to split out each of the plugins into a separate pkg
 
-2006-04-29 22:51  skvidal
+2006-04-30 02:51  skvidal
 
-	* Makefile, yum-utils.spec: 
-	update Makefile and spec for reposync
+	* Makefile, yum-utils.spec:
+	  update Makefile and spec for reposync
 
-2006-04-29 22:49  skvidal
+2006-04-30 02:49  skvidal
 
-	* reposync.py: 
-	- make it create the subdirs properly - fix it to download all
-	versions by default
+	* reposync.py:
+	  - make it create the subdirs properly - fix it to download all
+	  versions by default
 
-2006-04-11 05:06  skvidal
+2006-04-11 09:06  skvidal
 
-	* reposync.py: 
-	- make reposync create subdirs per repo in destination dir - remove
-	confusing --newest 'toggle' for  a simpler --all-versions option
-	that produces the same result
+	* reposync.py:
+	  - make reposync create subdirs per repo in destination dir -
+	  remove confusing --newest 'toggle' for  a simpler --all-versions
+	  option that produces the same result
 
-2006-04-11 02:25  skvidal
+2006-04-11 06:25  skvidal
 
 	* yumdownloader.py: add --enablerepo to yumdownloader - similar to
-	patch from Miroslav Prymek - thanks!
+	  patch from Miroslav Prymek - thanks!
 
-2006-04-03 11:45  pmatilai
+2006-04-03 15:45  pmatilai
 
 	* repoquery.py: - resurrect group operations with yum 2.6.x API
 
-2006-03-27 11:15  pmatilai
+2006-03-27 16:15  pmatilai
 
 	* repoquery.py: - workaround for yum returning extra leading dashes
-	for some directories   (which posix allows but it doesn't look good
-	for repoquerys purposes)
+	  for some directories	 (which posix allows but it doesn't look
+	  good for repoquerys purposes)
 
-2006-03-16 14:27  pmatilai
+2006-03-16 19:27  pmatilai
 
 	* repoquery.py: - convert tags to lower case (yum bugzilla #548)
 
-2006-03-16 10:46  pnasrat
+2006-03-16 15:46  pnasrat
 
 	* yum-builddep.py: Add option parsing
 
-2006-03-07 02:14  skvidal
+2006-03-07 07:14  skvidal
 
-	* reposync.py: 
-	reposync todo modification
+	* reposync.py:
+	  reposync todo modification
 
-2006-02-28 14:18  skvidal
+2006-02-28 19:18  skvidal
 
-	* reposync.py: 
-	update TODO list
+	* reposync.py:
+	  update TODO list
 
-2006-02-28 12:41  skvidal
+2006-02-28 17:41  skvidal
 
-	* reposync.py: 
-	first checkin of reposync.  It does, essentially, what repotrack
-	does but it just iterates the package lists for a given repository
-	(set of repositories) and downloads all the ones you don't already
-	have downloaded into a path.
+	* reposync.py:
+	  first checkin of reposync.  It does, essentially, what repotrack
+	  does but it just iterates the package lists for a given
+	  repository (set of repositories) and downloads all the ones you
+	  don't already have downloaded into a path.
 
-2006-02-24 16:34  skvidal
+2006-02-24 21:34  skvidal
 
-	* package-cleanup.py: 
-	add dupe-checking and output --dupes option
+	* package-cleanup.py:
+	  add dupe-checking and output --dupes option
 
-2006-02-23 10:50  skvidal
+2006-02-23 15:50  skvidal
 
-	* yum-utils.spec: 
-	changed yum versioned deps
+	* yum-utils.spec:
+	  changed yum versioned deps
 
-2006-02-16 18:24  pmatilai
+2006-02-16 23:24  pmatilai
 
 	* yumdownloader.py: - apply patch by Ville Skytta to make
-	yumdownloader compatible with yum-2.5.x  
-	(https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=175335)
+	  yumdownloader compatible with yum-2.5.x
+	  (https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=175335)
 
-2006-02-13 15:21  slack
+2006-02-13 20:21  slack
 
 	* plugins/fedorakmod/: README, fedorakmod.conf, fedorakmod.py: A
-	begining of support for the Fedora Extras kernel module proposal.
+	  begining of support for the Fedora Extras kernel module proposal.
 
-2006-02-10 01:13  skvidal
+2006-02-10 06:13  skvidal
 
-	* repotrack.py: 
-	simplify RepoTrack.findDeps
+	* repotrack.py:
+	  simplify RepoTrack.findDeps
 
-2006-02-10 00:48  skvidal
+2006-02-10 05:48  skvidal
 
-	* Makefile, yum-utils.spec: 
-	added in repotrack, bumped version not finished checking yet,
-	though
+	* Makefile, yum-utils.spec:
+	  added in repotrack, bumped version not finished checking yet,
+	  though
 
-2006-02-06 22:14  lmacken
+2006-02-07 03:14  lmacken
 
 	* plugins/fastestmirror/: ChangeLog, fastestmirror.py: * Feb 06
-	2006 Luke Macken <lmacken@redhat.com> - 0.2.4 - Only write the
-	timedhost file if we've re-pinged the mirrors
+	  2006 Luke Macken <lmacken@redhat.com> - 0.2.4 - Only write the
+	  timedhost file if we've re-pinged the mirrors
 
-2006-02-03 13:08  pnasrat
+2006-02-03 18:08  pnasrat
 
 	* yum-builddep.py: List not individual package
 
-2006-02-02 16:25  lmacken
+2006-02-02 21:25  lmacken
 
 	* plugins/fastestmirror/: ChangeLog, fastestmirror.conf,
-	fastestmirror.py: * Feb 02 2006 Luke Macken <lmacken@redhat.com> -
-	0.2.3 - Added 'maxhostfileage' option to specify how many days to
-	keep the hostfile
+	  fastestmirror.py: * Feb 02 2006 Luke Macken <lmacken@redhat.com>
+	  - 0.2.3 - Added 'maxhostfileage' option to specify how many days
+	  to keep the hostfile
 
-2006-01-22 16:05  skvidal
+2006-01-22 21:05  skvidal
 
-	* repotrack.py: 
-	make urls only print if the file needs to be download and -u is in
-	cli flags.
+	* repotrack.py:
+	  make urls only print if the file needs to be download and -u is
+	  in cli flags.
 
-2006-01-16 14:23  pmatilai
+2006-01-16 19:23  pmatilai
 
 	* repoquery.py, docs/repoquery.1: - add --archlist option for
-	limiting which package architectures to consider in queries.
+	  limiting which package architectures to consider in queries.
 
-2006-01-12 11:20  pmatilai
+2006-01-12 16:20  pmatilai
 
 	* repoclosure.py: - remove unnecessary double definition of
-	evrTupletoVer (patch from Brian Long)
+	  evrTupletoVer (patch from Brian Long)
 
-2006-01-12 11:16  pmatilai
+2006-01-12 16:16  pmatilai
 
 	* docs/: Makefile, repo-rss.1, yum-builddep.1, yumdownloader.1: -
-	Add man pages for yumdownloader, yum-builddep and repo-rss from
-	Brian Long
+	  Add man pages for yumdownloader, yum-builddep and repo-rss from
+	  Brian Long
 
-2006-01-10 15:22  pmatilai
+2006-01-10 20:22  pmatilai
 
 	* docs/: Makefile, package-cleanup.1: - Add package-cleanup manpage
-	from Brian Long
+	  from Brian Long
 
-2006-01-10 12:12  pmatilai
+2006-01-10 17:12  pmatilai
 
 	* Makefile, repo-graph.py, yum-utils.spec: Apply patch from Brian
-	Long (with slight modifications): - add fastestmirror subpackage -
-	mark config files config(noreplace) - bump version to 0.4 - make
-	lines in repo-graph a bit darker
+	  Long (with slight modifications): - add fastestmirror subpackage
+	  - mark config files config(noreplace) - bump version to 0.4 -
+	  make lines in repo-graph a bit darker
 
-2006-01-10 11:02  pmatilai
+2006-01-10 16:02  pmatilai
 
 	* plugins/kernel-module/kernel-module.py: - only look at kernel
-	modules of same arch as the new kernel to be installed	 (patch by
-	Tim Lauridsen)
+	  modules of same arch as the new kernel to be installed   (patch
+	  by Tim Lauridsen)
 
-2006-01-10 03:56  lmacken
+2006-01-10 08:56  lmacken
 
 	* plugins/fastestmirror/: fastestmirror-asyncore.py,
-	fastestmirror.conf, fastestmirror.py: - Latest fastestmirror
-	(0.2.2) - Updated configuration file to reflect new hostfilepath
-	option - Removed fastestmirror-asyncore (deprecated and awful)
+	  fastestmirror.conf, fastestmirror.py: - Latest fastestmirror
+	  (0.2.2) - Updated configuration file to reflect new hostfilepath
+	  option - Removed fastestmirror-asyncore (deprecated and awful)
 
-2006-01-09 02:07  skvidal
+2006-01-09 07:07  skvidal
 
-	* repotrack.py: 
-	- make it work with yum 2.4.X, too - fix a bug where -u was
-	erroring out if the destdir didn't exist
+	* repotrack.py:
+	  - make it work with yum 2.4.X, too - fix a bug where -u was
+	  erroring out if the destdir didn't exist
 
-2006-01-09 01:56  skvidal
+2006-01-09 06:56  skvidal
 
-	* repotrack.py: 
-	update a few comments
+	* repotrack.py:
+	  update a few comments
 
-2006-01-09 01:54  skvidal
+2006-01-09 06:54  skvidal
 
-	* repotrack.py: 
-	clean up some output, check more error cases, make newest-only
-	download the default
+	* repotrack.py:
+	  clean up some output, check more error cases, make newest-only
+	  download the default
 
-2006-01-09 01:25  skvidal
+2006-01-09 06:25  skvidal
 
-	* repotrack.py: 
-	make it, you know, actually download things
+	* repotrack.py:
+	  make it, you know, actually download things
 
-2006-01-06 10:06  pmatilai
+2006-01-06 15:06  pmatilai
 
 	* repo-graph.py: - add initial rough-cut version for creating
-	graphviz dot files from repodata   similarly to rpmgraph
+	  graphviz dot files from repodata   similarly to rpmgraph
 
-2006-01-05 03:21  skvidal
+2006-01-05 08:21  skvidal
 
-	* repotrack.py: 
-	rough cut of repotrack
+	* repotrack.py:
+	  rough cut of repotrack
 
-2006-01-04 10:51  pmatilai
+2006-01-04 15:51  pmatilai
 
 	* plugins/kernel-module/kernel-module.py: - mark kernel-module
-	plugin as type core (patch from Tim Lauridsen)
+	  plugin as type core (patch from Tim Lauridsen)
 
-2006-01-02 14:23  pmatilai
+2006-01-02 19:23  pmatilai
 
 	* repoquery.py, docs/repoquery.1: - --all is really just a
-	shorthand for '*'
+	  shorthand for '*'
 
-2005-12-20 12:25  pmatilai
+2005-12-20 17:25  pmatilai
 
 	* repoquery.py, docs/repoquery.1: - add --whatobsoletes and
-	--whatconflicts operations to repoquery
+	  --whatconflicts operations to repoquery
 
-2005-12-19 14:03  pmatilai
+2005-12-19 19:03  pmatilai
 
 	* plugins/versionlock/versionlock.py: - allow the lockfile location
-	to be specified as an url - lockfile format is envra
+	  to be specified as an url - lockfile format is envra
 
-2005-12-15 02:14  pmatilai
+2005-12-15 07:14  pmatilai
 
 	* repoquery.py: - remove useless self.conf assignment, making
-	repoquery work with both   yum 2.4 and 2.5 (from Ville Skytta)
+	  repoquery work with both   yum 2.4 and 2.5 (from Ville Skytta)
 
-2005-12-07 11:41  pmatilai
+2005-12-07 16:41  pmatilai
 
 	* Makefile, package-cleanup.py, repoclosure.py, repomanage.py,
-	repoquery.py, yum-utils.spec, yumdownloader.py, docs/Makefile,
-	docs/repoquery.1, plugins/kernel-module/kernel-module.conf,
-	plugins/kernel-module/kernel-module.py: - Update from HEAD:   * add
-	repoquery manpage   * package-cleanup can take alternative conf
-	file   * repoclosure can optionally check only newest packages	 *
-	repomanage has option to keep N newest packages and can skip gpg
-	checking   * repoquery shows directories in package listing, better
-	whatrequires	 operation and can take alternative conf file	*
-	yumdownloader supports private cache   * new plugin for handling
-	kernel-module-foo-`uname -r` style kernel module     packages -
-	Mark as 0.4.0
+	  repoquery.py, yum-utils.spec, yumdownloader.py, docs/Makefile,
+	  docs/repoquery.1, plugins/kernel-module/kernel-module.conf,
+	  plugins/kernel-module/kernel-module.py: - Update from HEAD:	*
+	  add repoquery manpage   * package-cleanup can take alternative
+	  conf file   * repoclosure can optionally check only newest
+	  packages   * repomanage has option to keep N newest packages and
+	  can skip gpg checking   * repoquery shows directories in package
+	  listing, better whatrequires	   operation and can take
+	  alternative conf file   * yumdownloader supports private cache
+	  * new plugin for handling kernel-module-foo-`uname -r` style
+	  kernel module     packages - Mark as 0.4.0
 
-2005-12-02 14:05  skvidal
+2005-12-02 19:05  skvidal
 
-	* repoclosure.py: 
-	make -n, --newest check newest to newest so we don't end up getting
-	a provide from something that is older.
+	* repoclosure.py:
+	  make -n, --newest check newest to newest so we don't end up
+	  getting a provide from something that is older.
 
-2005-11-28 11:45  pmatilai
+2005-11-28 16:45  pmatilai
 
 	* yumdownloader.py: - add support for private cache to
-	yumdownloader
+	  yumdownloader
 
-2005-11-26 10:30  skvidal
+2005-11-26 15:30  skvidal
 
-	* repomanage.py: 
-	typo on the placement of -c option
+	* repomanage.py:
+	  typo on the placement of -c option
 
-2005-11-26 10:27  skvidal
+2005-11-26 15:27  skvidal
 
-	* repomanage.py: 
-	check in most of patch from Ville Skytta from buy #524, disables
-	payload checking
+	* repomanage.py:
+	  check in most of patch from Ville Skytta from buy #524, disables
+	  payload checking
 
-2005-11-25 12:33  pmatilai
+2005-11-25 17:33  pmatilai
 
 	* repoquery.py: - fix
-	http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=517 - fix
-	http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=523 (patch
-	from   Ville Skyttä)
+	  http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=517 - fix
+	  http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=523 (patch
+	  from	 Ville Skyttä)
 
-2005-11-13 04:28  pmatilai
+2005-11-13 09:28  pmatilai
 
 	* docs/repoquery.1: - Document -c option in repoquery manpage
 
-2005-11-12 15:09  katzj
+2005-11-12 20:09  katzj
 
 	* repoquery.py: allow specifying an alternate config file
 
-2005-11-09 10:40  pmatilai
+2005-11-09 15:40  pmatilai
 
 	* repoquery.py: - fix --resolve option
 
-2005-11-07 13:15  skvidal
+2005-11-07 18:15  skvidal
 
-	* repoclosure.py: 
-	make repoclosure optionally operate on only the newest packages in
-	the repo
+	* repoclosure.py:
+	  make repoclosure optionally operate on only the newest packages
+	  in the repo
 
-2005-11-03 20:01  skvidal
+2005-11-04 01:01  skvidal
 
-	* package-cleanup.py: 
-	merge David Lutterkort's patch to add a -c conffile option to
-	package-cleanup
+	* package-cleanup.py:
+	  merge David Lutterkort's patch to add a -c conffile option to
+	  package-cleanup
 
-2005-11-02 14:19  pmatilai
+2005-11-02 19:19  pmatilai
 
 	* plugins/kernel-module/: kernel-module.conf, kernel-module.py: Add
-	kernel-module plugin for livna.org style kernel-module-foo-<uname
-	-r> style kernel module packaging.
+	  kernel-module plugin for livna.org style kernel-module-foo-<uname
+	  -r> style kernel module packaging.
 
-2005-10-19 01:46  skvidal
+2005-10-19 05:46  skvidal
 
-	* repomanage.py: 
-	fix repomanage so it won't output multiples of the same entry
+	* repomanage.py:
+	  fix repomanage so it won't output multiples of the same entry
 
-2005-10-17 16:25  pmatilai
+2005-10-17 20:25  pmatilai
 
 	* Makefile, yum-utils.spec, docs/Makefile, docs/repoquery.1: - Add
-	initial manpage for repoquery - Install docs in make install
+	  initial manpage for repoquery - Install docs in make install
 
-2005-10-13 10:53  skvidal
+2005-10-13 14:53  skvidal
 
-	* repomanage.py: 
-	add option to repomanage to keep latest N packages.
-	
-	so now if you do: repomanage -k 2 -o /some/dir
-	
-	it will list all but the newest 2 packages (by name, arch)
-	
-	or if you do: repomanage -k 2 -n /some/dir
-	
-	it will list only the newest 2 packages (by name, arch)
-	
-	handy for keeping the newest N packages around in a repo
+	* repomanage.py:
+	  add option to repomanage to keep latest N packages.
 
-2005-09-17 04:52  pmatilai
+	  so now if you do: repomanage -k 2 -o /some/dir
+
+	  it will list all but the newest 2 packages (by name, arch)
+
+	  or if you do: repomanage -k 2 -n /some/dir
+
+	  it will list only the newest 2 packages (by name, arch)
+
+	  handy for keeping the newest N packages around in a repo
+
+2005-09-17 08:52  pmatilai
 
 	* repoquery.py, yum-utils.spec, plugins/changelog/changelog.py:
-	Apply repoquery and changelog fixes from HEAD,	mark as 0.3.1.
+	  Apply repoquery and changelog fixes from HEAD,  mark as 0.3.1.
 
-2005-09-06 15:19  pmatilai
+2005-09-06 19:19  pmatilai
 
 	* plugins/changelog/changelog.py: Avoid causing tracebacks with
-	yumex and pup which don't use ConfigParser
+	  yumex and pup which don't use ConfigParser
 
-2005-08-29 14:57  pmatilai
+2005-08-29 18:57  pmatilai
 
 	* repoquery.py: - _prco wasn't really private to pkgQuery so rename
-	it - Have separate query classes for installed and available
-	packages, necessary   because YumInstalledPackage class doesn't
-	have nearly all the methods   Available class does. Now --pkgnarrow
-	can actually function for real.  - Clean up some old stuff, use
-	existing yum methods for formatting where   suitable etc.
+	  it - Have separate query classes for installed and available
+	  packages, necessary	because YumInstalledPackage class doesn't
+	  have nearly all the methods	Available class does. Now
+	  --pkgnarrow can actually function for real.  - Clean up some old
+	  stuff, use existing yum methods for formatting where	 suitable
+	  etc.
 
-2005-08-25 15:30  pmatilai
+2005-08-25 19:30  pmatilai
 
 	* repoquery.py: - and same to HEAD
 
-2005-08-25 15:29  pmatilai
+2005-08-25 19:29  pmatilai
 
 	* repoquery.py: Duh, last minute fix to make repoquery really honor
-	the --show-dupes option.
+	  the --show-dupes option.
 
-2005-08-23 12:14  pmatilai
+2005-08-23 16:14  pmatilai
 
 	* plugins/fastestmirror/: fastestmirror-asyncore.py,
-	fastestmirror.conf, fastestmirror.py: Add Luke Macken's
-	fastestmirror plugins (two different implementations)
+	  fastestmirror.conf, fastestmirror.py: Add Luke Macken's
+	  fastestmirror plugins (two different implementations)
 
-2005-08-23 12:10  pmatilai
+2005-08-23 16:10  pmatilai
 
 	* plugins/changelog/changelog.py: Only load otherdata when
-	--changelog is actually used
+	  --changelog is actually used
 
-2005-08-09 12:50  pmatilai
+2005-08-09 16:50  pmatilai
 
 	* repoquery.py: - Implement --pkgnarrow=available|recent.. option -
-	Add --show-dupes option
+	  Add --show-dupes option
 
-2005-07-25 12:32  pmatilai
+2005-07-25 16:32  pmatilai
 
-	* yum-utils.spec: - Package changelog plugin, add others as %doc. 
-	- Bump version to 0.3.
+	* yum-utils.spec: - Package changelog plugin, add others as %doc.
+	  - Bump version to 0.3.
 
-2005-07-25 12:31  pmatilai
+2005-07-25 16:31  pmatilai
 
 	* plugins/: changelog/changelog.py, tsflags/tsflags.py,
-	versionlock/versionlock.py: Add plugin type definitions to
-	changelog, tsflags and versionlock plugins.
+	  versionlock/versionlock.py: Add plugin type definitions to
+	  changelog, tsflags and versionlock plugins.
 
-2005-07-20 07:06  pmatilai
+2005-07-20 11:06  pmatilai
 
 	* repoquery.py: Don't traceback on unknown conversions.
 
-2005-07-20 07:00  pmatilai
+2005-07-20 11:00  pmatilai
 
 	* repoquery.py: Add support for rpmquery style string formatting,
-	eg "%-25{name} %{repoid}", date conversions (%{buildtime:date} and
-	:day) and fix changelog time formatting.
+	  eg "%-25{name} %{repoid}", date conversions (%{buildtime:date}
+	  and :day) and fix changelog time formatting.
 
-2005-07-20 03:21  pmatilai
+2005-07-20 07:21  pmatilai
 
 	* repoquery.py: Unbreak --qf "%{license}"
 
-2005-07-20 02:22  pmatilai
+2005-07-20 06:22  pmatilai
 
 	* repoquery.py: Add --querytags option.  Support \t in
-	--queryformat (Paul Nasrat)
+	  --queryformat (Paul Nasrat)
 
-2005-07-16 22:26  mjs
+2005-07-17 02:26  mjs
 
 	* plugins/protectbase/: protectbase.conf, protectbase.py: initial
-	add of protectbase plugin
+	  add of protectbase plugin
 
-2005-07-13 06:32  pmatilai
+2005-07-13 10:32  pmatilai
 
 	* package-cleanup.py: Add --orphans option to list locally
-	installed packages, eg those which aren't available in any
-	currently configured repositories.
+	  installed packages, eg those which aren't available in any
+	  currently configured repositories.
 
-2005-07-13 05:33  pmatilai
+2005-07-13 09:33  pmatilai
 
 	* repo-rss.py: Add tempcache support to repo-rss.
 
-2005-06-29 05:00  pmatilai
+2005-06-29 09:00  pmatilai
 
 	* plugins/changelog/: changelog.conf, changelog.py: Add
-	configuration option to changelog plugin to allow viewing the
-	changelog deltas before or after the transaction.
+	  configuration option to changelog plugin to allow viewing the
+	  changelog deltas before or after the transaction.
 
-2005-06-27 09:34  pmatilai
+2005-06-27 13:34  pmatilai
 
 	* plugins/changelog/changelog.py: Doh, changelog dates were being
-	compared as a string values, not ints so it wasn't working at all,
-	except that there was a hardcoded limit of five latest entries so
-	it *appeared* to work. Talk about embarrassing... :)
+	  compared as a string values, not ints so it wasn't working at
+	  all, except that there was a hardcoded limit of five latest
+	  entries so it *appeared* to work. Talk about embarrassing... :)
 
-2005-06-23 02:27  pmatilai
+2005-06-23 06:27  pmatilai
 
 	* repoquery.py: Add private cachedir support to reqoquery (default
-	when non-root)
+	  when non-root)
 
-2005-06-23 00:53  skvidal
+2005-06-23 04:53  skvidal
 
-	* repoclosure.py: 
-	check in most of Bill Nottingham's patch to make repoclosure work
-	as a class for importing from other programs
+	* repoclosure.py:
+	  check in most of Bill Nottingham's patch to make repoclosure work
+	  as a class for importing from other programs
 
-2005-06-23 00:10  skvidal
+2005-06-23 04:10  skvidal
 
-	* repoquery.py: 
-	properly fix up the returnPackagesByDep() method in the repoquery
-	derived class
+	* repoquery.py:
+	  properly fix up the returnPackagesByDep() method in the repoquery
+	  derived class
 
-2005-06-23 00:06  skvidal
+2005-06-23 04:06  skvidal
 
-	* repoquery.py: 
-	make --whatprovides use returnPackagesByDep() method in yum so it
-	will get all possible resolvers for the requested depstring, not
-	just the 'best' one
+	* repoquery.py:
+	  make --whatprovides use returnPackagesByDep() method in yum so it
+	  will get all possible resolvers for the requested depstring, not
+	  just the 'best' one
 
-2005-06-21 15:12  pmatilai
+2005-06-21 19:12  pmatilai
 
 	* repoquery.py: Repoquery: - unbreak group queries - show srpm name
-	with --source like described in help text - querying the source rpm
-	now happens by specifying .src as package arch - add support for
-	"envra" query format
+	  with --source like described in help text - querying the source
+	  rpm now happens by specifying .src as package arch - add support
+	  for "envra" query format
 
-2005-06-21 12:14  pmatilai
+2005-06-21 16:14  pmatilai
 
 	* plugins/: changelog/changelog.py, tsflags/tsflags.py,
-	versionlock/versionlock.py: Changelog plugin: - nicer formatting -
-	add cli option for enabling it
-	
-	Add GPL notices to my plugins
+	  versionlock/versionlock.py: Changelog plugin: - nicer formatting
+	  - add cli option for enabling it
 
-2005-06-21 11:50  skvidal
+	  Add GPL notices to my plugins
 
-	* repoclosure.py: 
-	os.lstat() and just in time to mv to yum itself
+2005-06-21 15:50  skvidal
 
-2005-06-21 09:39  gijs
+	* repoclosure.py:
+	  os.lstat() and just in time to mv to yum itself
+
+2005-06-21 13:39  gijs
 
 	* COPYING, yum-utils.spec: - Added GPL COPYING file and add it to
-	the spec file
+	  the spec file
 
-2005-06-21 01:09  skvidal
+2005-06-21 05:09  skvidal
 
-	* repoclosure.py: 
-	fix up the getCacheDir() dir test to exclude an extremely narrow
-	race condition
+	* repoclosure.py:
+	  fix up the getCacheDir() dir test to exclude an extremely narrow
+	  race condition
 
-2005-06-19 20:09  skvidal
+2005-06-20 00:09  skvidal
 
-	* repoclosure.py: 
-	make repoclosure use a user yum cache if not running as root.
+	* repoclosure.py:
+	  make repoclosure use a user yum cache if not running as root.
 
-2005-06-16 17:17  pmatilai
+2005-06-16 21:17  pmatilai
 
 	* plugins/tsflags/tsflags.py: Doh, remove extra print :)
 
-2005-06-16 17:15  pmatilai
+2005-06-16 21:15  pmatilai
 
 	* plugins/tsflags/: tsflags.conf, tsflags.py: Add plugin for
-	setting tsflags from the cli
+	  setting tsflags from the cli
 
-2005-06-16 16:33  pmatilai
+2005-06-16 20:33  pmatilai
 
 	* plugins/changelog/: changelog.conf, changelog.py: Add plugin for
-	showing changelog deltas between package updates.
+	  showing changelog deltas between package updates.
 
-2005-06-16 12:34  pmatilai
+2005-06-16 16:34  pmatilai
 
 	* plugins/versionlock/: versionlock.conf, versionlock.py: Add
-	versionlock plugin
+	  versionlock plugin
 
-2005-06-13 13:48  gijs
+2005-06-13 17:48  gijs
 
 	* package-cleanup.py: - Remove old kernel-devel packages together
-	with kernel packages   (this can be disabled by using the
-	--keepdevel command line option)
+	  with kernel packages	 (this can be disabled by using the
+	  --keepdevel command line option)
 
-2005-06-13 01:48  skvidal
+2005-06-13 05:48  skvidal
 
-	* TODO: 
-	todo file for yum-utils please add more
+	* TODO:
+	  todo file for yum-utils please add more
 
-2005-06-13 00:53  skvidal
+2005-06-13 04:53  skvidal
 
-	* repomanage.py: 
-	call the 'arch' for src.rpms as 'src' - not the arch it was built
-	on.  thanks to Pasi Pirhonen for pointing it out.
+	* repomanage.py:
+	  call the 'arch' for src.rpms as 'src' - not the arch it was built
+	  on.  thanks to Pasi Pirhonen for pointing it out.
 
-2005-06-12 22:05  skvidal
+2005-06-13 02:05  skvidal
 
-	* package-cleanup.py: 
-	add in a -y to allow removing kernels 'automatically'
+	* package-cleanup.py:
+	  add in a -y to allow removing kernels 'automatically'
 
-2005-06-12 21:53  skvidal
+2005-06-13 01:53  skvidal
 
-	* package-cleanup.py: 
-	various cleanups and edits
+	* package-cleanup.py:
+	  various cleanups and edits
 
-2005-06-12 20:15  skvidal
+2005-06-13 00:15  skvidal
 
-	* package-cleanup.py: 
-	add --quiet and optimize getLocalRequires and getKernels
+	* package-cleanup.py:
+	  add --quiet and optimize getLocalRequires and getKernels
 
-2005-06-12 18:36  skvidal
+2005-06-12 22:36  skvidal
 
-	* package-cleanup.py: 
-	migrated the package-cleanup --leaves to use the returnLeafNodes()
-	method in rpmUtils. This returns leaf nodes much faster.
+	* package-cleanup.py:
+	  migrated the package-cleanup --leaves to use the
+	  returnLeafNodes() method in rpmUtils. This returns leaf nodes
+	  much faster.
 
-2005-06-11 15:43  skvidal
+2005-06-11 19:43  skvidal
 
-	* repotrack.py: 
-	stub for a new yum-util - repotrack
+	* repotrack.py:
+	  stub for a new yum-util - repotrack
 
-2005-06-09 16:04  pmatilai
+2005-06-09 20:04  pmatilai
 
 	* repoquery.py: Repoquery: - don't treat --qf as a separate
-	operation, it's just formatting of how packages represent
-	themselves.  - handle --qf with --whatrequires
+	  operation, it's just formatting of how packages represent
+	  themselves.  - handle --qf with --whatrequires
 
-2005-06-09 14:14  pmatilai
+2005-06-09 18:14  pmatilai
 
 	* repoquery.py: Dont traceback on repo errors (eg cache out of
-	date)
+	  date)
 
-2005-06-08 20:48  pnasrat
+2005-06-09 00:48  pnasrat
 
 	* yum-builddep.py: Error not traceback on non-root
 
-2005-06-05 04:03  skvidal
+2005-06-05 08:03  skvidal
 
 	* yum-utils.spec: fix spec file for fedora extras
 
-2005-06-04 15:37  skvidal
+2005-06-04 19:37  skvidal
 
-	* repoquery.py: 
-	allow repoquery to handle pkg args like yum
+	* repoquery.py:
+	  allow repoquery to handle pkg args like yum
 
-2005-06-04 13:52  skvidal
+2005-06-04 17:52  skvidal
 
-	* yum-utils.spec: 
-	add some requires
+	* yum-utils.spec:
+	  add some requires
 
-2005-06-03 17:18  skvidal
+2005-06-03 21:18  skvidal
 
-	* README: 
-	readme updates
+	* README:
+	  readme updates
 
-2005-06-03 16:45  skvidal
+2005-06-03 20:45  skvidal
 
-	* repoclosure.py: 
-	make repoclosure use -r args for options, instead of just repoids
-	as argv[1], argv[2] etc.
+	* repoclosure.py:
+	  make repoclosure use -r args for options, instead of just repoids
+	  as argv[1], argv[2] etc.
 
-2005-06-03 03:11  skvidal
+2005-06-03 07:11  skvidal
 
 	* repoclosure.py: check in bill nottingham's patch to allow to
-	specify arch and a different config file for repoclosure
+	  specify arch and a different config file for repoclosure
 
-2005-06-02 14:59  pmatilai
+2005-06-02 18:59  pmatilai
 
 	* repoquery.py: repoquery: - Catch unknown/unsupported querytags
-	and operations - Support some new ways to query things
+	  and operations - Support some new ways to query things
 
-2005-06-02 13:04  pmatilai
+2005-06-02 17:04  pmatilai
 
 	* README: Add brief description of the included utilities to
-	README.
+	  README.
 
-2005-06-01 23:46  skvidal
+2005-06-02 03:46  skvidal
 
-	* plugins/README: 
-	Added plugins dir
+	* plugins/README:
+	  Added plugins dir
 
-2005-06-01 02:29  skvidal
+2005-06-01 06:29  skvidal
 
-	* yum-utils.spec: 
-	call it 0.2 in the spec file
+	* yum-utils.spec:
+	  call it 0.2 in the spec file
 
-2005-06-01 02:24  pmatilai
+2005-06-01 06:24  pmatilai
 
 	* repoquery.py, yumdownloader.py: yumdownloader: - add --source
-	option - add /usr/share/yum-cli to module search path so it
-	actually works
-	
-	reqoquery: - remove leftover debug junk
+	  option - add /usr/share/yum-cli to module search path so it
+	  actually works
 
-2005-06-01 02:08  skvidal
+	  reqoquery: - remove leftover debug junk
 
-	* repoquery.py: 
-	--repoid help text
+2005-06-01 06:08  skvidal
 
-2005-05-31 14:56  pmatilai
+	* repoquery.py:
+	  --repoid help text
+
+2005-05-31 18:56  pmatilai
 
 	* repoquery.py: More repoquery stuff: - add option to run from
-	cache only - get rid of the ugly runtime extensions to
-	yum.AvailablePackage class,   generating new pkgQuery instances
-	seems to be just as fast in practice
+	  cache only - get rid of the ugly runtime extensions to
+	  yum.AvailablePackage class,	generating new pkgQuery instances
+	  seems to be just as fast in practice
 
-2005-05-31 13:41  pmatilai
+2005-05-31 17:41  pmatilai
 
 	* repoquery.py: Some fixes to repoquery: - eliminate duplicates
-	from --whatrequires --alldeps - catch various exceptions, print
-	errors to stderr unless --quiet specified
+	  from --whatrequires --alldeps - catch various exceptions, print
+	  errors to stderr unless --quiet specified
 
-2005-05-30 12:24  pmatilai
+2005-05-30 16:24  pmatilai
 
 	* repoquery.py, yum-utils.spec: New version of repoquery: - support
-	some group queries - only set caching when non-root
+	  some group queries - only set caching when non-root
 
-2005-05-30 11:47  pmatilai
+2005-05-30 15:47  pmatilai
 
 	* Makefile, yum-builddep.py: Add yum-builddep for installing
-	package build dependencies
+	  package build dependencies
 
-2005-05-30 08:31  skvidal
+2005-05-30 12:31  skvidal
 
 	* repoquery.py: let users specify repos to use repoquery against
 
-2005-05-23 11:38  pmatilai
+2005-05-23 15:38  pmatilai
 
 	* yum-utils.spec, updateonboot/Makefile,
-	updateonboot/yum-updateonboot.init: - add Makefile for updateboot -
-	create a subpackage yum-updateonboot - don't enable updateonboot by
-	default on package install
+	  updateonboot/yum-updateonboot.init: - add Makefile for updateboot
+	  - create a subpackage yum-updateonboot - don't enable
+	  updateonboot by default on package install
 
-2005-05-16 15:22  gijs
+2005-05-16 19:22  gijs
 
 	* Makefile, yum-utils.spec: Adding Makefile and spec file (both
-	based on mock)
+	  based on mock)
 
-2005-05-16 10:14  gijs
+2005-05-16 14:14  gijs
 
 	* README, package-cleanup.py: - Created initial version of README
-	file - Added old kernel clean up to package-cleanup
+	  file - Added old kernel clean up to package-cleanup
 
-2005-04-26 14:31  gijs
+2005-04-26 18:31  gijs
 
 	* package-cleanup.py: Adding a yum util to list leaf nodes and
-	problems in the local RPM db
+	  problems in the local RPM db
 
-2005-04-19 10:27  gijs
+2005-04-19 14:27  gijs
 
 	* yumdownloader.py: Added a first version of dep resolving support
-	to yumdownloader
+	  to yumdownloader
 
-2005-04-10 02:13  skvidal
+2005-04-10 06:13  skvidal
 
-	* yumdownloader.py: 
-	added --urls option to yumdownloader to just print out the urls it
-	would download
+	* yumdownloader.py:
+	  added --urls option to yumdownloader to just print out the urls
+	  it would download
 
-2005-04-01 05:19  gijs
+2005-04-01 10:19  gijs
 
 	* yumdownloader.py: Fixed a bug in yumdownloader, causing it not to
-	work if relativepath contains a directory name.
+	  work if relativepath contains a directory name.
 
-2005-03-24 06:15  gijs
+2005-03-24 11:15  gijs
 
 	* yumdownloader.py: Initial version of yumdownloader
 
-2005-03-22 14:26  gijs
+2005-03-22 19:26  gijs
 
 	* repoquery.py, updateonboot/README,
-	updateonboot/yum-updateonboot.init,
-	updateonboot/yum-updateonboot.sysconfig: Adding initial versions of
-	updateonboot and repoquery scripts
+	  updateonboot/yum-updateonboot.init,
+	  updateonboot/yum-updateonboot.sysconfig: Adding initial versions
+	  of updateonboot and repoquery scripts
 
-2005-03-22 09:10  gijs
+2005-03-22 14:10  gijs
 
 	* repo-rss.py: Make repo-rss work with sqlite by calling
-	returnChangeLog if no changelog info is loaded for a specific
-	package.
+	  returnChangeLog if no changelog info is loaded for a specific
+	  package.
 
-2005-03-22 08:54  gijs
+2005-03-22 13:54  gijs
 
 	* repoclosure.py: Cache already resolved dependencies
 
-2005-03-21 03:42  skvidal
+2005-03-21 08:42  skvidal
 
-	* repo-rss.py, repoclosure.py, repomanage.py: 
-	initial import of repo* scripts
+	* repo-rss.py, repoclosure.py, repomanage.py:
+	  initial import of repo* scripts
 
-2005-03-21 03:36  skvidal
-
-	* README: initial import for yum-utils
-
-2005-03-21 03:36  skvidal
+2005-03-21 08:36  skvidal
 
 	* README: Initial revision
+
+2005-03-21 08:36  skvidal
+
+	* README: initial import for yum-utils
 
