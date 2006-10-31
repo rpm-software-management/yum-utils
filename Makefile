@@ -44,7 +44,7 @@ upload:
 	@$(MAKE) archive
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
 	@$(MAKE) srpm
-	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}*.src.rpm $(WEBHOST):$(WEBPATH)/	
+	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-${RELEASE}.src.rpm $(WEBHOST):$(WEBPATH)/	
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
 ChangeLog: FORCE
