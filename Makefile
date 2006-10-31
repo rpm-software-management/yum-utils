@@ -3,6 +3,10 @@ PKGNAME = yum-utils
 UTILS = package-cleanup repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
+WEBHOST = login.dulug.duke.edu
+WEBPATH = /home/groups/yum/web/download/yum-utils/
+CVS_TAG = ${PKGNAME}-$(shell echo $(VERSION) | sed -e 's/\./-/g')
+
 
 clean:
 	rm -f *.pyc *.pyo *~
@@ -17,7 +21,7 @@ install:
 	for d in $(SUBDIRS); do make DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
 
 archive:
-	@rm -rf ${PKGNAME}-%{VERSION}.tar.gz
+	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	@rm -rf /tmp/${PKGNAME}-$(VERSION) /tmp/${PKGNAME}
 	@dir=$$PWD; cd /tmp; cp -a $$dir ${PKGNAME}
 	@rm -f /tmp/${PKGNAME}/${PKGNAME}-daily.spec
@@ -26,3 +30,17 @@ archive:
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 
+release: 
+	@cvs commit -m "bumped yum-utils version to $(VERSION)"
+	@$(MAKE) ChangeLog
+	@cvs commit -m "updated ChangeLog"
+	@cvs tag $(CVS_TAG)
+	@$(MAKE) archive
+	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
+	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
+	
+ChangeLog: FORCE
+	@cvs2cl --utc
+	
+	
+FORCE:	
