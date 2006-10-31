@@ -1,3 +1,11 @@
+2006-10-31 13:55  timlau
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.0.1
+
+2006-10-31 13:49  timlau
+
+	* Makefile: added tags to make releases more easy
+
 2006-10-27 09:17  timlau
 
 	* yum-utils.spec: Added priorities plugin to spec file
