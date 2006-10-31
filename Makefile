@@ -29,14 +29,22 @@ archive:
 	@dir=$$PWD; cd /tmp; tar cvzf $$dir/${PKGNAME}-$(VERSION).tar.gz ${PKGNAME}-$(VERSION)
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
+	
+srpm:
+	rpmbuild -ts ${PKGNAME}-${VERSION}.tar.gz
 
 release: 
 	@cvs commit -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
 	@cvs commit -m "updated ChangeLog"
 	@cvs tag $(CVS_TAG)
+	@$(MAKE) upload
+	
+upload:
 	@$(MAKE) archive
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
+	@$(MAKE) srpm
+	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}*.src.rpm $(WEBHOST):$(WEBPATH)/	
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
 ChangeLog: FORCE
