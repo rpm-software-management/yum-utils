@@ -31,10 +31,10 @@ from yum.misc import getCacheDir
 from optparse import OptionParser
 from urlparse import urljoin
 
-def initYum():
+def initYum(yumconfigfile):
     global logger
     my = yum.YumBase()
-    my.doConfigSetup(init_plugins=False) # init yum, without plugins
+    my.doConfigSetup(fn=yumconfigfile,init_plugins=False) # init yum, without plugins
     my.conf.uid = os.geteuid()
     if my.conf.uid != 0:
         cachedir = getCacheDir()
@@ -73,8 +73,7 @@ def main():
     global logger
     logger = logging.getLogger("yum.verbose.yumdownloader")
     (opts, args) = parseArgs()
-    my = initYum()
-    my.doConfigSetup(fn=opts.config)
+    my = initYum(opts.config)
 
     if len(opts.repo) > 0:
         myrepos = []
