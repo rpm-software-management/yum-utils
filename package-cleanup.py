@@ -128,8 +128,14 @@ def findDupes(my):
     
     del pkgdict
     
-    for (n,a) in refined.keys():
-        for (e,v,r) in refined[(n,a)]:
+    return refined
+    
+def printDupes(my):
+    """print out the dupe listing"""
+    dupedict = findDupes(my)
+    dupes = []    
+    for (n,a) in dupedict.keys():
+        for (e,v,r) in dupedict[(n,a)]:
             po = my.getInstalledPackageObject((n,a,e,v,r))
             if po.name.startswith('kernel'):
                continue
@@ -143,7 +149,44 @@ def findDupes(my):
         else:
             print '%s-%s-%s.%s' % (pkg.name, pkg.ver, pkg.rel, pkg.arch)
 
-        
+def cleanOldDupes(my, confirmed):
+    """remove all the older duplicates"""
+    dupedict = findDupes(my)
+    removedupes = []
+    for (n,a) in dupedict.keys():
+        if n.startswith('kernel'):
+            continue
+        if n.startswith('gpg-pubkey'):
+            continue
+        (e,v,r) = dupedict[(n,a)][0]
+        lowpo = my.getInstalledPackageObject((n,a,e,v,r))
+
+        for (e,v,r) in dupedict[(n,a)][1:]:
+            po = my.getInstalledPackageObject((n,a,e,v,r))
+            if po.EVR < lowpo.EVR:
+                lowpo = po
+                
+        removedupes.append(lowpo)
+
+    print "I will remove the following old duplicate packages:"
+    for po in removedupes:
+        print "%s" % po
+
+    if not confirmed:
+        if not userconfirm():
+            sys.exit(0)
+
+    for po in removedupes:
+        my.remove(po)
+
+    # Now perform the action transaction
+    my.populateTs()
+    my.ts.check()
+    my.ts.order()
+    my.ts.run(progress,'')
+                 
+
+    
 
 def listLeaves(all):
     """return a packagtuple of any installed packages that
@@ -297,6 +340,8 @@ def parseArgs():
       help='Agree to anything asked')
     parser.add_option("-d", "--dupes", default=False, dest="dupes", action="store_true",
       help='Scan for duplicates in your rpmdb')
+    parser.add_option("--cleandupes", default=False, dest="cleandupes", action="store_true",
+      help='Scan for duplicates in your rpmdb and cleans out the older versions')    
     parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
       help="Remove old kernel and kernel-devel packages")
     parser.add_option("--count",default=2,dest="kernelcount",action="store",
@@ -307,7 +352,7 @@ def parseArgs():
                 default='/etc/yum.conf', help="config file location")
 
     (opts, args) = parser.parse_args()
-    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans, opts.dupes)): 
+    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans, opts.dupes, opts.cleandupes)): 
         parser.print_help()
         print "Please specify either --problems, --leaves, --orphans or --oldkernels"
         sys.exit(0)
@@ -335,9 +380,17 @@ def main():
         sys.exit(0)
 
     if opts.dupes:
-        findDupes(my)
+        printDupes(my)
         sys.exit(0)
-        
+
+    if opts.cleandupes:
+        if os.geteuid() != 0:
+            print "Error: Cannot remove packages as a user, must be root"
+            sys.exit(1)
+    
+        cleanOldDupes(my, opts.confirmed)
+        sys.exit(0)
+            
     if not opts.quiet:
         print "Reading local RPM database"
     pkgs = getLocalRequires(my)
