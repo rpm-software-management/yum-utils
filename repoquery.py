@@ -645,11 +645,11 @@ def main(args):
         repoq.repos.setCacheDir(cachedir)
 
     if opts.cache:
-        repoq.conf.setattr('cache', 1)
+        repoq.conf.cache = True
         repoq.logger.error('Running from cache, results might be incomplete.')
 
     if opts.show_dupes:
-        repoq.conf.setattr('showdupesfromrepos', 1)
+        repoq.conf.showdupesfromrepos = True
 
     if len(opts.repoid) > 0:
         for repo in repoq.repos.findRepos('*'):
