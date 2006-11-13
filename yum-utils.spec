@@ -157,7 +157,7 @@ rm -rf $RPM_BUILD_ROOT
 %preun -n yum-updateonboot
 if [ $1 = 0 ]; then
     /sbin/service yum-updateonboot stop >/dev/null 2>&1 || :;
-    /sbin/chkconfig --del yum >/dev/null 2>&1 || :;
+    /sbin/chkconfig --del yum-updateonboot >/dev/null 2>&1 || :;
 fi
 
 %files
