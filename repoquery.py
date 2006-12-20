@@ -28,12 +28,12 @@ from optparse import OptionParser
 
 import logging
 import yum
+import yum.misc as misc
 import yum.config
 import yum.Errors
 import yum.packages
 from rpmUtils.arch import getArchList
 from rpmUtils.miscutils import formatRequire
-from yum.misc import getCacheDir
 
 version = "0.0.11"
 
@@ -184,7 +184,7 @@ class repoPkgQuery(pkgQuery):
             (rpn, rpf, (rp,rpv,rpr)) = rptup
             if rpn.startswith('rpmlib'):
                 continue
-            rpdict[self.pkg.prcoPrintable(rptup)] = None
+            rpdict[misc.prco_typle_to_string(rptup)] = None
     
         rplist = rpdict.keys()
         rplist.sort()
@@ -638,7 +638,7 @@ def main(args):
     repoq.doConfigSetup(fn=opts.conffile, init_plugins=False)
     
     if os.geteuid() != 0 or opts.tempcache:
-        cachedir = getCacheDir()
+        cachedir = misc.getCacheDir()
         if cachedir is None:
             repoq.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
