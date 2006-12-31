@@ -83,7 +83,7 @@ def config_hook(conduit):
     '''
     parser = conduit.getOptParser()
     if parser:
-        parser.add_option("", "--ignore-broken", dest="ignorebroken",
+        parser.add_option("", "--skip-broken", dest="skipbroken",
                 action="store_true", default=False, 
                 help="skip packages with broken dependencies")    
     
@@ -94,8 +94,8 @@ def preresolve_hook(conduit):
     only runs if then '--ignore-broken' was set. 
     '''
     opts, commands = conduit.getCmdLine()
-    if hasattr(opts,'ignorebroken'):
-        if opts.ignorebroken:
+    if hasattr(opts,'skipbroken'):
+        if opts.skipbroken:
             # get yum base
             conduit.info(2,'Checking packages for dependency problems')
             base = conduit._base
