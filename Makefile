@@ -33,17 +33,15 @@ archive:
 srpm:
 	rpmbuild -ts ${PKGNAME}-${VERSION}.tar.gz
 
-release: 
+release:
 	@cvs commit -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
 	@cvs commit -m "updated ChangeLog"
 	@cvs tag $(CVS_TAG)
 	@$(MAKE) upload
 	
-upload:
-	@$(MAKE) archive
+upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
-	@$(MAKE) srpm
 	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-${RELEASE}.src.rpm $(WEBHOST):$(WEBPATH)/	
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
