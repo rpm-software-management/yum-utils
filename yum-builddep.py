@@ -40,7 +40,8 @@ def main():
     logger = logging.getLogger("yum.verbose.yumbuilddep")
     opts, args = parseArgs()
     base = cli.YumBaseCli()
-    base.doConfigSetup(init_plugins=False)  # init yum, without plugins
+    base.doConfigSetup(init_plugins=True,
+                       plugin_types=(yum.plugins.TYPE_CORE,))
     base.conf.uid = os.geteuid()
         
     if base.conf.uid != 0:
@@ -62,26 +63,32 @@ def main():
     
     base.doSackSetup(archlist)
 
+    srcnames = []
+    srpms = []
     for arg in args:
-        if arg.endswith(".src.rpm"):
-            srpms = [yum.packages.YumLocalPackage(ts, arg)]
+        if arg.endswith('.src.rpm'):
+            srpms.append(yum.packages.YumLocalPackage(ts, arg))
+        elif arg.endswith('.src'):
+            srcnames.append(arg)
         else:
+            srcnames.append('%s.src' % arg)
+
+    exact, match, unmatch = yum.packages.parsePackages(base.pkgSack.returnPackages(), srcnames, casematch=1)
+    srpms += exact + match
+    if len(unmatch) > 0:
+        logger.error("No such package(s): %s" % ", ".join(unmatch))
+        sys.exit(1)
+
+    for srpm in srpms:
+        for dep in srpm.requiresList():
+            if dep.startswith("rpmlib("): continue
             try:
-                srpms = base.pkgSack.returnNewestByNameArch((arg, 'src'))
+                pkg = base.returnPackageByDep(dep)
+                if not base.rpmdb.installed(name=pkg.name):
+                    base.tsInfo.addInstall(pkg)
             except yum.Errors.PackageSackError, e:
                 logger.error("Error: %s" % e)
                 sys.exit(1)
-
-        for srpm in srpms:
-            for dep in srpm.requiresList():
-                if dep.startswith("rpmlib("): continue
-                try:
-                    pkg = base.returnPackageByDep(dep)
-                    if not base.rpmdb.installed(name=pkg.name):
-                        base.tsInfo.addInstall(pkg)
-                except yum.Errors.PackageSackError, e:
-                    logger.error("Error: %s" % e)
-                    sys.exit(1)
                     
     (result, resultmsgs) = base.buildTransaction()
     if len(base.tsInfo) == 0:
