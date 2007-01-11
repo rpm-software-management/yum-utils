@@ -184,7 +184,7 @@ class repoPkgQuery(pkgQuery):
             (rpn, rpf, (rp,rpv,rpr)) = rptup
             if rpn.startswith('rpmlib'):
                 continue
-            rpdict[misc.prco_typle_to_string(rptup)] = None
+            rpdict[misc.prco_tuple_to_string(rptup)] = None
     
         rplist = rpdict.keys()
         rplist.sort()
