@@ -31,7 +31,11 @@ requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
 
 kernelProvides = Set([ "kernel-%s" % a for a in rpmUtils.arch.arches.keys() ])
-        
+
+# We shouldn't need this if we didn't have to fake stuff so much
+kernelVariants = ["bigmem", "enterprise", "smp", "hugemem", "PAE",
+                  "guest", "hypervisor", "xen0", "xenU", "xen"]
+
 def getRunningKernel():
     # Taken from the installonlyn.py plugin writen by Jeremy Katz
     # Copyright 2005  Red Hat, Inc. 
@@ -39,8 +43,7 @@ def getRunningKernel():
     """This takes the output of uname and figures out the (version, release)
     tuple for the running kernel."""
     ver = os.uname()[2]
-    for s in ("bigmem", "enterprise", "smp", "hugemem", "PAE",
-              "guest", "hypervisor", "xen0", "xenU", "xen"):
+    for s in kernelVariants:
         if ver.endswith(s):
             ver = ver.replace(s, "")
     if ver.find("-") != -1:
@@ -96,6 +99,23 @@ def getKernelReqs(po):
     return _getKernelDeps(po, "requires")
 
 
+def fakeName(po):
+    """When Yum wont give us full PRCO information we yell
+          "Say my name, bitch!"
+       and fake it hard."""
+
+    # Normally, I should be able to pull the <name>-kmod provide
+
+    fields = po.name.split('-')
+    if fields[0] == "kmod":
+        del fields[0]
+    if fields[-1] in kernelVariants:
+        del fields[-1]
+
+    return ('-'.join(fields + ['kmod']), 'EQ', 
+            (po.epoch, po.version, po.release))
+
+
 def resolveVersions(packageList):
     """The packageDict is a dict of pkgtuple -> PO
        We return a dict of kernel version -> list of kmod POs
@@ -104,18 +124,24 @@ def resolveVersions(packageList):
     dict = {}
     for po in packageList:
         kernel = getKernelReqs(po)
-        if len(kernel) == 1:
+        if len(kernel) == 0:
+            print "Bad kmod package '%s' does not require a kernel" % po
+            continue
+        elif len(kernel) == 1:
             kernel = kernel[0]
         else:
-            print "Bad kmod package: May only require one kernel"
+            print "Bad kmod package: Must require only one kernel"
             continue
 
         # Figure out the real name of this kmod
         name = []
-        for r in po.returnPrco("provides"):
+        for r in po.prco["provides"]:
             if r[0].endswith('-kmod'):
                 name.append(r[0])
-        if len(name) != 1:
+        if len(name) == 0:
+            # Yum bug
+            name = fakeName(po)
+        elif len(name) != 1:
             print "Non compliant kmod package: %s" % po
             continue
         po.kmodName = name[0]
@@ -123,9 +149,15 @@ def resolveVersions(packageList):
         if not dict.has_key(kernel):
             dict[kernel] = [po]
         else:
-            sameName = [ x for x in dict[kernel] if x.name == po.name ][0]
-            if packages.comparePoEVR(sameName, po) < 0:
+            sameName = None
+            for tempPo in dict[kernel]:
+                if po.name == tempPo.name:
+                    sameName = tempPo
+                    break
+            if sameName and packages.comparePoEVR(sameName, po) < 0:
                 dict[kernel].remove(sameName)
+                dict[kernel].append(po)
+            elif sameName == None:
                 dict[kernel].append(po)
 
     return dict
@@ -253,12 +285,11 @@ def postresolve_hook(c):
 
     # Install modules for all kernels
     if c.confInt('main', 'installforallkernels', default=1) != 0:
-        #print "Running installAllKmods()"
-        #moreModules = installAllKmods(c, avaModules, 
-        #                              newModules + installedModules,
-        #                              newKernels + installedKernels)
-        #newModules = newModules + moreModules
-        pass
+        print "Running installAllKmods()"
+        moreModules = installAllKmods(c, avaModules, 
+                                      newModules + installedModules,
+                                      newKernels + installedKernels)
+        newModules = newModules + moreModules
 
     # Pin kernels
     if c.confInt('main', 'pinkernels', default=0) != 0:
