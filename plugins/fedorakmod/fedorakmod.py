@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # fedorakmod.py - Fedora Extras Yum Kernel Module Support
-# Copyright 2006 NC State University
+# Copyright 2006 - 2007 NC State University
 # Written by Jack Neely <jjneely@ncsu.edu>
 #
 # SDG
@@ -68,21 +68,16 @@ def _whatProvides(c, list):
 
     return bag
 
-
 def _getKernelDeps(po, match):
       
     reqs = po.returnPrco(match)
     return [ r for r in reqs if r[0] in kernelProvides ]
-    #return filter(lambda r: r[0] in kernelProvides, reqs)
-
 
 def getInstalledKernels(c):
     return _whatProvides(c, kernelProvides)
 
-
 def getInstalledModules(c):
     return _whatProvides(c, ["kernel-modules"])
-
 
 def getKernelProvides(po):
     """Pass in a package header.  This function will return a list of
@@ -91,13 +86,11 @@ def getKernelProvides(po):
      
     return _getKernelDeps(po, "provides")
 
-
 def getKernelReqs(po):
     """Pass in a package header.  This function will return a list of
        tuples (name, flags, ver) representing any kernel requires."""
       
     return _getKernelDeps(po, "requires")
-
 
 def fakeName(po):
     """When Yum wont give us full PRCO information we yell
@@ -114,7 +107,6 @@ def fakeName(po):
 
     return ('-'.join(fields + ['kmod']), 'EQ', 
             (po.epoch, po.version, po.release))
-
 
 def resolveVersions(packageList):
     """The packageDict is a dict of pkgtuple -> PO
@@ -162,7 +154,6 @@ def resolveVersions(packageList):
 
     return dict
 
-
 def installKernelModules(c, newModules, installedModules):
     """Figure out what special magic needs to be done to install/upgrade
        this kernel module.  This doesn't actually initiate an install
@@ -191,7 +182,6 @@ def installKernelModules(c, newModules, installedModules):
                            (po, modpo))
                     break
 
-
 def pinKernels(c, newKernels, modules):
     """If we are using kernel modules, do not upgrade/install a new 
        kernel until matching modules are available."""
@@ -218,10 +208,6 @@ def pinKernels(c, newKernels, modules):
             # XXX: This wants a pkgtuple which will probably change RSN
             c.getTsInfo().remove(kpo.pkgtup)
 
-
-# There is a Yum bug that prevents this from working propperly.
-# c.getRepos().getPackageSack().searchProvides("kernel-modules") does not
-# return packages with fully popluated Provides information
 def installAllKmods(c, avaModules, modules, kernels):
     list = []
     names = []
@@ -250,7 +236,6 @@ def installAllKmods(c, avaModules, modules, kernels):
 
     return list
 
-
 def tsCheck(te):
     "Make sure this transaction element is sane."
 
@@ -258,11 +243,9 @@ def tsCheck(te):
         te.ts_state = 'i'
         te.output_state = TS_INSTALL
 
-
 def init_hook(c):
     c.info(3, "Loading Fedora Extras kernel module support.")
 
-    
 def postresolve_hook(c):
 
     avaModules = c.getRepos().getPackageSack().searchProvides("kernel-modules")
@@ -285,7 +268,6 @@ def postresolve_hook(c):
 
     # Install modules for all kernels
     if c.confInt('main', 'installforallkernels', default=1) != 0:
-        print "Running installAllKmods()"
         moreModules = installAllKmods(c, avaModules, 
                                       newModules + installedModules,
                                       newKernels + installedKernels)
@@ -293,7 +275,6 @@ def postresolve_hook(c):
 
     # Pin kernels
     if c.confInt('main', 'pinkernels', default=0) != 0:
-        #print "Running pin kernels..."
         pinKernels(c, newKernels, newModules + installedModules)
 
     # Upgrade/Install kernel modules

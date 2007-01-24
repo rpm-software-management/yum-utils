@@ -5,11 +5,10 @@ packaging standards.
 
 To Do
 =====
-   *) Install kernel modules for all available kernels
    *) Remove kernel modules if matching kernel is removed.
 
 Folks, feel free to patch and add suggestions.  It will only help FE kernel
 module infrastructure develop faster.
 
-Jack Neely <jjneely@ncsu.edu> -- 07/05/2006
+Jack Neely <jjneely@ncsu.edu> -- 01/24/2007
 
