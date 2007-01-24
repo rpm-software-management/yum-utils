@@ -14,10 +14,10 @@
 #
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 
-from yum.plugins import TYPE_INTERFACE
+from yum.plugins import TYPE_INTERACTIVE
 
 requires_api_version = '2.1'
-plugin_type = (TYPE_INTERFACE,)
+plugin_type = (TYPE_INTERACTIVE,)
 
 def init_hook(conduit):
     parser = conduit.getOptParser()
