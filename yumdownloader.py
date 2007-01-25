@@ -89,7 +89,8 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
-    
+
+    my.doRpmDBSetup()
     my.doRepoSetup()
     archlist = None
     if opts.source:
