@@ -192,7 +192,12 @@ def main():
         my.logger.info('Num Packages in Repos: %s' % num)
     
     pkgs = baddeps.keys()
-    pkgs.sort()
+    
+    def sortbyname(a,b):
+        return cmp(a.__str__(),b.__str__())
+    
+    pkgs.sort(sortbyname)
+    
     for pkg in pkgs:
         my.logger.info('package: %s from %s\n  unresolved deps: ' % (pkg, pkg.repoid))
         for (n, f, v) in baddeps[pkg]:
