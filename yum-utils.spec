@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.0.2
+Version: 1.1.0
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -8,7 +8,7 @@ Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python >= 2.4 , yum >= 3.0
+Requires: python >= 2.4 , yum >= 3.1.1
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -240,6 +240,10 @@ fi
 
 
 %changelog
+* Wed Feb 7 2006 Tim Lauridsen <tla@rasmil.dk>
+- mark it as 1.1.0
+- Requires: yum >= 3.1.1 for yum-utils.
+
 * Tue Feb 6 2006 Tim Lauridsen <tla@rasmil.dk>
 - Added %%{?dist} tag
 
