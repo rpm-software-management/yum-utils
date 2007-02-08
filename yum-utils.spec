@@ -187,6 +187,8 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
 /usr/lib/yum-plugins/changelog.*
+%{_mandir}/man1/yum-changelog.1
+%{_mandir}/man5/yum-changelog.conf.5
 
 %files -n yum-fastestmirror
 %defattr(-, root, root)
@@ -240,11 +242,14 @@ fi
 
 
 %changelog
-* Wed Feb 7 2006 Tim Lauridsen <tla@rasmil.dk>
+* Thu Feb 8 2007 Tim Lauridsen <tla@rasmil.dk>
+- Added man dirs to yum-changelog files section
+
+* Wed Feb 7 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark it as 1.1.0
 - Requires: yum >= 3.1.1 for yum-utils.
 
-* Tue Feb 6 2006 Tim Lauridsen <tla@rasmil.dk>
+* Tue Feb 6 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added %%{?dist} tag
 
 * Sun Dec 31 2006 Tim Lauridsen <tla@rasmil.dk>
