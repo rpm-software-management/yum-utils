@@ -1,0 +1,78 @@
+.\" PROCESS THIS FILE WITH
+.\" groff -man -Tascii yum-changelog.1
+.\"
+.TH YUM-CHANGELOG 1 "08 FEBRUARY 2007" "" "User Manuals"
+.SH NAME
+.B yum-changelog
+.SH SYNOPSIS
+The
+.B yum-changelog
+package
+.SH DESCRIPTION
+.BR yum-changelog(1)
+is a Yum plugin for viewing package changelogs before/after updating.
+yum will invoke
+.BR yum-changelog(1)
+plugin if the
+.B --changelog
+option is used with yum.
+.SH OPTIONS
+.IP --changelog
+Show changelog delta of updated packages
+.SH FILES
+.I /etc/yum/pluginconf.d/changelog.conf
+.RS
+The system wide configuration file. See
+.BR yum-changelog.conf(5)
+for more information.
+.RE
+.SH EXAMPLES
+# yum update ktechlab
+.B --changelog
+.br
+Loading "changelog" plugin
+.br
+Setting up Update Process
+.br
+Setting up repositories
+.br
+[..]
+.br
+Resolving Dependencies
+.br
+--> Populating transaction set with selected packages. Please wait.
+.br
+---> Package ktechlab.i386 0:0.3-6 set to be updated
+.br
+--> Running transaction check
+
+Changes in packages about to be updated:
+
+ktechlab - 0.3-6.i386
+.br
+* Wed Nov 22 23:00:00 2006 Chitlesh Goorah - 0.3-6
+.br
+- Rebuilt due to new gpsim-devel release
+.br
+.SH "FILES"
+As yumdownloader uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi
+.SH BUGS
+If you happen to run across a bug, you can report it via yum@lists.linux.duke.edu or filed in bugzilla.
+.SH AVAILABILITY
+yum-changelog is available via:
+.nf
+# yum install yum-changelog
+.fi
+.SH AUTHOR
+.RS
+Chitlesh Goorah <chitlesh@fedoraproject.org>
+.SH "SEE ALSO"
+.BR yum(1)

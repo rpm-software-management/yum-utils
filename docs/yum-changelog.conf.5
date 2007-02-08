@@ -1,0 +1,43 @@
+.\" PROCESS THIS FILE WITH
+.\" groff -man -Tascii yum-changelog.conf.5
+.\"
+.TH YUM-CHANGELOG.CONF 5 "08 FEBRUARY 2007" "" "File Formats"
+.SH NAME
+.B yum-changelog.conf(5)
+
+.SH SYNOPSIS
+.B yum-changelog.conf(5)
+is the configuration file for
+.B yum-changelog(1)
+Yum plugin for viewing package changelogs before/after updating.
+By default, this plugin will show the changelogs before the updates.
+.SH FILES
+.I /etc/yum/pluginconf.d/changelog.conf
+.SH FILE FORMAT
+.B yum-changelog.conf(5)
+utilizes configuration options in the form of
+.IP OPTION=VALUE
+.SH OPTION
+.IP WHEN
+This option reflects when
+.B yum-changelog(1)
+will allow changelog viewing during yum updates.
+.SH VALUE
+.IP PRE
+To make
+.B yum-changelog(5)
+show the changelog
+.B before
+the yum updates
+.IP POST
+To make
+.B yum-changelog(5)
+show the changelog
+.B after
+the yum updates.
+.SH AUTHOR
+.RS
+Chitlesh Goorah <chitlesh@fedoraproject.org>
+.RS
+.SH SEE ALSO
+.BR yum-changelog(1)
