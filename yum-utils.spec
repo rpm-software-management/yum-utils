@@ -187,8 +187,8 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
 /usr/lib/yum-plugins/changelog.*
-%{_mandir}/man1/yum-changelog.1
-%{_mandir}/man5/yum-changelog.conf.5
+%{_mandir}/man1/yum-changelog.1.*
+%{_mandir}/man5/yum-changelog.conf.5.*
 
 %files -n yum-fastestmirror
 %defattr(-, root, root)
