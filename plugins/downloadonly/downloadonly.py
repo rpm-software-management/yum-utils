@@ -18,16 +18,27 @@
 
 from yum.plugins import PluginYumExit, TYPE_INTERACTIVE
 
-requires_api_version = '2.0'
+requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
 
 def config_hook(conduit):
-   parser = conduit.getOptParser()
-   parser.add_option('', '--downloadonly', dest='dlonly', action='store_true',
+    parser = conduit.getOptParser()
+    parser.add_option('', '--downloadonly', dest='dlonly', action='store_true',
            default=False, help="don't update, just download")
+    parser.add_option('', '--downloaddir', dest='dldir',
+                      action='store', default=None,
+                      help="specifies an alternate directory to store packages")
+
+def postreposetup_hook(conduit):
+    opts, commands = conduit.getCmdLine()
+    if opts.dldir:
+        repos = conduit.getRepos();
+        list = repos.listEnabled();
+        for repo in list:
+            repo.set('pkgdir',opts.dldir)
+           
 
 def postdownload_hook(conduit):
-   opts, commands = conduit.getCmdLine()
-   if opts.dlonly:
-       raise PluginYumExit('exiting because --downloadonly specified ')
-
+    opts, commands = conduit.getCmdLine()
+    if opts.dlonly:
+        raise PluginYumExit('exiting because --downloadonly specified ')
