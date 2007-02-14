@@ -143,15 +143,9 @@ class RepoRSS:
             (date, author, desc) = e
             date = time.strftime(clog_format, time.gmtime(float(date)))
             changelog += '%s - %s\n%s\n\n' % (date, author, desc)
-        body = item.newChild(None, "body", None)
-        body.newNs(xhtml_ns, None)
-        body.newChild(None, "p", escape(pkg.returnSimple('summary')))
-        body.newChild(None, "pre", escape(pkg.returnSimple('description')))
-        body.newChild(None, "p", 'Change Log:')
-        body.newChild(None, "pre", escape(changelog))
-        description = '<pre>%s - %s\n\n' % (escape(pkg.name), 
+        description = '<p><strong>%s</strong> - %s</p>\n\n' % (escape(pkg.name), 
                                             escape(pkg.returnSimple('summary')))
-        description += '%s\n\nChange Log:\n\n</pre>' % escape(pkg.returnSimple('description'))
+        description += '<p>%s</p>\n\n<p><strong>Change Log:</strong></p>\n\n' % escape(pkg.returnSimple('description').replace("\n", "<br />\n"))
         description += escape('<pre>%s</pre>' % escape(changelog))
         item.newChild(None, 'description', description)
         
