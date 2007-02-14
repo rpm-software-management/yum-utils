@@ -18,6 +18,8 @@
 import yum
 import yum.Errors
 from yum.misc import getCacheDir
+from yum.comps import Comps, CompsException
+from repomd.mdErrors import RepoMDError
 import sys
 import os
 import libxml2
@@ -165,6 +167,22 @@ class RepoRSS:
         del self.fo
         self.doc.freeDoc()
         del self.doc
+    
+    
+def makeFeed(filename, title, link, description, recent, my):
+    rssobj = RepoRSS(fn=filename)
+    rssobj.title = title
+    rssobj.link = link
+    rssobj.description = description
+    rssobj.startRSS()
+    # take recent updates only and dump to an rss compat output
+    if len(recent) > 0:
+        for pkg in recent:
+            repo = my.repos.getRepo(pkg.repoid)
+            url = repo.urls[0]
+            rssobj.doPkg(pkg, url)
+    rssobj.closeRSS()
+
 
 def main(options, args):
     days = options.days
@@ -203,20 +221,31 @@ def main(options, args):
             sys.exit(1)
     
     recent = my.getRecent(days=days)
-    rssobj = RepoRSS(fn=options.filename)
-    rssobj.title = options.title
-    rssobj.link = options.link
-    rssobj.description = options.description
-    rssobj.startRSS()
+    if options.groups:
+        comps = Comps()
+        for repo in my.repos.listEnabled():
+            try: 
+                groupsfn = repo.getGroups()
+            except RepoMDError: # no comps.xml file
+                groupsfn = None
+            if not groupsfn:
+                continue
+            try:
+                comps.add(groupsfn)
+            except (AttributeError, CompsException):
+                print 'Error parsing comps file %s !' % groupsfn
+                print 'Multiple feed generation impossible.'
+                sys.exit(1)
+        for group in comps.groups:
+            grouppkgs = group.optional_packages.keys() + group.default_packages.keys() + group.conditional_packages.keys()
+            title = "%s - %s" % (options.title, group.name)
+            description = "%s. %s" % (options.description, group.name)
+            filename = "%s.xml" % group.groupid
+            packages = [ pkg for pkg in recent if pkg.name in grouppkgs ]
+            makeFeed(filename, title, options.link, description, packages, my)
+    # Always make a full feed
+    makeFeed(options.filename, options.title, options.link, options.description, recent, my)
     
-    # take recent updates only and dump to an rss compat output
-    if len(recent) > 0:
-        for pkg in recent:
-            repo = my.repos.getRepo(pkg.repoid)
-            url = repo.urls[0]
-            rssobj.doPkg(pkg, url)
-        
-    rssobj.closeRSS()
 
 
 if __name__ == "__main__":
@@ -238,6 +267,8 @@ if __name__ == "__main__":
                       help='most recent (in days): %default')
     parser.add_option("--tempcache", default=False, action="store_true",
                       help="Use a temp dir for storing/accessing yum-cache")
+    parser.add_option("-g", action='store_true', dest='groups', default=False,
+                      help="Generate one feed per package group")
 
     (options, args) = parser.parse_args()
 
