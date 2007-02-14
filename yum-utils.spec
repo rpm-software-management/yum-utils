@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.0
+Version: 1.1.1
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -130,6 +130,17 @@ This plugin allows repositories to have different priorities.
 Packages in a repository with a lower priority can't be overridden by packages
 from a repository with a higher priority even if repo has a later version.
 
+%package -n yum-refresh-updatesd
+Summary: Tell yum-updatesd to check for updates when yum exits
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-refresh-updatesd
+yum-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
+This way, if you run 'yum list updates' and yum says there's a new version
+of (for example) zsh available, puplet will almost instantly update itself
+to reflect this.
+
 %prep
 %setup -q
 
@@ -139,7 +150,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -240,8 +251,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
 /usr/lib/yum-plugins/priorities.*
 
+%files -n yum-refresh-updatesd
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
+/usr/lib/yum-plugins/refresh-updatesd.*
+
 
 %changelog
+* Tue Feb 13 2007 James Bowes <jbowes@redhat.com>
+- Add yum-refresh-updatesd plugin
+
 * Thu Feb 8 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added man dirs to yum-changelog files section
 
