@@ -78,7 +78,8 @@ def exclude_hook(conduit):
     for repo in allrepos:
         if repo.enabled:
             for po in conduit.getPackages(repo):
-                if pkg_priorities.has_key(po.name) and pkg_priorities[po.name] < repo.priority:
+                key = "%s.%s" % (po.name,po.arch)
+                if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
                     conduit.delPackage(po)
                     cnt += 1
                     conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
@@ -87,7 +88,8 @@ def exclude_hook(conduit):
                     if obsoletes.has_key(po.pkgtup):
                         obsolete_pkgs = obsoletes[po.pkgtup]
                         for obsolete_pkg in obsolete_pkgs:
-                            if pkg_priorities.has_key(obsolete_pkg[0]) and pkg_priorities[obsolete_pkg[0]] < repo.priority:
+                            key = "%s.%s" % (obsolete_pkg[0],obsolete_pkg[1])        
+                            if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
                                 conduit.delPackage(po)
                                 cnt += 1
                                 conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
@@ -97,7 +99,8 @@ def exclude_hook(conduit):
 def _pkglisttodict(pl, priority):
     out = {}
     for p in pl:
-        out[p.name] = priority
+        key = "%s.%s" % (p.name,p.arch)
+        out[key] = priority
     return out
 
 def _mergeprioritydicts(dict1, dict2):
