@@ -57,10 +57,7 @@ def preresolve_hook(conduit):
     except AttributeError:
         return
 
-    instpkgs = []
-    for hdr in conduit.getRpmDB().getHdrList():
-        po = YumInstalledPackage(hdr)
-        instpkgs.append(po)
+    instpkgs = conduit.getRpmDB().getPackages()
 
     kmodprovides = []
     for pkg in instpkgs:
