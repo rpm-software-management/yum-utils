@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.1
+Version: 1.1.0
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -257,6 +257,9 @@ fi
 /usr/lib/yum-plugins/refresh-updatesd.*
 
 %changelog
+* Mon Feb 19 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark it as 1.1.0 (again)
+
 * Thu Feb 15 2007 Tim Lauridsen <tla@rasmil.dk>
 - removed versionlock.list installation.
 
