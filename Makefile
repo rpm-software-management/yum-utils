@@ -30,8 +30,9 @@ archive:
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	
-srpm:
-	rpmbuild -ts ${PKGNAME}-${VERSION}.tar.gz
+srpm: archive
+	rm -f ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm
+	rpmbuild -ts  ${PKGNAME}-${VERSION}.tar.gz
 
 release:
 	@cvs commit -m "bumped yum-utils version to $(VERSION)"
@@ -42,11 +43,11 @@ release:
 	
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
-	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-${RELEASE}.src.rpm $(WEBHOST):$(WEBPATH)/	
+	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/	
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
 ChangeLog: FORCE
-	@cvs2cl --utc
+	@cvs2cl --utc --follow trunk
 	
 	
 FORCE:	
