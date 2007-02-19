@@ -675,9 +675,9 @@ def main(args):
         repoq.doSackSetup(archlist=archlist)
         repoq.doTsSetup()
         if needfiles:
-            repoq.repos.populateSack(with='filelists')
+            repoq.repos.populateSack(mdtype='filelists')
         if needother:
-            repoq.repos.populateSack(with='otherdata')
+            repoq.repos.populateSack(mdtype='otherdata')
         if needgroup:
             repoq.doGroupSetup()
     except yum.Errors.RepoError, e:

@@ -19,7 +19,7 @@ import yum
 import yum.Errors
 from yum.misc import getCacheDir
 from yum.comps import Comps, CompsException
-from repomd.mdErrors import RepoMDError
+from yum.Errors import RepoMDError
 import sys
 import os
 import libxml2
@@ -208,7 +208,7 @@ def main(options, args):
     for repo in my.repos.listEnabled():
             
         try:
-            my.repos.populateSack(which=[repo.id], with='otherdata')
+            my.repos.populateSack(which=[repo.id], mdtype='otherdata')
         except yum.Errors.RepoError, e:
             print >> sys.stderr, 'otherdata not available for repo: %s' % repo
             print >> sys.stderr, 'run as root to get changelog data'

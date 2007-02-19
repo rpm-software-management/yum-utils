@@ -75,7 +75,7 @@ def postreposetup_hook(conduit):
 
     if changelog:
         repos = conduit.getRepos()
-        repos.populateSack(with='otherdata')
+        repos.populateSack(mdtype='otherdata')
 
 def postresolve_hook(conduit):
     if not changelog: 

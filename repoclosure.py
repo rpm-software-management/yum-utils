@@ -94,7 +94,7 @@ class RepoClosure(yum.YumBase):
             archs.append('src')
         self.doSackSetup(archs)
         for repo in self.repos.listEnabled():
-            self.repos.populateSack(which=[repo.id], with='filelists')
+            self.repos.populateSack(which=[repo.id], mdtype='filelists')
 
     def getBrokenDeps(self, newest=False):
         unresolved = {}
