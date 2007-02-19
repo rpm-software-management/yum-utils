@@ -1,3 +1,26 @@
+2007-02-19 12:37  timlau
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.1
+
+2007-02-19 12:32  timlau
+
+	* repo-rss.py, repoclosure.py, repoquery.py,
+	  plugins/changelog/changelog.py: changed 'with=' to 'mdtype=' in
+	  repos.populateSack calls, because of changes in the yum API in
+	  YumPackageSack.populate method to avoid warnings about 'with' is
+	  a reserved word in Python 2.6.
+
+2007-02-19 11:20  timlau
+
+	* yumdownloader.py: redesigned yumdownloader to use the new
+	  yum-utils base class introduced in yum-3.1.1.  This version
+	  inherit all command line options from the yum-cli and also
+	  command line option added by yum plugins.
+
+2007-02-19 09:16  timlau
+
+	* ChangeLog: updated ChangeLog
+
 2007-02-19 09:16  timlau
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.0
