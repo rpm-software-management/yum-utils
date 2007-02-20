@@ -145,8 +145,8 @@ class RepoRSS:
             changelog += '%s - %s\n%s\n\n' % (date, author, desc)
         description = '<p><strong>%s</strong> - %s</p>\n\n' % (escape(pkg.name), 
                                             escape(pkg.returnSimple('summary')))
-        description += '<p>%s</p>\n\n<p><strong>Change Log:</strong></p>\n\n' % escape(pkg.returnSimple('description').replace("\n", "<br />\n"))
-        description += escape('<pre>%s</pre>' % escape(changelog))
+        description += '<p>%s</p>\n\n<p><strong>Change Log:</strong></p>\n\n' % escape(pkg.returnSimple('description').encode('utf-8').replace("\n", "<br />\n"))
+        description += escape('<pre>%s</pre>' % escape(changelog.encode('utf-8')))
         item.newChild(None, 'description', description)
         
         return item
