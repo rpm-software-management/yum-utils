@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "*********************  Testing repotrack *******************************"
+echo "**** repotrack --urls yum"
+rm yum*.rpm
+python repotrack.py --urls yum
+echo "*************************************************************************"
+

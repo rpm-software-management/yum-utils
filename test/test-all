@@ -1,0 +1,9 @@
+#!/bin/sh
+test/test-yumdownloader
+test/test-repo-rss
+test/test-package-cleanup
+test/test-repoquery
+test/test-repoclosure
+test/test-reposync
+test/test-repotrack
+test/test-repo-graph

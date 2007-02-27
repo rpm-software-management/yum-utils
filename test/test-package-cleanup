@@ -1,0 +1,10 @@
+#!/bin/sh
+# Test script to test package-cleanup
+echo "*********************  Testing package-cleanup  ***************************"
+echo "****  package-cleanup.py --problems"
+python package-cleanup.py --problems
+echo "*************************************************************************"
+echo "****  package-cleanup.py --leaves"
+python package-cleanup.py --leaves
+echo "*************************************************************************"
+

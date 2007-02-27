@@ -1,0 +1,12 @@
+#!/bin/sh
+echo "*********************  Testing repoquery  *******************************"
+echo "**** repoquery -i yum"
+python repoquery.py -i yum 
+echo "*************************************************************************"
+echo "**** repoquery -l yum"
+python repoquery.py -l yum 
+echo "*************************************************************************"
+echo "**** repoquery -f /usr/bin/yum"
+python repoquery.py -f /usr/bin/yum 
+echo "*************************************************************************"
+

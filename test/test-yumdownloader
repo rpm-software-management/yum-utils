@@ -1,0 +1,11 @@
+#!/bin/sh
+# Test script to test yumdownloader
+echo "*********************  Testing yumdownloader  ***************************"
+echo "****  yumdownloader.py yum  (basic package download in current dir"
+rm yum*.rpm 
+python yumdownloader.py yum
+echo "*************************************************************************"
+echo "****  yumdownloader.py --resolve --url kdetoys (testing --resolv and --url)"
+python yumdownloader.py --resolve --url kdetoys
+echo "*************************************************************************"
+
