@@ -37,12 +37,14 @@ class CheckDependency:
     def resetTs(self):
         '''Clear the current tsInfo Transaction Set'''
         # clear current tsInfo, we want a empty one.
-        if hasattr(self,'_tsInfo'):
-            self._tsInfo = None
-        else:                     # support yum < 3.1.3
-            del self.tsInfo
-            self.tsInfo = self._transactionDataFactory()
-            self.initActionTs()
+        del self.base.tsInfo
+        # if yum < 3.1.3, we have setup a new tsInfo
+        # FIXME: This should be something like:
+        # if yum.__version__ < '3.1.3':
+        # but we have to wait to yum cvs head version is bumped.
+        if not hasattr(self.base,'_tsInfo'):
+            self.base.tsInfo = self._transactionDataFactory()
+            self.base.initActionTs()
 
     def preDepCheck(self):
         '''
@@ -105,9 +107,10 @@ def preresolve_hook(conduit):
             cd = CheckDependency(base,conduit.info)
             cd.dumpTsInfo()
             (good,bad) = cd.preDepCheck()
+            tsInfo = base.tsInfo
             for txmbr,err in bad:
                 # Removing bad packages for self.tsInfo
-                base.tsInfo.remove(txmbr.po.pkgtup)
+                tsInfo.remove(txmbr.po.pkgtup)
                 conduit.info(2,"%s failed dependency resolving " % txmbr.po)
                 conduit.info(2,"%s " % err[0])
             for txmbr in good:
