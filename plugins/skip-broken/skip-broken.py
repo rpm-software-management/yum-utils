@@ -38,13 +38,8 @@ class CheckDependency:
         '''Clear the current tsInfo Transaction Set'''
         # clear current tsInfo, we want a empty one.
         del self.base.tsInfo
-        # if yum < 3.1.3, we have setup a new tsInfo
-        # FIXME: This should be something like:
-        # if yum.__version__ < '3.1.3':
-        # but we have to wait to yum cvs head version is bumped.
-        if not hasattr(self.base,'_tsInfo'):
-            self.base.tsInfo = self._transactionDataFactory()
-            self.base.initActionTs()
+        self.base.tsInfo = self.base._transactionDataFactory()
+        self.base.initActionTs()
 
     def preDepCheck(self):
         '''
