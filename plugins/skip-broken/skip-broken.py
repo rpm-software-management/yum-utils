@@ -37,9 +37,12 @@ class CheckDependency:
     def resetTs(self):
         '''Clear the current tsInfo Transaction Set'''
         # clear current tsInfo, we want a empty one.
-        del self.base.tsInfo
-        self.base.tsInfo = self.base._transactionDataFactory()
-        self.base.initActionTs()
+        if hasattr(self,'_tsInfo'):
+            self._tsInfo = None
+        else:                     # support yum < 3.1.3
+            del self.tsInfo
+            self.tsInfo = self._transactionDataFactory()
+            self.initActionTs()
 
     def preDepCheck(self):
         '''
