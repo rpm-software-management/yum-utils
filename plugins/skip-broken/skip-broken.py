@@ -5,7 +5,7 @@
 # Option.
 #
 # Ex.
-# yum --ignore-broken install foo
+# yum --skip-broken install foo
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,8 +79,12 @@ class CheckDependency:
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
-    Setup the option parser with the '--ignore-broken' command line option
+    Setup the option parser with the '--skip-broken' command line option
     '''
+    global check_always
+    #  Get 'check_always' option from plugin conf
+    check_always = conduit.confBool('main', 'check_always', default=False)    
+    
     parser = conduit.getOptParser()
     if parser:
         parser.add_option("", "--skip-broken", dest="skipbroken",
@@ -91,11 +95,11 @@ def preresolve_hook(conduit):
     '''
     Yum Plugin PreResolve Hook:
     Check and remove packages with dependency problems
-    only runs if then '--ignore-broken' was set. 
+    only runs if then '--skip-broken' was set. 
     '''
     opts, commands = conduit.getCmdLine()
     if hasattr(opts,'skipbroken'):
-        if opts.skipbroken:
+        if opts.skipbroken or check_always:
             # get yum base
             conduit.info(2,'Checking packages for dependency problems')
             base = conduit._base
