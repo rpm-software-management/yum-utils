@@ -10,6 +10,7 @@ CVS_TAG = ${PKGNAME}-$(shell echo $(VERSION) | sed -e 's/\./-/g')
 
 clean:
 	rm -f *.pyc *.pyo *~
+	rm -f test/*~
 
 install:
 	mkdir -p $(DESTDIR)/usr/bin/
