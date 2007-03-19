@@ -17,6 +17,8 @@
 
 
 import sys
+sys.path.insert(0, '/usr/share/yum-cli')
+
 import signal
 import re
 import fnmatch
@@ -34,6 +36,8 @@ import yum.Errors
 import yum.packages
 from rpmUtils.arch import getArchList
 from rpmUtils.miscutils import formatRequire
+import output
+from urlgrabber.progress import TextMeter
 
 version = "0.0.11"
 
@@ -636,6 +640,13 @@ def main(args):
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
     repoq.doConfigSetup(fn=opts.conffile, init_plugins=False)
+    # Show what is going on, if --quiet is not set.
+    if not opts.quiet:
+        repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
+        repoq.repos.callback = output.CacheProgressCallback()
+        yumout = output.YumOutput()
+        freport = ( yumout.failureReport, (), {} )
+        repoq.repos.setFailureCallback( freport )       
     
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = misc.getCacheDir()
@@ -643,10 +654,12 @@ def main(args):
             repoq.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
         repoq.repos.setCacheDir(cachedir)
+        repoq.conf.cache = 0 # yum set cache=1, if uid != 0
 
     if opts.cache:
         repoq.conf.cache = True
         repoq.logger.error('Running from cache, results might be incomplete.')
+        
 
     if opts.show_dupes:
         repoq.conf.showdupesfromrepos = True
