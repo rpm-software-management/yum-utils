@@ -57,7 +57,7 @@ def preresolve_hook(conduit):
     except AttributeError:
         return
 
-    instpkgs = conduit.getRpmDB().getPackages()
+    instpkgs = conduit.getRpmDB().returnPackages()
 
     kmodprovides = []
     for pkg in instpkgs:
