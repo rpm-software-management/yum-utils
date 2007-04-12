@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.1
+Version: 1.1.2
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -141,6 +141,17 @@ This way, if you run 'yum list updates' and yum says there's a new version
 of (for example) zsh available, puplet will almost instantly update itself
 to reflect this.
 
+%package -n yum-merge-conf
+Summary: Yum plugin to merge configuration changes when installing packages
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-merge-conf
+This yum plugin adds the "--merge-conf" command line option. With this option,
+Yum will ask you what to do with config files which have changed on updating a
+package.
+
+
 %prep
 %setup -q
 
@@ -150,7 +161,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -256,7 +267,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
 /usr/lib/yum-plugins/refresh-updatesd.*
 
+%files -n yum-merge-conf
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
+/usr/lib/yum-plugins/merge-conf.*
+
 %changelog
+* Thu Apr 12 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark as 1.1.2
+- Added merge-conf plugin written by Aurelien Bompard <abompard@fedoraproject.org>
+
 * Mon Feb 19 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark it as 1.1.1
 
