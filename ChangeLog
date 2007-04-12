@@ -1,3 +1,64 @@
+2007-04-12 13:33  timlau
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.2
+
+2007-04-12 13:11  timlau
+
+	* plugins/merge-conf/: merge-conf.conf, merge-conf.py: Added
+	  merge-conf plugin written by Aurelien Bompard
+	  <abompard@fedoraproject.org>
+
+2007-03-20 07:27  timlau
+
+	* plugins/kernel-module/kernel-module.py: changed
+	  getRpmDB().getPackages() -> getRpmDB().returnPackages()
+
+2007-03-19 10:35  timlau
+
+	* repoquery.py: make repoquery work, when running as normal user.
+
+2007-03-14 14:19  timlau
+
+	* plugins/skip-broken/skip-broken.py: Make the skip-broken a little
+	  smarter and the make the output better.
+
+2007-03-13 11:53  timlau
+
+	* Makefile: added cleanup of test/ to Makefile.
+
+2007-03-13 11:42  timlau
+
+	* plugins/skip-broken/: skip-broken.conf, skip-broken.py: Added
+	  'check_always' option to the skip-broken plugin.  Setting
+	  'check_always=1' will make the skip-broken check run every time.
+	  (rhbz #231523)
+
+2007-03-01 19:51  timlau
+
+	* plugins/skip-broken/skip-broken.py: remove special hack to work
+	  with current api, they are not nesesary any more.
+
+2007-03-01 18:26  timlau
+
+	* plugins/skip-broken/skip-broken.py: more clean fix for work with
+	  latest yum api
+
+2007-03-01 09:31  timlau
+
+	* plugins/skip-broken/skip-broken.py: fixed issues with the latest
+	  changes in yum cvs head
+
+2007-02-27 07:37  timlau
+
+	* test/: test-all, test-package-cleanup, test-repo-graph,
+	  test-repo-rss, test-repoclosure, test-repoquery, test-reposync,
+	  test-repotrack, test-yumdownloader: Added some test scripts to
+	  test the basic functions of the yum-utils.
+
+2007-02-20 11:23  timlau
+
+	* ChangeLog: updated ChangeLog
+
 2007-02-20 11:23  timlau
 
 	* ChangeLog: bumped yum-utils version to 1.1.1
