@@ -23,6 +23,9 @@ from cli import *
 from utils import YumUtilBase
 
 from urlparse import urljoin
+from urlgrabber.progress import TextMeter
+import shutil
+
 
 class YumDownloader(YumUtilBase):
     NAME = 'yumdownloader'
@@ -56,6 +59,7 @@ class YumDownloader(YumUtilBase):
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
             self.repos.setCacheDir(cachedir)
+
         
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
@@ -142,6 +146,8 @@ class YumDownloader(YumUtilBase):
                     self.logger.info('%s' % url)
                     continue
                 local = os.path.basename(remote)
+                if not os.path.exists(opts.destdir):
+                    os.makedirs(opts.destdir)
                 local = os.path.join(opts.destdir, local)
                 if (os.path.exists(local) and 
                     str(os.path.getsize(local)) == download.returnSimple('packagesize')):
