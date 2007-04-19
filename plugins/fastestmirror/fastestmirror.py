@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.6
+# Version: 0.2.7
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
@@ -39,12 +39,10 @@ import urlparse
 import datetime
 import threading
 
-from yum.plugins import TYPE_INTERACTIVE, TYPE_CORE, API_VERSION
-from yum.plugins import TYPE_INTERFACE, PluginYumExit
+from yum.plugins import TYPE_CORE, PluginYumExit
 
 requires_api_version = '2.5'
-plugin_type = (API_VERSION <= 2.3 and TYPE_INTERFACE or TYPE_INTERACTIVE,
-               TYPE_CORE)
+plugin_type = (TYPE_CORE,)
 
 verbose = False
 socket_timeout = 3
