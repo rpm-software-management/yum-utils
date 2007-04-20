@@ -151,6 +151,17 @@ This yum plugin adds the "--merge-conf" command line option. With this option,
 Yum will ask you what to do with config files which have changed on updating a
 package.
 
+%package -n yum-security
+Summary: Yum plugin to enable security filters
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-security
+This plugin adds ther options --security, --cve, --bz and --advisory flags
+to yum and the list-security and info-security commands.
+The options make it possible to limit list/upgrade of packages to specific
+security relevant ones. The commands give you the security information.
+
 
 %prep
 %setup -q
@@ -161,7 +172,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf security"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -272,7 +283,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
 /usr/lib/yum-plugins/merge-conf.*
 
+%files -n yum-security
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
+/usr/lib/yum-plugins/security.*
+%{_mandir}/man8/yum-security.8.*
+
 %changelog
+* Fri Apr 20 2007 Tim Lauridsen <tla@rasmil.dk>
+- Added security plugin written by James Antill <james@and.org>
+
 * Thu Apr 12 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark as 1.1.2
 - Added merge-conf plugin written by Aurelien Bompard <abompard@fedoraproject.org>

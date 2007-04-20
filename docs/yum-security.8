@@ -1,0 +1,102 @@
+.\" yum security plugin
+.TH "yum-security" "8" "2007 Apr 12" "James Antill" ""
+.SH "NAME"
+yum security plugin
+.SH "SYNOPSIS"
+\fByum\fP [options] [command] [package ...]
+.SH "DESCRIPTION"
+.PP 
+This plugin extends \fByum\fP to allow lists and updates to be limited using security relevant criteria
+.PP 
+added yum \fIcommand\fPs are:
+.br 
+.I \fR * info-sec
+.br 
+.I \fR * list-sec
+.PP 
+both of which take these \fIsub-commands\fPs are:
+.br 
+.I \fR * * <advisory> [advisory...]
+.br 
+.I \fR * * bugzillas
+.br 
+.I \fR * * cves
+.br 
+.I \fR * * security
+.br 
+.br 
+.PP
+.IP "\fB<advisory> [advisory...]\fP"
+Is used to display information about one or more advisories.
+.PP 
+.IP "\fBlist-sec\fP" "\fBinfo-sec\fP"
+Is used to list all of the relevant security information, from the
+updateinfo.xml data in yum. This includes bugzillas, CVEs and security updates.
+.IP 
+.IP "\fBbugzillas / bzs\fP"
+Is the subset of the security information, pertaining to the bugzillas.
+.IP 
+.IP "\fBcves\fP"
+Is the subset of the security information, pertaining to the CVEs.
+.IP 
+.IP "\fBsecurity / sec\fP"
+Is the subset of the security information, pertaining to security.
+.IP
+.PP
+.SH "GENERAL OPTIONS"
+There are four options added to yum that are available in the "list updates", "info updates", "check-update" and "update" commands. They are:
+.PP 
+.IP "\fB\--advisory\fP"
+This option includes packages coresponding to the advisory ID, Eg. FEDORA-2201-123.
+.IP "\fB\--bz\fP"
+This option includes packages that say they fix a Bugzilla ID, Eg. 123.
+.IP "\fB\--cve\fP"
+This option includes packages that say they fix a CVE - Common Vulnerabilities and Exposures ID (http://cve.mitre.org/about/), Eg. CVE-2201-0123.
+.IP "\fB\--security\fP"
+This option includes packages that say they fix a security issue.
+.PP
+.PP
+
+.SH "EXAMPLES"
+.PP
+To list all updates that are security relevant, and get a reutrn code on whether there are security updates use:
+.IP
+yum --security check-update
+.PP
+To apply updates that are security relevant use:
+.IP
+yum --security update
+.PP
+To get a list of all BZs that are fixed for packages you have installed use:
+.IP
+yum list-sec bugzillas
+.PP
+To get the information on advisory FEDORA-2707-4567 use:
+.IP
+yum info-sec FEDORA-2707-4567
+.PP
+To apply updates for Bugzillas 123, 456 and 789; and all security updates use:
+.IP
+yum --bz 123 --bz 456 --bz 789 --security update
+.PP
+To get an info list of updates for Bugzilla 123; CVEs CVE-2207-0123 and CVE-2207-3210; and Fedora advisories FEDORA-2707-4567 and FEDORA-2707-7654 use:
+.IP
+yum --bz 123 --cve CVE-2207-0123 --cve CVE-2207-3210 --advisory FEDORA-2707-4567 --advisory FEDORA-2707-7654 info updates
+
+
+.SH "SEE ALSO"
+.nf
+.I yum (8)
+.I yum.conf (5)
+.fi
+
+.SH "AUTHORS"
+.nf
+James Antill <james.antill@redhat.com>.
+.fi
+
+.SH "BUGS"
+Currently yum.conf comes as default without plugins enabled, so just installing the yum security plugin will do nothing.
+There are detailed instructions on enabling plugins in the yum man page, however just putting "plugins=1" in yum.conf should just work.
+
+The main "problem" is that if the data is not correct the plugin cannot work correctly. For instance "--bz 123" will not fix BZ 123 if a package is updated to fix that BZ without referencing that it does so in the updateinfo.xml.
