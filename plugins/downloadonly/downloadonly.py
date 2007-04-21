@@ -35,7 +35,7 @@ def postreposetup_hook(conduit):
         repos = conduit.getRepos();
         list = repos.listEnabled();
         for repo in list:
-            repo.set('pkgdir',opts.dldir)
+            repo.setAttribute('pkgdir',opts.dldir)
            
 
 def postdownload_hook(conduit):
