@@ -2,7 +2,7 @@
 #
 # yum-updateonboot Updates rpms on the system at boot
 #
-# chkconfig: - 25 75
+# chkconfig: - 30 70
 # description: Runs 'yum update' at boot.  Also calls 'yum groupinstall' for \
 #              specified groups
 #
