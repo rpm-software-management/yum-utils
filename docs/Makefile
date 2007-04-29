@@ -11,6 +11,7 @@ clean:
 install:
 	mkdir -p $(DESTDIR)/usr/share/man/man1
 	mkdir -p $(DESTDIR)/usr/share/man/man5
+	mkdir -p $(DESTDIR)/usr/share/man/man8
 	for doc in $(DOCS); do \
 		install -m 644 $$doc.1 $(DESTDIR)/usr/share/man/man1/; \
 	done
