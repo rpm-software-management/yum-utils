@@ -83,6 +83,8 @@ def parseArgs():
         help="Use a temp dir for storing/accessing yum-cache")
     parser.add_option("-p", "--download_path", dest='destdir', 
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
+    parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
+        help="Remove packages that fail GPG signature checking after downloading")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
         help="Just list urls of what would be downloaded, don't download")
     parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true", 
@@ -95,8 +97,6 @@ def parseArgs():
 
 
 def main():
-# TODO/FIXME
-# gpg/sha checksum them
     (opts, junk) = parseArgs()
     
     if not os.path.exists(opts.destdir) and not opts.urls:
@@ -137,6 +137,7 @@ def main():
         for repo in myrepos:
             repo.enable()
 
+    my.doRpmDBSetup()
     my.doRepoSetup()
     my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
     
@@ -180,6 +181,7 @@ def main():
                     os.makedirs(local_repo_path)
                 except IOError, e:
                     my.logger.error("Could not make repo subdir: %s" % e)
+                    my.closeRpmDB()
                     sys.exit(1)
             
             # Disable cache otherwise things won't download            
@@ -188,9 +190,22 @@ def main():
                 my.logger.info( 'Downloading %s' % os.path.basename(remote))
             pkg.localpath = local # Hack: to set the localpath we want.
             path = repo.getPackage(pkg)
+            if opts.gpgcheck:
+                result, error = my.sigCheckPkg(pkg)
+                if result != 0:
+                    if result == 1:
+                        my.logger.warning('Removing %s, due to missing GPG key.' % os.path.basename(remote))
+                    elif result == 2:
+                        my.logger.warning('Removing %s due to failed signature check.' % os.path.basename(remote))
+                    else:
+                        my.logger.warning('Removing %s due to failed signature check: %s' % (os.path.basename(remote), error))
+                    os.unlink(path)
+                    continue
 
             if not os.path.exists(local) or not os.path.samefile(path, local):
                 shutil.copy2(path, local)
+
+    my.closeRpmDB()
 
 if __name__ == "__main__":
     main()
