@@ -1,3 +1,74 @@
+2007-05-01 17:19  timlau
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.3
+
+2007-05-01 16:42  skvidal
+
+	* Makefile, yum-util-cli-template, yum-utils.spec:
+	  - finish added debuginfo-install to makefile - add
+	  yum-util-cli-template to repo and add it to %doc in spec file
+	  - this is a template for folks to easily add more cli-based
+	  yum-utils
+
+2007-05-01 16:35  skvidal
+
+	* yum-utils.spec:
+	  add debuginfo-install to spec file
+
+2007-05-01 16:33  skvidal
+
+	* debuginfo-install.py:
+	  add debuginfo-install to yum-utils
+
+2007-04-30 13:27  timlau
+
+	* docs/: Makefile, reposync.1: Added reposync man page by Daniel de
+	  Kok (#717)
+
+2007-04-30 10:31  timlau
+
+	* reposync.py: Added gpgcheck option to reposync by Daniel de Kok
+	  (#715) adding a "-g/--gpgcheck" option that removes a newly
+	  downloaded package if the signature is not correct.
+
+2007-04-29 13:46  skvidal
+
+	* docs/Makefile:
+	  make sure man8 is made before installing the man page for
+	  yum-security
+
+2007-04-24 05:25  timlau
+
+	* updateonboot/yum-updateonboot.init:
+	  Changed yum-updateonboot priorities to 25/75 -> 30/70
+
+	  rhbz #235509
+
+2007-04-21 12:01  timlau
+
+	* plugins/downloadonly/downloadonly.py: fixed traceback when using
+	  --downloaddir rhbz #237367
+
+2007-04-20 10:25  timlau
+
+	* yum-utils.spec, docs/Makefile, docs/yum-security.8,
+	  plugins/security/security.conf, plugins/security/security.py:
+	  Added security plugin written by James Antill <james@and.org>
+
+2007-04-19 06:13  lmacken
+
+	* plugins/fastestmirror/: ChangeLog, fastestmirror.py: * Apr 19
+	  2007 Luke Macken <lmacken@redhat.com> - 0.2.7 - Remove
+	  TYPE_{INTERFACE,INTERACTIVE}
+
+2007-04-13 13:07  timlau
+
+	* yumdownloader.py: create destdir if it not exists
+
+2007-04-12 13:46  timlau
+
+	* ChangeLog: updated ChangeLog
+
 2007-04-12 13:45  timlau
 
 	* ChangeLog: bumped yum-utils version to 1.1.2
