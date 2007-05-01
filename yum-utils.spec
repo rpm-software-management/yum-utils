@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.2
+Version: 1.1.3
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -291,6 +291,9 @@ fi
 %{_mandir}/man8/yum-security.8.*
 
 %changelog
+* Tue May 1 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark as 1.1.3
+
 * Tue May  1 2007 Seth Vidal <skvidal at linux.duke.edu>
 - added debuginfo-install
 
