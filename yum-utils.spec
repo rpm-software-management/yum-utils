@@ -198,6 +198,7 @@ fi
 %doc README 
 %doc COPYING
 %doc plugins/README
+%{_bindir}/debuginfo-install
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repomanage
@@ -290,6 +291,9 @@ fi
 %{_mandir}/man8/yum-security.8.*
 
 %changelog
+* Tue May  1 2007 Seth Vidal <skvidal at linux.duke.edu>
+- added debuginfo-install
+
 * Fri Apr 20 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added security plugin written by James Antill <james@and.org>
 
