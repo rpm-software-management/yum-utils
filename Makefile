@@ -1,6 +1,6 @@
 SUBDIRS = docs
 PKGNAME = yum-utils
-UTILS = package-cleanup repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync
+UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
 WEBHOST = login.dulug.duke.edu

@@ -195,7 +195,7 @@ fi
 
 %files
 %defattr(-, root, root)
-%doc README 
+%doc README yum-util-cli-template
 %doc COPYING
 %doc plugins/README
 %{_bindir}/debuginfo-install

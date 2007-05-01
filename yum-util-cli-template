@@ -1,0 +1,57 @@
+#!/usr/bin/python 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Copyright 2007 Seth Vidal
+
+import sys
+sys.path.insert(0,'/usr/share/yum-cli/')
+
+import yum
+import yum.Errors
+
+from cli import *
+from utils import YumUtilBase
+
+
+class MyYumUtil(YumUtilBase):
+    NAME = 'myyumutil'
+    VERSION = '1.0'
+    USAGE = '"usage: myyumutil [options] package1 [package2] [package..]'
+    
+    def __init__(self):
+        YumUtilBase.__init__(self,
+                             MyYumUtil.NAME,
+                             MyYumUtil.VERSION,
+                             MyYumUtil.USAGE)
+        self.logger = logging.getLogger("yum.verbose.cli.myyumutil")
+        self.main()
+
+    def main(self):
+        # Add util commandline options to the yum-cli ones
+        parser = self.getOptionParser() 
+        # Parse the commandline option and setup the basics.
+        opts = self.doUtilConfigSetup()
+        # Check if there is anything to do.
+        if len(self.cmds) < 1: 
+            parser.print_help()
+            sys.exit(0)
+        # at this point you have the entire YumBaseCli object as 'self'
+        # you can do whatever you want
+        # if you want to make sure to build and run a transaction based on
+        # what you added to the tsInfo then do:
+        #self.buildTransaction()
+        #self.doTransaction()
+        
+if __name__ == '__main__':
+    util = MyYumUtil()
