@@ -103,38 +103,10 @@ def ysp_should_show_pkg(opts, pkg, md, used_map, rname=None):
     md = md.get_notice((pkg.name, pkg.ver, pkg.rel))
     if not md:
         return None
-    md = md.get_metadata()
 
     if rname and not ysp_has_info_md(rname, md):
         return None
     return ysp_should_filter_pkg(opts, pkg, md, used_map)
-
-def ysp_show_pkg_md_info(pkg, md, msg):
-    msg(pkg)
-    msg('  ID      ' + md['update_id'])
-    msg('  Type    ' + md['type'])
-    msg('  Issued  ' + md['issued'])
-    if md['issued'] != md['updated']:
-        msg('  Updated ' + md['updated'])
-    if md['references']:
-        msg('  References')
-        for ref in md['references']:
-            if ref['type'] == 'cve':
-                txt = "    CVE " + ref['id'];
-            elif ref['type'] == 'bugzilla':
-                txt = "    BZ  " + ref['id'];
-            else:
-                msg("   *" + ref['type'])
-            if 'summary' in ref:
-                if (len(txt) + len(ref['summary'])) <= 76:
-                    msg("%s: %s" % (txt, ref['summary']))
-                else:
-                    msg("%s: %.*s..." % (txt, 73 -len(txt), ref['summary']))
-            elif 'href' in ref and \
-                     (len(txt) + len(ref['href'])) <= 76:
-                msg("%s - %s" % (txt, ref['href']))
-            else:
-                msg(txt)
 
 def ysp_gen_used_map(opts):
     used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}}
@@ -237,12 +209,7 @@ class SecurityInfoCommands(SecurityListCommands):
         return ['info-security', 'info-sec']
 
     def show_pkg(self, msg, pkg, md, disp=None):
-        ysp_show_pkg_md_info(pkg, md, msg)
-        if md['description'] != None:
-            msg('  Description')
-            msg(textwrap.fill(md['description'],
-                              width=75, expand_tabs=False,
-                              initial_indent="     ", subsequent_indent="    "))
+        msg(md)
         msg('')
     
 def config_hook(conduit):
@@ -305,7 +272,6 @@ def ysp_should_keep_pkg(opts, pkg, md, used_map):
     md = md.get_notice((pkg.name, pkg.ver, pkg.rel))
     if not md:
         return False
-    md = md.get_metadata()
     
     return ysp_should_filter_pkg(opts, pkg, md, used_map)
 
