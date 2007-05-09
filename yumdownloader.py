@@ -43,7 +43,7 @@ class YumDownloader(YumUtilBase):
     def main(self):
         # Add util commandline options to the yum-cli ones
         parser = self.getOptionParser() 
-        # Add command line option specific to yumdownloader
+        # Add commanself.logger.d line option specific to yumdownloader
         self.addCmdOptions(parser)
         # Parse the commandline option and setup the basics.
         opts = self.doUtilConfigSetup()
@@ -60,20 +60,30 @@ class YumDownloader(YumUtilBase):
                 sys.exit(50)
             self.repos.setCacheDir(cachedir)
 
-        
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
+        # Setup source repos
+        if opts.source:
+            self.setupSourceRepos()
         # Do the real action
         self.downloadPackages(opts)
         
+    def setupSourceRepos(self):
+        # enable the -source repos for enabled primary repos
+        archlist = rpmUtils.arch.getArchList() + ['src']    
+        for repo in self.repos.listEnabled():
+            srcrepo = '%s-source' % repo.id
+            for r in self.repos.findRepos(srcrepo):
+                self.logger.info('Enabling %s repository' % r.id)
+                r.enable()
+                # Setup the repo
+                self._getRepos(thisrepo=r.id,doSetup=True)
+                # Setup pkgSack with 'src' in the archlist
+                self._getSacks(archlist=archlist,thisrepo=r.id)
+        
+        
     def downloadPackages(self,opts):
         
-        archlist = None
-        if opts.source:
-            archlist = rpmUtils.arch.getArchList() + ['src']
-    
-        self.doSackSetup(archlist=archlist)
-    
         avail = self.pkgSack.returnPackages()
     
         toDownload = []
@@ -86,7 +96,6 @@ class YumDownloader(YumUtilBase):
             if len(unmatched) > 0: # if we get back anything in unmatched, it fails
                 self.logger.error('No Match for argument %s' % pkg)
                 continue
-    
             for newpkg in installable:
                 # This is to fix Bug 469
                 # If there are matches to the package argument given but there
