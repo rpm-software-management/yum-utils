@@ -43,7 +43,7 @@ class YumDownloader(YumUtilBase):
     def main(self):
         # Add util commandline options to the yum-cli ones
         parser = self.getOptionParser() 
-        # Add commanself.logger.d line option specific to yumdownloader
+        # Add command line option specific to yumdownloader
         self.addCmdOptions(parser)
         # Parse the commandline option and setup the basics.
         opts = self.doUtilConfigSetup()
