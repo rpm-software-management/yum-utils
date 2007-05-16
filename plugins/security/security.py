@@ -60,12 +60,19 @@ def ysp_gen_metadata(conduit):
             continue # No metadata found for this repo
     return md_info
 
+def ysp__safe_refs(refs):
+    """ Sometimes refs == None, if so return the empty list here. 
+        So we don't have to check everywhere. """
+    if refs == None:
+        return []
+    return refs
+
 def ysp_should_filter_pkg(opts, pkg, md, used_map):
     """ Do the package filtering for should_show and should_keep. """
     
     def has_id(refs, ref_type, ref_ids):
         ''' Check if the given ID is a match. '''
-        for ref in refs:
+        for ref in ysp__safe_refs(refs):
             if ref['type'] != ref_type:
                 continue
             if ref['id'] not in ref_ids:
@@ -92,7 +99,7 @@ def ysp_has_info_md(rname, md):
     if rname == "security":
         if md['type'] == 'security':
             return md
-    for ref in md['references']:
+    for ref in ysp__safe_refs(md['references']):
         if ref['type'] != rname:
             continue
         return md
@@ -146,7 +153,7 @@ class SecurityListCommands:
         # Make the list view much smaller
         # ysp_show_pkg_md_info(pkg, md, msg)
         if disp and ysp_has_info_md(disp, md):
-            for ref in md['references']:
+            for ref in ysp__safe_refs(md['references']):
                 if ref['type'] != disp:
                     continue
                 msg(" %s %-8s %s" % (str(ref['id']), md['type'], pkg))
@@ -374,7 +381,6 @@ def preresolve_hook(conduit):
         conduit.info(2, 'Needed %d packages, for security' % (cnt))
     else:
         conduit.info(2, 'No packages needed, for security')
-        sys.exit(0)
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"
