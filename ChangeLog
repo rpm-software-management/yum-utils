@@ -1,3 +1,38 @@
+2007-05-16 07:47  timlau
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.4
+
+2007-05-16 07:41  timlau
+
+	* plugins/security/security.py: Added patch by James Antill:
+
+	   It seems that on RHEL5 there are update metadata entries with
+	  references == None (in my FC6 testing they were always == []).
+	  This gives a traceback with the current code.
+
+2007-05-09 10:11  timlau
+
+	* yumdownloader.py: removed crap from comment .
+
+2007-05-09 10:01  timlau
+
+	* yumdownloader.py: make the '--source' work and make it a little
+	  smarter so the 'reponame-source' are enabled automaticly for all
+	  enabled repos, when '--source' is used.  (rhbz #239528)
+
+2007-05-08 07:54  timlau
+
+	* plugins/security/security.py: Added patch to security plugin by
+	  Luke Macken
+
+2007-05-08 07:52  timlau
+
+	* plugins/security/security.py: Added patch by James Antill.
+
+2007-05-01 17:19  timlau
+
+	* ChangeLog: updated ChangeLog
+
 2007-05-01 17:19  timlau
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.3
