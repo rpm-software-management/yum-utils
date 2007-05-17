@@ -565,7 +565,7 @@ def main(args):
     parser.add_option("--querytags", default=0, action="store_true",
                       help="list available tags in queryformat queries")
     parser.add_option("-c", dest="conffile", action="store",
-                      default='/etc/yum.conf', help="config file location")
+                      default=None, help="config file location")
 
     (opts, regexs) = parser.parse_args()
     if opts.version:
@@ -639,7 +639,11 @@ def main(args):
         pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
-    repoq.doConfigSetup(fn=opts.conffile, init_plugins=False)
+    if opts.conffile:
+        repoq.doConfigSetup(fn=opts.conffile, init_plugins=False)
+    else:
+        repoq.doConfigSetup(init_plugins=False)
+        
     # Show what is going on, if --quiet is not set.
     if not opts.quiet:
         repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
