@@ -489,88 +489,83 @@ def main(args):
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    parser = OptionParser()
+    parser = OptionParser(version = "Repoquery version %s" % version)
     # query options
-    parser.add_option("-l", "--list", default=0, action="store_true",
+    parser.add_option("-l", "--list", action="store_true",
                       help="list files in this package/group")
-    parser.add_option("-i", "--info", default=0, action="store_true",
+    parser.add_option("-i", "--info", action="store_true",
                       help="list descriptive info from this package/group")
-    parser.add_option("-f", "--file", default=0, action="store_true",
+    parser.add_option("-f", "--file", action="store_true",
                       help="query which package provides this file")
     parser.add_option("--qf", "--queryformat", dest="queryformat",
                       help="specify a custom output format for queries")
-    parser.add_option("--groupmember", default=0, action="store_true",
+    parser.add_option("--groupmember", action="store_true",
                       help="list which group(s) this package belongs to")
     # dummy for rpmq compatibility
-    parser.add_option("-q", "--query", default=0, action="store_true",
+    parser.add_option("-q", "--query", action="store_true",
                       help="no-op for rpmquery compatibility")
-    parser.add_option("-a", "--all", default=0, action="store_true",
+    parser.add_option("-a", "--all", action="store_true",
                       help="query all packages/groups")
-    parser.add_option("--requires", default=0, action="store_true",
+    parser.add_option("--requires", action="store_true",
                       help="list package dependencies")
-    parser.add_option("--provides", default=0, action="store_true",
+    parser.add_option("--provides", action="store_true",
                       help="list capabilities this package provides")
-    parser.add_option("--obsoletes", default=0, action="store_true",
+    parser.add_option("--obsoletes", action="store_true",
                       help="list other packages obsoleted by this package")
-    parser.add_option("--conflicts", default=0, action="store_true",
+    parser.add_option("--conflicts", action="store_true",
                       help="list capabilities this package conflicts with")
-    parser.add_option("--changelog", default=0, action="store_true",
+    parser.add_option("--changelog", action="store_true",
                       help="show changelog for this package")
-    parser.add_option("--location", default=0, action="store_true",
+    parser.add_option("--location", action="store_true",
                       help="show download URL for this package")
-    parser.add_option("--nevra", default=0, action="store_true",
+    parser.add_option("--nevra", action="store_true",
                       help="show name-epoch:version-release.architecture info of package")
-    parser.add_option("--envra", default=0, action="store_true",
+    parser.add_option("--envra", action="store_true",
                       help="show epoch:name-version-release.architecture info of package")
-    parser.add_option("--nvr", default=0, action="store_true",
+    parser.add_option("--nvr", action="store_true",
                       help="show name, version, release info of package")
-    parser.add_option("-s", "--source", default=0, action="store_true",
+    parser.add_option("-s", "--source", action="store_true",
                       help="show package source RPM name")
-    parser.add_option("--srpm", default=0, action="store_true",
+    parser.add_option("--srpm", action="store_true",
                       help="operate on corresponding source RPM")
-    parser.add_option("--resolve", default=0, action="store_true",
+    parser.add_option("--resolve", action="store_true",
                       help="resolve capabilities to originating package(s)")
-    parser.add_option("--alldeps", default=0, action="store_true",
+    parser.add_option("--alldeps", action="store_true",
                       help="check non-explicit dependencies as well")
-    parser.add_option("--whatprovides", default=0, action="store_true",
+    parser.add_option("--whatprovides", action="store_true",
                       help="query what package(s) provide a capability")
-    parser.add_option("--whatrequires", default=0, action="store_true",
+    parser.add_option("--whatrequires", action="store_true",
                       help="query what package(s) require a capability")
-    parser.add_option("--whatobsoletes", default=0, action="store_true",
+    parser.add_option("--whatobsoletes", action="store_true",
                       help="query what package(s) obsolete a capability")
-    parser.add_option("--whatconflicts", default=0, action="store_true",
+    parser.add_option("--whatconflicts", action="store_true",
                       help="query what package(s) conflicts with a capability")
     # group stuff
     parser.add_option("-g", "--group", default=0, action="store_true", 
                       help="query groups instead of packages")
-    parser.add_option("--grouppkgs", default="default", dest="grouppkgs",
+    parser.add_option("--grouppkgs", default="default",
                       help="filter which packages (all,optional etc) are shown from groups")
     # other opts
-    parser.add_option("--archlist", dest="archlist", 
+    parser.add_option("--archlist",
                       help="only query packages of certain architecture(s)")
-    parser.add_option("--pkgnarrow", default="repos", dest="pkgnarrow",
+    parser.add_option("--pkgnarrow", default="repos",
                       help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
-    parser.add_option("--show-dupes", default=0, action="store_true",
+    parser.add_option("--show-dupes", action="store_true",
                       help="show all versions of packages")
-    parser.add_option("--repoid", default=[], action="append",
+    parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
-    parser.add_option("-v", "--version", default=0, action="store_true",
-                      help="show program version and exit")
-    parser.add_option("--quiet", default=0, action="store_true", 
+    parser.add_option("--quiet", action="store_true", 
                       help="quiet (no output to stderr)")
-    parser.add_option("-C", "--cache", default=0, action="store_true",
+    parser.add_option("-C", "--cache", action="store_true",
                       help="run from cache only")
-    parser.add_option("--tempcache", default=0, action="store_true",
+    parser.add_option("--tempcache", action="store_true",
                       help="use private cache (default when used as non-root)")
-    parser.add_option("--querytags", default=0, action="store_true",
+    parser.add_option("--querytags", action="store_true",
                       help="list available tags in queryformat queries")
-    parser.add_option("-c", dest="conffile", action="store",
-                      default=None, help="config file location")
+    parser.add_option("-c", dest="conffile", help="config file location")
 
     (opts, regexs) = parser.parse_args()
-    if opts.version:
-        print "Repoquery version %s" % version
-        sys.exit(0)
+
     if opts.querytags:
         querytags.sort()
         for tag in querytags:
@@ -640,9 +635,9 @@ def main(args):
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
     if opts.conffile:
-        repoq.doConfigSetup(fn=opts.conffile, init_plugins=False)
+        repoq.doConfigSetup(fn=opts.conffile)
     else:
-        repoq.doConfigSetup(init_plugins=False)
+        repoq.doConfigSetup()
         
     # Show what is going on, if --quiet is not set.
     if not opts.quiet:
@@ -668,7 +663,7 @@ def main(args):
     if opts.show_dupes:
         repoq.conf.showdupesfromrepos = True
 
-    if len(opts.repoid) > 0:
+    if opts.repoid:
         for repo in repoq.repos.findRepos('*'):
             if repo.id not in opts.repoid:
                 repo.disable()
