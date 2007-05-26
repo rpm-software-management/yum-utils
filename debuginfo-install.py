@@ -58,6 +58,10 @@ class DebugInfoInstall(YumUtilBase):
         
         self.debugInfo_main()
         self.buildTransaction()
+        if len(self.tsInfo) < 1:
+            print 'No debuginfo packages available to install'
+            sys.exit()
+            
         self.doTransaction()
     
     def di_try_install(self, po):
