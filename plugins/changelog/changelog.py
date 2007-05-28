@@ -32,7 +32,7 @@ def changelog_delta(pkg, olddate):
     out = []
     for date, author, message in pkg.returnChangelog():
         if int(date) > olddate:
-            out.append("* %s %s\n%s\n" % (time.ctime(int(date)), author, message))
+            out.append("* %s %s\n%s" % (time.ctime(int(date)), author, message))
     return out
 
 def srpmname(pkg):
@@ -45,6 +45,8 @@ def show_changes(conduit, msg):
     srpms = {}
     ts = conduit.getTsInfo()
     for tsmem in ts.getMembers():
+        if not tsmem.updates:
+            continue
         name = srpmname(tsmem.po)
         if srpms.has_key(name):
             srpms[name].append(tsmem.po)
