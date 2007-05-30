@@ -22,8 +22,6 @@
 #     make it work with mirrorlists (silly, really)
 #     man page/more useful docs
 #     deal nicely with a package changing but not changing names (ie: replacement)
-#     maybe have it iterate the dir, if it exists, and delete files not listed
-#     in a repo
 
 # criteria
 # if a package is not the same and smaller then reget it
@@ -35,6 +33,7 @@
 import os
 import sys
 import shutil
+import stat
 
 from optparse import OptionParser
 from urlparse import urljoin
@@ -47,6 +46,7 @@ from yum.packages import parsePackages
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
+from urlgrabber.progress import TextMeter
 
 # for yum 2.4.X compat
 def sortPkgObj(pkg1 ,pkg2):
@@ -64,6 +64,24 @@ class RepoSync(yum.YumBase):
         self.logger = logging.getLogger('yum.verbose.reposync')
         self.opts = opts
 
+def localpkgs(dir):
+    names = os.listdir(dir)
+
+    cache = {}
+    for name in names:
+        fn = os.path.join(dir, name)
+        try:
+            st = os.lstat(fn)
+        except os.error:
+            continue
+        if stat.S_ISDIR(st.st_mode):
+            subcache= localpkgs(fn)
+            for pkg in subcache.keys():
+                cache[pkg] = subcache[pkg]
+        elif stat.S_ISREG(st.st_mode) and name.endswith(".rpm"):
+            cache[name] = { 'path': fn, 'size': st.st_size, 'device': st.st_dev }
+    return cache
+
 def parseArgs():
     usage = """
     Reposync is used to synchronize a remote yum repository to a local 
@@ -79,8 +97,12 @@ def parseArgs():
         help='act as if running the specified arch (default: current arch, note: does not override $releasever)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("-e", "--cachedir",
+        help="directory in which to store metadata")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
         help="Use a temp dir for storing/accessing yum-cache")
+    parser.add_option("-d", "--delete", default=False, action="store_true",
+        help="delete local packages no longer present in repository")
     parser.add_option("-p", "--download_path", dest='destdir', 
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
@@ -112,15 +134,21 @@ def main():
         
     my = RepoSync(opts=opts)
     my.doConfigSetup(fn=opts.config, init_plugins=False)
-    
-    # do the happy tmpdir thing if we're not root
-    if os.geteuid() != 0 or opts.tempcache:
+
+    # Force unprivileged users to have a private temporary cachedir
+    # if they've not given an explicit cachedir
+    if os.getuid() != 0 and not opts.cachedir:
+        opts.tempcache = True
+
+    if opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
             print >> sys.stderr, "Error: Could not make cachedir, exiting"
             sys.exit(50)
             
         my.repos.setCacheDir(cachedir)
+    elif opts.cachedir:
+        my.repos.setCacheDir(opts.cachedir)
 
     if len(opts.repoid) > 0:
         myrepos = []
@@ -137,25 +165,45 @@ def main():
         for repo in myrepos:
             repo.enable()
 
+    # Use progress bar display when downloading repo metadata
+    # and package files
+    if not opts.quiet:
+        my.repos.setProgressBar(TextMeter(fo=sys.stdout))
+
     my.doRpmDBSetup()
     my.doRepoSetup()
     my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
     
-    download_list = []
-    
-
     for repo in my.repos.listEnabled():
-        local_repo_path = opts.destdir + '/' + repo.id
-            
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
-            
+
         if opts.newest:
             download_list = reposack.returnNewestByNameArch()
         else:
             download_list = list(reposack)
-        
+
+        local_repo_path = opts.destdir + '/' + repo.id
+        if opts.delete and os.path.exists(local_repo_path):
+            current_pkgs = localpkgs(local_repo_path)
+
+            download_set = {}
+            for pkg in download_list:
+                remote = pkg.returnSimple('relativepath')
+                rpmname = os.path.basename(remote)
+                download_set[rpmname] = 1
+
+            for pkg in current_pkgs:
+                if download_set.has_key(pkg):
+                    continue
+
+                if not opts.quiet:
+                    my.logger.info("Removing obsolete %s", pkg)
+                os.unlink(current_pkgs[pkg]['path'])
+
         download_list.sort(sortPkgObj)
+        n = 0
         for pkg in download_list:
+            n = n + 1
             repo = my.repos.getRepo(pkg.repoid)
             remote = pkg.returnSimple('relativepath')
             local = local_repo_path + '/' + remote
@@ -167,7 +215,7 @@ def main():
                 str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
                 
                 if not opts.quiet:
-                    my.logger.error("%s already exists and appears to be complete" % local)
+                    my.logger.error("[%s: %-5d of %-5d ] Skipping existing %s" % (repo.id, n, len(download_list), remote))
                 continue
     
             if opts.urls:
@@ -187,7 +235,7 @@ def main():
             # Disable cache otherwise things won't download            
             repo.cache = 0
             if not opts.quiet:
-                my.logger.info( 'Downloading %s' % os.path.basename(remote))
+                my.logger.info( '[%s: %-5d of %-5d ] Downloading %s' % (repo.id, n, len(download_list), remote))
             pkg.localpath = local # Hack: to set the localpath we want.
             path = repo.getPackage(pkg)
             if opts.gpgcheck:
