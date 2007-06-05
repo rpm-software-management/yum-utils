@@ -220,7 +220,7 @@ def main():
         local = os.path.basename(remote)
         local = os.path.join(opts.destdir, local)
         if (os.path.exists(local) and 
-            str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+            os.path.getsize(local) == int(pkg.returnSimple('packagesize'))):
             
             if not opts.quiet:
                 my.logger.info("%s already exists and appears to be complete" % local)

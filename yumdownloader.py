@@ -159,7 +159,7 @@ class YumDownloader(YumUtilBase):
                     os.makedirs(opts.destdir)
                 local = os.path.join(opts.destdir, local)
                 if (os.path.exists(local) and 
-                    str(os.path.getsize(local)) == download.returnSimple('packagesize')):
+                    os.path.getsize(local) == int(download.returnSimple('packagesize'))):
                     self.logger.error("%s already exists and appears to be complete" % local)
                     continue
                 # Disable cache otherwise things won't download
