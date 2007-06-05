@@ -212,7 +212,8 @@ def main():
                 os.makedirs(localdir)
 
             if (os.path.exists(local) and 
-                str(os.path.getsize(local)) == pkg.returnSimple('packagesize')):
+                os.path.getsize(local) == int(pkg.returnSimple('packagesize'))):
+                
                 
                 if not opts.quiet:
                     my.logger.error("[%s: %-5d of %-5d ] Skipping existing %s" % (repo.id, n, len(download_list), remote))
