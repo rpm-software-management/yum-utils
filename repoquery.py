@@ -696,6 +696,12 @@ def main(args):
         repoq.logger.error( e)
         sys.exit(1)
 
+    # ick.. python assumes ascii encoding if stdout is not a tty, force
+    # it to preferred locale 
+    if not sys.stdout.isatty():
+        import codecs, locale
+        sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
+
     repoq.runQuery(regexs)
 
 if __name__ == "__main__":
