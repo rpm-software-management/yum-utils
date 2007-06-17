@@ -34,6 +34,11 @@ def config_hook(conduit):
                       help='Merge configuration changes after installation')
 
 def posttrans_hook(conduit):
+    has_vimdiff = False
+    for d in os.getenv("PATH", "").split(":"):
+        if os.path.exists(os.path.join(d, "vimdiff")):
+            has_vimdiff = True
+            break
     ts = conduit.getTsInfo()
     for tsmem in ts.getMembers():
         rpmdb = conduit.getRpmDB()
@@ -57,11 +62,11 @@ def posttrans_hook(conduit):
             for file, mode, flags in filetuple:
                 if flags & RPMFILE_CONFIG:
                     if flags & RPMFILE_NOREPLACE:
-                        mergeConfFiles(tsmem.po.name, file, True, conduit)
+                        mergeConfFiles(tsmem.po.name, file, True, conduit, has_vimdiff)
                     else:
-                        mergeConfFiles(tsmem.po.name, file, False, conduit)
+                        mergeConfFiles(tsmem.po.name, file, False, conduit, has_vimdiff)
 
-def mergeConfFiles(pkg, file, noreplace, conduit):
+def mergeConfFiles(pkg, file, noreplace, conduit, has_vimdiff):
     if noreplace:
         local_file = file
         pkg_file = "%s.rpmnew" % file
@@ -98,7 +103,8 @@ def mergeConfFiles(pkg, file, noreplace, conduit):
             print " - install the package's version (i)"
         else:
             print " - keep your version (n)"
-        print " - merge interactively with vim (v)"
+        if has_vimdiff:
+            print " - merge interactively with vim (v)"
         print " - background this process and examine manually (z)"
         sys.stdout.write("Your answer ? ")
         answer = sys.stdin.readline().strip()
@@ -124,7 +130,7 @@ def mergeConfFiles(pkg, file, noreplace, conduit):
             os.system(os.getenv("SHELL", "bash"))
         elif answer == "q":
             print "Choosing RPM's default action."
-        elif answer == "v":
+        elif answer == "v" and has_vimdiff:
             os.system("""vimdiff '%s' '%s'""" % (final_file, other_file))
             break
         else:
