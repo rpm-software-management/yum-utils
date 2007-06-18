@@ -1,3 +1,65 @@
+2007-06-18 08:02  timlau
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.5
+
+2007-06-17 07:03  timlau
+
+	* plugins/merge-conf/merge-conf.py: Patch to detech vimdiff by
+	  Aurelien Bompard
+
+2007-06-15 05:55  pmatilai
+
+	* repoquery.py: Ugly kludge to force local preferred encoding for
+	  stdout when redirected to a file where python defaults to
+	  ascii... ick. Mostly fixes rhbz#239744.
+
+2007-06-05 18:04  timlau
+
+	* reposync.py: Added patch by Perry Myers: fixes reposync so that
+	  it is properly skipping packages that have already been
+	  downloaded.
+
+2007-06-05 17:50  timlau
+
+	* repotrack.py, yumdownloader.py: Added patch by Perry Myers: fixes
+	  repotrack and yumdownloader so that they properly skip packages
+	  that have already been downloaded.
+
+2007-05-30 21:44  skvidal
+
+	* reposync.py:
+	  Commit 3 patches from Dan Berrange: 1. output better progress
+	  callback for the user in reposync 2. allow the user to set the
+	  cachedir specifically in reposync 3. allow reposync to delete
+	  no-longer-available packages from the local copy
+
+2007-05-28 12:38  pmatilai
+
+	* plugins/changelog/changelog.py: - filter out packages not
+	  updating anything to fix rhbz#238876 - drop extra newline after
+	  each changelog entry to make formatting nicer
+
+2007-05-26 03:51  skvidal
+
+	* debuginfo-install.py:
+	  if the transaction set is empty, don't try to run it. :) closes
+	  rh bug: 241466
+
+2007-05-23 14:17  jbowes
+
+	* repoquery.py: repoquery - remove unneeded arguments for option
+	  init, and load core plugins
+
+2007-05-17 19:12  skvidal
+
+	* repoquery.py: if the user doesn't specify -c then just use
+	  whatever the default is for the yum version they have installed.
+	  Don't default to /etc/yum.conf anymore.
+
+2007-05-16 07:48  timlau
+
+	* ChangeLog: updated ChangeLog
+
 2007-05-16 07:47  timlau
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.4
