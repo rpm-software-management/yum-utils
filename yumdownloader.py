@@ -59,6 +59,8 @@ class YumDownloader(YumUtilBase):
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
             self.repos.setCacheDir(cachedir)
+            # Turn of cache
+            self.conf.cache = 0
 
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
@@ -76,8 +78,8 @@ class YumDownloader(YumUtilBase):
             for r in self.repos.findRepos(srcrepo):
                 self.logger.info('Enabling %s repository' % r.id)
                 r.enable()
-                # Setup the repo
-                self._getRepos(thisrepo=r.id,doSetup=True)
+                # Setup the repo, without a cache
+                r.setup(0)
                 # Setup pkgSack with 'src' in the archlist
                 self._getSacks(archlist=archlist,thisrepo=r.id)
         
