@@ -162,6 +162,18 @@ to yum and the list-security and info-security commands.
 The options make it possible to limit list/upgrade of packages to specific
 security relevant ones. The commands give you the security information.
 
+%package -n yum-protect-packages
+Summary: Yum plugin to prevents Yum from removing itself and other protected packages 
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-protect-packages
+this plugin prevents Yum from removing itself and other protected packages.
+By default, yum is the only package protected, but by extension this
+automatically protects everything on which yum depends (rpm, python, glibc, 
+and so on).Therefore, the plugin functions well even without
+compiling careful lists of all important packages.
+
 
 %prep
 %setup -q
@@ -172,7 +184,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf security"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf security protect-packages"
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -290,7 +302,15 @@ fi
 /usr/lib/yum-plugins/security.*
 %{_mandir}/man8/yum-security.8.*
 
+%files -n yum-protect-packages
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protect-packages.conf
+/usr/lib/yum-plugins/protect-packages.*
+
 %changelog
+* Mon Jun 18 2007 Tim Lauridsen <tla@rasmil.dk>
+- Added protect-packages plugin by Svetlana Anissimova and Matthew Miller
+
 * Mon Jun 18 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark as 1.1.5
 
