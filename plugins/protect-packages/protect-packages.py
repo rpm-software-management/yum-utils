@@ -44,38 +44,44 @@ requires_api_version = '2.4'
 plugin_type = (TYPE_CORE, TYPE_INTERACTIVE)
 
 def config_hook(conduit):
-  parser = conduit.getOptParser()
-  parser.add_option("", "--override-protection", dest='override', 
-                    action="append", default=[], metavar='[package]',
-                    help="remove package from the list of protected packages")
+    parser = conduit.getOptParser()
+    parser.add_option("", "--override-protection", dest='override', 
+                      action="append", default=[], metavar='[package]',
+                      help="remove package from the list of protected packages")
 
 def postresolve_hook(conduit):
-  protectedpkgs = ['yum']
-  protectedlist = []
-  opts, args = conduit.getCmdLine()
+    protectedpkgs = ['yum']
+    protectedlist = []
+    opts, args = conduit.getCmdLine()
 
-  confdir = conduit.confString('main','confdir','/etc/sysconfig')
+    confdir = conduit.confString('main','confdir','/etc/sysconfig')
 
-  if os.access(confdir + "/protected-packages", os.R_OK) : 
-     protectedlist.append(confdir + "/protected-packages")
+    if os.access(confdir + "/protected-packages", os.R_OK) : 
+        protectedlist.append(confdir + "/protected-packages")
 
-  if os.access(confdir + "/protected-packages.d", os.R_OK):
-     protectedlist.extend(glob.glob(confdir + "/protected-packages.d/*.list"))
+    if os.access(confdir + "/protected-packages.d", os.R_OK):
+        protectedlist.extend(glob.glob(confdir + "/protected-packages.d/*.list"))
 
-  if protectedlist:
-     for f in protectedlist:
-       for line in open(f).readlines():            
-           line = string.strip(line)
-           if (line and line[0] != "#" and line not in opts.override  
-                    and line not in protectedpkgs):
-              protectedpkgs.append(line)
-       open(f).close()
+    if protectedlist:
+        for f in protectedlist:
+            for line in open(f).readlines():            
+                line = string.strip(line)
+                if (line and line[0] != "#" and line not in opts.override  
+                                            and line not in protectedpkgs):
+                    protectedpkgs.append(line)
 
-  for tsmem in conduit.getTsInfo().getMembers():
-    if tsmem.name in protectedpkgs and tsmem.ts_state == 'e':
-      raise PluginYumExit("This transaction would cause %s to be removed. "
-           "This package is vital for the basic operation of your system. "
-           "If you really want to remove it, edit the list of protected "
-           "packages in the file %s or in the directory %s."
-           %(tsmem.name, confdir + "/protected-packages",
-             confdir + "/protected-packages.d"))
+    for tsmem in conduit.getTsInfo().getMembers():
+        if tsmem.name in protectedpkgs and tsmem.ts_state == 'e':
+            raise PluginYumExit("This transaction would cause %s to be removed."
+                " This package is vital for the basic operation of your system."
+                " If you really want to remove it, edit the list of protected"
+                " packages in the file %s or in the directory %s or use the"
+                " --override-protection command-line option."
+                %(tsmem.name, confdir + "/protected-packages",
+                 confdir + "/protected-packages.d"))
+
+
+
+
+
+
