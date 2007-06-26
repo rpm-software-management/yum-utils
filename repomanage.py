@@ -105,8 +105,8 @@ def getFileList(path, ext, filelist):
     try:
         dir_list = os.listdir(path)
     except OSError, e:
-        errorprint('Error accessing directory %s, %s' % (path, e))
-        raise Error, 'Error accessing directory %s, %s' % (path, e)
+        errorprint('Error accessing directory %s, %s' % (path, e.message))
+        raise Error, 'Error accessing directory %s, %s' % (path, e.message)
         
     for d in dir_list:
         if os.path.isdir(path + '/' + d):
