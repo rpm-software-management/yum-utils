@@ -63,7 +63,7 @@ class YumDownloader(YumUtilBase):
             self.conf.cache = 0
 
         # Setup yum (Ts, RPM db, Repo & Sack)
-        self.doUtilYumSetup()
+        self.doUtilYumSetup(opts)
         # Setup source repos
         if opts.source:
             self.setupSourceRepos()
@@ -118,6 +118,9 @@ class YumDownloader(YumUtilBase):
                       ver = newpkg.version,
                       rel = newpkg.release
                     )
+                    if src == []:
+                        self.logger.error('No source RPM found for %s' % str(newpkg))
+                        
                     toActOn.extend(src)
                 else:
                     toActOn.append(newpkg)
@@ -145,6 +148,8 @@ class YumDownloader(YumUtilBase):
             for pkg in self.tsInfo.getMembers():
                 if not pkg in toDownload:
                     toDownload.append(pkg)
+        if len(toDownload) == 0:
+            self.logger.error('Nothing to download')
             
         for pkg in toDownload:
             n,a,e,v,r = pkg.pkgtup
@@ -175,7 +180,25 @@ class YumDownloader(YumUtilBase):
                                    size=os.stat(path).st_size)
                     shutil.copy2(path, local)
                     progress.end(progress.size)
-        
+   
+    # sligly modified from the one in YumUtilBase    
+    def doUtilYumSetup(self,opts):
+        """do a default setup for all the normal/necessary yum components,
+           really just a shorthand for testing"""
+        # FIXME - we need another way to do this, I think.
+        try:
+            self._getTs()
+            self._getRpmDB()
+            self._getRepos()
+            # if '--source' is used the add src to the archlist
+            if opts.source:
+                archlist = rpmUtils.arch.getArchList() + ['src']    
+            else:
+                archlist = rpmUtils.arch.getArchList()
+            self._getSacks(archlist=archlist)
+        except yum.Errors.YumBaseError, msg:
+            self.logger.critical(str(msg))
+            sys.exit(1)
 
 
     def addCmdOptions(self,parser):
