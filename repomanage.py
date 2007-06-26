@@ -34,9 +34,9 @@ from optparse import OptionParser
 
 
 class Error(Exception):
-    def __init__(self, args=None):
+    def __init__(self, message=None):
         Exception.__init__(self)
-        self.args = args
+        self.message = message
 
 
 def errorprint(stuff):
@@ -212,7 +212,7 @@ def main(args):
         try:
             hdr = returnHdr(ts, pkg)
         except Error, e:
-            errorprint(e)
+            errorprint(e.message)
             continue
         
         pkgtuple = hdr2pkgTuple(hdr)
