@@ -253,6 +253,7 @@ fi
 
 %files -n yum-versionlock
 %defattr(-, root, root)
+%doc plugins/versionlock/README
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
 /usr/lib/yum-plugins/versionlock.*
 
@@ -308,6 +309,9 @@ fi
 /usr/lib/yum-plugins/protect-packages.*
 
 %changelog
+* Tue Jul 03 2007 Panu Matilainen <pmatilai@laiskiainen.org>
+- Add versionlock list format documentation
+
 * Mon Jun 18 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added protect-packages plugin by Svetlana Anissimova and Matthew Miller
 

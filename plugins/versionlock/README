@@ -1,0 +1,15 @@
+The versionlock list format is NOT compatible with default 'rpm -qa' output.
+The locked packages and their versions need to be listed in ENVRA format:
+EPOCH:NAME-VERSION-RELEASE.ARCH
+
+That format can be easily generated with repoquery (also part of yum-utils)
+with --envra option. If for example you want to lock what's currently on
+the system you could use 
+   
+  repoquery --quiet --envra --pkgnarrow=installed -a 
+
+If using repoquery isn't an option for whatever reason, the following
+queryformat will extract ENVRA format from rpm:
+
+  rpm -qa --qf "%|epoch?{%{epoch}}:{0}|:%{name}-%{version}-%{release}.%{arch}\n"
+
