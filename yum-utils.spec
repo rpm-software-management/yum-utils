@@ -134,6 +134,7 @@ from a repository with a higher priority even if repo has a later version.
 Summary: Tell yum-updatesd to check for updates when yum exits
 Group: System Environment/Base
 Requires: yum >= 3.0
+Requires: yum-updatesd
 
 %description -n yum-refresh-updatesd
 yum-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
@@ -309,6 +310,8 @@ fi
 /usr/lib/yum-plugins/protect-packages.*
 
 %changelog
+* Tue Jul 17 2007 Tim Lauridsen <tla@rasmil.dk>
+- Added Requires: yum-updatesd to yum-refresh-updatesd
 * Tue Jul 03 2007 Panu Matilainen <pmatilai@laiskiainen.org>
 - Add versionlock list format documentation
 
