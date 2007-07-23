@@ -1,6 +1,3 @@
 - port all tools to optparser
 - standardize some of the args a bit
-- consider porting the commonly-used functions from multiple tools into
-  yum module?
 - work on manpages/docs
-- add plugins
