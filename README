@@ -52,7 +52,7 @@ repository.
 Various people have made a contribution to this collection:
 
 - Gijs Hollestelle
-Maintainer of yum-utils, author of yumdownloader and package-cleanup 
+Author of yumdownloader and package-cleanup 
 
 - Seth Vidal
 Maintainer of yum, author of repoclosure, repomanage and repo-rss
@@ -63,3 +63,5 @@ Author of repoquery, yum-builddep
 - Sean Dilda
 Author of the update on boot init scripts
 
+- Tim Lauridsen
+Maintainer of yum-utils - fixer of a lot of misc utils.
