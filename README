@@ -1,7 +1,8 @@
 -- Introduction --
 
 Yum-utils is a collection of utilities, plugins and examples related to
-the yum package manager. 
+the yum package manager.  See http://wiki.linux.duke.edu/YumUtils for more
+details.
 
 If you encounter any problems using these utilities feel free to send 
 an e-mail to the yum mailing list: 
