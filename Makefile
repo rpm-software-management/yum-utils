@@ -27,6 +27,7 @@ archive:
 	@dir=$$PWD; cd /tmp; cp -a $$dir ${PKGNAME}
 	@rm -f /tmp/${PKGNAME}/${PKGNAME}-daily.spec
 	@mv /tmp/${PKGNAME} /tmp/${PKGNAME}-$(VERSION)
+	@rm -rf /tmp/${PKGNAME}-$(VERSION)/.git
 	@dir=$$PWD; cd /tmp; tar cvzf $$dir/${PKGNAME}-$(VERSION).tar.gz ${PKGNAME}-$(VERSION)
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
