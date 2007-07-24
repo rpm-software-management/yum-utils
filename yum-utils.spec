@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.5
+Version: 1.1.6
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -310,6 +310,8 @@ fi
 /usr/lib/yum-plugins/protect-packages.*
 
 %changelog
+* Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark as 1.1.6
 * Tue Jul 17 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added Requires: yum-updatesd to yum-refresh-updatesd
 * Tue Jul 03 2007 Panu Matilainen <pmatilai@laiskiainen.org>
