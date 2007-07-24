@@ -1,5 +1,9 @@
 2007-07-24  Tim Lauridsen <tla@rasmil.dk>
 
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.6
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
 	* Makefile, tools/README, tools/git2cl: Make the Makefile targets
 	work with git insted of cvs. Added tools\git2cl perl script to
 	create ChangeLog from a git repository
