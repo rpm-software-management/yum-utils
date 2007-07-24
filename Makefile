@@ -5,12 +5,11 @@ VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
 WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
-CVS_TAG = ${PKGNAME}-$(shell echo $(VERSION) | sed -e 's/\./-/g')
-
 
 clean:
 	rm -f *.pyc *.pyo *~
 	rm -f test/*~
+	rm -f *.tar.gz
 
 install:
 	mkdir -p $(DESTDIR)/usr/bin/
@@ -28,6 +27,7 @@ archive:
 	@rm -f /tmp/${PKGNAME}/${PKGNAME}-daily.spec
 	@mv /tmp/${PKGNAME} /tmp/${PKGNAME}-$(VERSION)
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)/.git
+	@rm -rf /tmp/${PKGNAME}-$(VERSION)/tools	
 	@dir=$$PWD; cd /tmp; tar cvzf $$dir/${PKGNAME}-$(VERSION).tar.gz ${PKGNAME}-$(VERSION)
 	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
@@ -37,10 +37,11 @@ srpm: archive
 	rpmbuild -ts  ${PKGNAME}-${VERSION}.tar.gz
 
 release:
-	@cvs commit -m "bumped yum-utils version to $(VERSION)"
+	@git commit -a -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
-	@cvs commit -m "updated ChangeLog"
-	@cvs tag $(CVS_TAG)
+	@git commit -a -m "updated ChangeLog"
+	@git tag  ${PKGNAME}-$(VERSION)
+	@git push
 	@$(MAKE) upload
 	
 upload: archive srpm
@@ -49,7 +50,7 @@ upload: archive srpm
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
 ChangeLog: FORCE
-	@cvs2cl --utc --follow trunk
+	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	
 	
 FORCE:	
