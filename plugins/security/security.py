@@ -338,10 +338,27 @@ def exclude_hook(conduit):
         conduit.delPackage(pkg)
 
     used_map = ysp_gen_used_map(opts)
-    for pkg in conduit.getPackages():
-        if not ysp_should_keep_pkg(opts, pkg, md_info, used_map):
+    # The official API is:
+    #
+    # pkgs = conduit.getPackages()
+    #
+    # ...however that is _extremely_ slow, deleting all packages. So we ask
+    # for the list of update packages, which is all we care about.
+    upds = conduit._base.doPackageLists(pkgnarrow='updates')
+    pkgs = upds.updates
+    tot = 0
+    cnt = 0
+    for pkg in pkgs:
+        tot += 1
+        if ysp_should_keep_pkg(opts, pkg, md_info, used_map):
+            cnt += 1
+        else:
             ysp_del_pkg(pkg)
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
+    if cnt:
+        conduit.info(2, 'Needed %d of %d packages, for security' % (cnt, tot))
+    else:
+        conduit.info(2, 'No packages needed, for security, %d available' % tot)
             
 def preresolve_hook(conduit):
     '''
@@ -366,11 +383,13 @@ def preresolve_hook(conduit):
                      (tspkg.po,tspkg.po.repoid))
         tsinfo.remove(tspkg.pkgtup)
 
+    tot = 0
     cnt = 0
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
     tspkgs = tsinfo.getMembers()
     for tspkg in tspkgs:
+        tot += 1
         if not ysp_should_keep_pkg(opts, tspkg.po, md_info, used_map):
             ysp_del_pkg(tspkg)
         else:
@@ -378,9 +397,9 @@ def preresolve_hook(conduit):
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
     if cnt:
-        conduit.info(2, 'Needed %d packages, for security' % (cnt))
+        conduit.info(2, 'Needed %d of %d packages, for security' % (cnt, tot))
     else:
-        conduit.info(2, 'No packages needed, for security')
+        conduit.info(2, 'No packages needed, for security, %d available' % tot)
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"
