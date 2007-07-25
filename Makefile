@@ -22,14 +22,7 @@ install:
 
 archive:
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
-	@rm -rf /tmp/${PKGNAME}-$(VERSION) /tmp/${PKGNAME}
-	@dir=$$PWD; cd /tmp; cp -a $$dir ${PKGNAME}
-	@rm -f /tmp/${PKGNAME}/${PKGNAME}-daily.spec
-	@mv /tmp/${PKGNAME} /tmp/${PKGNAME}-$(VERSION)
-	@rm -rf /tmp/${PKGNAME}-$(VERSION)/.git
-	@rm -rf /tmp/${PKGNAME}-$(VERSION)/tools	
-	@dir=$$PWD; cd /tmp; tar cvzf $$dir/${PKGNAME}-$(VERSION).tar.gz ${PKGNAME}-$(VERSION)
-	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
+	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	
 srpm: archive
