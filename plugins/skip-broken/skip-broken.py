@@ -37,6 +37,10 @@ class CheckDependency:
     def resetTs(self):
         '''Clear the current tsInfo Transaction Set'''
         # clear current tsInfo, we want a empty one.
+        # FIXME: Dirty Hack, remove it later when then problem dont occour any more.
+        # remove depsolver cache.
+        if hasattr(self,"dcobj"):
+            del self.dcobj            
         del self.base.tsInfo
         self.base.tsInfo = self.base._transactionDataFactory()
         self.base.initActionTs()
