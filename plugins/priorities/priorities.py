@@ -38,10 +38,6 @@
 # priority for repositories is 99. The repositories with the lowest
 # number have the highest priority.
 #
-# If you do not want the plugin to override version checking:
-#
-# check_versions=1
-#
 # Please report errors to Daniel de Kok <danieldk@pobox.com>
 
 from yum.constants import *
@@ -50,16 +46,13 @@ from yum import config
 import yum
 
 check_obsoletes = False
-check_versions = False
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 def config_hook(conduit):
     global check_obsoletes
-    global check_versions
     check_obsoletes = conduit.confBool('main', 'check_obsoletes', default=False)
-    check_versions = conduit.confBool('main', 'check_versions', default=False)
     if yum.__version__ >= '2.5.0':
         # New style : yum >= 2.5
         config.RepoConf.priority = config.IntOption(99)
@@ -85,10 +78,7 @@ def exclude_hook(conduit):
     for repo in allrepos:
         if repo.enabled:
             for po in conduit.getPackages(repo):
-                if check_versions:
-                    key = "%s-%s:%s-%s.%s" % (po.name,po.epoch,po.ver,po.rel,po.arch)
-                else:
-                    key = "%s.%s" % (po.name,po.arch)
+                key = "%s.%s" % (po.name,po.arch)
                 if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
                     conduit.delPackage(po)
                     cnt += 1
@@ -109,10 +99,7 @@ def exclude_hook(conduit):
 def _pkglisttodict(pl, priority):
     out = {}
     for p in pl:
-        if check_versions:
-            key = "%s-%s:%s-%s.%s" % (p.name,p.epoch,p.ver,p.rel,p.arch)
-        else:
-            key = "%s.%s" % (p.name,p.arch)
+        key = "%s.%s" % (p.name,p.arch)
         out[key] = priority
     return out
 
