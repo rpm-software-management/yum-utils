@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# yum-plugin-priorities 0.0.4
+# yum-plugin-priorities 0.0.5
 #
 # Copyright (c) 2006 Daniel de Kok
 #
@@ -67,12 +67,20 @@ def exclude_hook(conduit):
     if check_obsoletes:
         obsoletes = conduit._base.pkgSack.returnObsoletes() 
 
-    # Build a dictionary with package priorities
-    pkg_priorities = {}
+    # Build a dictionary with package priorities. Since we handle obsoletes
+    # archless, also build an archless package priority dictionary for
+    # obsolete handling.
+    pkg_priorities = dict()
+    if check_obsoletes:
+        pkg_priorities_archless = dict() 
     for repo in allrepos:
         if repo.enabled:
-            repopkgs = _pkglisttodict(conduit.getPackages(repo), repo.priority)
+            repopkgs = _pkglist_to_dict(conduit.getPackages(repo), repo.priority)
             _mergeprioritydicts(pkg_priorities, repopkgs)
+
+            if check_obsoletes:
+                repopkgs_archless = _pkglist_to_archless_dict(conduit.getPackages(repo), repo.priority)
+                _mergeprioritydicts(pkg_priorities_archless, repopkgs_archless)
 
     # Eliminate packages that have a low priority
     for repo in allrepos:
@@ -83,24 +91,33 @@ def exclude_hook(conduit):
                     conduit.delPackage(po)
                     cnt += 1
                     conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
-                    
+                
+                # If this packages obsoletes other packages, check whether
+                # one of the obsoleted packages is not available through
+                # a repo with a higher priority. If so, remove this package.
                 if check_obsoletes:
                     if obsoletes.has_key(po.pkgtup):
                         obsolete_pkgs = obsoletes[po.pkgtup]
                         for obsolete_pkg in obsolete_pkgs:
-                            key = "%s.%s" % (obsolete_pkg[0],obsolete_pkg[1])        
-                            if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
+                            pkg_name = obsolete_pkg[0]
+                            if pkg_priorities_archless.has_key(pkg_name) and pkg_priorities_archless[pkg_name] < repo.priority:
                                 conduit.delPackage(po)
                                 cnt += 1
                                 conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
                                 break
     conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
 
-def _pkglisttodict(pl, priority):
-    out = {}
+def _pkglist_to_dict(pl, priority):
+    out = dict()
     for p in pl:
         key = "%s.%s" % (p.name,p.arch)
         out[key] = priority
+    return out
+
+def _pkglist_to_archless_dict(pl, priority):
+    out = dict()
+    for p in pl:
+        out[p.name] = priority
     return out
 
 def _mergeprioritydicts(dict1, dict2):
