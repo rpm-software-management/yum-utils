@@ -175,6 +175,17 @@ automatically protects everything on which yum depends (rpm, python, glibc,
 and so on).Therefore, the plugin functions well even without
 compiling careful lists of all important packages.
 
+%package -n yum-basearchonly
+Summary: Yum plugin to let Yum install only basearch packages.
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-basearchonly
+this plugin makes Yum only install basearch packages on multiarch systems.
+If you type 'yum install foo' on a x68_64 system, only 'foo-x.y.x86_46.rpm' is installed.
+If you want to install the foo-x.y.i386.rpm, you have to type 'yum install foo.i386'.
+The plugin only works with 'yum install'.
+
 
 %prep
 %setup -q
@@ -185,7 +196,10 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf security protect-packages"
+plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
+         downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
+         security protect-packages basearchonly"
+
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
 cd plugins
@@ -309,7 +323,15 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protect-packages.conf
 /usr/lib/yum-plugins/protect-packages.*
 
+%files -n yum-basearchonly
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/basearchonly.conf
+/usr/lib/yum-plugins/basearchonly.*
+
+
 %changelog
+* Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
+- Added basearchonly plugin by Adel Gadllah
 * Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark as 1.1.6
 * Tue Jul 17 2007 Tim Lauridsen <tla@rasmil.dk>
