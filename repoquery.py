@@ -555,7 +555,9 @@ def main(args):
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("--quiet", action="store_true", 
-                      help="quiet (no output to stderr)")
+                      help="quiet (no output to stderr)", default=True)
+    parser.add_option("--verbose", action="store_false",
+                      help="verbose output", dest="quiet")
     parser.add_option("-C", "--cache", action="store_true",
                       help="run from cache only")
     parser.add_option("--tempcache", action="store_true",
@@ -634,10 +636,13 @@ def main(args):
         pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
+
+    # silence initialisation junk from modules etc unless verbose mode
+    initnoise = (not opts.quiet) * 2
     if opts.conffile:
-        repoq.doConfigSetup(fn=opts.conffile)
+        repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise)
     else:
-        repoq.doConfigSetup()
+        repoq.doConfigSetup(debuglevel=initnoise)
         
     # Show what is going on, if --quiet is not set.
     if not opts.quiet:
