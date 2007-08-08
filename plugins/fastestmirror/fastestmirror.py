@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.7
+# Version: 0.2.8
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
@@ -98,10 +98,13 @@ def read_timedhosts():
 
 def write_timedhosts():
     global timedhosts
-    hostfile = file(hostfilepath, 'w')
-    for host in timedhosts.keys():
-        hostfile.write('%s %s\n' % (host, timedhosts[host]))
-    hostfile.close()
+    try:
+        hostfile = file(hostfilepath, 'w')
+        for host in timedhosts.keys():
+            hostfile.write('%s %s\n' % (host, timedhosts[host]))
+        hostfile.close()
+    except IOError:
+        pass
 
 def get_hostfile_age():
     global hostfilepath

@@ -1,3 +1,8 @@
+* Aug  8 2007 Luke Macken <lmacken@redhat.com> - 0.2.8
+- Add patch from Christopher Aillon to fail quietly when fastestmirror does
+  not have write access to the timed hostfile.
+  https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=237034
+
 * Apr 19 2007 Luke Macken <lmacken@redhat.com> - 0.2.7
 - Remove TYPE_{INTERFACE,INTERACTIVE}
 
