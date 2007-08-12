@@ -86,7 +86,7 @@ def main():
                 pkg = base.returnPackageByDep(dep)
                 if not base.rpmdb.installed(name=pkg.name):
                     base.tsInfo.addInstall(pkg)
-            except yum.Errors.PackageSackError, e:
+            except yum.Errors.YumBaseError, e:
                 logger.error("Error: %s" % e)
                 sys.exit(1)
                     
