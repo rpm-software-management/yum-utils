@@ -353,10 +353,15 @@ class YumBaseQuery(yum.YumBase):
 
         return pkgs
 
-    def returnPackagesByDep(self, depstring):
+    def returnPackagesByDepStr(self, depstring):
         provider = []
         try:
-            provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
+            # XXX rhbz#246519, for some reason returnPackagesByDep() fails
+            # to find some root level directories while 
+            # searchPackageProvides() does... use that for now
+            matches = yum.YumBase.searchPackageProvides(self, [depstring])
+            provider = matches.keys()
+            # provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
         except yum.Errors.YumBaseError, err:
             self.logger.error("No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
@@ -432,7 +437,7 @@ class YumBaseQuery(yum.YumBase):
         return grps
 
     def fmt_whatprovides(self, name, **kw):
-        return self.returnPackagesByDep(name)
+        return self.returnPackagesByDepStr(name)
 
     def fmt_whatrequires(self, name, **kw):
         pkgs = {}
