@@ -83,7 +83,8 @@ class DebugInfoInstall(YumUtilBase):
         # look through that pkgs' deps
         # add all the debuginfos for the pkgs providing those deps
         for pkgglob in self.cmds:
-            for po in self.rpmdb.matchPackageNames(pkgglob, casematch=True):
+            e, m, u = self.rpmdb.matchPackageNames([pkgglob])
+            for po in e + m:
                 try:
                     self.di_try_install(po)
                 except yum.Errors.InstallError, e:
