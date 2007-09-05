@@ -81,6 +81,10 @@ convertmap = { 'date': sec2date,
              }
 
 def rpmevr(e, v, r):
+    """
+    Given epoch, version and release strings, return one string
+    representing the combination, possibly omitting any of the three.
+    """
     et = ""
     vt = ""
     rt = ""
@@ -99,6 +103,16 @@ class queryError(exceptions.Exception):
 
 # abstract class
 class pkgQuery:
+    """
+    My implementation of __getitem__ either forwards to an implementation
+    of fmt_(name), or to self.pkg.returnSimple(), allowing subclasses
+    to override the package's items.
+
+    @type pkg: L{yum.package.YumAvailablePackage}
+    @ivar qf:  the query format for this package query
+    @type qf:  str
+    """
+
     def __init__(self, pkg, qf):
         self.pkg = pkg
         self.qf = qf
@@ -149,6 +163,18 @@ class pkgQuery:
     def isSource(self):
         return self["arch"] == "src"
 
+    def prco(self, what, **kw):
+        """
+        Query for the provides/requires/conflicts/obsoletes of this package.
+
+        @param what: one of provides, requires, conflicts, obsoletes
+        @type  what: str
+
+        @rtype: list of str
+        """
+        # for subclasses to implement
+        raise NotImplementedError
+
     def fmt_queryformat(self):
 
         if not self.qf:
@@ -178,6 +204,9 @@ class pkgQuery:
         return "\n".join(self.files())
 
 class repoPkgQuery(pkgQuery):
+    """
+    I wrap a query of a non-installed package available in the repository.
+    """
     def __init__(self, pkg, qf):
         pkgQuery.__init__(self, pkg, qf)
         self.classname = 'repo pkg'
@@ -212,6 +241,10 @@ class repoPkgQuery(pkgQuery):
         return "\n".join(changelog)
 
 class instPkgQuery(pkgQuery):
+    """
+    I wrap a query of an installed package 
+    of type L{yum.packages.YumInstalledPackage}
+    """
     # hmm, thought there'd be more things in need of mapping to rpm names :)
     tagmap = { 'installedsize': 'size',
              }
@@ -306,6 +339,11 @@ class groupQuery:
 
 class YumBaseQuery(yum.YumBase):
     def __init__(self, pkgops = [], sackops = [], options = None):
+        """
+        @type  pkgops:  list of str
+        @type  sackops: list of str
+        @type  options: L{optparse.Values}
+        """
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoquery")
         self.options = options
@@ -313,6 +351,13 @@ class YumBaseQuery(yum.YumBase):
         self.sackops = sackops
 
     def queryPkgFactory(self, pkgs):
+        """
+        For each given package, create a query.
+
+        @type  pkgs: list of L{yum.package.YumAvailablePackage}
+
+        @rtype: list of L{queryPkg}
+        """
         qf = self.options.queryformat or std_qf["nevra"]
         qpkgs = []
         for pkg in pkgs:
@@ -324,6 +369,13 @@ class YumBaseQuery(yum.YumBase):
         return qpkgs
 
     def returnByName(self, name):
+        """
+        Given a name, return a list of package queries matching the name.
+
+        @type  name: str
+
+        @rtype: list of L{queryPkg}
+        """
         pkgs = []
         try:
             exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
@@ -335,6 +387,7 @@ class YumBaseQuery(yum.YumBase):
     def returnPkgList(self):
         pkgs = []
         if self.options.pkgnarrow == "repos":
+            # self.pkgSack is a yum.packageSack.MetaSack
             if self.conf.showdupesfromrepos:
                 pkgs = self.pkgSack.returnPackages()
             else:
@@ -441,19 +494,30 @@ class YumBaseQuery(yum.YumBase):
 
     def fmt_whatrequires(self, name, **kw):
         pkgs = {}
-        provs = [name]
-                
-        if self.options.alldeps:
-            for pkg in self.returnByName(name):
-                provs.extend(pkg.prco("provides"))
-                provs.extend(pkg.files())
+        done = [] # keep track of names we have already visited
 
-        for prov in provs:
-            # Only look at the providing name, not the whole version. This 
-            # might occasionally give some false positives but that's 
-            # better than missing ones which it had previously
-            for pkg in self.pkgSack.searchRequires(prov.split()[0]):
-                pkgs[pkg.pkgtup] = pkg
+        def require_recursive(name):
+            if name in done:
+                return
+            done.append(name)
+
+            provs = [name]
+                    
+            if self.options.alldeps:
+                for pkg in self.returnByName(name):
+                    provs.extend(pkg.prco("provides"))
+                    provs.extend(pkg.files())
+
+            for prov in provs:
+                # Only look at the providing name, not the whole version. This 
+                # might occasionally give some false positives but that's 
+                # better than missing ones which it had previously
+                for pkg in self.pkgSack.searchRequires(prov.split()[0]):
+                    pkgs[pkg.pkgtup] = pkg
+                    if self.options.recursive:
+                        require_recursive(pkg.name)
+
+        require_recursive(name)
         return self.queryPkgFactory(pkgs.values())
 
     def fmt_whatobsoletes(self, name, **kw):
@@ -536,7 +600,9 @@ def main(args):
     parser.add_option("--resolve", action="store_true",
                       help="resolve capabilities to originating package(s)")
     parser.add_option("--alldeps", action="store_true",
-                      help="check non-explicit dependencies as well")
+                      help="check non-explicit dependencies (files and Provides:) as well")
+    parser.add_option("--recursive", action="store_true",
+                      help="recursively query for packages (for whatrequires)")
     parser.add_option("--whatprovides", action="store_true",
                       help="query what package(s) provide a capability")
     parser.add_option("--whatrequires", action="store_true",
