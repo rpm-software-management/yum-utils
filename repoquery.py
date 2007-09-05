@@ -650,7 +650,7 @@ def main(args):
         repoq.doConfigSetup(debuglevel=initnoise)
         
     # Show what is going on, if --quiet is not set.
-    if not opts.quiet:
+    if not opts.quiet and sys.stdout.isatty():
         repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
         repoq.repos.callback = output.CacheProgressCallback()
         yumout = output.YumOutput()
