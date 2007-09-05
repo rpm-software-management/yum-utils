@@ -24,6 +24,7 @@ import re
 import fnmatch
 import time
 import os
+import os.path
 import exceptions
 
 from optparse import OptionParser
@@ -625,6 +626,8 @@ def main(args):
                       help="show all versions of packages")
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("--repofrompath", action="append",
+                      help="specify paths of additional repositories - complete path required, can be specified multiple times.")
     parser.add_option("--quiet", action="store_true", 
                       help="quiet (no output to stderr)", default=True)
     parser.add_option("--verbose", action="store_false",
@@ -714,6 +717,26 @@ def main(args):
         repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise)
     else:
         repoq.doConfigSetup(debuglevel=initnoise)
+
+    if opts.repofrompath:
+        # setup the fake repos
+        for repopath in opts.repofrompath:
+            if repopath[0] == '/':
+                baseurl = 'file://' + repopath
+            else:
+                baseurl = repopath
+                
+            # get some kind of name - use the last dir name in the path
+            repopath = os.path.normpath(repopath)
+            repoid = repopath.split('/')[-1]
+            
+            newrepo = yum.yumRepo.YumRepository(repoid)
+            newrepo.name = repopath
+            newrepo.baseurl = baseurl
+            newrepo.basecachedir = repoq.conf.cachedir
+            repoq.repos.add(newrepo)
+            repoq.repos.enableRepo(newrepo.id)
+
         
     # Show what is going on, if --quiet is not set.
     if not opts.quiet and sys.stdout.isatty():
@@ -738,7 +761,7 @@ def main(args):
 
     if opts.show_dupes:
         repoq.conf.showdupesfromrepos = True
-
+            
     if opts.repoid:
         for repo in repoq.repos.findRepos('*'):
             if repo.id not in opts.repoid:
@@ -747,7 +770,7 @@ def main(args):
                 repo.enable()
 
     repoq.doRepoSetup()
-
+    
     for exp in regexs:
         if exp.endswith('.src'):
             needsource = 1
