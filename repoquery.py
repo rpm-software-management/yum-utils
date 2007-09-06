@@ -720,22 +720,21 @@ def main(args):
 
     if opts.repofrompath:
         # setup the fake repos
-        for repopath in opts.repofrompath:
+        for repo in opts.repofrompath:
+            repoid,repopath = tuple(repo.split(','))
             if repopath[0] == '/':
                 baseurl = 'file://' + repopath
             else:
                 baseurl = repopath
                 
-            # get some kind of name - use the last dir name in the path
             repopath = os.path.normpath(repopath)
-            repoid = repopath.split('/')[-1]
-            
             newrepo = yum.yumRepo.YumRepository(repoid)
             newrepo.name = repopath
             newrepo.baseurl = baseurl
             newrepo.basecachedir = repoq.conf.cachedir
             repoq.repos.add(newrepo)
             repoq.repos.enableRepo(newrepo.id)
+            repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
         
     # Show what is going on, if --quiet is not set.
