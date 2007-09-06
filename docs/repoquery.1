@@ -20,14 +20,11 @@ Report program version and exit.
 Specify which repository to query. Using this option disables all repositories
 not explicitly enabled with --repoid option (can be used multiple times). By
 default repoquery uses whatever repositories are enabled in YUM configuration.
-.IP "\fB\-\-repofrompath=<path/url>\fP"
+.IP "\fB\-\-repofrompath=<repoid>,<path/url>\fP"
 Specify a path or url to a repository (same path as in a baseurl) to add to
 the repositories for this query. This option can be used multiple times. If
 you want to view only the pkgs from this repository combine this with
---repoid. The repoid of the paths specified are the last directory path
-segment. So if the path you specified was: '/some/place/named/my_repo/' then
-the repoid would be 'my_repo'. If the path was: 'http://server/path/my_repo'
-then the repoid would also by 'my_repo'. 
+--repoid. The repoid for the repository is specified by <repoid>.
 .IP "\fB\-q\fP"
 For rpmquery compatibility, doesn't do anything.
 .IP "\fB\-h, \-\-help\fP"

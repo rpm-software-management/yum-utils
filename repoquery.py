@@ -627,7 +627,7 @@ def main(args):
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("--repofrompath", action="append",
-                      help="specify paths of additional repositories - complete path required, can be specified multiple times.")
+                      help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
     parser.add_option("--quiet", action="store_true", 
                       help="quiet (no output to stderr)", default=True)
     parser.add_option("--verbose", action="store_false",
