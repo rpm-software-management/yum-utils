@@ -42,7 +42,7 @@ class CheckDependency:
         if hasattr(self,"dcobj"):
             del self.dcobj            
         del self.base.tsInfo
-        self.base.tsInfo = self.base._transactionDataFactory()
+        self.base.tsInfo # make the new one magically appear
         self.base.initActionTs()
 
     def preDepCheck(self):
