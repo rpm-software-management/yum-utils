@@ -113,6 +113,8 @@ def parseArgs():
         help="Download only newest packages per-repo")
     parser.add_option("-q", "--quiet", default=False, action="store_true", 
         help="Output as little as possible")
+    parser.add_option("-l", "--plugins", default=False, action="store_true", 
+        help="enable yum plugin support")
         
     (opts, args) = parser.parse_args()
     return (opts, args)
@@ -133,7 +135,7 @@ def main():
         sys.exit(1)
         
     my = RepoSync(opts=opts)
-    my.doConfigSetup(fn=opts.config, init_plugins=False)
+    my.doConfigSetup(fn=opts.config, init_plugins=opts.plugins)
 
     # Force unprivileged users to have a private temporary cachedir
     # if they've not given an explicit cachedir
