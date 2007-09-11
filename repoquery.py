@@ -628,6 +628,8 @@ def main(args):
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("--repofrompath", action="append",
                       help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
+    parser.add_option("--plugins", action="store_true", default=False,
+                      help="enable yum plugin support")
     parser.add_option("--quiet", action="store_true", 
                       help="quiet (no output to stderr)", default=True)
     parser.add_option("--verbose", action="store_false",
@@ -714,9 +716,9 @@ def main(args):
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
     if opts.conffile:
-        repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise)
+        repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
     else:
-        repoq.doConfigSetup(debuglevel=initnoise)
+        repoq.doConfigSetup(debuglevel=initnoise, init_plugins=opts.plugins)
 
     if opts.repofrompath:
         # setup the fake repos
