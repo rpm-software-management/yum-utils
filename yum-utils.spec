@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.6
+Version: 1.1.7
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -330,6 +330,9 @@ fi
 
 
 %changelog
+
+* Mon Sep 10 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark as 1.1.7
 * Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
 - Added basearchonly plugin by Adel Gadllah
 * Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>

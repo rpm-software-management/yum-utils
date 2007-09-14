@@ -1,3 +1,122 @@
+2007-09-10  Tim Lauridsen <tim@localhost.localdomain>
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.7
+
+2007-09-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/skip-broken/skip-broken.py: closes rh bug 281881 - don't
+	traceback when skip-broken is enabled
+
+2007-09-06  Tim Lauridsen <tla@rasmil.dk>
+
+	* docs/repoquery.1, repoquery.py: Fixed repoquery help & manpage
+	with --repofrompath=<repoid>,<url / path>
+
+2007-09-06  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Make the --repofrompath take a repoid, so we know
+	what to call the repo'
+
+2007-09-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/repoquery.1, repoquery.py: add --repofrompath and docs to
+	repoquery --repofrompath allows repoquery to query arbitrary paths
+	as repositories
+
+2007-09-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: merge --recursive patch from Thomas Vander-Stichele
+
+
+2007-09-05  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Added patch by Bill Nottingham to silence
+	progressbars in pipes
+
+2007-09-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make debuginfo-install use function for
+	matching correctly
+
+2007-08-17  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Added patch by Panu (rhbz #246519) to make repoquery
+	--whatprovides work with root level directories.
+
+2007-08-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: change exception from PackageSackError to
+	YumBaseError to close rh bug #251827
+
+2007-08-08  Luke Macken <lmacken@crow.(none)>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: - Add patch from Christopher Aillon to fail quietly when
+	fastestmirror does   not have write access to the timed hostfile.
+	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=237034
+
+2007-08-04  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Repoquery wants to have quiet output by default,
+	it's mostly used in scripts where you don't want any extra junk in
+	the output: - add --verbose option, default to quiet - honor quiet
+	on initialization to avoid messages from plugins as well
+
+2007-08-01  Tim Lauridsen <tla@rasmil.dk>
+
+	* .gitignore: Added .gitignore
+
+2007-08-01  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added basearchonly by Adel Gadllah to the spec
+	file
+
+2007-07-31  Tim Lauridsen <tla@rasmil.dk>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils
+
+2007-07-31  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/basearchonly/basearchonly.conf,
+	plugins/basearchonly/basearchonly.py: Added basearchonly plugin
+	files
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: fixed obsoletes handling (rhbz
+	#247246)
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: revert the latest check_version,
+	it is not totally sane
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: Added full version support to
+	priorities plugin (rhbz #249991) Use 'check_versions=1' in
+	priorities.conf to use full nerva check, insted of the default na
+	check.
+
+2007-07-26  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: Make skip-broken work again by
+	deleting depsolver cache in each run.
+
+2007-07-25  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: changed 'archive' Makefile target to work with
+	git-archive (HEAD)
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Fixed git tagging & pushing to work right
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
 2007-07-24  Tim Lauridsen <tla@rasmil.dk>
 
 	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.6
