@@ -236,7 +236,12 @@ fi
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
-%{_mandir}/man1/*
+%{_mandir}/man1/package-cleanup.1.*
+%{_mandir}/man1/repo-rss.1.*
+%{_mandir}/man1/repoquery.1.*
+%{_mandir}/man1/reposync.1.*
+%{_mandir}/man1/yum-builddep.1.*
+%{_mandir}/man1/yumdownloader.1.*
 
 %files -n yum-updateonboot
 %defattr(-, root, root)
@@ -331,6 +336,8 @@ fi
 
 %changelog
 
+* Mon Sep 14 2007 Tim Lauridsen <tla@rasmil.dk>
+- do not use wildcards for manpages in yum-utils files section to avoid duplicates
 * Mon Sep 10 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark as 1.1.7
 * Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
