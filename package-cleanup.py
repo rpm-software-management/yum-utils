@@ -101,8 +101,12 @@ def buildProviderList(my, pkgs, reportProblems):
                 # Store the resolve_sack so that we can re-use it if another
                 # package has the same requirement
                 providers[(req,rflags,ver)] = resolve_sack
-    if not errors and reportProblems:
-        print "No problems found"
+    if reportProblems:
+        if errors:
+            sys.exit(1)
+        else:
+            print "No problems found"
+            sys.exit(0)
     return provsomething
 
 def findDupes(my):
