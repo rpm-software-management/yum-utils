@@ -177,6 +177,9 @@ class SecurityListCommands:
                 msg(" %s %-8s %s" % (str(ref['id']), md['type'], pkg))
         else:
             msg("%s %-8s %s" % (md['update_id'], md['type'], pkg))
+
+    def show_pkg_exit(self):
+        pass
             
     def doCommand(self, base, basecmd, extcmds):
         ygh = base.doPackageLists('updates')
@@ -234,16 +237,24 @@ class SecurityListCommands:
             self.show_pkg(msg, pkg, md, show_type)
         ysp_chk_used_map(used_map, msg)
 
+        self.show_pkg_exit()
         return 0, [basecmd + ' done']
             
 class SecurityInfoCommands(SecurityListCommands):
+    show_pkg_info_done = {}
     def getNames(self):
         return ['info-security', 'info-sec']
 
     def show_pkg(self, msg, pkg, md, disp=None):
+        if md['update_id'] in self.show_pkg_info_done:
+            return
+        self.show_pkg_info_done[md['update_id']] = True
         msg(md)
         msg('')
     
+    def show_pkg_exit(self):
+        self.show_pkg_info_done = {}
+            
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
