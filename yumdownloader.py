@@ -158,7 +158,7 @@ class YumDownloader(YumUtilBase):
                 repo = self.repos.getRepo(download.repoid)
                 remote = download.returnSimple('relativepath')
                 if opts.urls:
-                    url = urljoin(repo.urls[0],remote)
+                    url = urljoin(repo.urls[0]+'/',remote)
                     self.logger.info('%s' % url)
                     continue
                 local = os.path.basename(remote)
