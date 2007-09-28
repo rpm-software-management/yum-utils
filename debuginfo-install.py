@@ -47,6 +47,9 @@ class DebugInfoInstall(YumUtilBase):
             parser.print_help()
             sys.exit(0)
 
+        # Setup yum (Ts, RPM db, Repo & Sack)
+        self.doUtilYumSetup()
+        
         # enable the -debuginfo repos for enabled primary repos
         for repo in self.repos.listEnabled():
             di = '%s-debuginfo' % repo.id
