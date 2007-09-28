@@ -26,18 +26,18 @@ def postreposetup_hook(conduit):
     global repos_setup
     repos_setup = True
 
-def close_hook(conduit):
+def posttrans_hook(conduit):
     if not repos_setup:
         return
 
     try:
         bus = dbus.SystemBus()
     except dbus.DBusException:
-        conduit.error(2, "Unable to connect to dbus")
+        conduit.info(2, "Unable to connect to dbus")
         return
     try:
         updatesd_proxy = bus.get_object('edu.duke.linux.yum', '/Updatesd')
         updatesd_iface = dbus.Interface(updatesd_proxy, 'edu.duke.linux.yum')
         updatesd_iface.CheckNow()
     except dbus.DBusException:
-        conduit.error(2, "Unable to send message to yum-updatesd")
+        conduit.info(2, "Unable to send message to yum-updatesd")
