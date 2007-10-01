@@ -12,7 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# version 0.0.3
+# version 0.0.4
 
 import dbus
 from yum.plugins import TYPE_CORE
@@ -20,16 +20,7 @@ from yum.plugins import TYPE_CORE
 requires_api_version = '2.5'
 plugin_type = TYPE_CORE
 
-repos_setup = False
-
-def postreposetup_hook(conduit):
-    global repos_setup
-    repos_setup = True
-
 def posttrans_hook(conduit):
-    if not repos_setup:
-        return
-
     try:
         bus = dbus.SystemBus()
     except dbus.DBusException:
