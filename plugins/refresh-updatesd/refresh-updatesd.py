@@ -1,4 +1,4 @@
-# A plugin for yum which notifies yum-updatesd to refresh it's data
+# A plugin for yum which notifies yum-updatesd to refresh its data
 #
 # Written by James Bowes <jbowes@redhat.com>
 #
@@ -21,6 +21,9 @@ requires_api_version = '2.5'
 plugin_type = TYPE_CORE
 
 def posttrans_hook(conduit):
+    """
+    Tell yum-updatesd to refresh its state. Run only after an rpm transaction.
+    """
     try:
         bus = dbus.SystemBus()
     except dbus.DBusException:

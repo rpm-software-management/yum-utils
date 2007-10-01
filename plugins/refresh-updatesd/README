@@ -1,8 +1,8 @@
 This is refresh-updatesd, a plugin for Yum.
 
-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
-This way, if you run 'yum list updates' and yum says there's a new version
-of zsh available, puplet will almost instantly update itself to reflect this.
+refresh-updatesd tells yum-updatesd to check for updates when yum exits. This
+way, if you run 'yum update' and install all available updates, puplet will
+almost instantly update itself to reflect this.
 
-The plugin is very dumb, It should probably only send the message in
-certain cases.
+The plugin is very dumb, It should probably send a message when yum detects
+updated packages as well.

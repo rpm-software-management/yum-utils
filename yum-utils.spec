@@ -138,9 +138,8 @@ Requires: yum-updatesd
 
 %description -n yum-refresh-updatesd
 yum-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
-This way, if you run 'yum list updates' and yum says there's a new version
-of (for example) zsh available, puplet will almost instantly update itself
-to reflect this.
+This way, if you run 'yum update' and install all available updates, puplet
+will almost instantly update itself to reflect this.
 
 %package -n yum-merge-conf
 Summary: Yum plugin to merge configuration changes when installing packages
@@ -335,6 +334,8 @@ fi
 
 
 %changelog
+* Sun Sep 30 2007 James Bowes <jbowes@redhat.com>
+- Update the yum-refresh-updatesd description
 
 * Mon Sep 14 2007 Tim Lauridsen <tla@rasmil.dk>
 - do not use wildcards for manpages in yum-utils files section to avoid duplicates
