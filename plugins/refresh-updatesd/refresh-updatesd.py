@@ -12,7 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# version 0.0.4
+# version 0.0.5
 
 import dbus
 from yum.plugins import TYPE_CORE
@@ -28,6 +28,14 @@ def posttrans_hook(conduit):
         bus = dbus.SystemBus()
     except dbus.DBusException:
         conduit.info(2, "Unable to connect to dbus")
+        return
+    try:
+        o = bus.get_object('org.freedesktop.DBus', '/')
+        if not o.NameHasOwner("edu.duke.linux.yum"):
+            conduit.info(2, "yum-updatesd not on the bus")
+            return
+    except dbus.DBusException:
+        conduit.info(2, "Unable to look at what's on dbus")
         return
     try:
         updatesd_proxy = bus.get_object('edu.duke.linux.yum', '/Updatesd')
