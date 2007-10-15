@@ -182,7 +182,11 @@ def main(options, args):
     days = options.days
     repoids = args
     my = YumQuiet()
-    my.doConfigSetup(init_plugins=False)
+    if options.config:
+        my.doConfigSetup(init_plugins=False, fn=options.config)
+    else:
+        my.doConfigSetup(init_plugins=False)
+
     if os.geteuid() != 0 or options.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
@@ -269,7 +273,8 @@ if __name__ == "__main__":
                       help="Generate one feed per package group")
     parser.add_option("-a", action='append', dest='arches', default=[],
                       help="arches to use - can be listed more than once")
-
+    parser.add_option("-c", action='store', dest='config', default=None,
+                      help="config file")
     (options, args) = parser.parse_args()
 
     main(options, args)
