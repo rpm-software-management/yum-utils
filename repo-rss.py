@@ -124,7 +124,7 @@ class RepoRSS:
         item.newChild(None, 'title', title)
         date = time.gmtime(float(pkg.returnSimple('buildtime')))
         item.newChild(None, 'pubDate', time.strftime(rfc822_format, date))
-        item.newChild(None, 'guid', pkg.returnSimple('id'))
+        item.newChild(None, 'guid', pkg.returnSimple('id')).setProp("isPermaLink", "false")        
         link = url + '/' + pkg.returnSimple('relativepath')
         item.newChild(None, 'link', escape(link))
     
@@ -198,13 +198,17 @@ def main(options, args):
                 repo.enable()
 
     try:
-        my.doRepoSetup()
+        my._getRepos()
     except yum.Errors.RepoError, e:
         print >> sys.stderr, '%s' % e
         print 'Cannot continue'
         sys.exit(1)
     print 'Reading in repository metadata - please wait....'
-    my.doSackSetup()
+    if len(options.arches):
+        my._getSacks(archlist=options.arches)
+    else:
+        my._getSacks()
+
     for repo in my.repos.listEnabled():
             
         try:
@@ -263,6 +267,8 @@ if __name__ == "__main__":
                       help="Use a temp dir for storing/accessing yum-cache")
     parser.add_option("-g", action='store_true', dest='groups', default=False,
                       help="Generate one feed per package group")
+    parser.add_option("-a", action='append', dest='arches', default=[],
+                      help="arches to use - can be listed more than once")
 
     (options, args) = parser.parse_args()
 
