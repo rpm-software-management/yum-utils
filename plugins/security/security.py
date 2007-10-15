@@ -37,6 +37,7 @@
 import yum
 import time
 import textwrap
+import fnmatch
 import sys
 from yum.plugins import TYPE_INTERACTIVE
 from yum.update_md import UpdateMetadata
@@ -80,8 +81,19 @@ def ysp_should_filter_pkg(opts, pkg, md, used_map):
             used_map[ref_type][ref['id']] = True
             return ref
         return None
-
-    if opts.advisory and md['update_id'] in opts.advisory:
+    def match_sec_cmd(sec_cmds, pkg, md):
+        for i in sec_cmds:
+            if fnmatch.fnmatch(pkg.name, i):
+                return i
+            if md['update_id'] == i:
+                return i
+        return None
+    
+    rcmd = match_sec_cmd(opts.sec_cmds, pkg, md)
+    if rcmd:
+        used_map['cmd'][rcmd] = True
+        return md        
+    elif opts.advisory and md['update_id'] in opts.advisory:
         used_map['id'][md['update_id']] = True
         return md
     elif opts.cve and has_id(md['references'], "cve", opts.cve):
@@ -91,7 +103,8 @@ def ysp_should_filter_pkg(opts, pkg, md, used_map):
     elif opts.security:
         if md['type'] == 'security':
             return md
-    elif not (opts.advisory or opts.cve or opts.bz or opts.security):
+    elif not (opts.advisory or opts.cve or opts.bz or opts.security or \
+              opts.sec_cmds):
         return md # This is only possible from should_show_pkg
     return None
 
@@ -116,7 +129,9 @@ def ysp_should_show_pkg(opts, pkg, md, used_map, rname=None):
     return ysp_should_filter_pkg(opts, pkg, md, used_map)
 
 def ysp_gen_used_map(opts):
-    used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}}
+    used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}, 'cmd' : {}}
+    for i in opts.sec_cmds:
+        used_map['cmd'][i] = False
     for i in opts.advisory:
         used_map['id'][i] = False
     for i in opts.bz:
@@ -126,6 +141,9 @@ def ysp_gen_used_map(opts):
     return used_map
 
 def ysp_chk_used_map(used_map, msg):
+    for i in used_map['cmd']:
+        if not used_map['cmd'][i]:
+            msg('Argument \"%s\" not found applicable for this system' % i)
     for i in used_map['id']:
         if not used_map['id'][i]:
             msg('Advisory \"%s\" not found applicable for this system' % i)
@@ -159,6 +177,9 @@ class SecurityListCommands:
                 msg(" %s %-8s %s" % (str(ref['id']), md['type'], pkg))
         else:
             msg("%s %-8s %s" % (md['update_id'], md['type'], pkg))
+
+    def show_pkg_exit(self):
+        pass
             
     def doCommand(self, base, basecmd, extcmds):
         ygh = base.doPackageLists('updates')
@@ -171,54 +192,69 @@ class SecurityListCommands:
         def msg_warn(x):
             logger.warn(x)
 
-        opts,cmdline = base.plugins.cmdline
+        opts, cmdline = base.plugins.cmdline
         ygh.updates.sort(key=lambda x: x.name)
+        filt_type = None
+        show_type = None
+        if len(extcmds) >= 1:
+            filt_type = extcmds.pop(0)
+            
+            if False:
+                pass
+
+            elif filt_type == "bugzillas":
+                filt_type = "bugzilla"
+            elif filt_type == "bzs":
+                filt_type = "bugzilla"
+            elif filt_type == "bz":
+                filt_type = "bugzilla"
+            elif filt_type == "bugzilla":
+                pass
+            
+            elif filt_type == "sec":
+                filt_type = "security"
+            elif filt_type == "security":
+                pass
+            
+            elif filt_type == "cves":
+                filt_type = "cve"
+            elif filt_type == "cve":
+                pass
+            else:
+                extcmds = [filt_type] + extcmds
+                filt_type = None
+            show_type = filt_type
+            if filt_type and filt_type == "security":
+                show_type = None
+            
+        opts.sec_cmds = extcmds
         used_map = ysp_gen_used_map(opts)
-        if False:
-            pass
-        elif len(extcmds) == 1 and (extcmds[0] == "bugzillas" or \
-                                    extcmds[0] == "bzs"):
-            for pkg in ygh.updates:
-                md = ysp_should_show_pkg(opts, pkg, md_info, used_map,
-                                         "bugzilla")
-                if not md:
-                    continue
-                self.show_pkg(msg, pkg, md, "bugzilla")
-        elif len(extcmds) == 1 and extcmds[0] == "cves":
-            for pkg in ygh.updates:
-                md = ysp_should_show_pkg(opts, pkg, md_info, used_map, "cve")
-                if not md:
-                    continue
-                self.show_pkg(msg, pkg, md, "cve")
-        elif len(extcmds) == 1 and (extcmds[0] == "security" or \
-                                    extcmds[0] == "sec"):
-            for pkg in ygh.updates:
-                md = ysp_should_show_pkg(opts, pkg, md_info, used_map,
-                                         "security")
-                if not md:
-                    continue
-                self.show_pkg(msg, pkg, md)
-        else:
-            opts.advisory += extcmds
-            used_map = ysp_gen_used_map(opts)
-            for pkg in ygh.updates:
-                md = ysp_should_show_pkg(opts, pkg, md_info, used_map)
-                if not md:
-                    continue                
-                self.show_pkg(msg, pkg, md)
+        for pkg in ygh.updates:
+            md = ysp_should_show_pkg(opts, pkg, md_info, used_map,
+                                     filt_type)
+            if not md:
+                continue
+            self.show_pkg(msg, pkg, md, show_type)
         ysp_chk_used_map(used_map, msg)
-#        else:
-#            return 1, [str(PluginYumExit('Bad %s commands' % basecmd))]
+
+        self.show_pkg_exit()
         return 0, [basecmd + ' done']
             
 class SecurityInfoCommands(SecurityListCommands):
+    show_pkg_info_done = {}
     def getNames(self):
         return ['info-security', 'info-sec']
 
     def show_pkg(self, msg, pkg, md, disp=None):
+        if md['update_id'] in self.show_pkg_info_done:
+            return
+        self.show_pkg_info_done[md['update_id']] = True
         msg(md)
         msg('')
     
+    def show_pkg_exit(self):
+        self.show_pkg_info_done = {}
+            
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
@@ -288,7 +324,7 @@ def ysp_check_func_enter(conduit):
     opts, args = conduit.getCmdLine()
 
     ndata = not (opts.security or opts.advisory or opts.bz or opts.cve)
-
+    
     ret = None
     if len(args) >= 2:
         if ((args[0] == "list") and (args[1] == "updates")):
@@ -337,6 +373,7 @@ def exclude_hook(conduit):
                      (pkg,pkg.repoid))
         conduit.delPackage(pkg)
 
+    opts.sec_cmds = []
     used_map = ysp_gen_used_map(opts)
     # The official API is:
     #
@@ -385,6 +422,7 @@ def preresolve_hook(conduit):
 
     tot = 0
     cnt = 0
+    opts.sec_cmds = []
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
     tspkgs = tsinfo.getMembers()

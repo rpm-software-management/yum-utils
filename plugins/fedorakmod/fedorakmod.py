@@ -26,6 +26,7 @@ from sets import Set
 from yum import packages
 from yum.constants import TS_INSTALL
 from yum.plugins import TYPE_CORE, PluginYumExit
+from rpm import RPMPROB_FILTER_OLDPACKAGE
 
 requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
@@ -224,6 +225,15 @@ def installAllKmods(c, avaModules, modules, kernels):
         for po in group:
             if po.kmodName in names:
                 interesting.append(po)
+
+    # If We have stuff in the interesting list its most likely a kmod for
+    # an older kernel and therefore will have a VR < a VR of a kmod that
+    # may already be installed.  RPM doesn't like installing packages
+    # older than what's already installed.  Tell it to shutup.
+    # XXX: If we thought hard enough we could do this more exactly.
+    if len(interesting) > 0:
+        tsInfo = c.getTsInfo()
+        tsInfo.probFilterFlags.append(RPMPROB_FILTER_OLDPACKAGE)
 
     table = resolveVersions(interesting + modules)
     

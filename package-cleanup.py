@@ -34,11 +34,22 @@ from rpmUtils import miscutils, transaction
 from optparse import OptionParser
 from yum.packages import YumInstalledPackage
 from yum import Errors
+from yum.misc import getCacheDir
+
 
 def initYum(opts):
     my = yum.YumBase()
     my.doConfigSetup(opts.conffile,init_plugins=False)
     if opts.orphans:
+        # make it work as non root user.
+        if my.conf.uid != 0:
+            cachedir = getCacheDir()
+            if cachedir is None:
+                my.logger.error("Error: Could not make cachedir, exiting")
+                sys.exit(50)
+            my.repos.setCacheDir(cachedir)
+            # Turn of cache
+            my.conf.cache = 0
         my.doRepoSetup()
     else:
         # Disable all enabled repositories

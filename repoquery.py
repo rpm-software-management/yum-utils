@@ -413,7 +413,7 @@ class YumBaseQuery(yum.YumBase):
             # XXX rhbz#246519, for some reason returnPackagesByDep() fails
             # to find some root level directories while 
             # searchPackageProvides() does... use that for now
-            matches = yum.YumBase.searchPackageProvides(self, [depstring])
+            matches = yum.YumBase.searchPackageProvides(self, [str(depstring)])
             provider = matches.keys()
             # provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
         except yum.Errors.YumBaseError, err:
