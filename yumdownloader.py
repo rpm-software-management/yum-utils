@@ -74,8 +74,16 @@ class YumDownloader(YumUtilBase):
         # enable the -source repos for enabled primary repos
         archlist = rpmUtils.arch.getArchList() + ['src']    
         for repo in self.repos.listEnabled():
-            srcrepo = '%s-source' % repo.id
+            if not repo.id.endswith('-source'):
+                srcrepo = '%s-source' % repo.id
+            else:
+                repo.close()
+                self.repos.disableRepo(repo.id)
+                srcrepo = repo.id
+            
             for r in self.repos.findRepos(srcrepo):
+                if r in self.repos.listEnabled():
+                    continue
                 self.logger.info('Enabling %s repository' % r.id)
                 r.enable()
                 # Setup the repo, without a cache
@@ -213,4 +221,5 @@ class YumDownloader(YumUtilBase):
         
 if __name__ == '__main__':
     util = YumDownloader()
+        
         
