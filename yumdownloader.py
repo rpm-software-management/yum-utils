@@ -192,7 +192,7 @@ class YumDownloader(YumUtilBase):
                     progress.start(basename=os.path.basename(local),
                                    size=os.stat(path).st_size)
                     shutil.copy2(path, local)
-                    progress.end(progress.size)
+                    progress.end(progress.size) 
    
     # sligly modified from the one in YumUtilBase    
     def doUtilYumSetup(self,opts):
@@ -202,6 +202,11 @@ class YumDownloader(YumUtilBase):
         try:
             self._getTs()
             self._getRpmDB()
+            # if running as non-root and '--source' is specified, then
+            # disable all enabled *-source repos, because we dont want then to be initialized
+            # yet.
+            if self.conf.uid != 0 and opts.source:
+                self._removeEnabledSourceRepos()
             self._getRepos()
             # if '--source' is used the add src to the archlist
             if opts.source:
@@ -213,6 +218,13 @@ class YumDownloader(YumUtilBase):
             self.logger.critical(str(msg))
             sys.exit(1)
 
+    def _removeEnabledSourceRepos(self):
+        ''' Disable all enabled *-source repos.'''
+        for repo in self.repos.listEnabled():
+            if repo.id.endswith('-source'):
+                repo.close()
+                self.repos.disableRepo(repo.id)
+                srcrepo = repo.id
 
     def addCmdOptions(self,parser):
         parser.add_option("--destdir", default=".", dest="destdir",

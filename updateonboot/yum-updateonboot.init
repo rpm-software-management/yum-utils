@@ -7,6 +7,19 @@
 #              specified groups
 #
 
+### BEGIN INIT INFO
+# Provides: lsb-yum-updateonboot
+# Required-Start: $local_fs $network $remote_fs
+# Required-Stop: $local_fs $network $remote_fs
+# Should-Start: 
+# Should-Stop: 
+# Default-Start: 
+# Default-Stop: 
+# Short-Description: start the yum-updateonboot deamon
+# Description: Runs 'yum update' at boot.  Also calls 'yum groupinstall' for \
+#              specified groups     
+### END INIT INFO
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
