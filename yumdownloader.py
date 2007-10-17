@@ -46,7 +46,12 @@ class YumDownloader(YumUtilBase):
         # Add command line option specific to yumdownloader
         self.addCmdOptions(parser)
         # Parse the commandline option and setup the basics.
-        opts = self.doUtilConfigSetup()
+        try:
+            opts = self.doUtilConfigSetup()
+        except yum.Errors.RepoError, e:
+            self.logger.error("Cannot handle specific enablerepo/disablerepo options.")
+            sys.exit(50)
+                
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
             parser.print_help()
