@@ -1,6 +1,161 @@
-2007-09-10  Tim Lauridsen <tim@localhost.localdomain>
+2007-10-17  Tim Lauridsen <timlau@fedoraproject.org>
 
-	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.7
+	* Makefile, yum-utils.spec: bumped yum-utils version to 1.1.8
+
+2007-10-17  Tim Lauridsen <tim@localhost.localdomain>
+
+	* updateonboot/yum-updateonboot.init, yumdownloader.py: Make
+	yumdownloader work as non-root users even if *-source repos is
+	enabled in *.repo files or by --enablerepo.
+
+2007-10-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: catches an error if someone has --enablerepo or
+	--disablerepo set and tries to tell them what to do.
+
+2007-10-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: make sure enabled source repos don't cause
+	yumdownloader --source to not do the right thing
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-rss.py: add config file option to repo-rss
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:
+	provide more verbose failure information with higher debug level
+	check for yum-updatesd being on the bus in case we're using system
+	activation   refresh-updatesd: documentation updates
+	refresh-updatesd: Remove repos_setup check.   refresh-updatesd: some
+	tweaks   fixed issue in debuginfo-install there make it fail with
+	plugins there uses conduit.getPackages() (rhbz #249742)   chmod +x
+	*.py (make it a little easier to test)   fixed UnboundLocalError:
+	local variable 'r_e' referenced before assignment in repoquery
+	(convert unicode -> str)   Make package-cleanup --orphans work as no
+	root (rhbz #253352)   Fixed yumdownloader --url output to show the
+	right url (rhbz #301981)   Allow package name globs on the
+	list-sec/info-sec lines   We need to catch when we install a kmod
+	with a lower VR than a kmod of   Don't print metadata more than once
+
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-rss.py: - apply guid patch from ricky zhou to repo-rss.xml - add -a option
+	to specify arches that repo-rss should use
+
+2007-10-09  Jeremy Katz <katzj@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: provide more verbose
+	failure information with higher debug level
+
+2007-10-09  Jeremy Katz <katzj@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: check for
+	yum-updatesd being on the bus in case we're using system activation
+
+
+2007-09-30  James Bowes <jbowes@redhat.com>
+
+	* plugins/refresh-updatesd/README,
+	plugins/refresh-updatesd/refresh-updatesd.py, yum-utils.spec: 
+	refresh-updatesd: documentation updates
+
+2007-09-30  James Bowes <jbowes@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: refresh-updatesd:
+	Remove repos_setup check.  Since the plugin fires a dbus signal only
+	on posttrans, it will only fire if yum is doing something. This is
+	enough of a check in itself.
+
+2007-09-28  Bill Nottingham <notting@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: refresh-updatesd:
+	some tweaks  1) Be less verbose, as yum-updatesd might not be
+	running 2) Run on posttrans, not close. This stops it continually
+	firing off    when I run repoqeury. (Perhaps repoquery shouldn't
+	initialize    plugins, but...)  Bill
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* debuginfo-install.py: fixed issue in debuginfo-install there make
+	it fail with plugins there uses conduit.getPackages() (rhbz #249742)
+
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* debuginfo-install.py, repo-rss.py, repoclosure.py, repomanage.py,
+	repoquery.py, reposync.py, repotrack.py, yumdownloader.py: chmod +x
+	*.py (make it a little easier to test)
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: fixed UnboundLocalError: local variable 'r_e'
+	referenced before assignment in repoquery (convert unicode -> str)
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Make package-cleanup --orphans work as no root
+	(rhbz #253352)
+
+2007-09-23  Tim Lauridsen <tla@rasmil.dk>
+
+	* yumdownloader.py: Fixed yumdownloader --url output to show the
+	right url (rhbz #301981)
+
+2007-09-19  James Antill <james@code.and.org>
+
+	Fix merge
+
+2007-09-19  Tim Lauridsen <tla@rasmil.dk>
+
+	Merge branch 'yum-sec-upmd-info-uniq' of
+	http://people.redhat.com/jantill/gits/yum-utils
+
+2007-09-19  James Antill <james@code.and.org>
+
+	* plugins/security/security.py: Allow package name globs on the
+	list-sec/info-sec lines
+
+2007-09-19  Jack Neely <jjneely@ncsu.edu>
+
+	* plugins/fedorakmod/fedorakmod.py: We need to catch when we install
+	a kmod with a lower VR than a kmod of the same name that is already
+	installed.  RPM doesn't like this so we need to toss in an extra
+	flag or the transaction wont proccede.
+
+2007-09-19  James Antill <james@code.and.org>
+
+	* plugins/security/security.py: Don't print metadata more than once
+
+
+2007-09-18  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Added patch by Mathew Miller to make
+	package-cleanup return exit code
+
+2007-09-14  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: do not use wildcards for manpages in yum-utils
+	files section to avoid duplicates (rhbz #290171)
+
+2007-09-14  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog, yum-utils.spec: commited yum-utils.spec & Changelog for
+	yum-utils 1.1.7 ( I was some how not committed when i made the
+	release :-(
+
+2007-09-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: add --plugins support to repoquery, too
+
+2007-09-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: add option to enable plugins for reposync (helps with
+	using it with rhn-plugin)
 
 2007-09-07  Seth Vidal <skvidal@fedoraproject.org>
 
