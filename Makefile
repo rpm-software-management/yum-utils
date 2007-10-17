@@ -33,6 +33,7 @@ release:
 	@git commit -a -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
 	@git commit -a -m "updated ChangeLog"
+	@git push
 	@git tag -a ${PKGNAME}-$(VERSION) -m "Tagged ${PKGNAME}-$(VERSION)"
 	@git push --tags
 	@$(MAKE) upload

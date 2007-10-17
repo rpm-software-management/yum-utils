@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.7
+Version: 1.1.8
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -334,6 +334,8 @@ fi
 
 
 %changelog
+* Wed Oct 17 2007 Tim Lauridsen <tla@rasmil.dk>
+- mark as 1.1.8
 * Sun Sep 30 2007 James Bowes <jbowes@redhat.com>
 - Update the yum-refresh-updatesd description
 
