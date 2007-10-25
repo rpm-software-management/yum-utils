@@ -185,7 +185,12 @@ class YumDownloader(YumUtilBase):
                 # Disable cache otherwise things won't download
                 repo.cache = 0
                 download.localpath = local # Hack: to set the localpath we want.
-                path = repo.getPackage(download)
+                try:
+                    path = repo.getPackage(download)
+                except IOError, e:
+                    self.logger.error("Cannot write to file %s. Error was: %s" % (local, e))
+                    continue
+                    
     
                 if not os.path.exists(local) or not os.path.samefile(path, local):
                     progress = TextMeter()
