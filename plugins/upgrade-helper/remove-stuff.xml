@@ -1,0 +1,4 @@
+<cleanup>
+  <removespec pkgmatch="zsh.i386" on_arch="x86_64"/>
+  <removespec pkgmatch="zvbi"/>
+</cleanup>

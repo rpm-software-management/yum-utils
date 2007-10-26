@@ -185,6 +185,15 @@ If you type 'yum install foo' on a x68_64 system, only 'foo-x.y.x86_46.rpm' is i
 If you want to install the foo-x.y.i386.rpm, you have to type 'yum install foo.i386'.
 The plugin only works with 'yum install'.
 
+%package -n yum-upgrade-helper
+Summary: Yum plugin to help upgrades to the next distribution version
+Group: System Environment/Base
+Requires: yum >= 3.0
+
+%description -n yum-upgrade-helper
+this plugin allows yum to erase specific packages on install/update based on an additional
+metadata file in repositories. It is used to simplify distribution upgrade hangups.
+
 
 %prep
 %setup -q
@@ -332,8 +341,15 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/basearchonly.conf
 /usr/lib/yum-plugins/basearchonly.*
 
+%files -n yum-upgrade-helper
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
+/usr/lib/yum-plugins/upgrade-helper.*
+
 
 %changelog
+* Fri Oct 26 2007 Seth Vidal <skvidal at fedoraproject.org>
+- add upgrade-helper plugin
 * Wed Oct 17 2007 Tim Lauridsen <tla@rasmil.dk>
 - mark as 1.1.8
 * Sun Sep 30 2007 James Bowes <jbowes@redhat.com>
