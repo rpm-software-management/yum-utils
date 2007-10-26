@@ -116,8 +116,12 @@ def preresolve_hook(conduit):
             break
     if runme:
         rpmdb = conduit.getRpmDB()
+        # we should probably consider also allowing version-range packagespecs
+        # like foo < 1.1.1-1 by using rpmdb.getProvides() with some other magic
+        # FIXME FOR LATER
         for pkgglob in stuff_to_remove(conduit.getRepos()):
-            for po in rpmdb.matchPackageNames(pkgglob, casematch=True):
+            ex, m, u = rpmdb.matchPackageNames([pkgglob])
+            for po in ex + m:
                 conduit.info(1, "Setting %s to be removed due to repository metadata in cleanup plugin" % po)
                 ts.addErase(po)
 
