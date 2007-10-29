@@ -757,7 +757,8 @@ def main(args):
 
     if opts.cache:
         repoq.conf.cache = True
-        repoq.logger.error('Running from cache, results might be incomplete.')
+        if not opts.quiet:
+            repoq.logger.info('Running from cache, results might be incomplete.')
         
 
     if opts.show_dupes:
