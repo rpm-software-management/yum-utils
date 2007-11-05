@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# yum-plugin-priorities 0.0.5
+# yum-plugin-priorities 0.0.6
 #
-# Copyright (c) 2006 Daniel de Kok
+# Copyright (c) 2006-2007 Daniel de Kok
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,6 +30,12 @@
 #
 # check_obsoletes=1
 #
+# By default, this plugin excludes packages from lower priority repositories
+# based on the package name. If you want to exclude packages based ony the
+# package name and architecture, enable the 'only_samearch' bool:
+#
+# only_samearch=N
+#
 # You can add priorities to repositories, by adding the line:
 #
 # priority=N
@@ -46,13 +52,20 @@ from yum import config
 import yum
 
 check_obsoletes = False
+only_samearch = False
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 def config_hook(conduit):
     global check_obsoletes
-    check_obsoletes = conduit.confBool('main', 'check_obsoletes', default=False)
+    global only_samearch
+
+    # Plugin configuration
+    check_obsoletes = conduit.confBool('main', 'check_obsoletes', default = False)
+    only_samearch = conduit.confBool('main', 'only_samearch', default = False)
+
+    # Repo priorities
     if yum.__version__ >= '2.5.0':
         # New style : yum >= 2.5
         config.RepoConf.priority = config.IntOption(99)
@@ -60,38 +73,62 @@ def config_hook(conduit):
         # Old add extra options style
         conduit.registerOpt('priority', PLUG_OPT_INT, PLUG_OPT_WHERE_REPO, 99)
 
+    # Command-line options.
+    parser = conduit.getOptParser()
+    parser.add_option('', '--samearch-priorities', dest='samearch',
+        action='store_true', default = False,
+        help="Priority-exclude packages based on name + arch")
+
 def exclude_hook(conduit):
+    global only_samearch
+
+    # Check whether the user specified the --samearch option.
+    opts, commands = conduit.getCmdLine()
+    if opts.samearch:
+        only_samearch = True
+
     cnt = 0
     allrepos = conduit.getRepos().listEnabled()
 
     if check_obsoletes:
         obsoletes = conduit._base.pkgSack.returnObsoletes() 
 
-    # Build a dictionary with package priorities. Since we handle obsoletes
-    # archless, also build an archless package priority dictionary for
-    # obsolete handling.
-    pkg_priorities = dict()
-    if check_obsoletes:
+    # Build a dictionary with package priorities. Either with arch or
+    # archless, based on the user's settings.
+    if only_samearch:
+        pkg_priorities = dict()
+    if check_obsoletes or not only_samearch:
         pkg_priorities_archless = dict() 
     for repo in allrepos:
         if repo.enabled:
-            repopkgs = _pkglist_to_dict(conduit.getPackages(repo), repo.priority)
-            _mergeprioritydicts(pkg_priorities, repopkgs)
+            if only_samearch:
+                repopkgs = _pkglist_to_dict(conduit.getPackages(repo), repo.priority, True)
+                _mergeprioritydicts(pkg_priorities, repopkgs)
 
-            if check_obsoletes:
-                repopkgs_archless = _pkglist_to_archless_dict(conduit.getPackages(repo), repo.priority)
+            if check_obsoletes or not only_samearch:
+                repopkgs_archless = _pkglist_to_dict(conduit.getPackages(repo), repo.priority)
                 _mergeprioritydicts(pkg_priorities_archless, repopkgs_archless)
 
     # Eliminate packages that have a low priority
     for repo in allrepos:
         if repo.enabled:
             for po in conduit.getPackages(repo):
-                key = "%s.%s" % (po.name,po.arch)
-                if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
+                delPackage = False
+
+                if only_samearch:
+                    key = "%s.%s" % (po.name,po.arch)
+                    if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
+                        delPackage = True
+                else:
+                    key = "%s" % po.name
+                    if pkg_priorities_archless.has_key(key) and pkg_priorities_archless[key] < repo.priority:
+                        delPackage = True
+
+                if delPackage:
                     conduit.delPackage(po)
                     cnt += 1
                     conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
-                
+
                 # If this packages obsoletes other packages, check whether
                 # one of the obsoleted packages is not available through
                 # a repo with a higher priority. If so, remove this package.
@@ -107,17 +144,14 @@ def exclude_hook(conduit):
                                 break
     conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
 
-def _pkglist_to_dict(pl, priority):
+def _pkglist_to_dict(pl, priority, addArch = False):
     out = dict()
     for p in pl:
-        key = "%s.%s" % (p.name,p.arch)
-        out[key] = priority
-    return out
-
-def _pkglist_to_archless_dict(pl, priority):
-    out = dict()
-    for p in pl:
-        out[p.name] = priority
+        if addArch:
+            key = "%s.%s" % (p.name,p.arch)
+            out[key] = priority
+        else:
+            out[p.name] = priority
     return out
 
 def _mergeprioritydicts(dict1, dict2):

@@ -1,3 +1,7 @@
+* Mon Nov 5 Daniel de Kok <daniel@centos.org> - 0.0.6
+- Make excluding based on package name + arch optional. Default to
+  exclusion by name.
+
 * Fri Oct 27 Tim Lauridsen <tla@rasmil.dk> - 0.0.4
 - made code to work with current yum API and yum 2.4.x API
 - Added output of exclude packages when yum -d3 is used

@@ -21,6 +21,15 @@ obsoletes in low-priority repositories, enable the 'check_obsoletes' bool:
 
 check_obsoletes=1
 
+By default, this plugin excludes packages from lower priority repositories
+based on the package name. If you want to exclude packages based ony the
+package name and architecture, enable the 'only_samearch' bool:
+
+only_samearch=N
+
+You can also temporarily enable this option with the '--samearch-priorities'
+command-line option.
+
 * Setting repository priorities *
 
 You can add priorities to repositories by adding the line:
@@ -33,11 +42,11 @@ number have the highest priority.
 
 * Bugs *
 
-Please report errors to Daniel de Kok <danieldk@pobox.com>
+Please report errors to Daniel de Kok <daniel@centos.org>
 
 * License *
 
-Copyright (c) 2006 Daniel de Kok
+Copyright (c) 2006-2007 Daniel de Kok
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
