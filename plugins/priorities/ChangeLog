@@ -1,3 +1,6 @@
+* Thu Nov 8 Daniel de Kok <daniel@centos.org> - 0.0.7
+- Only add an option if an option parser is returned.
+
 * Mon Nov 5 Daniel de Kok <daniel@centos.org> - 0.0.6
 - Make excluding based on package name + arch optional. Default to
   exclusion by name.

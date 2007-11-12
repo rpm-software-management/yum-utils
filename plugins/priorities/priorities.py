@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# yum-plugin-priorities 0.0.6
+# yum-plugin-priorities 0.0.7
 #
 # Copyright (c) 2006-2007 Daniel de Kok
 #
@@ -75,9 +75,10 @@ def config_hook(conduit):
 
     # Command-line options.
     parser = conduit.getOptParser()
-    parser.add_option('', '--samearch-priorities', dest='samearch',
-        action='store_true', default = False,
-        help="Priority-exclude packages based on name + arch")
+    if parser:
+        parser.add_option('', '--samearch-priorities', dest='samearch',
+            action='store_true', default = False,
+            help="Priority-exclude packages based on name + arch")
 
 def exclude_hook(conduit):
     global only_samearch
