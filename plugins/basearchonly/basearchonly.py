@@ -17,10 +17,11 @@
 # Copyright 2007 by Adel Gadllah
 
 import re, os
-from yum.plugins import TYPE_CORE
+from fnmatch import fnmatch
+from yum.plugins import TYPE_INTERACTIVE
 
 requires_api_version = '2.3'
-plugin_type = TYPE_CORE
+plugin_type = TYPE_INTERACTIVE
 
 
 def exclude_hook(conduit):
@@ -42,6 +43,7 @@ def basearch(conduit, barch, excludearchP):
 	
 	exclude = []
 	whitelist = []
+	skippkg = 0
 	conf , cmd = conduit.getCmdLine()
 	packageList = conduit.getPackages()
 	excludearch = re.compile(excludearchP);
@@ -63,8 +65,12 @@ def basearch(conduit, barch, excludearchP):
 	""" decide which packages we want to exclude """	
 
 	for userpkg in cmd:
-           if not userpkg in whitelist and not excludearch.search(userpkg):
-               exclude.append(userpkg)
+          skippkg = 0
+          for wlpkg in whitelist:
+               if fnmatch(userpkg,wlpkg):
+                 skippkg = 1
+          if not skippkg and not excludearch.search(userpkg):
+            exclude.append(userpkg)
 
 	""" exclude the packages """	
 	
