@@ -14,92 +14,128 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import sys, os
+import sys
+sys.path.insert(0,'/usr/share/yum-cli')
 
-sys.path.insert(0, '/usr/share/yum-cli')
-import cli
 import yum
-import rpmUtils
-import yum.Errors
-import logging
-from optparse import OptionParser
+from yum.misc import getCacheDir
 
-def parseArgs():
-    usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
-    parser = OptionParser(usage=usage)
-    parser.add_option("--repoid", default=[], dest="repos", action="append", 
-      help='operate on a specific repo, can be specified multiple times', 
-      metavar='[repo]')
-    (opts, args) = parser.parse_args()
-    if len(args) < 1: 
-        parser.print_help()
-        sys.exit(0)
-    return (opts, args)
+from cli import *
+from utils import YumUtilBase
 
-def main():
-    logger = logging.getLogger("yum.verbose.yumbuilddep")
-    opts, args = parseArgs()
-    base = cli.YumBaseCli()
-    base.doConfigSetup(init_plugins=True,
-                       plugin_types=(yum.plugins.TYPE_CORE,))
-    base.conf.uid = os.geteuid()
-        
-    if base.conf.uid != 0:
-        logger.info("You must be root to install packages")
-        sys.exit(1)
+from urlparse import urljoin
+from urlgrabber.progress import TextMeter
 
-    if len(opts.repos) > 0:
-        for repo in base.repos.findRepos('*'):
-            if repo.id not in opts.repos:
-                repo.disable()
-            else:
-                repo.enable()
 
-    archlist = rpmUtils.arch.getArchList() + ['src']
-    base.doRepoSetup(dosack=0)
-    base.doTsSetup()
-    base.doRpmDBSetup()
-    ts = rpmUtils.transaction.initReadOnlyTransaction()
+class YumBuildDep(YumUtilBase):
+    NAME = 'yum-builddep'
+    VERSION = '1.0'
+    USAGE = '"usage: yum-builddep [options] package1 [package2] [package..]'
     
-    base.doSackSetup(archlist)
+    def __init__(self):
+        YumUtilBase.__init__(self,
+                             YumBuildDep.NAME,
+                             YumBuildDep.VERSION,
+                             YumBuildDep.USAGE)
+        self.logger = logging.getLogger("yum.verbose.cli.yumbuildep")                             
+        self.main()
 
-    srcnames = []
-    srpms = []
-    for arg in args:
-        if arg.endswith('.src.rpm'):
-            srpms.append(yum.packages.YumLocalPackage(ts, arg))
-        elif arg.endswith('.src'):
-            srcnames.append(arg)
-        else:
-            srcnames.append('%s.src' % arg)
+    def main(self):
+        # Add util commandline options to the yum-cli ones
+        parser = self.getOptionParser() 
+        # Parse the commandline option and setup the basics.
+        try:
+            opts = self.doUtilConfigSetup()
+        except yum.Errors.RepoError, e:
+            self.logger.error("Cannot handle specific enablerepo/disablerepo options.")
+            sys.exit(50)
 
-    exact, match, unmatch = yum.packages.parsePackages(base.pkgSack.returnPackages(), srcnames, casematch=1)
-    srpms += exact + match
-    if len(unmatch) > 0:
-        logger.error("No such package(s): %s" % ", ".join(unmatch))
-        sys.exit(1)
+        # Check if there is anything to do.
+        if len(self.cmds) < 1: 
+            parser.print_help()
+            sys.exit(0)
 
-    for srpm in srpms:
-        for dep in srpm.requiresList():
-            if dep.startswith("rpmlib("): continue
-            try:
-                pkg = base.returnPackageByDep(dep)
-                if not base.rpmdb.installed(name=pkg.name):
-                    base.tsInfo.addInstall(pkg)
-            except yum.Errors.YumBaseError, e:
-                logger.error("Error: %s" % e)
+        if self.conf.uid != 0:
+            self.logger.error("Error: You must be root to install packages")
+            sys.exit(1)
+
+        # Setup yum (Ts, RPM db, Repo & Sack)
+        self.doUtilYumSetup()
+        # Do the real action
+        # solve for each srpm and put the pkgs into a ts
+        self.get_build_deps()
+
+        self.buildTransaction()
+        if len(self.tsInfo) < 1:
+            print 'No uninstalled build requires'
+            sys.exit()
+            
+        self.doTransaction()
+        
+    def setupSourceRepos(self):
+        # enable the -source repos for enabled primary repos
+        archlist = rpmUtils.arch.getArchList() + ['src']    
+        for repo in self.repos.listEnabled():
+            if not repo.id.endswith('-source'):
+                srcrepo = '%s-source' % repo.id
+            else:
+                repo.close()
+                self.repos.disableRepo(repo.id)
+                srcrepo = repo.id
+            
+            for r in self.repos.findRepos(srcrepo):
+                if r in self.repos.listEnabled():
+                    continue
+                self.logger.info('Enabling %s repository' % r.id)
+                r.enable()
+                # Setup the repo, without a cache
+                r.setup(0)
+                # Setup pkgSack with 'src' in the archlist
+                self._getSacks(archlist=archlist,thisrepo=r.id)
+
+    # go through each of the pkgs, figure out what they are/where they are 
+    # if they are not a local package then run
+        # Setup source repos
+        #self.setupSourceRepos()
+    # get all of their deps
+    # throw them into a ts
+    # run the ts
+    
+    def get_build_deps(self):
+        srcnames = []
+        srpms = []
+        for arg in self.cmds:
+            if arg.endswith('.src.rpm'):
+                srpms.append(yum.packages.YumLocalPackage(self.ts, arg))
+            elif arg.endswith('.src'):
+                srcnames.append(arg)
+            else:
+                srcnames.append('%s.src' % arg)
+
+        if srcnames:
+            self.setupSourceRepos()
+            exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), srcnames, casematch=1)
+            srpms += exact + match
+            
+            if len(unmatch) > 0:
+                self.logger.error("No such package(s): %s" % ", ".join(unmatch))
                 sys.exit(1)
+
+        for srpm in srpms:
+            for dep in srpm.requiresList():
+                if dep.startswith("rpmlib("): continue
+                try:
+                    pkg = self.returnPackageByDep(dep)
+                    print pkg
+                    if not self.rpmdb.installed(name=pkg.name):
+                        self.tsInfo.addInstall(pkg)
                     
-    (result, resultmsgs) = base.buildTransaction()
-    if len(base.tsInfo) == 0:
-        logger.info("Nothing to do")
-    else: 
-        base.listTransaction()
-        base.doTransaction()
-
-
-
-if __name__ == "__main__":
-    main()
-                
-# vim:sw=4:sts=4:expandtab              
+                except yum.Errors.YumBaseError, e:
+                    self.logger.error("Error: %s" % e)
+                    sys.exit(1)
+    
+    
+if __name__ == '__main__':
+    util = YumBuildDep()
+        
+       
