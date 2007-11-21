@@ -324,8 +324,7 @@ def removeKernels(my, count, confirmed, keepdevel):
             sys.exit(0)
 
     for kernel in toremove:
-        hdr = my.rpmdb.returnHeaderByTuple(kernel)[0]
-        po = YumInstalledPackage(hdr)
+        po = my.rpmdb.searchPkgTuple(kernel)[0]
         my.tsInfo.addErase(po)
 
     # Now perform the action transaction
