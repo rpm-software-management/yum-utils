@@ -210,7 +210,7 @@ def listLeaves(all):
     leaves = ts.returnLeafNodes()
     for pkg in leaves:
         name=pkg[0]
-        if name.startswith('lib') or all:
+        if all or name.startswith('lib') or name.endswith('lib') or name.endswith('libs'):
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
 def listOrphans(my):
