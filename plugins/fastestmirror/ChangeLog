@@ -1,3 +1,8 @@
+* Dec  3 2007 Luke Macken <lmacken@redhat.com> - 0.3.0
+- Throttle threads based on 'maxthreads' configuration option (rh#227772)
+- Add an exclude configuration option (rh#407471)
+- Actually display the fastest mirrors
+
 * Aug  8 2007 Luke Macken <lmacken@redhat.com> - 0.2.8
 - Add patch from Christopher Aillon to fail quietly when fastestmirror does
   not have write access to the timed hostfile.
