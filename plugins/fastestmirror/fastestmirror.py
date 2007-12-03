@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.2.8
+# Version: 0.3.0
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
@@ -17,6 +17,7 @@
 #   hostfilepath=/var/cache/yum/timedhosts
 #   maxhostfileage=10
 #   maxthreads=15
+#   #exclude=.gov
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,16 +53,18 @@ hostfilepath = ''
 maxhostfileage = 10
 loadcache = False
 maxthreads = 15
+exclude = None
 
 def init_hook(conduit):
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
-    global maxthreads
+    global maxthreads, exclude
     verbose = conduit.confBool('main', 'verbose', default=False)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
             default='/var/cache/yum/timedhosts')
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
+    exclude = conduit.confString('main', 'exclude', default=None)
     if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
         loadcache = True
 
@@ -70,8 +73,10 @@ def clean_hook(conduit):
         conduit.info(2, "Cleaning up list of fastest mirrors")
         os.unlink(hostfilepath)
 
+host = lambda mirror: mirror.split('/')[2]
+
 def postreposetup_hook(conduit):
-    global loadcache
+    global loadcache, exclude
     if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
@@ -82,8 +87,13 @@ def postreposetup_hook(conduit):
     for repo in repos.listEnabled():
         if not repomirrors.has_key(str(repo)):
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
+        if exclude:
+            for mirror in repomirrors[str(repo)]:
+                if exclude in host(mirror):
+                    conduit.info(2, "Excluding mirrors: %s" % host(mirror))
+                    repomirrors[str(repo)].remove(mirror)
         repo.urls = repomirrors[str(repo)]
-        conduit.info(2, " * %s: %s" % (str(repo), repo.urls[0].split('/')[2]))
+        conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
