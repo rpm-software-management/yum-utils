@@ -39,7 +39,7 @@ import urlparse
 import datetime
 import threading
 
-from yum.plugins import TYPE_CORE, PluginYumExit
+from yum.plugins import TYPE_CORE
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_CORE,)
