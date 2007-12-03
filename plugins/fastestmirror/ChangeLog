@@ -1,3 +1,6 @@
+* Dec  3 2007 Luke Macken <lmacken@redhat.com> - 0.3.1
+- Support multiple excludes
+
 * Dec  3 2007 Luke Macken <lmacken@redhat.com> - 0.3.0
 - Throttle threads based on 'maxthreads' configuration option (rh#227772)
 - Add an exclude configuration option (rh#407471)

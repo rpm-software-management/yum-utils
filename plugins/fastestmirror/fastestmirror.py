@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Version: 0.3.0
+# Version: 0.3.1
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
@@ -17,7 +17,7 @@
 #   hostfilepath=/var/cache/yum/timedhosts
 #   maxhostfileage=10
 #   maxthreads=15
-#   #exclude=.gov
+#   #exclude=.gov, facebook
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,8 +89,9 @@ def postreposetup_hook(conduit):
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         if exclude:
             for mirror in repomirrors[str(repo)]:
-                if exclude in host(mirror):
-                    conduit.info(2, "Excluding mirrors: %s" % host(mirror))
+                if filter(lambda exp: exp in host(mirror),
+                          exclude.replace(',', ' ').split()):
+                    conduit.info(2, "Excluding mirror: %s" % host(mirror))
                     repomirrors[str(repo)].remove(mirror)
         repo.urls = repomirrors[str(repo)]
         conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
