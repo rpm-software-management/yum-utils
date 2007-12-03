@@ -16,6 +16,7 @@
 #   socket_timeout=3
 #   hostfilepath=/var/cache/yum/timedhosts
 #   maxhostfileage=10
+#   maxthreads=15
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,14 +51,17 @@ timedhosts = {}
 hostfilepath = ''
 maxhostfileage = 10
 loadcache = False
+maxthreads = 15
 
 def init_hook(conduit):
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
+    global maxthreads
     verbose = conduit.confBool('main', 'verbose', default=False)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
             default='/var/cache/yum/timedhosts')
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
+    maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
         loadcache = True
 
@@ -128,14 +132,19 @@ class FastestMirror:
         return [x[1] for x in mirrors]
 
     def _poll_mirrors(self):
+        global maxthreads
         for mirror in self.mirrorlist:
+            if len(self.threads) > maxthreads:
+                if self.threads[0].isAlive():
+                    self.threads[0].join()
+                del self.threads[0]
             pollThread = PollThread(self, mirror)
             pollThread.start()
             self.threads.append(pollThread)
         while len(self.threads) > 0:
             if self.threads[0].isAlive():
                 self.threads[0].join()
-            del(self.threads[0])
+            del self.threads[0]
 
     def _add_result(self, mirror, host, time):
         global timedhosts
