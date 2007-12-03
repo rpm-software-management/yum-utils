@@ -79,6 +79,7 @@ def postreposetup_hook(conduit):
         if not repomirrors.has_key(str(repo)):
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         repo.urls = repomirrors[str(repo)]
+        conduit.info(2, " * %s: %s" % (str(repo), repo.urls[0].split('/')[2]))
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
