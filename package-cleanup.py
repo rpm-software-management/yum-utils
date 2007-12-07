@@ -182,7 +182,10 @@ def cleanOldDupes(my, confirmed):
                 lowpo = po
                 
         removedupes.append(lowpo)
-
+    if len(removedupes) == 0:
+        print "No dupes to clean"
+        sys.exit(0)
+        
     print "I will remove the following old duplicate packages:"
     for po in removedupes:
         print "%s" % po
