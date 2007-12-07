@@ -349,7 +349,7 @@ fi
 
 %changelog
 * Fri Dec 7 2007 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.9
+- mark as 1.1.9 
 * Fri Oct 26 2007 Seth Vidal <skvidal at fedoraproject.org>
 - add upgrade-helper plugin
 * Wed Oct 17 2007 Tim Lauridsen <tla@rasmil.dk>
