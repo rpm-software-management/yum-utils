@@ -1,3 +1,125 @@
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.9
+
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.9
+
+2007-12-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: get rid of the confirmation to clean up old
+	dupes when there are no dupes to clean up. rh bug: 328711
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Support multiple mirror
+	excludes in fastestmirror
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog: update fastestmirrors ChangeLog
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Add an 'exclude'
+	configuration option to fastestmirror (Bug #407471)
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Add a maxthreads
+	configuration option to fastestmirror (Bug #227772)
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Actually display the
+	fastest mirrors
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Remove unused
+	PluginYumExit import
+
+2007-11-23  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Added patch by Ville Skytta to make
+	'package-cleanup --leaves' catch *lib and *libs
+
+2007-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: port yum-builddep to YumUtilBase format. Make it
+	actually, work :) closes rh bug #381291
+
+2007-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: clean up a deprecation
+
+2007-11-19  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/basearchonly/basearchonly.conf,
+	plugins/basearchonly/basearchonly.py: basearchobly patch by Adel
+	Gadllah * Fix system-install-packages crash on F8 * Add wildcard
+	support to whitelist * Add all wine packages to the default
+	whitelist on x86 (wine*)
+
+2007-11-12  Tim Lauridsen <tim@localhost.localdomain>
+
+	* Makefile, plugins/priorities/ChangeLog,
+	plugins/priorities/priorities.py: Added optparser check in
+	priorities plugin (bz #847)
+
+2007-11-05  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/ChangeLog, plugins/priorities/README,
+	plugins/priorities/priorities.py: Make the name.arch checking
+	optional in the priorities plugin. This adds the 'only_samearch'
+	plugin option and the '--samearch-priorities'
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/basearchonly/basearchonly.conf: apply patch from Adel
+	Gadllah to add libflashsupport to basearchonly-plugin whitelist
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: apply patch from Bill Nottingham to make repoquery
+	more silent when --quiet is specified.
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/cleanup.xml,
+	plugins/upgrade-helper/remove-stuff.xml: rename remove-stuff.xml to
+	cleanup.xml
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/upgrade-helper.py: make it work with more
+	recent matchPackageNames than when I originally wrote it
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: left out upgrade-helper from the list of plugins
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/remove-stuff.xml,
+	plugins/upgrade-helper/upgrade-helper.conf,
+	plugins/upgrade-helper/upgrade-helper.py, yum-utils.spec: add
+	upgrade-helper - this _should_ work - but I'll be testing it some
+	more before tagging
+
+2007-10-25  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: catch error on download if destdir is not
+	writable. closed rh bug 352911
+
+2007-10-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2007-10-17  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* Makefile, yum-utils.spec: bumped yum-utils version to 1.1.8

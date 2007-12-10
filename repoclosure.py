@@ -170,7 +170,7 @@ def main():
     try:
         my.readMetadata()
     except yum.Errors.RepoError, e:
-        my.logger.info('Filelists not available for repo: %s' % repo)
+        my.logger.info(e)
         my.logger.info('Some dependencies may not be complete for this repository')
         my.logger.info('Run as root to get all dependencies or use -t to enable a user temp cache')
 
