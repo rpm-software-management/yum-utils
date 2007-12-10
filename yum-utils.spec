@@ -244,11 +244,13 @@ fi
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
+%{_bindir}/yum-complete-transaction
 %{_mandir}/man1/package-cleanup.1.*
 %{_mandir}/man1/repo-rss.1.*
 %{_mandir}/man1/repoquery.1.*
 %{_mandir}/man1/reposync.1.*
 %{_mandir}/man1/yum-builddep.1.*
+%{_mandir}/man1/yum-complete-transaction.1.*
 %{_mandir}/man1/yumdownloader.1.*
 
 %files -n yum-updateonboot

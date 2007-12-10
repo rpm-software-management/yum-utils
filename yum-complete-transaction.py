@@ -31,7 +31,7 @@ from urlgrabber.progress import TextMeter
 class YumCompleteTransaction(YumUtilBase):
     NAME = 'yum-complete-transactions'
     VERSION = '1.0'
-    USAGE = '"usage: yum-complete-transaction [options] package1 [package2] [package..]'
+    USAGE = '"usage: yum-complete-transaction'
     
     def __init__(self):
         YumUtilBase.__init__(self,

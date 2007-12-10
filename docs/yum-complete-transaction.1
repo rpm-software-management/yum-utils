@@ -1,0 +1,48 @@
+.\" yum-complete-transaction
+.TH "yum-complete-transaction" "1" "2007 Dec 10" "Seth Vidal" ""
+.SH "NAME"
+yum-complete-transaction
+.SH "SYNOPSIS"
+\fByum-complete-transaction\fP
+.SH "DESCRIPTION"
+.PP 
+\fByum-complete-transaction\fP is a program which finds incomplete or
+aborted yum transactions on a system and attempts to complete them. It
+looks at the transaction-all* and transaction-done* files which can normally
+be found in /var/lib/yum if a yum transaction aborted in the middle of 
+execution.
+.PP
+If it finds more than one unfinished transaction it will attempt to complete
+the most recent one first. You can run it more than once to clean up all
+unfinished transactions.
+.PP 
+.SH "FILES"
+As yum-complete-transaction uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+.\"http://linux.duke.edu/yum-utils/
+http://linux.duke.edu/yum/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There of course aren't any bugs, but if you find any, they should be sent
+to the mailing list: yum@lists.linux.duke.edu or filed in bugzilla.
+.fi
