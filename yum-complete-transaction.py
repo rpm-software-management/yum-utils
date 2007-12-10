@@ -19,7 +19,6 @@ sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
 from yum.misc import getCacheDir
-import yum.misc
 
 from cli import *
 from utils import YumUtilBase
@@ -27,6 +26,74 @@ from utils import YumUtilBase
 from urlparse import urljoin
 from urlgrabber.progress import TextMeter
 
+
+try:
+   from yum.misc import find_unfinished_transactions, find_ts_remaining
+except ImportError:
+
+    import glob
+    import os
+    import os.path
+        
+    def find_unfinished_transactions(yumlibpath='/var/lib/yum'):
+        """returns a list of the timestamps from the filenames of the unfinished 
+           transactions remaining in the yumlibpath specified.
+        """
+        timestamps = []    
+        tsallg = '%s/%s' % (yumlibpath, 'transaction-all*')
+        tsdoneg = '%s/%s' % (yumlibpath, 'transaction-done*')
+        tsalls = glob.glob(tsallg)
+        tsdones = glob.glob(tsdoneg)
+
+        for fn in tsalls:
+            trans = os.path.basename(fn)
+            timestamp = trans.replace('transaction-all.','')
+            timestamps.append(timestamp)
+
+        timestamps.sort()
+        return timestamps
+        
+    def find_ts_remaining(timestamp, yumlibpath='/var/lib/yum'):
+        """this function takes the timestamp of the transaction to look at and 
+           the path to the yum lib dir (defaults to /var/lib/yum)
+           returns a list of tuples(action, pkgspec) for the unfinished transaction
+           elements. Returns an empty list if none.
+
+        """
+        
+        to_complete_items = []
+        tsallpath = '%s/%s.%s' % (yumlibpath, 'transaction-all', timestamp)    
+        tsdonepath = '%s/%s.%s' % (yumlibpath,'transaction-done', timestamp)
+        tsdone_items = []
+
+        if not os.path.exists(tsallpath):
+            # something is wrong, here, probably need to raise _something_
+            return to_complete_items    
+
+                
+        if os.path.exists(tsdonepath):
+            tsdone_fo = open(tsdonepath, 'r')
+            tsdone_items = tsdone_fo.readlines()
+            tsdone_fo.close()     
+        
+        tsall_fo = open(tsallpath, 'r')
+        tsall_items = tsall_fo.readlines()
+        tsall_fo.close()
+        
+        for item in tsdone_items:
+            # this probably shouldn't happen but it's worth catching anyway
+            if item not in tsall_items:
+                continue        
+            tsall_items.remove(item)
+            
+        for item in tsall_items:
+            item = item.replace('\n', '')
+            if item == '':
+                continue
+            (action, pkgspec) = item.split()
+            to_complete_items.append((action, pkgspec))
+        
+        return to_complete_items
 
 class YumCompleteTransaction(YumUtilBase):
     NAME = 'yum-complete-transactions'
@@ -76,7 +143,7 @@ class YumCompleteTransaction(YumUtilBase):
         # take the most recent one
         # populate the ts
         # run it
-        times = yum.misc.find_unfinished_transactions(self.conf.persistdir)
+        times = find_unfinished_transactions(self.conf.persistdir)
         if not times:
             print "No unfinished transactions left."      
             sys.exit()
@@ -84,7 +151,7 @@ class YumCompleteTransaction(YumUtilBase):
         print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)    
         
         timestamp = times[-1]
-        remaining = yum.misc.find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
+        remaining = find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
         print "The remaining transaction had %d elements left to run" % len(remaining)
         for (action, pkgspec) in remaining:
             if action == 'install':
