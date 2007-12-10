@@ -1,4 +1,4 @@
-DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync
+DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync yum-complete-transaction
 DOCS5 = yum-changelog.conf
 DOCS8 = yum-security
 
