@@ -45,14 +45,15 @@ def basearch(conduit, barch, excludearchP):
 	whitelist = []
 	skippkg = 0
 	conf , cmd = conduit.getCmdLine()
-	packageList = conduit.getPackages()
-	excludearch = re.compile(excludearchP);
 	
 	if not cmd:
 		return
 
 	if cmd[0] != "install":
 		return
+
+	packageList = conduit.getPackages()
+	excludearch = re.compile(excludearchP);
 
 	""" get whitelist from config file """	
 	
