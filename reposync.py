@@ -222,7 +222,9 @@ def main():
                 continue
     
             if opts.urls:
-                url = urljoin(repo.urls[0],remote)
+                if repo.urls[0][-1] != '/':
+                    baseurl = repo.urls[0] + '/'
+                url = urljoin(baseurl,remote)
                 print '%s' % url
                 continue
     
