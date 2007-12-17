@@ -1,3 +1,7 @@
+* Dec 17 2007 Luke Macken <lmacken@redhat.com> - 0.3.2
+- Only display our mirrors if we have any
+- Strip any username:passwords from our mirrors hostname before we display it
+
 * Dec  3 2007 Luke Macken <lmacken@redhat.com> - 0.3.1
 - Support multiple excludes
 
