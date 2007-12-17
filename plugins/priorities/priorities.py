@@ -85,7 +85,7 @@ def exclude_hook(conduit):
 
     # Check whether the user specified the --samearch option.
     opts, commands = conduit.getCmdLine()
-    if opts.samearch:
+    if opts and opts.samearch:
         only_samearch = True
 
     cnt = 0
