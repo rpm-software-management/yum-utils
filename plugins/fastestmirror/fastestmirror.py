@@ -94,7 +94,8 @@ def postreposetup_hook(conduit):
                     conduit.info(2, "Excluding mirror: %s" % host(mirror))
                     repomirrors[str(repo)].remove(mirror)
         repo.urls = repomirrors[str(repo)]
-        conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
+        if len(repo.urls):
+            conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
