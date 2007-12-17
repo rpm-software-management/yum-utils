@@ -73,7 +73,8 @@ def clean_hook(conduit):
         conduit.info(2, "Cleaning up list of fastest mirrors")
         os.unlink(hostfilepath)
 
-host = lambda mirror: mirror.split('/')[2]
+# Get the hostname from a url, stripping away any usernames/passwords
+host = lambda mirror: mirror.split('/')[2].split('@')[-1]
 
 def postreposetup_hook(conduit):
     global loadcache, exclude
