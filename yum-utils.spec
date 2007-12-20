@@ -157,7 +157,7 @@ Group: System Environment/Base
 Requires: yum >= 3.0.5
 
 %description -n yum-security
-This plugin adds ther options --security, --cve, --bz and --advisory flags
+This plugin adds the options --security, --cve, --bz and --advisory flags
 to yum and the list-security and info-security commands.
 The options make it possible to limit list/upgrade of packages to specific
 security relevant ones. The commands give you the security information.
