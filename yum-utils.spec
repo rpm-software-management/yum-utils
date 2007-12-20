@@ -194,6 +194,15 @@ Requires: yum >= 3.0
 this plugin allows yum to erase specific packages on install/update based on an additional
 metadata file in repositories. It is used to simplify distribution upgrade hangups.
 
+%package -n yum-aliases
+Summary: Yum plugin to enable aliases filters
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-aliases
+This plugin adds the command alias, and parses the aliases config. file to
+enable aliases.
+
 
 %prep
 %setup -q
@@ -206,7 +215,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper"
+         security protect-packages basearchonly upgrade-helper aliases"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -215,6 +224,8 @@ for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 done
+install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -348,8 +359,17 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
 /usr/lib/yum-plugins/upgrade-helper.*
 
+%files -n yum-aliases
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
+%config(noreplace) %{_sysconfdir}/yum/aliases.conf
+/usr/lib/yum-plugins/aliases.*
+
 
 %changelog
+* Thu Dec 12 2007 James Antill <james@fedoraproject.org>
+- Add yum-aliases plugin
+
 * Fri Dec 7 2007 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.9 
 * Fri Oct 26 2007 Seth Vidal <skvidal at fedoraproject.org>
