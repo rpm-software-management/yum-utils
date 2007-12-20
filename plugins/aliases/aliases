@@ -1,0 +1,57 @@
+
+#  These are some aliases that a lot of people might find useful, well those
+# who install yum-aliases plugin anyway :). Note that they require alias
+# recursion, which is the default.
+
+DEV --enablerepo=development
+UPT --enablerepo=updates-testing
+SEC --security
+
+SRC --enablerepo=fedora-source    --enablerepo=updates-source
+# Note that we/you can move to =X,Y in 3.2.9 onwards.
+DBG --enablerepo=fedora-debuginfo --enablerepo=updates-debuginfo
+ALLSRC --enablerepo=*-source
+ALLDBG --enablerepo=*-debuginfo
+
+up   upgrade
+inst install
+
+ls  list
+lsi ls installed
+lsu ls updates
+lss 
+lsec list-security
+lssu SEC ls updates
+
+force-install --skip-broken --disableexcludes=all install
+force-inst    --skip-broken --disableexcludes=all inst
+force-upgrade --skip-broken --disableexcludes=all upgrade
+force-up      --skip-broken --disableexcludes=all up
+force-update  --skip-broken --disableexcludes=all update
+
+dbg-install DBG install
+dbg-inst    DBG inst
+
+#  These are some example aliases, which probably aren't worth enabling for
+# everyone. Mostly useful for people who use DEV / UPT a lot.
+
+# lsT UPT ls
+# lsD DEV ls
+# 
+# lsuT lsT updates
+# lsuD lsD updates
+# 
+# lssT SEC lsT
+# lssD SEC lsD
+# 
+# lssuT SEC lsT updates 
+# lssuD SEC lsD updates
+# 
+# lsecT UPT lsec
+# lsecD DEV lsec
+# 
+# upT UPT update
+# upD DEV update
+# 
+# instT UPT install
+# instD DEV install
