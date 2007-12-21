@@ -15,6 +15,7 @@
 # Copyright 2007 Seth Vidal
 
 import sys
+import os
 sys.path.insert(0,'/usr/share/yum-cli/')
 
 import yum
@@ -46,7 +47,10 @@ class DebugInfoInstall(YumUtilBase):
         if len(self.cmds) < 1: 
             parser.print_help()
             sys.exit(0)
-
+        if os.geteuid() != 0:
+            print >> sys.stderr, "You must be root to run this command."
+            sys.exit(1)
+            
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
         
