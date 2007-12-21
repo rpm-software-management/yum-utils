@@ -16,10 +16,14 @@
 #
 # by James Antill
 
-from yum.plugins import PluginYumExit, TYPE_INTERACTIVE
+from yum.plugins import TYPE_INTERACTIVE
 import sys
 import time
-import cli
+try: # yumex doesn't like import cli, but runs this
+    from cli import CliError
+except:
+    class CliError: # Never used by yumex
+        pass
 from i18n import _
 
 requires_api_version = '2.1'
@@ -88,7 +92,7 @@ class AliasCommand(AliasedCommand):
             except:
                 base.logger.critical(_("Can't open aliases file: %s") %
                                      conffile)
-                raise cli.CliError
+                raise CliError
                 
     def doCommand(self, base, basecmd, extcmds):
         if len(extcmds) > 1: # Add a new alias
