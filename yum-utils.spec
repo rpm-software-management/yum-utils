@@ -367,7 +367,7 @@ fi
 
 
 %changelog
-* Thu Jan 3 2007 Tim Lauridsen <timlau@fedoraproject.org>
+* Thu Jan 3 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.10
 * Thu Dec 12 2007 James Antill <james@fedoraproject.org>
 - Add yum-aliases plugin
