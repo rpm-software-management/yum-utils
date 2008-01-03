@@ -2,6 +2,14 @@
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.10
 
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.10
+
 2007-12-21  James Antill <james@and.org>
 
 	* plugins/aliases/aliases.py: Quick work around for yumex
