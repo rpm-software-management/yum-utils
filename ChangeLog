@@ -1,5 +1,13 @@
 2008-01-03  Tim Lauridsen <tla@rasmil.dk>
 
+	* Makefile: bumped yum-utils version to 1.1.10
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
 	* yum-utils.spec: bumped yum-utils version to 1.1.10
 
 2008-01-03  Tim Lauridsen <tla@rasmil.dk>
