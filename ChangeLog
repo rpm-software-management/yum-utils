@@ -1,3 +1,110 @@
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.10
+
+2007-12-21  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Quick work around for yumex
+
+2007-12-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make sure we're root to run
+	debuginfo-install closes rh bug #426470
+
+2007-12-20  James Antill <james@and.org>
+
+	* .gitignore: Match foo.py~ for backup files
+
+2007-12-20  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix typo
+
+2007-12-20  James Antill <james@and.org>
+
+	* yum-utils.spec: Add yum-aliases to the specfile
+
+2007-12-20  James Antill <james@and.org>
+
+	* plugins/aliases/aliases, plugins/aliases/aliases.conf,
+	plugins/aliases/aliases.py: Add aliases module
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: Update fastestmirrors
+	ChangeLog, and do a rev bump
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Strip any
+	username:passwords from our mirrors hostname before we display it
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Only display our mirrors
+	if we have some
+
+2007-12-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/priorities/priorities.py: apply patch to fix rh bug:
+	421961 - make sure we're passing in opts before we get the value of
+	the opts.
+
+2007-12-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   Move
+	conduit.getPackages until needed, as it takes significant time
+
+2007-12-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: make sure that our repo url has a trailing /,
+	otherwise urljoin does the wrong thing. We should probably append
+	this higher up in the stack, too.  closes rh bug: 421801
+
+2007-12-11  James Antill <james@and.org>
+
+	* plugins/basearchonly/basearchonly.py: Move conduit.getPackages
+	until needed, as it takes significant time
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: make yum-complete-transaction
+	backward compat to yum 3.2.7/3.2.8
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/Makefile: add complete-transaction to doc makefile, too
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, docs/yum-complete-transaction.1,
+	yum-complete-transaction.py, yum-utils.spec: add
+	yum-complete-transaction man page and update specfile/makefile
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   Fix
+	unreferenced variable in repoclosure.py   updated ChangeLog   bumped
+	yum-utils version to 1.1.9   bumped yum-utils version to 1.1.9
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: implement yum-util to clean up
+	unfinished/aborted transactions using
+	transaction-done/transaction-all files.
+
+2007-12-07  Luke Macken <lmacken@redhat.com>
+
+	* repoclosure.py: Fix unreferenced variable in repoclosure.py
+
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: updated ChangeLog
+
 2007-12-07  Tim Lauridsen <tim@naboo.local>
 
 	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.9
