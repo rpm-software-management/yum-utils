@@ -250,7 +250,6 @@ class SecurityInfoCommands(SecurityListCommands):
             return
         self.show_pkg_info_done[md['update_id']] = True
         msg(md)
-        msg('')
     
     def show_pkg_exit(self):
         self.show_pkg_info_done = {}
