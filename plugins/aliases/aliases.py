@@ -24,7 +24,11 @@ try: # yumex doesn't like import cli, but runs this
 except:
     class CliError: # Never used by yumex
         pass
-from i18n import _
+
+try: # $rand yum using python code don't have i18n
+    from i18n import _
+except:
+    def _(x): return x
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
