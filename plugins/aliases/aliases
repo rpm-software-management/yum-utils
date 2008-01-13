@@ -13,21 +13,22 @@ DBG --enablerepo=fedora-debuginfo --enablerepo=updates-debuginfo
 ALLSRC --enablerepo=*-source
 ALLDBG --enablerepo=*-debuginfo
 
+FORCE --skip-broken --disableexcludes=all
+
 up   upgrade
 inst install
 
 ls  list
 lsi ls installed
 lsu ls updates
-lss 
 lsec list-security
-lssu SEC ls updates
+lssu SEC lsu
 
-force-install --skip-broken --disableexcludes=all install
-force-inst    --skip-broken --disableexcludes=all inst
-force-upgrade --skip-broken --disableexcludes=all upgrade
-force-up      --skip-broken --disableexcludes=all up
-force-update  --skip-broken --disableexcludes=all update
+force-install FORCE install
+force-inst    FORCE inst
+force-upgrade FORCE upgrade
+force-up      FORCE up
+force-update  FORCE update
 
 dbg-install DBG install
 dbg-inst    DBG inst
@@ -50,8 +51,8 @@ dbg-inst    DBG inst
 # lsecT UPT lsec
 # lsecD DEV lsec
 # 
-# upT UPT update
-# upD DEV update
+# upT UPT up
+# upD DEV up
 # 
-# instT UPT install
-# instD DEV install
+# instT UPT inst
+# instD DEV inst

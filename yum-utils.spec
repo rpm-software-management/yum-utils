@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.9
+Version: 1.1.10
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -370,6 +370,9 @@ fi
 %changelog
 * Sun Jan 13 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add repodiff
+
+* Thu Jan 3 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.10
 
 * Thu Dec 12 2007 James Antill <james@fedoraproject.org>
 - Add yum-aliases plugin
