@@ -247,6 +247,7 @@ fi
 %{_bindir}/debuginfo-install
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
+%(_bindir}/repodiff
 %{_bindir}/repomanage
 %{_bindir}/repoquery
 %{_bindir}/repotrack
@@ -367,6 +368,9 @@ fi
 
 
 %changelog
+* Sun Jan 13 2008 Seth Vidal <skvidal at fedoraproject.org>
+- add repodiff
+
 * Thu Dec 12 2007 James Antill <james@fedoraproject.org>
 - Add yum-aliases plugin
 
