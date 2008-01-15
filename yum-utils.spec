@@ -203,6 +203,14 @@ Requires: yum >= 3.0.5
 This plugin adds the command alias, and parses the aliases config. file to
 enable aliases.
 
+%package -n yum-list-data
+Summary: Yum plugin to list aggregate package data
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-list-data
+This plugin adds the commands list-vendors, groups, baseurls, packagers,
+buildhosts, licenses and arches.
 
 %prep
 %setup -q
@@ -215,7 +223,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases"
+         security protect-packages basearchonly upgrade-helper aliases list-data"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -365,6 +373,11 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
 %config(noreplace) %{_sysconfdir}/yum/aliases.conf
 /usr/lib/yum-plugins/aliases.*
+
+%files -n yum-list-data
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
+/usr/lib/yum-plugins/list-data.*
 
 
 %changelog
