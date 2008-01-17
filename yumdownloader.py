@@ -78,23 +78,40 @@ class YumDownloader(YumUtilBase):
     def setupSourceRepos(self):
         # enable the -source repos for enabled primary repos
         archlist = rpmUtils.arch.getArchList() + ['src']    
+        # Ok, we have src and bin repos. What we want to do here is:
+        #
+        # 1. _enable_ source repos for which the bin repos are enabled.
+        # 2. _disable_ the _other_ src repos.
+        #
+        # ...also we don't want to disable the src repos. for #1 and then
+        # re-enable them as then we get annoying messages and call .close() on
+        # them losing the primarydb data etc.
+
+        # Get all src repos.
+        src_repos = {}
+        for repo in self.repos.findRepos('*-source'):
+            src_repos[repo.id] = False
+
+        #  Find the enabled bin repos, and mark their respective *-source repo.
+        # as good.
         for repo in self.repos.listEnabled():
-            if not repo.id.endswith('-source'):
+            if repo.id not in src_repos:
                 srcrepo = '%s-source' % repo.id
-            else:
+                if srcrepo in src_repos:
+                    src_repos[srcrepo] = True
+
+        # Toggle src repos that are set the wrong way
+        for repo in self.repos.findRepos('*-source'):
+            if     repo.isEnabled() and not src_repos[repo.id]:
                 repo.close()
                 self.repos.disableRepo(repo.id)
-                srcrepo = repo.id
-            
-            for r in self.repos.findRepos(srcrepo):
-                if r in self.repos.listEnabled():
-                    continue
-                self.logger.info('Enabling %s repository' % r.id)
-                r.enable()
+            if not repo.isEnabled() and     src_repos[repo.id]:
+                self.logger.info('Enabling %s repository' % repo.id)
+                repo.enable()
                 # Setup the repo, without a cache
-                r.setup(0)
+                repo.setup(0)
                 # Setup pkgSack with 'src' in the archlist
-                self._getSacks(archlist=archlist,thisrepo=r.id)
+                self._getSacks(archlist=archlist, thisrepo=repo.id)
         
         
     def downloadPackages(self,opts):
