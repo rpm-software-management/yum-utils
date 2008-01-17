@@ -220,15 +220,9 @@ class YumDownloader(YumUtilBase):
     def doUtilYumSetup(self,opts):
         """do a default setup for all the normal/necessary yum components,
            really just a shorthand for testing"""
-        # FIXME - we need another way to do this, I think.
         try:
             self._getTs()
             self._getRpmDB()
-            # if running as non-root and '--source' is specified, then
-            # disable all enabled *-source repos, because we dont want then to be initialized
-            # yet.
-            if self.conf.uid != 0 and opts.source:
-                self._removeEnabledSourceRepos()
             self._getRepos()
             # if '--source' is used the add src to the archlist
             if opts.source:
