@@ -32,7 +32,7 @@ class DiffYum(yum.YumBase):
         self.repos.disableRepo('*')
 
         
-    def dy_setup_repo(self, repotype, baseurl, srcrepo=False):
+    def dy_setup_repo(self, repotype, baseurl):
         repoid = repotype + str (len(self.dy_repos[repotype]) + 1)
         self.dy_repos[repotype].append(repoid)
      
@@ -48,9 +48,8 @@ class DiffYum(yum.YumBase):
         self.repos.enableRepo(repoid)
         # setup the repo dirs/etc
         self.doRepoSetup(thisrepo=repoid)
-        if srcrepo:
-            archlist = rpmUtils.arch.getArchList() + ['src']    
-            self._getSacks(archlist=archlist, thisrepo=repoid)
+        archlist = ['src']    
+        self._getSacks(archlist=archlist, thisrepo=repoid)
 
     def dy_diff(self):
         add = []
@@ -113,7 +112,7 @@ def main(args):
     for r in opts.old:
         if not opts.quiet: print "setting up old repo %s" % r
         try:
-            my.dy_setup_repo('old', r, srcrepo=True)
+            my.dy_setup_repo('old', r)
         except yum.Errors.RepoError, e:
             print "Could not setup repo at url  %s: %s" % (r, e)
             sys.exit(1)
@@ -121,7 +120,7 @@ def main(args):
     for r in opts.new:
         if not opts.quiet: print "setting up new repo %s" % r
         try:
-            my.dy_setup_repo('new', r, srcrepo=True)
+            my.dy_setup_repo('new', r)
         except yum.Errors.RepoError, e:
             print "Could not setup repo at url %s: %s" % (r, e)
             sys.exit(1)
