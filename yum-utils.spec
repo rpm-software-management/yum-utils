@@ -247,7 +247,7 @@ fi
 %{_bindir}/debuginfo-install
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
-%(_bindir}/repodiff
+%{_bindir}/repodiff
 %{_bindir}/repomanage
 %{_bindir}/repoquery
 %{_bindir}/repotrack
