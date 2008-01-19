@@ -9,26 +9,26 @@ package-cleanup
 \fBpackage-cleanup\fP is a program for cleaning up the locally-installed RPMs.
 .PP 
 .SH "GENERAL OPTIONS"
-.IP "\fB\-v, \-\-version\fP" 
-Report program version and exit.
+.IP "\fB\-c <config file>\fP"
+Use alternative config file (default is /etc/yum.conf).
 .IP "\fB\-h, \-\-help\fP"
 Help; display a help message and then quit\&.
 .IP "\fB\-q, \-\-quiet\fP" 
 Print out nothing unecessary.
+.IP "\fB\-v, \-\-version\fP" 
+Report program version and exit.
 .IP "\fB\-y\fP" 
 Agree to anything asked.
-.IP "\fB\-c <config file>\fP"
-Use alternative config file (default is /etc/yum.conf).
 .IP "\fB\-\-leaves\fP"
 List leaf nodes in the local RPM database.  Leaf nodes are RPMs that
 are not relied upon by any other RPM.
-.IP "\fB\-\-problems\fP"
-List dependency problems in the local RPM database.
 .IP "\fB\-\-orphans\fP"
 List installed packages which are not available from currenly configured
 repositories.
 .IP "\fB\-\-oldkernels\fP"
 Remove old kernel and kernel-devel packages.
+.IP "\fB\-\-problems\fP"
+List dependency problems in the local RPM database.
 .PP 
 .SH "LEAVES OPTIONS" 
 .IP "\fB\-\-all\fP"
