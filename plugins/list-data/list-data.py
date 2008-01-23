@@ -34,9 +34,6 @@ from yum import logginglevels
 # For baseurl
 import urlparse
 
-# For committers
-import re
-
 import UnicodeWidth
 
 # Decent (UK/US English only) number formatting.
@@ -189,27 +186,6 @@ def size_get_data(self, data):
     msg = "[ %s - %s ]  " % (pnum[1], " " * len(pnum[1]))
     return SizeRangeData(pnum[0], msg)    
 
-def _nf2ascii(x):
-    """ does .encode("ascii", "replace") but it never fails. """
-    ret = []
-    for val in x:
-        if ord(val) >= 128:
-            val = '?'
-        ret.append(val)
-    return "".join(ret)
-
-def committer_get_data(self, data):
-    if not hasattr(data, self.attr):
-        return self.unknown
-    val = getattr(data, self.attr)
-
-    # No good way to get number of utf-8 code points Arghh.
-    val = val[0][1]
-    # .encode("ascii", "replace") fails as does .encode("utf-8")
-    val = _nf2ascii(val)
-    # Hacky way to get rid of version numbers...
-    return re.sub("""> .*""", '>', val)
-
 def _list_data_custom(conduit, data, func):
     cmd = ListDataCommands(*data)
     cmd.oget_data = cmd.get_data 
@@ -234,6 +210,7 @@ def config_hook(conduit):
                  ('packagers', 'packager'),
                  ('licenses', 'license'),
                  ('arches', 'arch'),
+                 ('committers', 'committer'),
                  ('buildhosts', 'buildhost')]:
         conduit.registerCommand(ListDataCommands(*data))
         conduit.registerCommand(InfoDataCommands(*data))
@@ -244,6 +221,4 @@ def config_hook(conduit):
     _list_data_custom(conduit, ('installed-sizes', 'installedsize'),
                       size_get_data)
     
-    _list_data_custom(conduit, ('committers', 'changelog'),
-                      committer_get_data)
     # Buildtime/installtime/committime?
