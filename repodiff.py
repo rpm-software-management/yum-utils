@@ -85,8 +85,13 @@ def parseArgs(args):
     """
        Parse the command line args. return a list of 'new' and 'old' repos
     """
+    usage = """
+    repodiff: take 2 or more repositories and return a list of added, removed and changed
+              packages.
+              
+    repodiff --old=old_repo_baseurl --new=new_repo_baseurl """
     
-    parser = OptionParser(version = "repodiff 0.2")
+    parser = OptionParser(version = "repodiff 0.2", usage=usage)
     # query options
     parser.add_option("-n", "--new", default=[], action="append",
                       help="new baseurl[s] for repos")
@@ -95,15 +100,16 @@ def parseArgs(args):
     parser.add_option("-q", "--quiet", default=False, action='store_true')
     
     (opts, argsleft) = parser.parse_args()
+
+    if not opts.new or not opts.old:
+        parser.print_usage()
+        sys.exit(1)
     
     return opts
 
 def main(args):
     opts = parseArgs(args)
 
-    if not opts.new or not opts.old:
-        print "\nUsage:\n     repodiff --old=old_repo_baseurl --new=new_repo_baseurl\n"
-        sys.exit(1)
             
     my = DiffYum()
     my.dy_shutdown_all_other_repos()

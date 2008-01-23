@@ -28,7 +28,10 @@ from utils import YumUtilBase
 class DebugInfoInstall(YumUtilBase):
     NAME = 'debuginfo-install'
     VERSION = '1.0'
-    USAGE = '"usage: debuginfo-install [options] package1 [package2] [package..]'
+    USAGE = """
+    debuginfo-install: Install debuginfo packages and their dependencies based on 
+                       the name of the non-debug package
+    debuginfo-install [options] package1 [package2] [package..]"""
     
     def __init__(self):
         YumUtilBase.__init__(self,

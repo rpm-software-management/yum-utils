@@ -136,7 +136,12 @@ def trimRpms(rpms, excludeGlobs):
 
 
 def parseargs(args):
-    usage = "repomanage [--old] [--new] path."
+    usage = """
+    repomanage: manage a directory of rpm packages. returns lists of newest 
+                or oldest packages in a directory for easy piping to xargs
+                or similar programs.
+    repomanage [--old] [--new] path.
+    """
     parser = OptionParser(usage=usage)
     
     # new is only used to make sure that the user is not trying to get both 

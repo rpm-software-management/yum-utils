@@ -98,7 +98,12 @@ except ImportError:
 class YumCompleteTransaction(YumUtilBase):
     NAME = 'yum-complete-transactions'
     VERSION = '1.0'
-    USAGE = '"usage: yum-complete-transaction'
+    USAGE = """
+    yum-complete-transaction: completes unfinished yum transactions which occur due to error, failure 
+                              or act of $deity
+    
+    usage: yum-complete-transaction
+    """
     
     def __init__(self):
         YumUtilBase.__init__(self,

@@ -82,7 +82,12 @@ def more_to_check(unprocessed_pkgs):
     return False
 
 def parseArgs():
-    usage = "usage: %s [options] package1 [package2] [package..]" % sys.argv[0]
+    usage = """
+    Repotrack: keep current on any given pkg and its deps. It will download the package(s) you 
+               want to track and all of their dependencies
+    
+    %s [options] package1 [package2] [package..]    """ % sys.argv[0]
+    
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')

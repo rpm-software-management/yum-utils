@@ -33,7 +33,13 @@ from yum.constants import *
 from yum.packageSack import ListPackageSack
 
 def parseArgs():
-    usage = "usage: %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]" % sys.argv[0]
+    usage = """
+    Read in the metadata of a series of repositories and check all the   
+    dependencies in all packages for resolution. Print out the list of
+    packages with unresolved dependencies
+    
+    %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]
+    """ % sys.argv[0]
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
