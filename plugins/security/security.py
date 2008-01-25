@@ -159,7 +159,10 @@ class SecurityListCommands:
         return ['list-security', 'list-sec']
 
     def getUsage(self):
-        return self.getNames()[0]
+        return "[security|bugzilla|cve] [PACKAGE-wildcard]"
+
+    def getSummary(self):
+        return "Returns security data for the packages listed, that affects your system"
 
     def doCheck(self, base, basecmd, extcmds):
         pass
