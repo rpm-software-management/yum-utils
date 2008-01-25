@@ -80,17 +80,31 @@ def config_hook(conduit):
             action='store_true', default = False,
             help="Priority-exclude packages based on name + arch")
 
+def _all_repo_priorities_same(allrepos):
+    """ Are all repos are at the same priority """
+    first = None
+    for repo in allrepos:
+        if first is None:
+            first = repo.priority
+        elif first != repo.priority:
+            return False
+    return True
+
 def exclude_hook(conduit):
     global only_samearch
 
+    allrepos = conduit.getRepos().listEnabled()
+
+    # If they haven't done anything, don't do any work
+    if _all_repo_priorities_same(allrepos):
+        return
+    
     # Check whether the user specified the --samearch option.
     opts, commands = conduit.getCmdLine()
     if opts and opts.samearch:
         only_samearch = True
 
     cnt = 0
-    allrepos = conduit.getRepos().listEnabled()
-
     if check_obsoletes:
         obsoletes = conduit._base.pkgSack.returnObsoletes() 
 
