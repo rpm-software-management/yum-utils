@@ -56,7 +56,14 @@ class ListDataCommands:
         return ['list-' + self.name]
 
     def getUsage(self):
-        return self.getNames()[0]
+        return "[PACKAGE|all|installed|updates|extras|obsoletes|recent]"
+
+    def _getSummary(self):
+        return """\
+Display aggregate data on the %s attribute of a group of packages""" % self.attr
+
+    def getSummary(self):
+        return self._getSummary()
 
     def doCheck(self, base, basecmd, extcmds):
         pass
@@ -122,6 +129,9 @@ class ListDataCommands:
 class InfoDataCommands(ListDataCommands):
     def getNames(self):
         return ['info-' + self.name]
+
+    def getSummary(self):
+        return self._getSummary() + "\nAnd list all the packages under each"
 
     def show_pkgs(self, msg, pkgs):
         for pkg in pkgs:
