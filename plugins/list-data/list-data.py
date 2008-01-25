@@ -34,8 +34,6 @@ from yum import logginglevels
 # For baseurl
 import urlparse
 
-import UnicodeWidth
-
 # Decent (UK/US English only) number formatting.
 import locale
 locale.setlocale(locale.LC_ALL, '') 
