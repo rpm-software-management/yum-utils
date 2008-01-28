@@ -212,6 +212,17 @@ Requires: yum >= 3.0.5
 This plugin adds the commands list-vendors, groups, baseurls, packagers,
 buildhosts, licenses and arches.
 
+%package -n yum-tmprepo
+Summary: Yum plugin to add temporary repositories
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-tmprepo
+This plugin adds the option --tmprepo which takes a url to a .repo file
+downloads it and enables it for a single run. This plugin tries to ensure
+that temporary repositories are safe to use, by default, by not allowing
+gpg checking to be disabled.
+
 %prep
 %setup -q
 
@@ -223,7 +234,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data"
+         security protect-packages basearchonly upgrade-helper aliases list-data tmprepo"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -378,6 +389,11 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
+
+%files -n yum-tmprepo
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
+/usr/lib/yum-plugins/tmprepo.*
 
 
 %changelog
