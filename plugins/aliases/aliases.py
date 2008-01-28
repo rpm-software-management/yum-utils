@@ -41,7 +41,10 @@ class AliasedCommand:
         return [self.cmd]
 
     def getUsage(self):
-        return self.getNames()[0]
+        return ''
+
+    def getSummary(self):
+        return ''
 
     # doCheck and doCommand are never called, for aliased commands.
 
@@ -88,6 +91,12 @@ def resolve_aliases(args, log, skip=0):
 class AliasCommand(AliasedCommand):
     def __init__(self):
         AliasedCommand.__init__(self, "alias")
+
+    def getUsage(self):
+        return "[ALIAS] [expansion]"
+
+    def getSummary(self):
+        return "Adds or lists aliases"
 
     def doCheck(self, base, basecmd, extcmds):
         if len(extcmds) > 1: # Add a new alias
