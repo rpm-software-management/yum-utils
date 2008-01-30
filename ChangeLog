@@ -1,3 +1,109 @@
+2008-01-30  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.11
+
+2008-01-28  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.conf, plugins/tmprepo/tmprepo.py,
+	yum-utils.spec: Add --tmprepo as a plugin
+
+2008-01-28  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: New help info. for aliases
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add support for the new help
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Add support for the new help
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Fix bad import
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/priorities/priorities.py: Make yum-priorities not eat CPU
+	just by installing it
+
+2008-01-23  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Use .committer property in HEAD
+	yum
+
+2008-01-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, repoclosure.py, repodiff.py, repomanage.py,
+	repotrack.py, yum-complete-transaction.py: add better usage
+	explanations to a lot of yum-utils. helps to give people an idea
+	what the tool is used for.
+
+2008-01-15  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.conf, plugins/list-data/list-data.py,
+	yum-utils.spec:  List vendors, groups, packagers, buildhosts, licenses, arches,
+	 buildhosts, baseurls, package-sizes, archive-sizes,
+	 installed-sizes, committers
+
+2008-01-19  James Antill <james@and.org>
+
+	* docs/package-cleanup.1: Reorder option docs to be sorted
+
+2008-01-19  James Antill <james@and.org>
+
+	* docs/package-cleanup.1: Remove duplicate doc
+
+2008-01-18  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: make sure this only operates on src rpms b/c
+	otherwise bad things happen
+
+2008-01-18  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix typo
+
+2008-01-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: add -q, --new and --old options to repodiff. Correct
+	some logic issues in the diffing, fix up the output to a pipe
+
+2008-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: Remove hack for *-source repos.
+
+2008-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py:  Real fix for the __len__ problem. Don't disableRepo() and then
+	 enable it, this even do the disable last ... oops.
+
+2008-01-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	add repodiff, merge yum-utils.spec
+
+2008-01-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, repodiff.py, yum-utils.spec: add repodiff
+
+2008-01-10  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Workaround for bad yum module users
+
+2008-01-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Remove extra newlines, __str__
+	already leads with one
+
+2008-01-09  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Remove empty lss alias and minor cleanup
+
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
 2008-01-03  Tim Lauridsen <tla@rasmil.dk>
 
 	* Makefile: bumped yum-utils version to 1.1.10
