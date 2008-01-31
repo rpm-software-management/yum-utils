@@ -185,7 +185,12 @@ def size_get_data(self, data):
             (100 * 1024 * 1024, "100MB"),
             (500 * 1024 * 1024, "500MB"),
             )
-    pnum = (0, "  0KB")
+    pnum = (0, "   0B")
+    if val <= pnum[0]:
+        msg = "[ %s - %s ]  " % (" " * len(pnum[1]), pnum[1])
+        return SizeRangeData(pnum[0], msg)
+
+    pnum = (1, "   1B")
     for num in nums:
         if val >= pnum[0] and val <= num[0]:
             msg = "[ %s - %s ]  " % (pnum[1], num[1])
