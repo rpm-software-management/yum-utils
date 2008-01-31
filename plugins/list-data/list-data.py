@@ -94,7 +94,7 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
             self.show_pkgs(msg, calc[data])
 
     # pkg.vendor has weird values, for instance
-    def get_data(self, data):
+    def get_data(self, data, strip=True):
         if not hasattr(data, self.attr):
             return self.unknown
         
@@ -107,7 +107,10 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         tval = str(val).strip()
         if tval == "":
             return self.unknown
-        
+
+        if strip:
+            return tval
+
         return val
             
     def doCommand(self, base, basecmd, extcmds):
@@ -164,7 +167,7 @@ class SizeRangeData:
         return hash(self._msg)
 
 def size_get_data(self, data):
-    val = self.oget_data(data)
+    val = self.oget_data(data, strip=False)
     if val == self.unknown:
         return val
 
