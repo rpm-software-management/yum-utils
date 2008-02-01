@@ -336,7 +336,7 @@ def ysp_check_func_enter(conduit):
     if len(args):
         if (args[0] == "check-update"):
             ret = {"skip": ndata, "list_cmd": True}
-        if (args[0] == "update"):
+        if (args[0] in ["update", "upgrade"]):
             ret = {"skip": ndata, "list_cmd": False}
         if (args[0] == "list-sec") or (args[0] == "list-security"):
             return (opts, {"skip": True, "list_cmd": True})
