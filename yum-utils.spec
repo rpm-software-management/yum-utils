@@ -209,8 +209,20 @@ Group: System Environment/Base
 Requires: yum >= 3.0.5
 
 %description -n yum-list-data
-This plugin adds the commands list-vendors, groups, baseurls, packagers,
-buildhosts, licenses and arches.
+This plugin adds the commands list- vendors, groups, packagers, licenses,
+arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
+installed-sizes.
+
+%package -n yum-filter-data
+Summary: Yum plugin to list filter based on package data
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-filter-data
+This plugin adds the options --filter- vendors, groups, packagers, licenses,
+arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
+installed-sizes. Note that each package must match at least one pattern/range in
+each category, if any were specified.
 
 %package -n yum-tmprepo
 Summary: Yum plugin to add temporary repositories
@@ -234,7 +246,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data tmprepo"
+         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -390,6 +402,11 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
 
+%files -n yum-filter-data
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
+/usr/lib/yum-plugins/filter-data.*
+
 %files -n yum-tmprepo
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
@@ -397,8 +414,12 @@ fi
 
 
 %changelog
+* Fri Fed  1 2008 James Antill <james@fedoraproject.org>
+- Add filter-data plugin
+
 * Wed Jan 30 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.11
+
 * Sun Jan 13 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add repodiff
 
