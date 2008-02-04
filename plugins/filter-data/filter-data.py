@@ -338,6 +338,11 @@ def config_hook(conduit):
     parser.values.filter_installed_sizes = []
     def ogroups(opt, key, val, parser):
         parser.values.filter_groups.extend(str(val).split(","))
+    def make_sopt(attrs):
+        def func(opt, key, val, parser):
+            vals = str(val).split(",")
+            getattr(parser.values, 'filter_' + attrs).extend(vals)
+        return func
     def make_nopt(attrs):
         def func(opt, key, val, parser):
             vals = str(val).replace(",", " ").split()
@@ -368,13 +373,18 @@ def config_hook(conduit):
 
                 getattr(parser.values, 'filter_' + attrs).append(rang)
         return func
-    
+
+    # These have spaces in their values, so we can't split on space
     for (attrs, attr) in [('vendors', 'vendor'),
                           ('groups', 'group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
-                          ('arches', 'arch'),
-                          ('committers', 'committer'),
+                          ('committers', 'committer')]:
+        parser.add_option('--filter-' + attrs, action="callback",
+                          callback=make_sopt(attrs), default=[], type="string",
+                          help='Filter to packages with a matching ' + attr)
+
+    for (attrs, attr) in [('arches', 'arch'),
                           ('buildhosts', 'buildhost'),
                           ('urls', 'url')]:
         parser.add_option('--filter-' + attrs, action="callback",
