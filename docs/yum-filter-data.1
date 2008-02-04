@@ -1,0 +1,108 @@
+.\" yum filter data plugin
+.TH "yum-filter-data" "1" "2008 Feb  4" "James Antill" ""
+.SH "NAME"
+yum filter data plugin
+.SH "SYNOPSIS"
+\fByum\fP [options] [command] [package ...]
+.SH "DESCRIPTION"
+.PP 
+This plugin extends \fByum\fP with some options, currently just for "update"
+and "list update" type commands, to allow filters to be placed on which
+packages should be used based on the data in those packages. Note that due to
+some of the data being unknown, and thus could possibly match, all unknown data
+is treated as a match.
+.PP 
+.SH "GENERAL OPTIONS"
+These are the options added to yum that are available in the "list updates", 
+"info updates", "check-update" and "update" commands. They are:
+.PP 
+.IP "\fB\--filter-vendors\fP"
+This option includes packages which have a vendor which matches one of the
+passed vendor wildcard strings, or is unknown. Note that vendors can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument.
+.IP "\fB\--filter-groups\fP"
+This option includes packages which have a group which matches one of the
+passed group wildcard strings, or is unknown. Note that groups can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument.
+.IP "\fB\--filter-packagers\fP"
+This option includes packages which have a packager which matches one of the
+passed packager wildcard strings, or is unknown. Note that vendors can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument.
+.IP "\fB\--filter-licenses\fP"
+This option includes packages which have a license which matches one of the
+passed license wildcard strings, or is unknown. Note that licenses can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument.
+.IP "\fB\--filter-arches\fP"
+This option includes packages which have a arch which matches one of the
+passed arch wildcard strings, or is unknown.
+.IP "\fB\--filter-committers\fP"
+This option includes packages which have a committer which matches one of the
+passed committer wildcard strings, or is unknown. Note that committers can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument. Also, committer values are so loosely formed that they could
+contain commas too, it is recommeneded to not do that but you can work around it
+by using "?".
+.IP "\fB\--filter-buildhosts\fP"
+This option includes packages which have a buildhost which matches one of the
+passed buildhost wildcard strings, or is unknown.
+.IP "\fB\--filter-urls\fP"
+This option includes packages which have a url which matches one of the
+passed url wildcard strings, or is unknown.
+.IP "\fB\--filter-package-sizes\fP"
+This option includes packages which have a packagesize which is within one of
+the passed packagesize ranges, or is unknown.
+.IP "\fB\--filter-archive-sizes\fP"
+This option includes packages which have a archivesize which is within one of
+the passed archivesize ranges, or is unknown.
+.IP "\fB\--filter-installed-sizes\fP"
+This option includes packages which have a installedsize which is within one of
+the passed installedsize ranges, or is unknown.
+.PP
+.PP
+
+.SH "EXAMPLES"
+.PP
+To list all updates that are 1 MB or less use:
+.IP
+yum --filter-package-sizes=-1m check-update
+.PP
+To apply updates that Dan Walsh has committed use:
+.IP
+yum --filter-committer='Dan Walsh *' update
+.PP
+To get a list of all BZs that are fixed for packages you have installed use:
+.IP
+yum list-sec bugzillas
+.PP
+To get the information on advisory FEDORA-2707-4567 use:
+.IP
+yum info-sec FEDORA-2707-4567
+.PP
+To apply updates for Bugzillas 123, 456 and 789; and all security updates use:
+.IP
+yum --bz 123 --bz 456 --bz 789 --security update
+.PP
+To get an info list of updates for Bugzilla 123; CVEs CVE-2207-0123 and CVE-2207-3210; and Fedora advisories FEDORA-2707-4567 and FEDORA-2707-7654 use:
+.IP
+yum --bz 123 --cve CVE-2207-0123 --cve CVE-2207-3210 --advisory FEDORA-2707-4567 --advisory FEDORA-2707-7654 info updates
+
+
+.SH "SEE ALSO"
+.nf
+.I yum-list-data (1)
+.I yum (8)
+.I yum.conf (5)
+.fi
+
+.SH "AUTHORS"
+.nf
+James Antill <james.antill@redhat.com>.
+.fi
+
+.SH "BUGS"
+Currently yum can't filter packages in all of the commands, so for instance
+"yum list 'yum*'" doesn't get the results filtered.
