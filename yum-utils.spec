@@ -401,13 +401,13 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
-%{_mandir}/man8/yum-list-data.8.*
+%{_mandir}/man1/yum-list-data.1.*
 
 %files -n yum-filter-data
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
 /usr/lib/yum-plugins/filter-data.*
-%{_mandir}/man8/yum-filter-data.8.*
+%{_mandir}/man1/yum-filter-data.1.*
 
 %files -n yum-tmprepo
 %defattr(-, root, root)
