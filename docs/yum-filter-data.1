@@ -72,24 +72,15 @@ yum --filter-package-sizes=-1m check-update
 .PP
 To apply updates that Dan Walsh has committed use:
 .IP
-yum --filter-committer='Dan Walsh *' update
+yum --filter-committers='Dan Walsh *' update
 .PP
-To get a list of all BZs that are fixed for packages you have installed use:
+To list updates for a specific group use:
 .IP
-yum list-sec bugzillas
+yum --filter-groups='App*/Sys*' list updates
 .PP
-To get the information on advisory FEDORA-2707-4567 use:
+To apply updates to a specific set of group use:
 .IP
-yum info-sec FEDORA-2707-4567
-.PP
-To apply updates for Bugzillas 123, 456 and 789; and all security updates use:
-.IP
-yum --bz 123 --bz 456 --bz 789 --security update
-.PP
-To get an info list of updates for Bugzilla 123; CVEs CVE-2207-0123 and CVE-2207-3210; and Fedora advisories FEDORA-2707-4567 and FEDORA-2707-7654 use:
-.IP
-yum --bz 123 --cve CVE-2207-0123 --cve CVE-2207-3210 --advisory FEDORA-2707-4567 --advisory FEDORA-2707-7654 info updates
-
+yum --filter-groups='App*/System,Devel*/Lib*,System Environment/Base' update
 
 .SH "SEE ALSO"
 .nf
