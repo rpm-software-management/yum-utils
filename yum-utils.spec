@@ -401,6 +401,7 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
+%{_mandir}/man8/yum-list-data.8.*
 
 %files -n yum-filter-data
 %defattr(-, root, root)

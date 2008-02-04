@@ -1,4 +1,4 @@
-DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync yum-complete-transaction
+DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync yum-complete-transaction yum-list-data
 DOCS5 = yum-changelog.conf
 DOCS8 = yum-security
 
@@ -21,4 +21,3 @@ install:
 	for doc in $(DOCS8); do \
 		install -m 644 $$doc.8 $(DESTDIR)/usr/share/man/man8/; \
 	done
-	
