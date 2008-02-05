@@ -21,11 +21,11 @@ This option includes packages which have a vendor which matches one of the
 passed vendor wildcard strings, or is unknown. Note that vendors can have
 spaces in their value, so "," is the only way to specify multiple vendors as one
 option argument.
-.IP "\fB\--filter-groups\fP"
+.IP "\fB\--filter-rpm-groups\fP"
 This option includes packages which have a group which matches one of the
-passed group wildcard strings, or is unknown. Note that groups can have
-spaces in their value, so "," is the only way to specify multiple groups as one
-option argument.
+passed rpm group wildcard strings, or is unknown. Note that rpm groups can have
+spaces in their value, so "," is the only way to specify multiple rpm groups as
+one option argument.
 .IP "\fB\--filter-packagers\fP"
 This option includes packages which have a packager which matches one of the
 passed packager wildcard strings, or is unknown. Note that vendors can have
@@ -61,7 +61,7 @@ the passed archivesize ranges, or is unknown.
 .IP "\fB\--filter-installed-sizes\fP"
 This option includes packages which have a installedsize which is within one of
 the passed installedsize ranges, or is unknown.
-.IP "\fB\--filter-yum-groups\fP"
+.IP "\fB\--filter-groups\fP"
 This option includes packages which are in a yum group which matches one of the
 passed yum group id strings, or is unknown. Note that yum groups can have
 spaces in their value, so "," is the only way to specify multiple yum groups as
@@ -81,11 +81,15 @@ yum --filter-committers='Dan Walsh *' update
 .PP
 To list updates for a specific group use:
 .IP
-yum --filter-groups='App*/Sys*' list updates
+yum --filter-rpm-groups='App*/Sys*' list updates
 .PP
 To apply updates to a specific set of groups use:
 .IP
-yum --filter-groups='App*/System,Devel*/Lib*,System Environment/Base' update
+yum --filter-rpm-groups='App*/System,Devel*/Lib*,System Environment/Base' update
+.PP
+To list updates for a set of yum groups use:
+.IP
+yum --filter-yum-groups='PostgreSQL Database,Web Server' list updates
 .PP
 To apply updates to a specific set of yum groups use:
 .IP

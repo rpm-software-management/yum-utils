@@ -270,7 +270,7 @@ def config_hook(conduit):
     '''
 
     for data in [('vendors', 'vendor'),
-                 ('groups', 'group'),
+                 ('rpm-groups', 'group'),
                  ('packagers', 'packager'),
                  ('licenses', 'license'),
                  ('arches', 'arch'),
@@ -285,7 +285,7 @@ def config_hook(conduit):
     _list_data_custom(conduit, ('installed-sizes', 'installedsize'),
                       size_get_data)
     
-    _list_data_custom(conduit, ('yum-groups', conduit._base),
+    _list_data_custom(conduit, ('groups', conduit._base),
                       yum_group_get_data,
                       beg=yum_group_make_data, end=yum_group_free_data)
     

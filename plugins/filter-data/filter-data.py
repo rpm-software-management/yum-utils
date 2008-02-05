@@ -66,7 +66,7 @@ all_yum_grp_mbrs = {}
 def fd_make_group_data(base, opts):
     global all_yum_grp_mbrs
 
-    for pat in opts.filter_yum_groups:
+    for pat in opts.filter_groups:
 
         group = base.comps.return_group(pat)
         if not group:
@@ -90,17 +90,17 @@ def fd_should_filter_pkg(base, opts, pkg, used_map):
     """ Do the package filtering for. """
 
     for (attrs, attr) in [('vendors', 'vendor'),
-                          ('groups', 'group'),
+                          ('rpm-groups', 'group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
                           ('arches', 'arch'),
                           ('committers', 'committer'),
                           ('buildhosts', 'buildhost'),
                           ('urls', 'url')]:
-        pats = getattr(opts, 'filter_' + attrs)
+        pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
         filt = len(pats)
+        data = fd__get_data(pkg, attr)
         for pat in pats:
-            data = fd__get_data(pkg, attr)
             if data == fd__unknown or fnmatch.fnmatch(data, pat):
                 used_map[attrs][pat] = True
                 filt = False
@@ -113,8 +113,8 @@ def fd_should_filter_pkg(base, opts, pkg, used_map):
                           ('installed-sizes', 'installedsize')]:
         rangs = getattr(opts, 'filter_' + attrs.replace('-', '_'))
         filt = len(rangs)
+        data = fd__get_data(pkg, attr, strip=False)
         for rang in rangs:
-            data = fd__get_data(pkg, attr, strip=False)
             if data == fd__unknown or range_match(data, rang):
                 used_map[attrs][rang] = True
                 filt = False
@@ -122,19 +122,20 @@ def fd_should_filter_pkg(base, opts, pkg, used_map):
         if filt:
             return (attrs, attr)
 
-    if pkg.name not in all_yum_grp_mbrs:
-        return ('yum-groups', None)
+    if len(opts.filter_groups):
+        if pkg.name not in all_yum_grp_mbrs:
+            return ('groups', None)
 
-    for pat in all_yum_grp_mbrs[pkg.name]:
-        used_map['yum-groups'][pat] = True
-        break
+        for pat in all_yum_grp_mbrs[pkg.name]:
+            used_map['groups'][pat] = True
+            break
 
     return None
 
 def fd_gen_used_map(opts):
     used_map = {}
     for (attrs, attr) in [('vendors', 'vendor'),
-                          ('groups', 'group'),
+                          ('rpm-groups', 'group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
                           ('arches', 'arch'),
@@ -144,7 +145,7 @@ def fd_gen_used_map(opts):
                           ('package-sizes', 'packagesize'),
                           ('archive-sizes', 'archivesize'),
                           ('installed-sizes', 'installedsize'),
-                          ('yum-groups', None)]:
+                          ('groups', None)]:
         used_map[attrs] = {}
         vattrs = attrs.replace('-', '_')
         for i in getattr(opts, 'filter_' + vattrs):
@@ -154,7 +155,7 @@ def fd_gen_used_map(opts):
 
 def fd_chk_used_map(used_map, msg):
     for (attrs, attr) in [('vendors', 'vendor'),
-                          ('groups', 'group'),
+                          ('rpm-groups', 'rpm group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
                           ('arches', 'arch'),
@@ -178,8 +179,8 @@ def fd_chk_used_map(used_map, msg):
                     msg(attrs[:-1].capitalize() +
                         ' range \"%d-%d\" did not match any packages' % i)
 
-    for i in used_map['yum-groups']:
-        if not used_map['yum-groups'][i]:
+    for i in used_map['groups']:
+        if not used_map['groups'][i]:
             msg('Yum group \"%s\" did not contain any packages' % i)
 
         
@@ -201,7 +202,7 @@ def fd_check_func_enter(conduit):
     # Quick match, so we don't do lots of work when nothing has been specified
     ndata = True
     for (attrs, attr) in [('vendors', 'vendor'),
-                          ('groups', 'group'),
+                          ('rpm-groups', 'group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
                           ('arches', 'arch'),
@@ -214,7 +215,7 @@ def fd_check_func_enter(conduit):
         vattrs = attrs.replace('-', '_')
         if len(getattr(opts, 'filter_' + vattrs)):
             ndata = False
-    if len(opts.filter_yum_groups):
+    if len(opts.filter_groups):
         ndata = False
     
     ret = None
@@ -227,9 +228,10 @@ def fd_check_func_enter(conduit):
 
     # FIXME: delPackage() only works for updates atm.
     valid_list_cmds = ["list", "info"]
-    for cmd in ["vendors", 'groups', 'packagers', 'licenses', 'arches',
+    for cmd in ["vendors", 'rpm-groups', 'packagers', 'licenses', 'arches',
                 'committers', 'buildhosts', 'baseurls', 'package-sizes',
-                'archive-sizes', 'installed-sizes', 'security', 'sec']:
+                'archive-sizes', 'installed-sizes', 'security', 'sec',
+                'groups']:
         valid_list_cmds.append("list-" + cmd)
         valid_list_cmds.append("info-" + cmd)
 
@@ -297,7 +299,7 @@ def exclude_hook(conduit):
             pkgs.extend(data.updates)
             del data
 
-    if opts.filter_yum_groups:
+    if opts.filter_groups:
         fd_make_group_data(conduit._base, opts)
     tot = 0
     cnt = 0
@@ -338,7 +340,7 @@ def preresolve_hook(conduit):
                      (tspkg.po, tspkg.po.repoid, which[0]))
         tsinfo.remove(tspkg.pkgtup)
 
-    if opts.filter_yum_groups:
+    if opts.filter_groups:
         fd_make_group_data(conduit._base, opts)
     tot = 0
     cnt = 0
@@ -371,7 +373,7 @@ def config_hook(conduit):
         return
 
     parser.values.filter_vendors         = []
-    parser.values.filter_groups          = []
+    parser.values.filter_rpm_groups      = []
     parser.values.filter_packagers       = []
     parser.values.filter_licenses        = []
     parser.values.filter_arches          = []
@@ -381,17 +383,19 @@ def config_hook(conduit):
     parser.values.filter_packages_sizes  = []
     parser.values.filter_archive_sizes   = []
     parser.values.filter_installed_sizes = []
-    parser.values.filter_yum_groups      = []
-    def ogroups(opt, key, val, parser):
-        parser.values.filter_groups.extend(str(val).split(","))
+    parser.values.filter_groups          = []
     def make_sopt(attrs):
+        attrs = attrs.replace("-", "_")
         def func(opt, key, val, parser):
             vals = str(val).split(",")
+            vals = filter(len, vals)
             getattr(parser.values, 'filter_' + attrs).extend(vals)
         return func
     def make_nopt(attrs):
+        attrs = attrs.replace("-", "_")
         def func(opt, key, val, parser):
             vals = str(val).replace(",", " ").split()
+            vals = filter(len, vals)
             getattr(parser.values, 'filter_' + attrs).extend(vals)
         return func
     def make_szopt(attrs):
@@ -407,6 +411,7 @@ def config_hook(conduit):
                     x = x[:-1]
                 return int(x) * mul
             vals = str(val).replace(",", " ").split()
+            vals = filter(len, vals)
             for val in vals:
                 rang = val.split("-")
                 if len(rang) > 2:
@@ -422,7 +427,7 @@ def config_hook(conduit):
 
     # These have spaces in their values, so we can't split on space
     for (attrs, attr) in [('vendors', 'vendor'),
-                          ('groups', 'group'),
+                          ('rpm-groups', 'group'),
                           ('packagers', 'packager'),
                           ('licenses', 'license'),
                           ('committers', 'committer')]:
@@ -446,8 +451,8 @@ def config_hook(conduit):
                           % attr)
 
     # This is kind of odd man out, but...
-    parser.add_option('--filter-yum-groups', action="callback",
-                      callback=make_sopt('yum_groups'),default=[],type="string",
+    parser.add_option('--filter-groups', action="callback",
+                      callback=make_sopt('groups'),default=[],type="string",
                       help='Filter to packages within a matching yum group')
 
 if __name__ == '__main__':

@@ -14,9 +14,9 @@ added yum \fIcommand\fPs are:
 .br 
 .I \fR * info-vendors
 .br 
-.I \fR * list-groups
+.I \fR * list-rpm-groups
 .br 
-.I \fR * info-groups
+.I \fR * info-rpm-groups
 .br 
 .I \fR * list-packagers
 .br 
@@ -54,9 +54,9 @@ added yum \fIcommand\fPs are:
 .br 
 .I \fR * info-installed-sizes
 .br 
-.I \fR * list-yum-groups
+.I \fR * list-groups
 .br 
-.I \fR * info-yum-groups
+.I \fR * info-groups
 .br 
 .PP 
 all of which take the same arguments as the list and info yum commands. The
@@ -70,7 +70,7 @@ all the packages under each agregation.
 Is used to list the aggregate of the vendor attribute on the packages, examples
 are "Fedora Project" and "Red Hat, Inc.".
 .IP
-.IP "\fBlist-groups\fP" "\fBinfo-groups\fP"
+.IP "\fBlist-rpm-groups\fP" "\fBinfo-rpm-groups\fP"
 Is used to list the aggregate of the group attribute on the packages, examples
 are "Applications/System", "Development/Tools" and "System Environment/Base"
 .IP
@@ -111,7 +111,7 @@ the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
 Is used to list the aggregate of specified ranges the installedsize attribute on
 the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
 .IP
-.IP "\fBlist-yum-groups\fP" "\fBinfo-yum-groups\fP"
+.IP "\fBlist-groups\fP" "\fBinfo-groups\fP"
 Is used to list the aggregate of the yum groups that the packages are in,
 examples are in "yum grouplist". Note that in yum groups a package can be in
 more than one group at a time.
@@ -123,7 +123,7 @@ which point a seperate aggregation called "-- Unknown --" is listed.
 .PP
 To list all the groups that have an update, along with the number of packages in each group, use:
 .IP
-yum list-groups updates
+yum list-rpm-groups updates
 .PP
 To list all the committers to packages that have yum in their name, use:
 .IP
@@ -135,7 +135,7 @@ yum list-package-sizes
 .PP
 To list yum groups that have an update, use:
 .IP
-yum list-yum-groups
+yum list-groups
 
 
 .SH "SEE ALSO"
