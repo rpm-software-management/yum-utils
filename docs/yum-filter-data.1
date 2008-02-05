@@ -19,7 +19,7 @@ These are the options added to yum that are available in the "list updates",
 .IP "\fB\--filter-vendors\fP"
 This option includes packages which have a vendor which matches one of the
 passed vendor wildcard strings, or is unknown. Note that vendors can have
-spaces in their value, so "," is the only way to specify multiple groups as one
+spaces in their value, so "," is the only way to specify multiple vendors as one
 option argument.
 .IP "\fB\--filter-groups\fP"
 This option includes packages which have a group which matches one of the
@@ -29,23 +29,23 @@ option argument.
 .IP "\fB\--filter-packagers\fP"
 This option includes packages which have a packager which matches one of the
 passed packager wildcard strings, or is unknown. Note that vendors can have
-spaces in their value, so "," is the only way to specify multiple groups as one
-option argument.
+spaces in their value, so "," is the only way to specify multiple packagers as
+one option argument.
 .IP "\fB\--filter-licenses\fP"
 This option includes packages which have a license which matches one of the
 passed license wildcard strings, or is unknown. Note that licenses can have
-spaces in their value, so "," is the only way to specify multiple groups as one
-option argument.
+spaces in their value, so "," is the only way to specify multiple licenses as
+one option argument.
 .IP "\fB\--filter-arches\fP"
 This option includes packages which have a arch which matches one of the
 passed arch wildcard strings, or is unknown.
 .IP "\fB\--filter-committers\fP"
 This option includes packages which have a committer which matches one of the
 passed committer wildcard strings, or is unknown. Note that committers can have
-spaces in their value, so "," is the only way to specify multiple groups as one
-option argument. Also, committer values are so loosely formed that they could
-contain commas too, it is recommeneded to not do that but you can work around it
-by using "?".
+spaces in their value, so "," is the only way to specify multiple committers as
+one option argument. Also, committer values are so loosely formed that they 
+could contain commas too, it is recommeneded to not do that but you can work
+around it by using "?".
 .IP "\fB\--filter-buildhosts\fP"
 This option includes packages which have a buildhost which matches one of the
 passed buildhost wildcard strings, or is unknown.
@@ -63,9 +63,9 @@ This option includes packages which have a installedsize which is within one of
 the passed installedsize ranges, or is unknown.
 .IP "\fB\--filter-yum-groups\fP"
 This option includes packages which are in a yum group which matches one of the
-passed yum group id strings, or is unknown. Note that groups can have
-spaces in their value, so "," is the only way to specify multiple groups as one
-option argument.
+passed yum group id strings, or is unknown. Note that yum groups can have
+spaces in their value, so "," is the only way to specify multiple yum groups as
+one option argument.
 .PP
 .PP
 
