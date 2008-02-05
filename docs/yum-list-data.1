@@ -54,6 +54,10 @@ added yum \fIcommand\fPs are:
 .br 
 .I \fR * info-installed-sizes
 .br 
+.I \fR * list-yum-groups
+.br 
+.I \fR * info-yum-groups
+.br 
 .PP 
 all of which take the same arguments as the list and info yum commands. The
 difference between the list and info varieties is that the info versions lists
@@ -107,6 +111,11 @@ the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
 Is used to list the aggregate of specified ranges the installedsize attribute on
 the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
 .IP
+.IP "\fBlist-yum-groups\fP" "\fBinfo-yum-groups\fP"
+Is used to list the aggregate of the yum groups that the packages are in,
+examples are in "yum grouplist". Note that in yum groups a package can be in
+more than one group at a time.
+.IP
 .PP 
 It is worth noting that some of the above data can be "unknown", to yum, at
 which point a seperate aggregation called "-- Unknown --" is listed.
@@ -123,6 +132,10 @@ yum list-committers 'yum*'
 To list ranges of the sizes of pacakges installed or available, use:
 .IP
 yum list-package-sizes
+.PP
+To list yum groups that have an update, use:
+.IP
+yum list-yum-groups
 
 
 .SH "SEE ALSO"

@@ -52,6 +52,12 @@ class ListDataCommands:
         self.name = name
         self.attr = attr
 
+    def cmd_beg(self):
+        pass
+
+    def cmd_end(self):
+        pass
+
     def getNames(self):
         return ['list-' + self.name]
 
@@ -79,7 +85,11 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         calc = {}
         for pkg in pkgs:
             data = self.get_data(pkg)
-            calc.setdefault(data, []).append(pkg)
+            if type(data) != type([]):
+                calc.setdefault(data, []).append(pkg)
+            else:
+                for sdata in data:
+                    calc.setdefault(sdata, []).append(pkg)
         maxlen = 0
         totlen = 0
         for data in calc:
@@ -120,12 +130,14 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         def msg_warn(x):
             logger.warn(x)
 
+        self.cmd_beg()
         ypl = base.returnPkgLists(extcmds)
         self.show_data(msg, ypl.installed, 'Installed Packages')
         self.show_data(msg, ypl.available, 'Available Packages')
         self.show_data(msg, ypl.extras,    'Extra Packages')
         self.show_data(msg, ypl.updates,   'Updated Packages')
         self.show_data(msg, ypl.obsoletes, 'Obsoleting Packages')
+        self.cmd_end()
 
         return 0, [basecmd + ' done']
             
@@ -202,15 +214,51 @@ def size_get_data(self, data):
     msg = "[ %s - %s ]  " % (pnum[1], " " * len(pnum[1]))
     return SizeRangeData(pnum[0], msg)    
 
-def _list_data_custom(conduit, data, func):
+
+all_yum_grp_mbrs = {}
+def yum_group_make_data(self):
+    global all_yum_grp_mbrs
+
+    base = self.attr
+    installed, available = base.doGroupLists(uservisible=0)
+    for group in installed + available:
+
+        # Should use translated_name/nameByLang()
+        for pkgname in group.mandatory_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname in group.default_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname in group.optional_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname, cond in group.conditional_packages.iteritems():
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+
+def yum_group_free_data(self):
+    global all_yum_grp_mbrs
+    all_yum_grp_mbrs = {}
+
+def yum_group_get_data(self, pkg):
+    if pkg.name not in all_yum_grp_mbrs:
+        return self.unknown
+    return all_yum_grp_mbrs[pkg.name]
+
+def _list_data_custom(conduit, data, func, beg=None, end=None):
     cmd = ListDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
+    if beg:
+        cmd.cmd_beg = types.MethodType(beg, cmd)
+    if end:
+        cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
 
     cmd = InfoDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
+    if beg:
+        cmd.cmd_beg = types.MethodType(beg, cmd)
+    if end:
+        cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
     
         
@@ -236,5 +284,9 @@ def config_hook(conduit):
     _list_data_custom(conduit, ('archive-sizes', 'archivesize'), size_get_data)
     _list_data_custom(conduit, ('installed-sizes', 'installedsize'),
                       size_get_data)
+    
+    _list_data_custom(conduit, ('yum-groups', conduit._base),
+                      yum_group_get_data,
+                      beg=yum_group_make_data, end=yum_group_free_data)
     
     # Buildtime/installtime/committime?

@@ -62,7 +62,31 @@ def fd__get_data(pkg, attr, strip=True):
 def range_match(sz, rang):
     return sz >= rang[0] and sz <= rang[1]
 
-def fd_should_filter_pkg(opts, pkg, used_map):
+all_yum_grp_mbrs = {}
+def fd_make_group_data(base, opts):
+    global all_yum_grp_mbrs
+
+    for pat in opts.filter_yum_groups:
+
+        group = base.comps.return_group(pat)
+        if not group:
+            base.logger.critical('Warning: Group %s does not exist.', pat)
+            continue
+
+        for pkgname in group.mandatory_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(pat)
+        for pkgname in group.default_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(pat)
+        for pkgname in group.optional_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(pat)
+        for pkgname, cond in group.conditional_packages.iteritems():
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(pat)
+
+def fd_free_group_data():
+    global all_yum_grp_mbrs
+    all_yum_grp_mbrs = {}
+
+def fd_should_filter_pkg(base, opts, pkg, used_map):
     """ Do the package filtering for. """
 
     for (attrs, attr) in [('vendors', 'vendor'),
@@ -74,29 +98,36 @@ def fd_should_filter_pkg(opts, pkg, used_map):
                           ('buildhosts', 'buildhost'),
                           ('urls', 'url')]:
         pats = getattr(opts, 'filter_' + attrs)
-        done = len(pats)
+        filt = len(pats)
         for pat in pats:
             data = fd__get_data(pkg, attr)
             if data == fd__unknown or fnmatch.fnmatch(data, pat):
                 used_map[attrs][pat] = True
-                done = False
+                filt = False
                 break
-        if done:
+        if filt:
             return (attrs, attr)
 
     for (attrs, attr) in [('package-sizes', 'packagesize'),
                           ('archive-sizes', 'archivesize'),
                           ('installed-sizes', 'installedsize')]:
         rangs = getattr(opts, 'filter_' + attrs.replace('-', '_'))
-        done = len(rangs)
+        filt = len(rangs)
         for rang in rangs:
             data = fd__get_data(pkg, attr, strip=False)
             if data == fd__unknown or range_match(data, rang):
                 used_map[attrs][rang] = True
-                done = False
+                filt = False
                 break
-        if done:
+        if filt:
             return (attrs, attr)
+
+    if pkg.name not in all_yum_grp_mbrs:
+        return ('yum-groups', None)
+
+    for pat in all_yum_grp_mbrs[pkg.name]:
+        used_map['yum-groups'][pat] = True
+        break
 
     return None
 
@@ -112,7 +143,8 @@ def fd_gen_used_map(opts):
                           ('urls', 'url'),
                           ('package-sizes', 'packagesize'),
                           ('archive-sizes', 'archivesize'),
-                          ('installed-sizes', 'installedsize')]:
+                          ('installed-sizes', 'installedsize'),
+                          ('yum-groups', None)]:
         used_map[attrs] = {}
         vattrs = attrs.replace('-', '_')
         for i in getattr(opts, 'filter_' + vattrs):
@@ -145,6 +177,11 @@ def fd_chk_used_map(used_map, msg):
                 else:
                     msg(attrs[:-1].capitalize() +
                         ' range \"%d-%d\" did not match any packages' % i)
+
+    for i in used_map['yum-groups']:
+        if not used_map['yum-groups'][i]:
+            msg('Yum group \"%s\" did not contain any packages' % i)
+
         
 #  You might think we'd just use the exclude_hook, and call delPackage
 # and indeed that works for list updates etc.
@@ -177,6 +214,8 @@ def fd_check_func_enter(conduit):
         vattrs = attrs.replace('-', '_')
         if len(getattr(opts, 'filter_' + vattrs)):
             ndata = False
+    if len(opts.filter_yum_groups):
+        ndata = False
     
     ret = None
     if len(args) >= 1:
@@ -257,12 +296,14 @@ def exclude_hook(conduit):
             data = conduit._base.doPackageLists(pkgnarrow=pn, patterns=args)
             pkgs.extend(data.updates)
             del data
-            
+
+    if opts.filter_yum_groups:
+        fd_make_group_data(conduit._base, opts)
     tot = 0
     cnt = 0
     for pkg in pkgs:
         tot += 1
-        which = fd_should_filter_pkg(opts, pkg, used_map)
+        which = fd_should_filter_pkg(conduit._base, opts, pkg, used_map)
         if which:
             fd_del_pkg(pkg, which)
         else:
@@ -273,6 +314,7 @@ def exclude_hook(conduit):
     else:
         conduit.info(2, 'No packages passed the filters, %d available' % tot)
 
+    fd_free_group_data()
     _in_plugin = False
 
 def preresolve_hook(conduit):
@@ -296,6 +338,8 @@ def preresolve_hook(conduit):
                      (tspkg.po, tspkg.po.repoid, which[0]))
         tsinfo.remove(tspkg.pkgtup)
 
+    if opts.filter_yum_groups:
+        fd_make_group_data(conduit._base, opts)
     tot = 0
     cnt = 0
     used_map = fd_gen_used_map(opts)
@@ -303,7 +347,7 @@ def preresolve_hook(conduit):
     tspkgs = tsinfo.getMembers()
     for tspkg in tspkgs:
         tot += 1
-        which = fd_should_filter_pkg(opts, tspkg.po, used_map)
+        which = fd_should_filter_pkg(conduit._base, opts, tspkg.po, used_map)
         if which:
             fd_del_pkg(tspkg, which)
         else:
@@ -314,6 +358,7 @@ def preresolve_hook(conduit):
         conduit.info(2, 'Left with %d of %d packages, after filters applied' % (cnt, tot))
     else:
         conduit.info(2, 'No packages passed the filters, %d available' % tot)
+    fd_free_group_data()
 
 def config_hook(conduit):
     '''
@@ -336,6 +381,7 @@ def config_hook(conduit):
     parser.values.filter_packages_sizes  = []
     parser.values.filter_archive_sizes   = []
     parser.values.filter_installed_sizes = []
+    parser.values.filter_yum_groups      = []
     def ogroups(opt, key, val, parser):
         parser.values.filter_groups.extend(str(val).split(","))
     def make_sopt(attrs):
@@ -398,6 +444,11 @@ def config_hook(conduit):
                           callback=make_szopt(attrs), default=[], type="string",
                           help='Filter to packages with a %s in the given range'
                           % attr)
+
+    # This is kind of odd man out, but...
+    parser.add_option('--filter-yum-groups', action="callback",
+                      callback=make_sopt('yum_groups'),default=[],type="string",
+                      help='Filter to packages within a matching yum group')
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"

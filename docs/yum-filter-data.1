@@ -61,6 +61,11 @@ the passed archivesize ranges, or is unknown.
 .IP "\fB\--filter-installed-sizes\fP"
 This option includes packages which have a installedsize which is within one of
 the passed installedsize ranges, or is unknown.
+.IP "\fB\--filter-yum-groups\fP"
+This option includes packages which are in a yum group which matches one of the
+passed yum group id strings, or is unknown. Note that groups can have
+spaces in their value, so "," is the only way to specify multiple groups as one
+option argument.
 .PP
 .PP
 
@@ -78,9 +83,13 @@ To list updates for a specific group use:
 .IP
 yum --filter-groups='App*/Sys*' list updates
 .PP
-To apply updates to a specific set of group use:
+To apply updates to a specific set of groups use:
 .IP
 yum --filter-groups='App*/System,Devel*/Lib*,System Environment/Base' update
+.PP
+To apply updates to a specific set of yum groups use:
+.IP
+yum --filter-yum-groups='KDE,Core,Printing Support' update
 
 .SH "SEE ALSO"
 .nf
