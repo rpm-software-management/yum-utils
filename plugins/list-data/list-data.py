@@ -34,11 +34,6 @@ from yum import logginglevels
 # For baseurl
 import urlparse
 
-# For committers
-import re
-
-import UnicodeWidth
-
 # Decent (UK/US English only) number formatting.
 import locale
 locale.setlocale(locale.LC_ALL, '') 
@@ -57,11 +52,24 @@ class ListDataCommands:
         self.name = name
         self.attr = attr
 
+    def cmd_beg(self):
+        pass
+
+    def cmd_end(self):
+        pass
+
     def getNames(self):
         return ['list-' + self.name]
 
     def getUsage(self):
-        return self.getNames()[0]
+        return "[PACKAGE|all|installed|updates|extras|obsoletes|recent]"
+
+    def _getSummary(self):
+        return """\
+Display aggregate data on the %s attribute of a group of packages""" % self.attr
+
+    def getSummary(self):
+        return self._getSummary()
 
     def doCheck(self, base, basecmd, extcmds):
         pass
@@ -77,7 +85,11 @@ class ListDataCommands:
         calc = {}
         for pkg in pkgs:
             data = self.get_data(pkg)
-            calc.setdefault(data, []).append(pkg)
+            if type(data) != type([]):
+                calc.setdefault(data, []).append(pkg)
+            else:
+                for sdata in data:
+                    calc.setdefault(sdata, []).append(pkg)
         maxlen = 0
         totlen = 0
         for data in calc:
@@ -92,7 +104,7 @@ class ListDataCommands:
             self.show_pkgs(msg, calc[data])
 
     # pkg.vendor has weird values, for instance
-    def get_data(self, data):
+    def get_data(self, data, strip=True):
         if not hasattr(data, self.attr):
             return self.unknown
         
@@ -105,7 +117,10 @@ class ListDataCommands:
         tval = str(val).strip()
         if tval == "":
             return self.unknown
-        
+
+        if strip:
+            return tval
+
         return val
             
     def doCommand(self, base, basecmd, extcmds):
@@ -115,18 +130,23 @@ class ListDataCommands:
         def msg_warn(x):
             logger.warn(x)
 
+        self.cmd_beg()
         ypl = base.returnPkgLists(extcmds)
         self.show_data(msg, ypl.installed, 'Installed Packages')
         self.show_data(msg, ypl.available, 'Available Packages')
         self.show_data(msg, ypl.extras,    'Extra Packages')
         self.show_data(msg, ypl.updates,   'Updated Packages')
         self.show_data(msg, ypl.obsoletes, 'Obsoleting Packages')
+        self.cmd_end()
 
         return 0, [basecmd + ' done']
             
 class InfoDataCommands(ListDataCommands):
     def getNames(self):
         return ['info-' + self.name]
+
+    def getSummary(self):
+        return self._getSummary() + "\nAnd list all the packages under each"
 
     def show_pkgs(self, msg, pkgs):
         for pkg in pkgs:
@@ -159,7 +179,7 @@ class SizeRangeData:
         return hash(self._msg)
 
 def size_get_data(self, data):
-    val = self.oget_data(data)
+    val = self.oget_data(data, strip=False)
     if val == self.unknown:
         return val
 
@@ -180,7 +200,12 @@ def size_get_data(self, data):
             (100 * 1024 * 1024, "100MB"),
             (500 * 1024 * 1024, "500MB"),
             )
-    pnum = (0, "  0KB")
+    pnum = (0, "   0B")
+    if val <= pnum[0]:
+        msg = "[ %s - %s ]  " % (" " * len(pnum[1]), pnum[1])
+        return SizeRangeData(pnum[0], msg)
+
+    pnum = (1, "   1B")
     for num in nums:
         if val >= pnum[0] and val <= num[0]:
             msg = "[ %s - %s ]  " % (pnum[1], num[1])
@@ -189,36 +214,51 @@ def size_get_data(self, data):
     msg = "[ %s - %s ]  " % (pnum[1], " " * len(pnum[1]))
     return SizeRangeData(pnum[0], msg)    
 
-def _nf2ascii(x):
-    """ does .encode("ascii", "replace") but it never fails. """
-    ret = []
-    for val in x:
-        if ord(val) >= 128:
-            val = '?'
-        ret.append(val)
-    return "".join(ret)
 
-def committer_get_data(self, data):
-    if not hasattr(data, self.attr):
+all_yum_grp_mbrs = {}
+def yum_group_make_data(self):
+    global all_yum_grp_mbrs
+
+    base = self.attr
+    installed, available = base.doGroupLists(uservisible=0)
+    for group in installed + available:
+
+        # Should use translated_name/nameByLang()
+        for pkgname in group.mandatory_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname in group.default_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname in group.optional_packages:
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+        for pkgname, cond in group.conditional_packages.iteritems():
+            all_yum_grp_mbrs.setdefault(pkgname, []).append(group.name)
+
+def yum_group_free_data(self):
+    global all_yum_grp_mbrs
+    all_yum_grp_mbrs = {}
+
+def yum_group_get_data(self, pkg):
+    if pkg.name not in all_yum_grp_mbrs:
         return self.unknown
-    val = getattr(data, self.attr)
+    return all_yum_grp_mbrs[pkg.name]
 
-    # No good way to get number of utf-8 code points Arghh.
-    val = val[0][1]
-    # .encode("ascii", "replace") fails as does .encode("utf-8")
-    val = _nf2ascii(val)
-    # Hacky way to get rid of version numbers...
-    return re.sub("""> .*""", '>', val)
-
-def _list_data_custom(conduit, data, func):
+def _list_data_custom(conduit, data, func, beg=None, end=None):
     cmd = ListDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
+    if beg:
+        cmd.cmd_beg = types.MethodType(beg, cmd)
+    if end:
+        cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
 
     cmd = InfoDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
+    if beg:
+        cmd.cmd_beg = types.MethodType(beg, cmd)
+    if end:
+        cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
     
         
@@ -230,10 +270,11 @@ def config_hook(conduit):
     '''
 
     for data in [('vendors', 'vendor'),
-                 ('groups', 'group'),
+                 ('rpm-groups', 'group'),
                  ('packagers', 'packager'),
                  ('licenses', 'license'),
                  ('arches', 'arch'),
+                 ('committers', 'committer'),
                  ('buildhosts', 'buildhost')]:
         conduit.registerCommand(ListDataCommands(*data))
         conduit.registerCommand(InfoDataCommands(*data))
@@ -244,6 +285,8 @@ def config_hook(conduit):
     _list_data_custom(conduit, ('installed-sizes', 'installedsize'),
                       size_get_data)
     
-    _list_data_custom(conduit, ('committers', 'changelog'),
-                      committer_get_data)
+    _list_data_custom(conduit, ('groups', conduit._base),
+                      yum_group_get_data,
+                      beg=yum_group_make_data, end=yum_group_free_data)
+    
     # Buildtime/installtime/committime?

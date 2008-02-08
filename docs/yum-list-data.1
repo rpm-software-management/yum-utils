@@ -1,0 +1,151 @@
+.\" yum list-data plugin
+.TH "yum-list-data" "1" "2008 Feb 4" "James Antill" ""
+.SH "NAME"
+yum list data plugin
+.SH "SYNOPSIS"
+\fByum\fP [options] [command] [package ...]
+.SH "DESCRIPTION"
+.PP 
+This plugin extends \fByum\fP for some commands that give aggregate package data based on lists of packages
+.PP 
+added yum \fIcommand\fPs are:
+.br 
+.I \fR * list-vendors
+.br 
+.I \fR * info-vendors
+.br 
+.I \fR * list-rpm-groups
+.br 
+.I \fR * info-rpm-groups
+.br 
+.I \fR * list-packagers
+.br 
+.I \fR * info-packagers
+.br 
+.I \fR * list-licenses
+.br 
+.I \fR * info-licenses
+.br 
+.I \fR * list-arches
+.br 
+.I \fR * info-arches
+.br 
+.I \fR * list-committers
+.br 
+.I \fR * info-committers
+.br 
+.I \fR * list-buildhosts
+.br 
+.I \fR * info-buildhosts
+.br 
+.I \fR * list-baseurls
+.br 
+.I \fR * info-baseurls
+.br 
+.I \fR * list-package-sizes
+.br 
+.I \fR * info-package-sizes
+.br 
+.I \fR * list-archive-sizes
+.br 
+.I \fR * info-archive-sizes
+.br 
+.I \fR * list-installed-sizes
+.br 
+.I \fR * info-installed-sizes
+.br 
+.I \fR * list-groups
+.br 
+.I \fR * info-groups
+.br 
+.PP 
+all of which take the same arguments as the list and info yum commands. The
+difference between the list and info varieties is that the info versions lists
+all the packages under each agregation.
+.PP
+.br 
+.br 
+.PP 
+.IP "\fBlist-vendors\fP" "\fBinfo-vendors\fP"
+Is used to list the aggregate of the vendor attribute on the packages, examples
+are "Fedora Project" and "Red Hat, Inc.".
+.IP
+.IP "\fBlist-rpm-groups\fP" "\fBinfo-rpm-groups\fP"
+Is used to list the aggregate of the group attribute on the packages, examples
+are "Applications/System", "Development/Tools" and "System Environment/Base"
+.IP
+.IP "\fBlist-packagers\fP" "\fBinfo-packagers\fP"
+Is used to list the aggregate of the packager attribute on the packages,
+examples are "Fedora Project" and "Red Hat, Inc.".
+.IP
+.IP "\fBlist-licenses\fP" "\fBinfo-licenses\fP"
+Is used to list the aggregate of the license attribute on the packages,
+examples are "GPL" and "MIT"
+.IP
+.IP "\fBlist-arches\fP" "\fBinfo-arches\fP"
+Is used to list the aggregate of the arch attribute on the packages,
+examples are "i386" and "x86_64"
+.IP
+.IP "\fBlist-committers\fP" "\fBinfo-committers\fP"
+Is used to list the aggregate of the committer attribute on the packages, this
+is taken from the most recent changelog entry of the package.
+.IP
+.IP "\fBlist-buildhosts\fP" "\fBinfo-buildhosts\fP"
+Is used to list the aggregate of the buildhost attribute on the packages,
+examples are "mybuilder.example.com" and "xenbuilder1.fedora.redhat.com"
+.IP
+.IP "\fBlist-baseurls\fP" "\fBinfo-baseurls\fP"
+Is used to list the aggregate of the url attribute on the packages after
+discarding the path of the URL, examples are "http://linux.duke.edu/" and
+"http://www.and.org/"
+.IP
+.IP "\fBlist-package-sizes\fP" "\fBinfo-package-sizes\fP"
+Is used to list the aggregate of specified ranges the packagesize attribute on
+the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
+.IP
+.IP "\fBlist-archive-sizes\fP" "\fBinfo-archive-sizes\fP"
+Is used to list the aggregate of specified ranges the archivesize attribute on
+the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
+.IP
+.IP "\fBlist-installed-sizes\fP" "\fBinfo-installed-sizes\fP"
+Is used to list the aggregate of specified ranges the installedsize attribute on
+the packages, examples are "[    1B -  10KB ]" and "[ 750KB -   1MB ]".
+.IP
+.IP "\fBlist-groups\fP" "\fBinfo-groups\fP"
+Is used to list the aggregate of the yum groups that the packages are in,
+examples are in "yum grouplist". Note that in yum groups a package can be in
+more than one group at a time.
+.IP
+.PP 
+It is worth noting that some of the above data can be "unknown", to yum, at
+which point a seperate aggregation called "-- Unknown --" is listed.
+.SH "EXAMPLES"
+.PP
+To list all the groups that have an update, along with the number of packages in each group, use:
+.IP
+yum list-rpm-groups updates
+.PP
+To list all the committers to packages that have yum in their name, use:
+.IP
+yum list-committers 'yum*'
+.PP
+To list ranges of the sizes of pacakges installed or available, use:
+.IP
+yum list-package-sizes
+.PP
+To list yum groups that have an update, use:
+.IP
+yum list-groups
+
+
+.SH "SEE ALSO"
+.nf
+.I yum-filter-data (1)
+.I yum (8)
+.I yum.conf (5)
+.fi
+
+.SH "AUTHORS"
+.nf
+James Antill <james.antill@redhat.com>.
+.fi

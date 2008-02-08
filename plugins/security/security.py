@@ -159,7 +159,10 @@ class SecurityListCommands:
         return ['list-security', 'list-sec']
 
     def getUsage(self):
-        return self.getNames()[0]
+        return "[security|bugzilla|cve] [PACKAGE-wildcard]"
+
+    def getSummary(self):
+        return "Returns security data for the packages listed, that affects your system"
 
     def doCheck(self, base, basecmd, extcmds):
         pass
@@ -333,7 +336,7 @@ def ysp_check_func_enter(conduit):
     if len(args):
         if (args[0] == "check-update"):
             ret = {"skip": ndata, "list_cmd": True}
-        if (args[0] == "update"):
+        if (args[0] in ["update", "upgrade"]):
             ret = {"skip": ndata, "list_cmd": False}
         if (args[0] == "list-sec") or (args[0] == "list-security"):
             return (opts, {"skip": True, "list_cmd": True})

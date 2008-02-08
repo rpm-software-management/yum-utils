@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.10
+Version: 1.1.11
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -211,8 +211,31 @@ Group: System Environment/Base
 Requires: yum >= 3.0.5
 
 %description -n yum-list-data
-This plugin adds the commands list-vendors, groups, baseurls, packagers,
-buildhosts, licenses and arches.
+This plugin adds the commands list- vendors, groups, packagers, licenses,
+arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
+installed-sizes.
+
+%package -n yum-filter-data
+Summary: Yum plugin to list filter based on package data
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-filter-data
+This plugin adds the options --filter- vendors, groups, packagers, licenses,
+arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
+installed-sizes. Note that each package must match at least one pattern/range in
+each category, if any were specified.
+
+%package -n yum-tmprepo
+Summary: Yum plugin to add temporary repositories
+Group: System Environment/Base
+Requires: yum >= 3.0.5
+
+%description -n yum-tmprepo
+This plugin adds the option --tmprepo which takes a url to a .repo file
+downloads it and enables it for a single run. This plugin tries to ensure
+that temporary repositories are safe to use, by default, by not allowing
+gpg checking to be disabled.
 
 %prep
 %setup -q
@@ -225,7 +248,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data"
+         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -380,9 +403,27 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
+%{_mandir}/man1/yum-list-data.1.*
+
+%files -n yum-filter-data
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
+/usr/lib/yum-plugins/filter-data.*
+%{_mandir}/man1/yum-filter-data.1.*
+
+%files -n yum-tmprepo
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
+/usr/lib/yum-plugins/tmprepo.*
 
 
 %changelog
+* Fri Fed  1 2008 James Antill <james@fedoraproject.org>
+- Add filter-data plugin
+
+* Wed Jan 30 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.11
+
 * Sun Jan 13 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add repodiff
 
