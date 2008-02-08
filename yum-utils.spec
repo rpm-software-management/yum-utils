@@ -13,7 +13,9 @@ Requires: python >= 2.4 , yum >= 3.1.1
 %description
 yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and 
-more powerful to use.
+more powerful to use. These tools include: debuginfo-install, package-cleanup,
+repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
+repotrack, yum-builddep, yum-complete-transaction, yumdownloader.
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
