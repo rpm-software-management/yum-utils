@@ -25,9 +25,11 @@ except:
     class CliError: # Never used by yumex
         pass
 
-try: # $rand yum using python code don't have i18n
-    from i18n import _
-except:
+#try: # $rand yum using python code don't have i18n
+#    from i18n import _
+#except:
+# i18n is now yum.i18n ... but need a real yum-utils i18n so just rm atm.
+if True:
     def _(x): return x
 
 requires_api_version = '2.1'
