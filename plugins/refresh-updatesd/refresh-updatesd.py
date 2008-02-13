@@ -14,6 +14,7 @@
 #
 # version 0.0.5
 
+import os
 import dbus
 from yum.plugins import TYPE_CORE
 
