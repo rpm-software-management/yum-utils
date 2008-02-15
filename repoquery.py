@@ -770,8 +770,11 @@ def main(args):
                 repo.disable()
             else:
                 repo.enable()
-
-    repoq.doRepoSetup()
+    try:
+        repoq.doRepoSetup()
+    except yum.Errors.RepoError, e:
+        repoq.logger.error("Could not setup repo: %s" % (e))
+        sys.exit(50)
     
     for exp in regexs:
         if exp.endswith('.src'):
