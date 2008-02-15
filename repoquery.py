@@ -626,6 +626,10 @@ def main(args):
                       help="show all versions of packages")
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("--enablerepo", action="append", dest="repoid",
+                      help="specify repoids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("--disablerepo", action="append", dest="disablerepos",
+                      help="specify repoids to disable, can be specified multiple times")                      
     parser.add_option("--repofrompath", action="append",
                       help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
     parser.add_option("--plugins", action="store_true", default=False,
@@ -770,6 +774,11 @@ def main(args):
                 repo.disable()
             else:
                 repo.enable()
+    if opts.disablerepos:
+        for repo_match in opts.disablerepos:
+            for repo in repoq.repos.findRepos(repo_match):
+                repo.disable()
+    
     try:
         repoq.doRepoSetup()
     except yum.Errors.RepoError, e:
