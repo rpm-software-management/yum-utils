@@ -626,7 +626,7 @@ def main(args):
                       help="show all versions of packages")
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
-    parser.add_option("--enablerepo", action="append", dest="repoid",
+    parser.add_option("--enablerepo", action="append", dest="enablerepos",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("--disablerepo", action="append", dest="disablerepos",
                       help="specify repoids to disable, can be specified multiple times")                      
@@ -778,7 +778,12 @@ def main(args):
         for repo_match in opts.disablerepos:
             for repo in repoq.repos.findRepos(repo_match):
                 repo.disable()
-    
+
+    if opts.enablerepos:    
+            for repo_match in opts.enablerepos:
+            for repo in repoq.repos.findRepos(repo_match):
+                repo.enable()
+
     try:
         repoq.doRepoSetup()
     except yum.Errors.RepoError, e:
