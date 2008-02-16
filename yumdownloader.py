@@ -64,9 +64,12 @@ class YumDownloader(YumUtilBase):
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
             self.repos.setCacheDir(cachedir)
-            # Turn of cache
-            self.conf.cache = 0
 
+            # Turn off cache
+            self.conf.cache = 0
+            # make sure the repos know about it, too
+            self.repos.setCache(0)
+            
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup(opts)
         # Setup source repos
@@ -116,14 +119,12 @@ class YumDownloader(YumUtilBase):
         
     def downloadPackages(self,opts):
         
-        avail = self.pkgSack.returnPackages()
-    
         toDownload = []
     
         packages = self.cmds
         for pkg in packages:
             toActOn = []
-            exactmatch, matched, unmatched = parsePackages(avail, [pkg])
+            exactmatch, matched, unmatched = parsePackages(self.pkgSack.returnPackages(), [pkg])
             installable = yum.misc.unique(exactmatch + matched)
             if len(unmatched) > 0: # if we get back anything in unmatched, it fails
                 self.logger.error('No Match for argument %s' % pkg)
@@ -160,7 +161,7 @@ class YumDownloader(YumUtilBase):
                     toDownload.extend(self.bestPackagesFromList(toActOn, 'src'))
                 else:
                     toDownload.extend(self.bestPackagesFromList(toActOn))
-        
+                    
         # If the user supplies to --resolve flag, resolve dependencies for
         # all packages
         # note this might require root access because the headers need to be
@@ -215,14 +216,12 @@ class YumDownloader(YumUtilBase):
                                    size=os.stat(path).st_size)
                     shutil.copy2(path, local)
                     progress.end(progress.size) 
-   
+            
     # sligly modified from the one in YumUtilBase    
     def doUtilYumSetup(self,opts):
         """do a default setup for all the normal/necessary yum components,
            really just a shorthand for testing"""
         try:
-            self._getTs()
-            self._getRpmDB()
             self._getRepos()
             # if '--source' is used the add src to the archlist
             if opts.source:

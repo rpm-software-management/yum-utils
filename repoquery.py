@@ -781,8 +781,8 @@ def main(args):
 
     if opts.enablerepos:    
             for repo_match in opts.enablerepos:
-            for repo in repoq.repos.findRepos(repo_match):
-                repo.enable()
+                for repo in repoq.repos.findRepos(repo_match):
+                    repo.enable()
 
     try:
         repoq.doRepoSetup()
