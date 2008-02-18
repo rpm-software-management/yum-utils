@@ -15,10 +15,15 @@ yum will invoke
 .BR yum-changelog(1)
 plugin if the
 .B --changelog
-option is used with yum.
+option or the
+.B changelog
+command is used with yum.
 .SH OPTIONS
 .IP --changelog
 Show changelog delta of updated packages
+.SH COMMANDS
+.IP changelog
+Show changelog data of packages since a specified point in time
 .SH FILES
 .I /etc/yum/pluginconf.d/changelog.conf
 .RS
@@ -27,6 +32,23 @@ The system wide configuration file. See
 for more information.
 .RE
 .SH EXAMPLES
+# yum
+.B changelog
+2008-Jan yum\*
+.br
+Listing changelogs since: 2008-01-18
+.br
+.br
+yum-versionlock-1.1.11-1.fc8.noarch      installed
+.br
+* Wed Jan 30 17:00:00 2008 Tim Lauridsen <timlau@fedoraproject.org>
+.br
+- mark as 1.1.11
+.br
+.br
+changelog stats. 33 pkgs, 12 source pkgs, 1 changelog
+.br
+.br
 # yum update ktechlab
 .B --changelog
 .br
@@ -71,8 +93,12 @@ yum-changelog is available via:
 .nf
 # yum install yum-changelog
 .fi
-.SH AUTHOR
+.SH AUTHORS
 .RS
 Chitlesh Goorah <chitlesh@fedoraproject.org>
+.br
+Panu Matilainen <pmatilai@laiskiainen.org>
+.br
+James Antill <james@and.org>
 .SH "SEE ALSO"
 .BR yum(1)

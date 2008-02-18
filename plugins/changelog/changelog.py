@@ -13,6 +13,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # by Panu Matilainen <pmatilai@laiskiainen.org>
+#    James Antill    <james@and.org>
 #
 # TODO: 
 # - In 'pre' mode we could get the changelogs from rpmdb thus avoiding
@@ -21,6 +22,11 @@
 import time
 from rpmUtils.miscutils import splitFilename
 from yum.plugins import TYPE_INTERACTIVE
+
+from yum import logginglevels
+import logging
+
+import dateutil.parser
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
@@ -63,7 +69,85 @@ def show_changes(conduit, msg):
             for line in changelog_delta(srpms[name][0], origpkgs[name]):
                 conduit.info(2, "%s\n" % line)
 
+class ChangeLogCommand:
+
+    def getNames(self):
+        return ['changelog', 'ChangeLog']
+
+    def getUsage(self):
+        return "<date>|forever [PACKAGE|all|installed|updates|extras|obsoletes|recent]"
+
+    def getSummary(self):
+        return """\
+Display changelog data, since a specified time, on a group of packages"""
+
+    def doCheck(self, base, basecmd, extcmds):
+        pass
+
+    def show_data(self, msg, pkgs, name):
+        for pkg in pkgs:
+            self._pkgs += 1
+            if pkg.sourcerpm in self._done:
+                continue
+
+            self._spkgs += 1
+
+            for line in changelog_delta(pkg, self._since):
+                if pkg.sourcerpm not in self._done:
+                    if not self._done:
+                        msg('')
+                        if not self._since:
+                            msg('Listing all changelogs')
+                        else:
+                            msg('Listing changelogs since: ' +
+                                str(self._since_dto.date()))
+                    msg('')
+
+                    self._done[pkg.sourcerpm] = True
+                    msg('%-40.40s %s' % (pkg, pkg.repoid))
+                self._changelogs += 1
+                msg(line)
+                msg('')
+
+    def doCommand(self, base, basecmd, extcmds):
+        logger = logging.getLogger("yum.verbose.main")
+        def msg(x):
+            logger.log(logginglevels.INFO_2, x)
+        def msg_warn(x):
+            logger.warn(x)
+
+        self._done = {}
+        self._pkgs = 0
+        self._spkgs = 0
+        self._changelogs = 0
+        self._since = 0
+        self._since_dto = None
+        if len(extcmds):
+            since = extcmds[0]
+            extcmds = extcmds[1:]
+
+            if since != 'forever':
+                self._since_dto = dateutil.parser.parse(since, fuzzy=True)
+                tt = self._since_dto.timetuple()
+                self._since = time.mktime(tt)
+
+        ypl = base.returnPkgLists(extcmds)
+        self.show_data(msg, ypl.installed, 'Installed Packages')
+        self.show_data(msg, ypl.available, 'Available Packages')
+        self.show_data(msg, ypl.extras,    'Extra Packages')
+        self.show_data(msg, ypl.updates,   'Updated Packages')
+        self.show_data(msg, ypl.obsoletes, 'Obsoleting Packages')
+
+        ps = sps = cs = ""
+        if self._pkgs       != 1: ps  = "s"
+        if self._spkgs      != 1: sps = "s"
+        if self._changelogs != 1: cs  = "s"
+        return 0, [basecmd +
+                   ' stats. %d pkg%s, %d source pkg%s, %d changelog%s' %
+                   (self._pkgs, ps, self._spkgs, sps, self._changelogs, cs)]
+
 def config_hook(conduit):
+    conduit.registerCommand(ChangeLogCommand())
     parser = conduit.getOptParser()
     if parser:
         parser.add_option('--changelog', action='store_true', 
