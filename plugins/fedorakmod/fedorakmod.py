@@ -150,7 +150,7 @@ def resolveVersions(packageList):
             if sameName and packages.comparePoEVR(sameName, po) < 0:
                 dict[kernel].remove(sameName)
                 dict[kernel].append(po)
-            elif sameName == None:
+            elif sameName is None:
                 dict[kernel].append(po)
 
     return dict
@@ -188,7 +188,7 @@ def pinKernels(c, newKernels, modules):
        kernel until matching modules are available."""
     
     runningKernel = getRunningKernel()
-    if runningKernel == None:
+    if runningKernel is None:
         c.error(2, "Could not parsing running kernel version.")
         return
 
