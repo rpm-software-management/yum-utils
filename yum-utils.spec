@@ -418,7 +418,7 @@ fi
 
 
 %changelog
-* Fri Fed  1 2008 James Antill <james@fedoraproject.org>
+* Fri Feb  1 2008 James Antill <james@fedoraproject.org>
 - Add filter-data plugin
 
 * Wed Jan 30 2008 Tim Lauridsen <timlau@fedoraproject.org>
