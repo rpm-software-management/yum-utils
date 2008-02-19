@@ -85,16 +85,17 @@ Display changelog data, since a specified time, on a group of packages"""
         pass
 
     def show_data(self, msg, pkgs, name):
+        done = False
         for pkg in pkgs:
             self._pkgs += 1
-            if pkg.sourcerpm in self._done:
+            if pkg.sourcerpm in self._done_spkgs:
                 continue
 
             self._spkgs += 1
 
             for line in changelog_delta(pkg, self._since):
-                if pkg.sourcerpm not in self._done:
-                    if not self._done:
+                if pkg.sourcerpm not in self._done_spkgs:                    
+                    if not self._done_spkgs:
                         msg('')
                         if not self._since:
                             msg('Listing all changelogs')
@@ -102,8 +103,11 @@ Display changelog data, since a specified time, on a group of packages"""
                             msg('Listing changelogs since: ' +
                                 str(self._since_dto.date()))
                     msg('')
+                    if not done:
+                        msg("%s %s %s" % ('=' * 20, name, '=' * 20))
+                    done = True
 
-                    self._done[pkg.sourcerpm] = True
+                    self._done_spkgs[pkg.sourcerpm] = True
                     msg('%-40.40s %s' % (pkg, pkg.repoid))
                 self._changelogs += 1
                 msg(line)
@@ -116,7 +120,7 @@ Display changelog data, since a specified time, on a group of packages"""
         def msg_warn(x):
             logger.warn(x)
 
-        self._done = {}
+        self._done_spkgs = {}
         self._pkgs = 0
         self._spkgs = 0
         self._changelogs = 0
