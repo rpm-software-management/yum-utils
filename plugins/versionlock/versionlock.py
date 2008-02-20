@@ -24,6 +24,11 @@ import urlgrabber.grabber
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
+def vl_search(conduit, name):
+    """ Search for packages with a particular name. """
+    # Note that conduit.getPackageByNevra _almost_ works enough, but doesn't
+    return conduit._base.pkgSack.searchNevra(name=name)
+
 def exclude_hook(conduit):
     conduit.info(2, 'Reading version lock configuration')
     locklist = []
@@ -40,19 +45,11 @@ def exclude_hook(conduit):
     except urlgrabber.grabber.URLGrabError, e:
         raise PluginYumExit('Unable to read version lock configuration: %s' % e)
 
-    if not locklist:
-        return
-
-    pkgs = conduit.getPackages()
-    locked = {}
     for pkg in locklist:
         (n, v, r, e, a) = splitFilename("%s" % pkg)
         if e == '': 
             e = '0'
-        locked[n] = (e, v, r) 
-    for pkg in pkgs:
-        if locked.has_key(pkg.name):
-            (n,a,e,v,r) = pkg.pkgtup
-            if compareEVR(locked[pkg.name], (e, v, r)) != 0:
+        for pkg in vl_search(conduit, n):
+            if compareEVR((pkg.epoch, pkg.version, pkg.release), (e, v, r)):
                 conduit.delPackage(pkg)
                 conduit.info(5, 'Excluding package %s due to version lock' % pkg)
