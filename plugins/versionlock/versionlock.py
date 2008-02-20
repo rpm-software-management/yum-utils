@@ -20,7 +20,6 @@ from yum.plugins import TYPE_CORE
 from rpmUtils.miscutils import splitFilename, compareEVR
 import urlgrabber
 import urlgrabber.grabber
-import os
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
@@ -31,15 +30,11 @@ def vl_search(conduit, name):
     return conduit._base.pkgSack.searchNevra(name=name)
 
 def exclude_hook(conduit):
+    conduit.info(2, 'Reading version lock configuration')
     locklist = []
     location = conduit.confString('main', 'locklist')
     if not location:
         raise PluginYumExit('Locklist not set')
-
-    if location.startswith('/') and not os.path.exists(location):
-        return # Don't die if the file doesn't exist, just treat as empty
-
-    conduit.info(2, 'Reading version lock configuration')
     try:
         llfile = urlgrabber.urlopen(location)
         for line in llfile.readlines():
