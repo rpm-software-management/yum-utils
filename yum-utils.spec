@@ -258,7 +258,7 @@ for plug in $plugins; do
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
-
+install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -330,6 +330,7 @@ fi
 %defattr(-, root, root)
 %doc plugins/versionlock/README
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.list
 /usr/lib/yum-plugins/versionlock.*
 
 %files -n yum-tsflags
@@ -418,6 +419,9 @@ fi
 
 
 %changelog
+* Wed Feb 20 2008 James Antill <james@fedoraproject.org>
+- Add empty versionlock file
+
 * Fri Feb  1 2008 James Antill <james@fedoraproject.org>
 - Add filter-data plugin
 
