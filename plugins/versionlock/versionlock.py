@@ -40,6 +40,9 @@ def exclude_hook(conduit):
     except urlgrabber.grabber.URLGrabError, e:
         raise PluginYumExit('Unable to read version lock configuration: %s' % e)
 
+    if not locklist:
+        return
+
     pkgs = conduit.getPackages()
     locked = {}
     for pkg in locklist:
