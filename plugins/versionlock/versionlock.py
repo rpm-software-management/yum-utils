@@ -49,7 +49,7 @@ def exclude_hook(conduit):
         locked[n] = (e, v, r) 
     for pkg in pkgs:
         if locked.has_key(pkg.name):
-            (n,a,e,v,r) = pkg._pkgtup()
+            (n,a,e,v,r) = pkg.pkgtup
             if compareEVR(locked[pkg.name], (e, v, r)) != 0:
                 conduit.delPackage(pkg)
                 conduit.info(5, 'Excluding package %s due to version lock' % pkg)
