@@ -5,14 +5,21 @@
 
 DEV --enablerepo=development
 UPT --enablerepo=updates-testing
-SEC --security
 
 SRC --enablerepo=fedora-source    --enablerepo=updates-source
+DEVSRC --enablerepo=development-source
+UPTSRC --enablerepo=updates-testing-source
 # Note that we/you can move to =X,Y in 3.2.9 onwards.
 DBG --enablerepo=fedora-debuginfo --enablerepo=updates-debuginfo
-ALLSRC --enablerepo=*-source
-ALLDBG --enablerepo=*-debuginfo
+DEVDBG --enablerepo=development-debuginfo
+UPTDBG --enablerepo=updates-testing-debuginfo
 
+ALLSRC SRC DEVSRC UPTSRC
+ALLDBG DBG DEVDBG UPTDBG
+
+ALL DEV UPT ALLSRC ALLDBG
+
+SEC --security
 FORCE --skip-broken --disableexcludes=all
 
 up   upgrade
