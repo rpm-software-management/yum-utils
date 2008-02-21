@@ -53,7 +53,13 @@ class DebugInfoInstall(YumUtilBase):
         if os.geteuid() != 0:
             print >> sys.stderr, "You must be root to run this command."
             sys.exit(1)
-            
+        try:
+            self.doLock()
+        except yum.Errors.LockError, e:
+            self.logger.critical("Another application is holding the yum lock, cannot continue")
+            sys.exit(1)
+        
+        
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
         
@@ -70,10 +76,11 @@ class DebugInfoInstall(YumUtilBase):
         self.buildTransaction()
         if len(self.tsInfo) < 1:
             print 'No debuginfo packages available to install'
+            self.doUnlock()
             sys.exit()
             
         self.doTransaction()
-    
+        self.doUnlock()    
     def di_try_install(self, po):
         di_name = '%s-debuginfo' % po.name
         if self.pkgSack.searchNevra(name=di_name):
