@@ -137,6 +137,7 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         self.show_data(msg, ypl.extras,    'Extra Packages')
         self.show_data(msg, ypl.updates,   'Updated Packages')
         self.show_data(msg, ypl.obsoletes, 'Obsoleting Packages')
+        self.show_data(msg, ypl.recent,    'Recent Packages')
         self.cmd_end()
 
         return 0, [basecmd + ' done']
