@@ -75,7 +75,7 @@ class ChangeLogCommand:
         return ['changelog', 'ChangeLog']
 
     def getUsage(self):
-        return "<date>|forever [PACKAGE|all|installed|updates|extras|obsoletes|recent]"
+        return "<date>|<number>|all [PACKAGE|all|installed|updates|extras|obsoletes|recent]"
 
     def getSummary(self):
         return """\
@@ -83,6 +83,27 @@ Display changelog data, since a specified time, on a group of packages"""
 
     def doCheck(self, base, basecmd, extcmds):
         pass
+
+    def changelog(self, pkg):
+        if self._since_all:
+            for date, author, message in pkg.returnChangelog():
+                yield "* %s %s\n%s" % (time.ctime(int(date)), author, message)
+            return
+
+        if self._since_num is not None:
+            num = self._since_num
+            for date, author, message in pkg.returnChangelog():
+                if num <= 0:
+                    return
+                num -= 1
+                yield "* %s %s\n%s" % (time.ctime(int(date)), author, message)
+            return
+        
+        if True:
+            for date, author, message in pkg.returnChangelog():
+                if int(date) < self._since_tt:
+                    return
+                yield "* %s %s\n%s" % (time.ctime(int(date)), author, message)
 
     def show_data(self, msg, pkgs, name):
         done = False
@@ -93,14 +114,19 @@ Display changelog data, since a specified time, on a group of packages"""
 
             self._spkgs += 1
 
-            for line in changelog_delta(pkg, self._since):
+            for line in self.changelog(pkg):
                 if pkg.sourcerpm not in self._done_spkgs:                    
                     if not self._done_spkgs:
                         msg('')
-                        if not self._since:
+                        if self._since_all:
                             msg('Listing all changelogs')
+                        elif self._since_num is not None:
+                            sn = "s"
+                            if self._since_num == 1:
+                                sn = ""
+                            msg('Listing %d changelog%s' % (self._since_num,sn))
                         else:
-                            msg('Listing changelogs since: ' +
+                            msg('Listing changelogs since ' +
                                 str(self._since_dto.date()))
                     msg('')
                     if not done:
@@ -124,16 +150,29 @@ Display changelog data, since a specified time, on a group of packages"""
         self._pkgs = 0
         self._spkgs = 0
         self._changelogs = 0
-        self._since = 0
+        self._since_all = False
         self._since_dto = None
-        if len(extcmds):
-            since = extcmds[0]
-            extcmds = extcmds[1:]
+        self._since_tt  = None
+        self._since_num = None
 
-            if since != 'forever':
+        if not len(extcmds):
+            return 1, [basecmd + " " + self.getUsage()]
+        
+        since = extcmds[0]
+        extcmds = extcmds[1:]
+
+        if since == 'all':
+            self._since_all = True
+        else:
+            try:
+                num = int(since)
+                if num <= 0:
+                    raise ValueError
+                self._since_num = num
+            except:
                 self._since_dto = dateutil.parser.parse(since, fuzzy=True)
                 tt = self._since_dto.timetuple()
-                self._since = time.mktime(tt)
+                self._since_tt = time.mktime(tt)
 
         ypl = base.returnPkgLists(extcmds)
         self.show_data(msg, ypl.installed, 'Installed Packages')
@@ -141,6 +180,7 @@ Display changelog data, since a specified time, on a group of packages"""
         self.show_data(msg, ypl.extras,    'Extra Packages')
         self.show_data(msg, ypl.updates,   'Updated Packages')
         self.show_data(msg, ypl.obsoletes, 'Obsoleting Packages')
+        self.show_data(msg, ypl.recent,    'Recent Packages')
 
         ps = sps = cs = ""
         if self._pkgs       != 1: ps  = "s"
