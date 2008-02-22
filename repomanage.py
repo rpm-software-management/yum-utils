@@ -156,7 +156,7 @@ def parseargs(args):
     parser.add_option("-k", "--keep", default=1, dest='keep', action="store",
       help='newest N packages to keep - defaults to 1')
     parser.add_option("-c", "--nocheck", default=0, action="store_true", 
-      help='do not check package paload signatures/digests')
+      help='do not check package payload signatures/digests')
     
     (opts, args)= parser.parse_args()
     
