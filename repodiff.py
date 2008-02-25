@@ -26,6 +26,7 @@ class DiffYum(yum.YumBase):
         yum.YumBase.__init__(self)
         self.dy_repos = {'old':[], 'new':[]}
         self.dy_basecachedir = yum.misc.getCacheDir()
+        self.dy_archlist = ['src']
         
     def dy_shutdown_all_other_repos(self):
         # disable all the other repos
@@ -48,13 +49,13 @@ class DiffYum(yum.YumBase):
         self.repos.enableRepo(repoid)
         # setup the repo dirs/etc
         self.doRepoSetup(thisrepo=repoid)
-        archlist = ['src']    
-        self._getSacks(archlist=archlist, thisrepo=repoid)
+        self._getSacks(archlist=self.dy_archlist, thisrepo=repoid)
 
     def dy_diff(self):
         add = []
         remove = []        
         modified = []
+        obsoleted = {} # obsoleted = by
         newsack = yum.packageSack.ListPackageSack()
         for repoid in self.dy_repos['new']:
             newsack.addList(self.pkgSack.returnPackages(repoid=repoid))
@@ -77,8 +78,26 @@ class DiffYum(yum.YumBase):
         for pkg in oldsack.returnNewestByName():
             if len(newsack.searchNevra(name=pkg.name)) == 0:
                 remove.append(pkg)
+
+
+        for po in remove:
+            for newpo in add:
+                foundit = 0
+                for obs in newpo.obsoletes:
+                    if po.inPrcoRange('provides', obs):
+                        foundit = 1
+                        obsoleted[po] = newpo
+                        break
+                if foundit:
+                    break
         
-        return add, remove, modified
+        ygh = yum.misc.GenericHolder()
+        ygh.add = add
+        ygh.remove = remove
+        ygh.modified = modified
+        ygh.obsoleted = obsoleted
+                 
+        return ygh
 
 
 def parseArgs(args):
@@ -98,7 +117,8 @@ def parseArgs(args):
     parser.add_option("-o", "--old", default=[], action="append",
                       help="old baseurl[s] for repos")
     parser.add_option("-q", "--quiet", default=False, action='store_true')
-    
+    parser.add_option("-a", "--archlist", default=['src'], action="append",
+                      help="In addition to src.rpms, any arch you want to include")
     (opts, argsleft) = parser.parse_args()
 
     if not opts.new or not opts.old:
@@ -113,7 +133,7 @@ def main(args):
             
     my = DiffYum()
     my.dy_shutdown_all_other_repos()
-
+    my.dy_archlist = opts.archlist
     if not opts.quiet: print 'setting up repos'
     for r in opts.old:
         if not opts.quiet: print "setting up old repo %s" % r
@@ -131,21 +151,24 @@ def main(args):
             print "Could not setup repo at url %s: %s" % (r, e)
             sys.exit(1)
     if not opts.quiet: print 'performing the diff'
-    add, rem, mod = my.dy_diff()
+    ygh = my.dy_diff()
   
 
                
-    if add:
-        for pkg in add:
+    if ygh.add:
+        for pkg in ygh.add:
             print 'New package %s' % pkg.name
             print '        %s' % pkg.summary
                 
-    if rem:
-        for pkg in rem:
+    if ygh.remove:
+        for pkg in ygh.remove:
             print 'Removed package %s' % pkg.name
-    if mod:
+            if ygh.obsoleted.has_key(pkg):
+                print 'Obsoleted by %s' % ygh.obsoleted[pkg]
+                
+    if ygh.modified:
         print 'Updated Packages:\n'
-        for (pkg, oldpkg) in mod:
+        for (pkg, oldpkg) in ygh.modified:
             msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
             dashes = "-" * len(msg) 
             msg += "\n%s\n" % dashes
@@ -166,7 +189,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    # ARRRRRRGH
     if not sys.stdout.isatty():
         import codecs, locale
         sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
