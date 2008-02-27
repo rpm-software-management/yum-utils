@@ -98,6 +98,8 @@ def prereposetup_hook(conduit):
     '''
 
     opts, args = conduit.getCmdLine()
+    if not opts.tmp_repos:
+        return
     log = logging.getLogger("yum.verbose.main")
     add_repos(conduit._base, log, opts.tmp_repos,
               make_validate(log, my_gpgcheck))
