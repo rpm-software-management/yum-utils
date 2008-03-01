@@ -229,13 +229,23 @@ each category, if any were specified.
 %package -n yum-tmprepo
 Summary: Yum plugin to add temporary repositories
 Group: System Environment/Base
-Requires: yum >= 3.0.5
+Requires: yum >= 3.2.11
 
 %description -n yum-tmprepo
 This plugin adds the option --tmprepo which takes a url to a .repo file
 downloads it and enables it for a single run. This plugin tries to ensure
 that temporary repositories are safe to use, by default, by not allowing
 gpg checking to be disabled.
+
+%package -n yum-verify
+Summary: Yum plugin to add verify command, and options
+Group: System Environment/Base
+Requires: yum >= 3.2.12
+
+%description -n yum-verify
+This plugin adds the commands verify, verify-all and verify-rpm. There are
+also a couple of options. This command works like rpm -V, to verify your
+installation.
 
 %prep
 %setup -q
@@ -248,7 +258,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo"
+         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo verify"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -417,8 +427,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
 /usr/lib/yum-plugins/tmprepo.*
 
+%files -n yum-verify
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/verify.conf
+/usr/lib/yum-plugins/verify.*
+%{_mandir}/man1/yum-verify.1.*
 
 %changelog
+* Sat Mar  1 2008 James Antill <james@fedoraproject.org>
+- Add verify plugin
+
 * Wed Feb 20 2008 James Antill <james@fedoraproject.org>
 - Add empty versionlock file
 

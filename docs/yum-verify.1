@@ -1,0 +1,82 @@
+.\" yum verify plugin
+.TH "yum-verify" "1" "2008 Mar 1" "James Antill" ""
+.SH "NAME"
+yum verify plugin
+.SH "SYNOPSIS"
+\fByum\fP [options] verify [package ...]
+.SH "DESCRIPTION"
+.PP 
+This plugin extends \fByum\fP with some commands that give verification information on the installed system, much like rpm -V. You can change how the verification is done and which files it applies to.
+.PP 
+added yum \fIcommand\fPs are:
+.br 
+.I \fR * verify
+.br 
+.I \fR * verify-rpm
+.br 
+.I \fR * verify-all
+.br 
+.PP 
+all of which take the same arguments as the list yum command, obviously you can
+only verify packages that are installed on the system.
+.PP
+.br 
+.br 
+.PP 
+.IP "\fBverify\fP"
+Is the generic verification command, and is intented to give the most useful
+output. It removes all false matches due to multilib and ignores changes to
+configuration files by default.
+.IP
+.IP "\fBverify-rpm\fP"
+Is meant to be 100% compatible with rpm -V output, and any differences should be
+considered as bugs.
+.IP
+.IP "\fBverify-all\fP"
+Is used to list all the differences, including some that rpm itself will ignore.
+.IP
+.SH "GENERAL OPTIONS"
+These are the options added to yum that are available in the verify commands.
+They are:
+.PP 
+.IP "\fB\--verify-filenames\fP"
+This option is used to limit the filenames that the packages will perform
+verification.
+.IP "\fB\--verify-configuration-files\fP"
+This option is only useful in the generic verify command, and will
+enable/disable verification of files that are tagged as configuration files.
+.SH "EXAMPLES"
+.PP
+To do the same as rpm -Va, use:
+.IP
+yum verify-rpm
+.PP
+To verify the packages starting with the name yum, use:
+.IP
+yum verify 'yum*'
+.PP
+To verify the binaries that are in a bin directory, use:
+.IP
+yum verify --verify-filenames='*bin/*'
+.PP
+To verify all include files, Eg. for multilib problems, use:
+.IP
+yum verify-all --verify-filenames='/usr/include/*'
+
+.SH "SEE ALSO"
+.nf
+.I yum (8)
+.I yum.conf (5)
+.I the verify.conf file in /etc/yum/plugins.d
+.fi
+
+.SH "AUTHORS"
+.nf
+James Antill <james.antill@redhat.com>.
+.fi
+
+.SH "BUGS"
+.nf
+Currently yum-verify does not do verify-script checking or dependancy checking,
+only file checking.
+.fi
