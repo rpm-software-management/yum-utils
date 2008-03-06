@@ -226,6 +226,8 @@ class YumDownloader(YumUtilBase):
             # if '--source' is used the add src to the archlist
             if opts.source:
                 archlist = rpmUtils.arch.getArchList() + ['src']    
+            elif opts.archlist:
+                archlist = opts.archlist.split(',')                
             else:
                 archlist = rpmUtils.arch.getArchList()
             self._getSacks(archlist=archlist)
@@ -250,7 +252,8 @@ class YumDownloader(YumUtilBase):
           help='resolve dependencies and download required packages')
         parser.add_option("--source", default=False, dest="source", action="store_true",
           help='operate on source packages')
-        
+        parser.add_option("--archlist",
+          help="only download packages of certain architecture(s)")        
 if __name__ == '__main__':
     util = YumDownloader()
         
