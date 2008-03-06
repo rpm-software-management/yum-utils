@@ -118,8 +118,9 @@ class YumCompleteTransaction(YumUtilBase):
         # clean up the transactions 
         tsdone = '%s/transaction-done.%s' % (path, timestamp)
         tsall = '%s/transaction-all.%s' % (path, timestamp)        
-        os.unlink(tsdone)
-        os.unlink(tsall)
+        for f in [tsall, tsdone]:
+            if os.path.exists(f):
+                os.unlink(f)
 
     def main(self):
         # Add util commandline options to the yum-cli ones
