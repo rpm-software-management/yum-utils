@@ -74,7 +74,7 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
     def doCheck(self, base, basecmd, extcmds):
         pass
 
-    def show_pkgs(self, msg, pkgs):
+    def show_pkgs(self, msg, gval, pkgs):
         pass
 
     def show_data(self, msg, pkgs, name):
@@ -84,12 +84,12 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         pkgs.sort(key=lambda x: x.name)
         calc = {}
         for pkg in pkgs:
-            data = self.get_data(pkg)
+            (data, rdata) = self.get_data(pkg)
             if type(data) != type([]):
-                calc.setdefault(data, []).append(pkg)
+                calc.setdefault(data, []).append((pkg, rdata))
             else:
                 for sdata in data:
-                    calc.setdefault(sdata, []).append(pkg)
+                    calc.setdefault(sdata, []).append((pkg, rdata))
         maxlen = 0
         totlen = 0
         for data in calc:
@@ -101,29 +101,31 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         for data in sorted(calc):
             val = len(calc[data])
             msg(fmt % (str(data), loc_num(val), (100 * val) / totlen))
-            self.show_pkgs(msg, calc[data])
+            self.show_pkgs(msg, data, calc[data])
 
     # pkg.vendor has weird values, for instance
     def get_data(self, data, strip=True):
         if not hasattr(data, self.attr):
-            return self.unknown
+            return (self.unknown, self.unknown)
         
         val = getattr(data, self.attr)
         if val is None:
             return self.unknown
         if type(val) == type([]):
-            return self.unknown
+            return (self.unknown, self.unknown)
 
         tval = str(val).strip()
         if tval == "":
-            return self.unknown
+            return (self.unknown, self.unknown)
 
         if strip:
-            return tval
+            return (tval, tval)
 
-        return val
+        return (val, val)
             
     def doCommand(self, base, basecmd, extcmds):
+        self.base = base
+        
         logger = logging.getLogger("yum.verbose.main")
         def msg(x):
             logger.log(logginglevels.INFO_2, x)
@@ -149,16 +151,39 @@ class InfoDataCommands(ListDataCommands):
     def getSummary(self):
         return self._getSummary() + "\nAnd list all the packages under each"
 
-    def show_pkgs(self, msg, pkgs):
-        for pkg in pkgs:
-            msg("    %s" % (pkg))
+    def show_pkgs(self, msg, gval, pkgs):
+        for (pkg, val) in pkgs:
+            if gval == val:
+                msg("  %s" % pkg)
+                continue
 
-def url_get_data(self, data): # Special version for baseurl
-    val = self.oget_data(data)
+            if type(val) == type([]):
+                val = ", ".join(sorted(val))
+            linelen = len(val) + len(str(pkg))
+            if linelen < 77:
+                msg("  %s %*s%s" % (pkg, 77 - linelen, '', val))
+            else:
+                msg("  %s" % pkg)
+                msg("  => %s" % val)
+                msg('')
+        if pkgs:
+            msg('')
+
+def buildhost_get_data(self, data): # Just show the dnsname
+    val = self.oget_data(data)[0]
     if val == self.unknown:
-        return val
+        return (val, val)
+    dns_names = val.split('.')
+    if len(dns_names) > 2:
+        dns_names[0] = '*'
+    return (".".join(dns_names), val)
+
+def url_get_data(self, data): # Just show the hostname
+    val = self.oget_data(data)[0]
+    if val == self.unknown:
+        return (val, val)
     (scheme, netloc, path, query, fragid) = urlparse.urlsplit(val)
-    return "%s://%s/" % (scheme, netloc)
+    return ("%s://%s/" % (scheme, netloc), val)
 
 class SizeRangeData:
     def __init__(self, beg, msg):
@@ -179,10 +204,13 @@ class SizeRangeData:
     def __hash__(self):
         return hash(self._msg)
 
+def _format_size(base, num, max):
+    return "%s (%*s)" %(base.format_number(num),len(loc_num(max)),loc_num(num))
+
 def size_get_data(self, data):
-    val = self.oget_data(data, strip=False)
+    val = self.oget_data(data, strip=False)[0]
     if val == self.unknown:
-        return val
+        return (val, val)
 
     #  Even if it was sane, don't put 1GB and up here, or the alpha sorting
     # won't be correct.
@@ -204,16 +232,19 @@ def size_get_data(self, data):
     pnum = (0, "   0B")
     if val <= pnum[0]:
         msg = "[ %s - %s ]  " % (" " * len(pnum[1]), pnum[1])
-        return SizeRangeData(pnum[0], msg)
+        return (SizeRangeData(pnum[0], msg),
+                _format_size(self.base, val, pnum[0]))
 
     pnum = (1, "   1B")
     for num in nums:
         if val >= pnum[0] and val <= num[0]:
             msg = "[ %s - %s ]  " % (pnum[1], num[1])
-            return SizeRangeData(pnum[0], msg)
+            return (SizeRangeData(pnum[0], msg),
+                    _format_size(self.base, val, num[0]))
         pnum = num
     msg = "[ %s - %s ]  " % (pnum[1], " " * len(pnum[1]))
-    return SizeRangeData(pnum[0], msg)    
+    return (SizeRangeData(pnum[0], msg),
+            _format_size(self.base, val, pnum[0] * 20))
 
 
 all_yum_grp_mbrs = {}
@@ -240,8 +271,8 @@ def yum_group_free_data(self):
 
 def yum_group_get_data(self, pkg):
     if pkg.name not in all_yum_grp_mbrs:
-        return self.unknown
-    return all_yum_grp_mbrs[pkg.name]
+        return (self.unknown, self.unknown)
+    return (all_yum_grp_mbrs[pkg.name], all_yum_grp_mbrs[pkg.name])
 
 def _list_data_custom(conduit, data, func, beg=None, end=None):
     cmd = ListDataCommands(*data)
@@ -275,11 +306,11 @@ def config_hook(conduit):
                  ('packagers', 'packager'),
                  ('licenses', 'license'),
                  ('arches', 'arch'),
-                 ('committers', 'committer'),
-                 ('buildhosts', 'buildhost')]:
+                 ('committers', 'committer')]:
         conduit.registerCommand(ListDataCommands(*data))
         conduit.registerCommand(InfoDataCommands(*data))
 
+    _list_data_custom(conduit, ('buildhosts', 'buildhost'), buildhost_get_data)
     _list_data_custom(conduit, ('baseurls', 'url'), url_get_data)
     _list_data_custom(conduit, ('package-sizes', 'packagesize'), size_get_data)
     _list_data_custom(conduit, ('archive-sizes', 'archivesize'), size_get_data)
