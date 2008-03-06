@@ -180,11 +180,14 @@ class YumCompleteTransaction(YumUtilBase):
             sys.exit()
             
         else:            
-            if self.doTransaction():
+            if self.doTransaction() == 0:
                 print "Cleaning up completed transaction file"            
                 self.clean_up_ts_files(timestamp, self.conf.persistdir)
                 sys.exit()
-             
+            else:
+                print "Not removing old transaction files"
+                sys.exit()
+                             
 
 
         
