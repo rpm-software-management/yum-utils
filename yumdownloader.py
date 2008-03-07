@@ -26,6 +26,7 @@ from urlparse import urljoin
 from urlgrabber.progress import TextMeter
 import shutil
 
+import rpmUtils
 
 class YumDownloader(YumUtilBase):
     NAME = 'yumdownloader'
@@ -159,6 +160,9 @@ class YumDownloader(YumUtilBase):
             if toActOn:
                 if opts.source:
                     toDownload.extend(self.bestPackagesFromList(toActOn, 'src'))
+                elif opts.archlist:
+                    for arch in opts.archlist.split(','):
+                        toDownload.extend(self.bestPackagesFromList(toActOn, arch))
                 else:
                     toDownload.extend(self.bestPackagesFromList(toActOn))
                     
@@ -227,7 +231,9 @@ class YumDownloader(YumUtilBase):
             if opts.source:
                 archlist = rpmUtils.arch.getArchList() + ['src']    
             elif opts.archlist:
-                archlist = opts.archlist.split(',')                
+                archlist = []
+                for a in opts.archlist.split(','):
+                    archlist.extend(rpmUtils.arch.getArchList(a))
             else:
                 archlist = rpmUtils.arch.getArchList()
             self._getSacks(archlist=archlist)
