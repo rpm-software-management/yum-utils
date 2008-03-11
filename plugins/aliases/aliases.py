@@ -80,7 +80,7 @@ def resolve_aliases(args, log, skip=0):
         enum = num + 1
         for cmd in aliases:
             if cmd == args[num]:
-                log(3, 'ALIAS DONE(%s): %s' % (cmd, str(aliases[cmd])))
+                log(4, 'ALIAS DONE(%s): %s' % (cmd, str(aliases[cmd])))
                 args[num:enum] = aliases[cmd]
                 # Mostly works like the shell, so \ls does no alias lookup on ls
                 if args[num][0] == '\\':
