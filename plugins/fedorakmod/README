@@ -1,14 +1,30 @@
-Plugin for Yum to handle kernel modules as described by the Fedora Extras
-packaging standards.
+Fedorakmod - Yum Plugin for Kernel Modules
+==========================================
 
-    http://www.fedoraproject.org/wiki/Extras/KernelModuleProposal
+Plugin for Yum to handle kernel modules as described by the Fedora Extras
+packaging standards.  (Now obsolete as Fedora no longer includes kernel
+module packages.)
+
+    http://fedoraproject.org/wiki/Obsolete/KernelModules
+
+We can install a kmod for all installed kernel versions/variants.  Set
+
+    installforallkernels = 1
+
+in the conf file.  The default is to turn this feature on.  Set to 0
+to disable.
+
+We can delay instalation of a new kernel until the needed kmods are 
+available based on the kmods installed for the running kernel.  Set
+
+    pinkernels = 1
+
+in the conf file.  Any other value or a missing pinkernels line defaults
+to turn this functionality off.
 
 To Do
 =====
-   *) Remove kernel modules if matching kernel is removed.
+Hopefully nothing.
 
-Folks, feel free to patch and add suggestions.  It will only help FE kernel
-module infrastructure develop faster.
-
-Jack Neely <jjneely@ncsu.edu> -- 01/24/2007
+Jack Neely <jjneely@ncsu.edu> -- 03/12/2008
 
