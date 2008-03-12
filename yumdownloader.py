@@ -185,6 +185,7 @@ class YumDownloader(YumUtilBase):
                     toDownload.append(pkg)
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
+            sys.exit(1)
             
         for pkg in toDownload:
             n,a,e,v,r = pkg.pkgtup
