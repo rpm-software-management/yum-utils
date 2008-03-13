@@ -667,6 +667,8 @@ def main(args):
     pkgops = []
     sackops = []
     archlist = None
+    if opts.info:
+        pkgops.append("info")
     if opts.requires:
         if opts.resolve:
             sackops.append("requires")
@@ -687,8 +689,6 @@ def main(args):
         pkgops.append("list")
     if opts.alldeps:
         needfiles = 1
-    if opts.info:
-        pkgops.append("info")
     if opts.envra:
         pkgops.append("envra")
     if opts.nvr:
