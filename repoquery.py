@@ -622,6 +622,9 @@ def main(args):
                       help="only query packages of certain architecture(s)")
     parser.add_option("--pkgnarrow", default="repos",
                       help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
+    parser.add_option("--show-duplicates", action="store_true",
+                      dest="show_dupes",
+                      help="show all versions of packages")
     parser.add_option("--show-dupes", action="store_true",
                       help="show all versions of packages")
     parser.add_option("--repoid", action="append",

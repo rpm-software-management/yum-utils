@@ -156,16 +156,18 @@ class YumDownloader(YumUtilBase):
                     toActOn.extend(src)
                 else:
                     toActOn.append(newpkg)
-    
             if toActOn:
-                if opts.source:
-                    toDownload.extend(self.bestPackagesFromList(toActOn, 'src'))
-                elif opts.archlist:
-                    for arch in opts.archlist.split(','):
-                        toDownload.extend(self.bestPackagesFromList(toActOn, arch))
-                else:
-                    toDownload.extend(self.bestPackagesFromList(toActOn))
-                    
+                pkgGroups = self._groupPackages(toActOn)
+                for group in pkgGroups:
+                    pkgs = pkgGroups[group]
+                    if opts.source:
+                        toDownload.extend(self.bestPackagesFromList(pkgs, 'src'))
+                    elif opts.archlist:
+                        for arch in opts.archlist.split(','):
+                            toDownload.extend(self.bestPackagesFromList(pkgs, arch))
+                    else:
+                        toDownload.extend(self.bestPackagesFromList(pkgs))
+                            
         # If the user supplies to --resolve flag, resolve dependencies for
         # all packages
         # note this might require root access because the headers need to be
@@ -185,6 +187,7 @@ class YumDownloader(YumUtilBase):
                     toDownload.append(pkg)
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
+            sys.exit(1)
             
         for pkg in toDownload:
             n,a,e,v,r = pkg.pkgtup
@@ -220,6 +223,16 @@ class YumDownloader(YumUtilBase):
                                    size=os.stat(path).st_size)
                     shutil.copy2(path, local)
                     progress.end(progress.size) 
+                    
+    def _groupPackages(self,pkglist):
+        pkgGroups = {}
+        for po in pkglist:
+            na = '%s.%s' % (po.name,po.arch)
+            if not na in pkgGroups:
+                pkgGroups[na] = [po]
+            else:
+                pkgGroups[na].append(po)
+        return pkgGroups
             
     # sligly modified from the one in YumUtilBase    
     def doUtilYumSetup(self,opts):

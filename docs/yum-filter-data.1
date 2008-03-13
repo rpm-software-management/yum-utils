@@ -89,11 +89,11 @@ yum --filter-rpm-groups='App*/System,Devel*/Lib*,System Environment/Base' update
 .PP
 To list updates for a set of yum groups use:
 .IP
-yum --filter-yum-groups='PostgreSQL Database,Web Server' list updates
+yum --filter-groups='PostgreSQL Database,Web Server' list updates
 .PP
 To apply updates to a specific set of yum groups use:
 .IP
-yum --filter-yum-groups='KDE,Core,Printing Support' update
+yum --filter-groups='KDE,Core,Printing Support' update
 
 .SH "SEE ALSO"
 .nf

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-# fedorakmod.py - Fedora Extras Yum Kernel Module Support
-# Copyright 2006 - 2007 NC State University
+# fedorakmod.py - Fedora Kmod -- Yum Kernel Module Support
+# Copyright 2006 - 2008 NC State University
 # Written by Jack Neely <jjneely@ncsu.edu>
 #
 # SDG
@@ -44,9 +44,9 @@ def getRunningKernel():
     """This takes the output of uname and figures out the (version, release)
     tuple for the running kernel."""
     ver = os.uname()[2]
-    for s in kernelVariants:
-        if ver.endswith(s):
-            ver = ver.replace(s, "")
+    #for s in kernelVariants:
+    #    if ver.endswith(s):
+    #        ver = ver.replace(s, "")
     if ver.find("-") != -1:
         (v, r) = ver.split("-", 1)
         # XXX: Gah, this assumes epoch
@@ -183,21 +183,37 @@ def installKernelModules(c, newModules, installedModules):
                            (po, modpo))
                     break
 
-def pinKernels(c, newKernels, modules):
+def pinKernels(c, newKernels, installedKernels, modules):
     """If we are using kernel modules, do not upgrade/install a new 
        kernel until matching modules are available."""
     
     runningKernel = getRunningKernel()
     if runningKernel is None:
-        c.error(2, "Could not parsing running kernel version.")
+        c.error(2, "Could not parse running kernel version.")
         return
+
+    iKernels = [ getKernelProvides(p)[0] for p in installedKernels ]
+    if runningKernel not in iKernels:
+        # We have no knowledge of the running kernel -- its not installed
+        # perhaps this is the anaconda %post environment or somebody
+        # rpm -e'd the currently running kernel.  Choose a reasonable
+        # kernel to go with.  IE, the greatest EVR we see.
+        topkpo = None
+        for p in installedKernels:
+            if topkpo is None or packages.comparePoEVR(topkpo, p) < 0:
+                topkpo = p
+        runningKernel = getKernelProvides(topkpo)[0]
+        c.info(2, "Unknown running kernel.  Using %s instead." % \
+               str(runningKernel))
 
     table = resolveVersions(modules)
     if not table.has_key(runningKernel):
-        # The current kernel has no modules installed
+        c.info(2, "Trying to mimic %s which has no kernel modules installed" \
+               % str(runningKernel))
         return
         
     names = [ p.kmodName for p in table[runningKernel] ]
+    c.info(2, "kmods in %s: %s" % (str(runningKernel), str(names)))
     for kpo in newKernels:
         prov = getKernelProvides(kpo)[0]
         if table.has_key(prov):
@@ -285,7 +301,8 @@ def postresolve_hook(c):
 
     # Pin kernels
     if c.confInt('main', 'pinkernels', default=0) != 0:
-        pinKernels(c, newKernels, newModules + installedModules)
+        pinKernels(c, newKernels, installedKernels, 
+                   newModules + installedModules)
 
     # Upgrade/Install kernel modules
     installKernelModules(c, newModules, installedModules)
