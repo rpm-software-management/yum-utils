@@ -31,6 +31,8 @@ import logging
 
 import yum
 import yum.Errors
+import rpmUtils
+
 from yum.misc import getCacheDir
 from yum.constants import *
 from yum.packages import parsePackages
@@ -91,8 +93,8 @@ def parseArgs():
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
-#    parser.add_option("-a", "--arch", default=None,
-#        help='check as if running the specified arch (default: current arch)')
+    parser.add_option("-a", "--arch", default=None,
+        help='check as if running the specified arch (default: current arch)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
@@ -105,7 +107,7 @@ def parseArgs():
         help="Toggle downloading only the newest packages(defaults to newest-only)")
     parser.add_option("-q", "--quiet", default=False, action="store_true", 
         help="Output as little as possible")
-        
+                          
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -113,7 +115,6 @@ def parseArgs():
 def main():
 # TODO/FIXME
 # gpg/sha checksum them
-# make -a do something
 
     (opts, user_pkg_list) = parseArgs()
     
@@ -135,6 +136,12 @@ def main():
     my = RepoTrack(opts=opts)
     my.doConfigSetup(fn=opts.config,init_plugins=False) # init yum, without plugins
     
+    if opts.arch:
+        archlist = []
+        archlist.extend(rpmUtils.arch.getArchList(opts.arch))
+    else:
+        archlist = rpmUtils.arch.getArchList()
+        
     # do the happy tmpdir thing if we're not root
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
@@ -158,9 +165,10 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
+            self._getSacks(archlist=archlist, thisrepo=repo.id)
 
     my.doRepoSetup()    
-    my.doSackSetup()
+    my._getSacks(archlist=archlist)
     
     unprocessed_pkgs = {}
     final_pkgs = {}

@@ -222,10 +222,13 @@ def main():
                 continue
     
             if opts.urls:
+                baseurl = None
                 if repo.urls[0][-1] != '/':
                     baseurl = repo.urls[0] + '/'
-                url = urljoin(baseurl,remote)
-                print '%s' % url
+                else:
+                    baseurl = repo.urls[0]
+                    url = urljoin(baseurl,remote)
+                    print '%s' % url
                 continue
     
             # make sure the repo subdir is here before we go on.
