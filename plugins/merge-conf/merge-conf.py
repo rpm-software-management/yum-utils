@@ -31,9 +31,17 @@ def config_hook(conduit):
     parser = conduit.getOptParser()
     if parser:
         parser.add_option('--merge-conf', action='store_true', 
-                      help='Merge configuration changes after installation')
+                   dest="merge_conf", default=False,                         
+                   help='Merge configuration changes after installation')
 
 def posttrans_hook(conduit):
+
+    opts, args = conduit.getCmdLine()
+    # if we're not invoked or if assumeyes is set then don't run 
+    conf = conduit.getConf()
+    if not opts.merge_conf or conf.assumeyes:
+        return
+        
     has_vimdiff = False
     for d in os.getenv("PATH", "").split(":"):
         if os.path.exists(os.path.join(d, "vimdiff")):
