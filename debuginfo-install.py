@@ -83,12 +83,12 @@ class DebugInfoInstall(YumUtilBase):
         self.doUnlock()    
     def di_try_install(self, po):
         di_name = '%s-debuginfo' % po.name
-        if self.pkgSack.searchNevra(name=di_name):
+        if self.pkgSack.searchNevra(name=di_name, arch=po.arch):
             test_name = di_name
         else:
             srpm_name = rpmUtils.miscutils.splitFilename(po.sourcerpm)[0] # take the srpmname
             test_name = '%s-debuginfo' % srpm_name
-        self.install(name=test_name, version=po.version, release=po.release)            
+        self.install(name=test_name, arch=po.arch, version=po.version, release=po.release)            
                 
         
     def debugInfo_main(self):
