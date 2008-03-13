@@ -39,8 +39,10 @@ def posttrans_hook(conduit):
     opts, args = conduit.getCmdLine()
     # if we're not invoked or if assumeyes is set then don't run 
     conf = conduit.getConf()
-    if not opts.merge_conf or conf.assumeyes:
+    if not opts.merge_conf:
         return
+    if conf.assumeyes:
+        return    
         
     has_vimdiff = False
     for d in os.getenv("PATH", "").split(":"):
