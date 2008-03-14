@@ -111,13 +111,14 @@ class DebugInfoInstall(YumUtilBase):
                 for (n,f,v) in po.requires:
                     if n.startswith('rpmlib'):
                         continue
-                    for pkgtup in self.rpmdb.whatProvides(n,f,v):
-                        deppo = self.rpmdb.searchPkgTuple(pkgtup)[0]
-                        try:
-                            self.di_try_install(deppo)
-                        except yum.Errors.InstallError, e:
-                            self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
-        
+                    if n.find('.so') != -1:
+                        for pkgtup in self.rpmdb.whatProvides(n,f,v):
+                            deppo = self.rpmdb.searchPkgTuple(pkgtup)[0]
+                            try:
+                                self.di_try_install(deppo)
+                            except yum.Errors.InstallError, e:
+                                self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
+            
         
 if __name__ == '__main__':
     util = DebugInfoInstall()
