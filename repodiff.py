@@ -117,13 +117,23 @@ def parseArgs(args):
     parser.add_option("-o", "--old", default=[], action="append",
                       help="old baseurl[s] for repos")
     parser.add_option("-q", "--quiet", default=False, action='store_true')
-    parser.add_option("-a", "--archlist", default=['src'], action="append",
+    parser.add_option("-a", "--archlist", default=[], action="append",
                       help="In addition to src.rpms, any arch you want to include")
+    parser.add_option("-s", "--size", default=False, action='store_true',
+                      help="Output size changes for any new->old packages")
     (opts, argsleft) = parser.parse_args()
 
     if not opts.new or not opts.old:
         parser.print_usage()
         sys.exit(1)
+
+    # sort out the comma-separated crap we somehow inherited.    
+    archlist = ['src']
+    for a in opts.archlist:
+        for arch in a.split(','):
+             archlist.append(arch)
+
+    opts.archlist = archlist             
     
     return opts
 
@@ -184,10 +194,13 @@ def main(args):
                 for (t, author, content) in  pkg.changelog:
                       if t > oldtime:
                           msg += "* %s %s\n%s\n\n" % (time.ctime(int(t)), author, content)
+            if opts.size:
+                sizechange = int(pkg.size) - int(oldpkg.size)
+                msg += "\nSize Change: %s bytes\n" % sizechange
 
             print msg
 
-
+      
 if __name__ == "__main__":
     if not sys.stdout.isatty():
         import codecs, locale
