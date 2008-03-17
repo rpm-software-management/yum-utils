@@ -162,19 +162,23 @@ def main(args):
             sys.exit(1)
     if not opts.quiet: print 'performing the diff'
     ygh = my.dy_diff()
-  
+    
 
-               
+    total_sizechange = 0
+    add_sizechange = 0
+    remove_sizechange = 0
     if ygh.add:
         for pkg in ygh.add:
             print 'New package %s' % pkg.name
             print '        %s' % pkg.summary
+            add_sizechange += int(pkg.size)
                 
     if ygh.remove:
         for pkg in ygh.remove:
             print 'Removed package %s' % pkg.name
             if ygh.obsoleted.has_key(pkg):
                 print 'Obsoleted by %s' % ygh.obsoleted[pkg]
+            remove_sizechange += (int(pkg.size))
                 
     if ygh.modified:
         print 'Updated Packages:\n'
@@ -196,10 +200,20 @@ def main(args):
                           msg += "* %s %s\n%s\n\n" % (time.ctime(int(t)), author, content)
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
+                total_sizechange += sizechange
                 msg += "\nSize Change: %s bytes\n" % sizechange
 
             print msg
 
+    print 'Summary:'
+    print 'Added Packages: %s' % len(ygh.add)
+    print 'Removed Packages: %s' % len(ygh.remove)
+    print 'Modified Packages: %s' % len(ygh.modified)
+    if opts.size:
+        print 'Size of added packages: %s' % add_sizechange
+        print 'Size change of modified packages: %s' % total_sizechange
+        print 'Size of removed packages: %s' % remove_sizechange
+    
       
 if __name__ == "__main__":
     if not sys.stdout.isatty():
