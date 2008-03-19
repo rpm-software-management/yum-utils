@@ -299,13 +299,14 @@ fi
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
-%{_bindir}/yum-complete-transaction
+%{_sbindir}/yum-complete-transaction
+%{_mandir}/man1/yum-utils.1.*
 %{_mandir}/man1/package-cleanup.1.*
 %{_mandir}/man1/repo-rss.1.*
 %{_mandir}/man1/repoquery.1.*
 %{_mandir}/man1/reposync.1.*
 %{_mandir}/man1/yum-builddep.1.*
-%{_mandir}/man1/yum-complete-transaction.1.*
+%{_mandir}/man8/yum-complete-transaction.8.*
 %{_mandir}/man1/yumdownloader.1.*
 
 %files -n yum-updateonboot
@@ -434,6 +435,11 @@ fi
 %{_mandir}/man1/yum-verify.1.*
 
 %changelog
+* Tue Mar 18 2008 Shawn Starr <shawn.starr@rogers.com>
+- Add yum-utils.1 manual page
+- Rename yum-complete-transaction manual page to 8
+- Move yum-complete-transaction to /usr/sbin
+
 * Sat Mar  1 2008 James Antill <james@fedoraproject.org>
 - Add verify plugin
 
