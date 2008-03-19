@@ -1,0 +1,27 @@
+.TH "yum-utils" "1" "18-Mar-2008" "yum-utils" ""
+.SH "NAME"
+yum\-utils \- tools for manipulating repositories and extended package management
+.SH "SYNOPSIS"
+.nf 
+\fBdebuginfo\-install\fR \- install debuginfo packages and their dependencies
+\fBpackage\-cleanup\fR \- manage package cleanup, duplicates, orphaned packages and outstanding dependency problems
+\fBrepo\-graph\fR \- outputs a full package dependency list in dot format 
+\fBrepo\-rss\fR \- generates an RSS feed from one or more repositories
+\fBrepoclosure\fR \- reads metadata of repositories, checks dependencies and displays list of unresolved dependencies
+\fBrepodiff\fR \- takes two or more repositories, returns a list of added, removed or changed packages
+\fBrepomanage\fR \- manages a directory of rpm packages, returns a list of newest or oldest packages in a directory
+\fBrepoquery\fR \- query yum repositories and get additional information on the them
+\fBreposync\fR \- synchronize a remote yum repository to a local directory using yum to retrieve packages
+\fBrepotrack\fR \- track packages and its dependencies and downloads them
+\fByum\-builddep\fR \- installs missing dependencies to build a specified package
+\fByum\-complete\-transaction\fR \- finds incomplete or aborted yum transactions and attempts to complete them
+\fByumdownloader\fR \- downloads packages from yum repositories including source RPMs
+.SH "DESCRIPTION"
+.B yum\-utils
+is a collection of tools and programs for managing yum repositories, installing debug packages, source packages, extended information from repositories and administration.
+.SH "NOTES"
+See respective tools for additional help for commands without a manual page
+.SH "SEE ALSO"
+package\-cleanup(1), repo\-rss(1), repoquery(1), reposync(1), yum\-builddep(1), yum\-complete\-transaction(8), yumdownloader(1)
+.SH "AUTHOR"
+Shawn Starr <shawn.starr@rogers.com>
