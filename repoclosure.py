@@ -56,6 +56,8 @@ def parseArgs():
                       help="quiet (no output to stderr)")
     parser.add_option("-n", "--newest", default=0, action="store_true",
                       help="check only the newest packages in the repos")
+    parser.add_option("--repofrompath", action="append",
+                      help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -154,6 +156,24 @@ class RepoClosure(yum.YumBase):
 def main():
     (opts, cruft) = parseArgs()
     my = RepoClosure(arch = opts.arch, config = opts.config, builddeps = opts.builddeps)
+
+    if opts.repofrompath:
+        # setup the fake repos
+        for repo in opts.repofrompath:
+            repoid,repopath = tuple(repo.split(','))
+            if repopath[0] == '/':
+                baseurl = 'file://' + repopath
+            else:
+                baseurl = repopath
+                
+            repopath = os.path.normpath(repopath)
+            newrepo = yum.yumRepo.YumRepository(repoid)
+            newrepo.name = repopath
+            newrepo.baseurl = baseurl
+            newrepo.basecachedir = my.conf.cachedir
+            my.repos.add(newrepo)
+            my.repos.enableRepo(newrepo.id)
+            my.logger.info( "Added %s repo from %s" % (repoid,repopath))
     
     if opts.repoid:
         for repo in my.repos.repos.values():
