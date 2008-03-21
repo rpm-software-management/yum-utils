@@ -32,6 +32,11 @@
 # (C) Copyright 2005 Luke Macken <lmacken@redhat.com>
 #
 
+"""
+B{FastestMirror} is a Yum plugin which sorts each repository's mirrorlist
+according to connection speed prior to download.
+"""
+
 import os
 import sys
 import time
@@ -56,6 +61,28 @@ maxthreads = 15
 exclude = None
 
 def init_hook(conduit):
+    """
+    This function initiliazes the variables required for running B{fastestmirror}
+    module. The variables are initiliazed from the main section of the plugin file.
+
+    There are no parameteres for this function. It uses global variables to
+    communicate with other functions.
+
+    This function refers:
+        - L{get_hostfile_age}
+
+    @param verbose : Verbosity of output.
+    @type verbose : Boolean
+    @param socket_timeout : The default timeout for a socket connection.
+    @type socket_timeout : Integer
+    @param hostfilepath : Absolute path to the plugin's cache file.
+    @type hostfilepath : String
+    @param maxhostfileage : Maximum age of the plugin's cache file.
+    @type maxhostfileage : Integer
+    @param loadcache : Fastest Mirrors to be loaded from plugin's cache or not.
+    @type loadcache : Boolean
+
+    """
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
     global maxthreads, exclude
     verbose = conduit.confBool('main', 'verbose', default=False)
@@ -65,10 +92,16 @@ def init_hook(conduit):
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
+    # If the file hostfilepath exists and is newer than the maxhostfileage,
+    # then load the cache.
     if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
         loadcache = True
 
 def clean_hook(conduit):
+    """
+    This function cleans the plugin cache file if exists. The function is called
+    when C{yum [options] clean [plugins | all ]} is executed.
+    """
     if os.path.exists(hostfilepath):
         conduit.info(2, "Cleaning up list of fastest mirrors")
         os.unlink(hostfilepath)
@@ -77,6 +110,24 @@ def clean_hook(conduit):
 host = lambda mirror: mirror.split('/')[2].split('@')[-1]
 
 def postreposetup_hook(conduit):
+    """
+    This function is called after Yum has initiliazed all the repository information.
+
+    If cache file exists, this function will load the mirror speeds from the file,
+    else it will determine the fastest mirrors afresh and write them back to the cache
+    file.
+
+    There are no parameteres for this function. It uses global variables to
+    communicate with other functions.
+
+    This function refers:
+        - L{read_timedhosts()}
+        - L{FastestMirror.get_mirrorlist()}
+        - L{write_timedhosts()}
+
+    @param loadcache : Fastest Mirrors to be loaded from plugin's cache file or not.
+    @type loadcache : Boolean
+    """
     global loadcache, exclude
     if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
@@ -104,6 +155,21 @@ def postreposetup_hook(conduit):
         write_timedhosts()
 
 def read_timedhosts():
+    """
+    This function reads the time and hostname from the plugin's cache file and
+    store them in C{timedhosts}.
+
+    There are no parameteres for this function. It uses global variables to
+    communicate with other functions.
+
+    This function is referred by:
+        - L{postreposetup_hook()}
+
+    @param timedhosts : A list of time intervals to reach different hosts
+    corresponding to the mirrors. The index of the list are hostnames.
+    C{timedhosts[host] = time}.
+    @type timedhosts : List
+    """
     global timedhosts
     try:
         hostfile = file(hostfilepath)
@@ -115,6 +181,21 @@ def read_timedhosts():
         pass
 
 def write_timedhosts():
+    """
+    This function writes the plugin's cache file with the entries in the
+    C{timedhosts} list.
+
+    There are no parameteres for this function. It uses global variables to
+    communicate with other functions.
+
+    This function is referred by:
+        - L{postreposetup_hook()}
+
+    @param timedhosts : A list of time intervals to reach different hosts
+    corresponding to the mirrors. The index of the list are hostnames.
+    C{timedhosts[host] = time}.
+    @type timedhosts : List
+    """
     global timedhosts
     try:
         hostfile = file(hostfilepath, 'w')
@@ -125,13 +206,38 @@ def write_timedhosts():
         pass
 
 def get_hostfile_age():
+    """
+    This function returns the current age of the plugin's cache file.
+
+    There are no parameteres for this function. It uses global variables to
+    communicate with other functions.
+
+    This function is referred by:
+        - L{init_hook()}
+
+    @param hostfilepath : Absolute path to the plugin's cache file.
+    @type hostfilepath : String
+    @rtype: Integer
+    @return: The age of the plugin's cache file.
+    """
     global hostfilepath
     timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(hostfilepath))
     return (datetime.datetime.now() - timestamp).days
 
 class FastestMirror:
+    """
+    This is the helper class of B{fastestmirror} module. This class does
+    all the processing of the response time calculation for all the mirrors
+    of all the enabled Yum repositories.
+    """
 
     def __init__(self, mirrorlist):
+        """
+        This is the initiliazer function of the B{L{FastestMirror}} class.
+
+        @param mirrorlist : A list of mirrors for an enabled repository.
+        @type mirrorlist : List
+        """
         self.mirrorlist = mirrorlist
         self.results = {}
         self.threads = []
@@ -139,12 +245,38 @@ class FastestMirror:
         socket.setdefaulttimeout(socket_timeout)
 
     def get_mirrorlist(self):
+        """
+        This function pings/polls all the mirrors in the list
+        C{FastestMirror.mirrorlist} and returns the sorted list of mirrors
+        according to the increasing response time of the mirrors.
+
+        This function refers:
+            - L{FastestMirror._poll_mirrors()}
+
+        This function is referred by:
+            - L{postreposetup_hook()}
+            - L{main()}
+
+        @rtype: List
+        @return: The list of mirrors sorted according to the increasing
+        response time.
+        """
         self._poll_mirrors()
         mirrors = [(v, k) for k, v in self.results.items()]
         mirrors.sort()
         return [x[1] for x in mirrors]
 
     def _poll_mirrors(self):
+        """
+        This function uses L{PollThread} class to ping/poll individual mirror
+        in parallel.
+
+        This function refers:
+            - L{PollThread.run()}
+
+        This function is referred by:
+            - L{FastestMirror.get_mirrorlist()}
+        """
         global maxthreads
         for mirror in self.mirrorlist:
             if len(self.threads) > maxthreads:
@@ -160,6 +292,23 @@ class FastestMirror:
             del self.threads[0]
 
     def _add_result(self, mirror, host, time):
+        """
+        This function is called by L{PollThread.run()} to add details of a
+        mirror in C{FastestMirror.results} dictionary.
+
+        This function is referred by:
+            - L{PollThread.run()}
+
+        @param mirror : The mirror that was polled for response time.
+        @type mirror : String
+        @param host : The hostname of the mirror.
+        @type host : String
+        @param time : The response time of the mirror.
+        @type time : Integer
+        @param timedhosts : A list of time intervals to reach different hosts
+        corresponding to the mirrors. The index of the list are hostnames.
+        @type timedhosts : List
+        """
         global timedhosts
         self.lock.acquire()
         if verbose: print " * %s : %f secs" % (host, time)
@@ -168,8 +317,21 @@ class FastestMirror:
         self.lock.release()
 
 class PollThread(threading.Thread):
+    """
+    B{PollThread} class implements C{threading.Thread} class. This class
+    provides the functionalities to ping/poll the mirrors in parallel.
+    """
 
     def __init__(self, parent, mirror):
+        """
+        It is initiliazer function for B{L{PollThread}} class. This function
+        initiliazes the service ports for different webservices.
+
+        @param parent : The parent class.
+        @type parent : Class
+        @param mirror : The mirror of a repository.
+        @type mirror : String
+        """
         threading.Thread.__init__(self)
         self.parent = parent
         self.mirror = mirror
@@ -187,6 +349,20 @@ class PollThread(threading.Thread):
             self.port = -2
 
     def run(self):
+        """
+        The C{threading.Thread.run()} function is being overridden here.
+        This function pings/polls a mirror and add the details of that
+        mirror to the C{FastestMirror.results} dictionary.
+
+        The response time of any mirror is '99999999999' if any exception
+        occurs during polling.
+
+        This function refers:
+            - L{FastestMirror._add_result()}
+
+        This function is referred by:
+            - L{FastestMirror._poll_mirrors()}
+        """
         try:
             if timedhosts.has_key(self.host):
                 result = timedhosts[self.host]
@@ -212,6 +388,15 @@ class PollThread(threading.Thread):
             self.parent._add_result(self.mirror, self.host, 99999999999)
 
 def main():
+    """
+    This is the main function for B{fastestmirror} module.
+
+    This function explains the usage of B{fastestmirror} module. Also parses
+    the command line arguments.
+
+    This function refers:
+        - L{FastestMirror.get_mirrorlist()}
+    """
     global verbose
     verbose = True
 
