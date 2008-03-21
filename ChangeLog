@@ -1,5 +1,28 @@
 2008-03-21  Tim Lauridsen <tim@naboo.local>
 
+	* yum-utils.spec: bumped yum-utils version to 1.1.13
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* docs/Makefile: more Makefile changes to install
+	yum-complete-transaction in sbin and docs to man8
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* Makefile: more Makefile changes to install
+	yum-complete-transaction in sbin and docs to man8
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* Makefile, docs/Makefile, yum-utils.spec: Makefile changes to
+	install yum-complete-transaction in sbin and docs to man8
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: updated ChangeLog
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
 	* ChangeLog: bumped yum-utils version to 1.1.12
 
 2008-03-21  Tim Lauridsen <tim@naboo.local>
