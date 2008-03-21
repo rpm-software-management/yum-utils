@@ -14,6 +14,7 @@ clean:
 
 install:
 	mkdir -p $(DESTDIR)/usr/bin/
+	mkdir -p $(DESTDIR)/usr/sbin/
 	mkdir -p $(DESTDIR)/usr/share/man/man1
 	for util in $(UTILS); do \
 		install -m 755 $$util.py $(DESTDIR)/usr/bin/$$util; \
