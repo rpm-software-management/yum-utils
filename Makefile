@@ -1,6 +1,7 @@
 SUBDIRS = docs
 PKGNAME = yum-utils
-UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync yum-complete-transaction repodiff
+UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff
+UTILSROOT = yum-complete-transaction 
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
 WEBHOST = login.dulug.duke.edu
@@ -16,6 +17,9 @@ install:
 	mkdir -p $(DESTDIR)/usr/share/man/man1
 	for util in $(UTILS); do \
 		install -m 755 $$util.py $(DESTDIR)/usr/bin/$$util; \
+	done
+	for util in $(UTILSROOT); do \
+		install -m 755 $$util.py $(DESTDIR)/usr/sbin/$$util; \
 	done
 
 	for d in $(SUBDIRS); do make DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done

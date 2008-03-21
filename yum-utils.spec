@@ -435,6 +435,8 @@ fi
 %{_mandir}/man1/yum-verify.1.*
 
 %changelog
+* Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.12
 * Tue Mar 18 2008 Shawn Starr <shawn.starr@rogers.com>
 - Add yum-utils.1 manual page
 - Rename yum-complete-transaction manual page to 8

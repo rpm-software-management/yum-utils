@@ -1,6 +1,6 @@
-DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync yum-complete-transaction yum-list-data yum-filter-data yum-verify
+DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync yum-list-data yum-filter-data yum-verify
 DOCS5 = yum-changelog.conf
-DOCS8 = yum-security
+DOCS8 = yum-security yum-complete-transaction 
 
 all:
 	echo "Nothing to do"
