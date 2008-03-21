@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.12
+Version: 1.1.13
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -435,6 +435,8 @@ fi
 %{_mandir}/man1/yum-verify.1.*
 
 %changelog
+* Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.13
 * Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.12
 * Tue Mar 18 2008 Shawn Starr <shawn.starr@rogers.com>
