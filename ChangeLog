@@ -1,0 +1,2485 @@
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: bumped yum-utils version to 1.1.12
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.12
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* plugins/fastestmirror/fastestmirror.py: Added doc strings to
+	fastestmirror plugin by Kulbir Saini
+
+2008-03-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: add --repofrompath option to repoclosure to make
+	jkeating happy. --repofrompath=repoid,url://to/repo
+
+2008-03-19  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/yum-complete-transaction.8, docs/yum-utils.1: add man pages
+	properly *boggle*
+
+2008-03-19  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/yum-complete-transaction.1, yum-utils.spec: - apply patch from Shawn Starr which does:  - yum utils  man page  -
+	move yum-complete-transaction to /usr/sbin  - move
+	yum-complete-transaction manpage to be .8 not .1
+
+2008-03-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: output summary info for size changes and total diff.
+	this is mostly b/c james a. is not wrong, but he's still a pain :)
+
+2008-03-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: add --size option to repodiff to output size changes
+	among changed pkgs
+
+2008-03-14  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: for rhbug #437427 - only install debuginfo's
+	for deps if the requirment is a library of some type. So we check if
+	the requirement contains ".so". if it does, install it, too.
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: apply patch from Jan Kratochvil
+	(jan.kratochvil@redhat.com) to make debuginfo-install obey arch
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: move info to the top of the list b/c it makes the
+	most sense for it to be first
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py, repotrack.py: fix rh bug: 427724 - add --arch to
+	repotrack fix minor bug with --urls in reposync
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   The
+	pinKernels functionality fails pretty badly if it can't match your
+	make yumdownloader wine\* download all packages starting with wine
+	(rhbz #435096)   make yumdownloader return an non zero value if
+	there is notthing to download (rhbz #170287)   Fix man page bug,
+	from RHEL testing   Add yum compatible arg.   Move debugging message
+	to level 4
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/merge-conf/merge-conf.py: slight edit to make it clearer
+	what we're doing for bug 329261
+
+2008-03-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/merge-conf/merge-conf.py: - make sure the user invokved merge-conf on the cli - only run if
+	conf.assumeyes is not set  fixes rh bug 329261
+
+2008-03-12  Jack Neely <jjneely@ncsu.edu>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils
+
+2008-03-12  Jack Neely <jjneely@ncsu.edu>
+
+	* plugins/fedorakmod/README, plugins/fedorakmod/fedorakmod.py: The
+	pinKernels functionality fails pretty badly if it can't match your
+	running kernel with a kernel package that it knows about.  In this
+	case we grab the highest EVR kernel that we know about and attempt
+	to mimic the kernel modules setup for that kernel.  This is handy in
+	the %post of a kickstart as kernel pinning was always broken there
+	or when some body erases your kernel.
+
+2008-03-12  Tim Lauridsen <tim@naboo.local>
+
+	* yumdownloader.py: make yumdownloader wine\* download all packages
+	starting with wine (rhbz #435096)
+
+2008-03-12  Tim Lauridsen <tim@naboo.local>
+
+	* yumdownloader.py: make yumdownloader return an non zero value if
+	there is notthing to download (rhbz #170287)
+
+2008-03-12  James Antill <james@and.org>
+
+	* docs/yum-filter-data.1: Fix man page bug, from RHEL testing
+
+2008-03-11  James Antill <james@and.org>
+
+	* repoquery.py: Add yum compatible arg.
+
+2008-03-11  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Move debugging message to level 4
+
+2008-03-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: make sure noarch and other sub-arch downloads
+	still work with --archlist
+
+2008-03-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: merge jesse keatings patch for --archlist in
+	yumdownloader
+
+2008-03-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: make sure the ts file exists before
+	we unlink it.
+
+2008-03-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: if the transaction we're cleaning up
+	fails or exited for ANY REASON do not remove the old transaction
+	files so the user can do it again after they've fixed whatever broke
+
+
+2008-03-06  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py:  Show unique values in info-* for size range, and baseurl.  Make
+	 buildhosts output much more readable (use dnsdomainname grouping).
+
+
+2008-03-01  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yum-verify.1, plugins/verify/verify.conf,
+	plugins/verify/verify.py, yum-utils.spec: Add verify plugin, and
+	documentation
+
+2008-02-27  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Minor cleanup
+
+2008-02-25  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: - add obsoletes reporting for non-srpm comparisons. This takes all
+	the removed packages and sees if anything in the new packages
+	obsoletes them. Only works for binary packages b/c srpms don't
+	obsolete things.  - added -a, --archlist option to handle looking at
+	other arches as well as src rpms
+
+2008-02-22  James Antill <james@and.org>
+
+	* docs/yum-changelog.1, plugins/changelog/changelog.py: Add recent
+	lists, and allow number of changelogs instead of date
+
+2008-02-22  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Add recent lists
+
+2008-02-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repomanage.py: spell payload right - thanks to Chris Aillon :)
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Try and make the repo enable aliases more
+	useful
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.list, yum-utils.spec: Create an
+	empty versionlock file, so we can have it enabled by default
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Revert "Fix non-existant
+	version lock file SNAFU"  This reverts commit
+	3a2d1fdf53635a8929693494b4fbacc2a5bf4545.   All bugs are features
+	for someone.
+
+2008-02-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make sure debuginfo-install obeys/sets yum
+	locks
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Fix non-existant version lock
+	file SNAFU
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Redo versionlock logic for
+	major speedup in non-update cases
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Add obvious speedup to
+	versionlock when no packages versionlocked.
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.conf: Auto enable versionlock on
+	install, as all other plugins do
+
+2008-02-20  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Fix versionlock plugin
+
+2008-02-19  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix typo
+
+2008-02-19  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Output the normal list headers
+
+2008-02-18  James Antill <james@and.org>
+
+	* docs/yum-changelog.1, plugins/changelog/changelog.py: Add
+	changelog command to yum-changelog
+
+2008-02-18  James Antill <james@and.org>
+
+	* plugins/fedorakmod/fedorakmod.py: Fix two == None bugs
+
+2008-02-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py, yumdownloader.py: repoquery: fix a typo in
+	--enablerepos handling yumdownloader: clean up some crap - make sure
+	that for --enablerepo'd repos that the cachedir is set properly
+
+2008-02-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make enablerepo behave like yum enablerepo - not
+	like repoid
+
+2008-02-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: support --enablerepo/disablerepo in repoquery so it
+	is more like other yum-utils
+
+2008-02-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make sure we catch the trace if we're in caching
+	mode and there is no metadata thanks to Bill Nottingham for
+	reporting this one.
+
+2008-02-14  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/package-cleanup.1: apply docs patch from Matej Cepl for rh
+	bug 429158
+
+2008-02-13  James Antill <james@and.org>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: Do the import
+
+2008-02-13  James Antill <james@and.org>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: Don't refresh
+	yum-updatesd if we can't have updated anything
+
+2008-02-11  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Remove i18n _ from aliases until we
+	have one
+
+2008-02-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils: (22
+	commits)    Change groups => rpm-groups, yum-groups => groups. Minor
+	fixes   Fix copy and paste problem   Add yum groups, to filter-data
+	and list-data   Fix the man8 to man1 move in specfile   Remove left
+	overs from copy and paste. Also add group examples   Add
+	yum-filter-data man page   Don't split values with spaces in their
+	names, on spaces   Man page for yum-list-data plugin, apparently
+	less /usr/lib/yum-plugins/*.py is not enough for everyone :)   Use
+	full command name   Add upgrade as a valid command to security
+	The compliment to the list-data plugin, allows you to filter
+	packages based   Keep the .strip() result for all strings   Add
+	special case for "zero length" sizes   updated ChangeLog   bumped
+	yum-utils version to 1.1.11   Add --tmprepo as a plugin   New help
+	info. for aliases   Add support for the new help   Add support for
+	the new help   Fix bad import   ...
+
+2008-02-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add more detail to the description so searches
+	match more
+
+2008-02-05  James Antill <james@and.org>
+
+	* docs/yum-filter-data.1, docs/yum-list-data.1,
+	plugins/filter-data/filter-data.py, plugins/list-data/list-data.py:  Change groups => rpm-groups, yum-groups => groups. Minor fixes
+
+2008-02-05  James Antill <james@and.org>
+
+	* docs/yum-filter-data.1: Fix copy and paste problem
+
+2008-02-05  James Antill <james@and.org>
+
+	* docs/yum-filter-data.1, docs/yum-list-data.1,
+	plugins/filter-data/filter-data.py, plugins/list-data/list-data.py: 
+	Add yum groups, to filter-data and list-data
+
+2008-02-04  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix the man8 to man1 move in specfile
+
+2008-02-04  James Antill <james@and.org>
+
+	* docs/yum-filter-data.1: Remove left overs from copy and paste.
+	Also add group examples
+
+2008-02-04  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yum-filter-data.1, docs/yum-list-data.1,
+	yum-utils.spec: Add yum-filter-data man page
+
+2008-02-04  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py: Don't split values with spaces
+	in their names, on spaces
+
+2008-02-04  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yum-list-data.1, yum-utils.spec: Man page for
+	yum-list-data plugin, apparently less /usr/lib/yum-plugins/*.py is
+	not enough for everyone :)
+
+2008-02-04  James Antill <james@and.org>
+
+	* docs/yum-security.8: Use full command name
+
+2008-02-01  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add upgrade as a valid command to
+	security
+
+2008-02-01  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.conf,
+	plugins/filter-data/filter-data.py, yum-utils.spec:  The compliment to the list-data plugin, allows you to filter
+	 packages based on arbitrary package data.
+
+2008-01-31  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Keep the .strip() result for all
+	strings
+
+2008-01-31  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Add special case for "zero length"
+	sizes
+
+2008-01-30  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-30  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.11
+
+2008-01-28  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.conf, plugins/tmprepo/tmprepo.py,
+	yum-utils.spec: Add --tmprepo as a plugin
+
+2008-01-28  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: New help info. for aliases
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add support for the new help
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Add support for the new help
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Fix bad import
+
+2008-01-25  James Antill <james@and.org>
+
+	* plugins/priorities/priorities.py: Make yum-priorities not eat CPU
+	just by installing it
+
+2008-01-23  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Use .committer property in HEAD
+	yum
+
+2008-01-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, repoclosure.py, repodiff.py, repomanage.py,
+	repotrack.py, yum-complete-transaction.py: add better usage
+	explanations to a lot of yum-utils. helps to give people an idea
+	what the tool is used for.
+
+2008-01-15  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.conf, plugins/list-data/list-data.py,
+	yum-utils.spec:  List vendors, groups, packagers, buildhosts, licenses, arches,
+	 buildhosts, baseurls, package-sizes, archive-sizes,
+	 installed-sizes, committers
+
+2008-01-19  James Antill <james@and.org>
+
+	* docs/package-cleanup.1: Reorder option docs to be sorted
+
+2008-01-19  James Antill <james@and.org>
+
+	* docs/package-cleanup.1: Remove duplicate doc
+
+2008-01-18  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: make sure this only operates on src rpms b/c
+	otherwise bad things happen
+
+2008-01-18  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix typo
+
+2008-01-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: add -q, --new and --old options to repodiff. Correct
+	some logic issues in the diffing, fix up the output to a pipe
+
+2008-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: Remove hack for *-source repos.
+
+2008-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py:  Real fix for the __len__ problem. Don't disableRepo() and then
+	 enable it, this even do the disable last ... oops.
+
+2008-01-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	add repodiff, merge yum-utils.spec
+
+2008-01-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, repodiff.py, yum-utils.spec: add repodiff
+
+2008-01-10  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Workaround for bad yum module users
+
+2008-01-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Remove extra newlines, __str__
+	already leads with one
+
+2008-01-09  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Remove empty lss alias and minor cleanup
+
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: bumped yum-utils version to 1.1.10
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.10
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-01-03  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.10
+
+2007-12-21  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Quick work around for yumex
+
+2007-12-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make sure we're root to run
+	debuginfo-install closes rh bug #426470
+
+2007-12-20  James Antill <james@and.org>
+
+	* .gitignore: Match foo.py~ for backup files
+
+2007-12-20  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix typo
+
+2007-12-20  James Antill <james@and.org>
+
+	* yum-utils.spec: Add yum-aliases to the specfile
+
+2007-12-20  James Antill <james@and.org>
+
+	* plugins/aliases/aliases, plugins/aliases/aliases.conf,
+	plugins/aliases/aliases.py: Add aliases module
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: Update fastestmirrors
+	ChangeLog, and do a rev bump
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Strip any
+	username:passwords from our mirrors hostname before we display it
+
+2007-12-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Only display our mirrors
+	if we have some
+
+2007-12-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/priorities/priorities.py: apply patch to fix rh bug:
+	421961 - make sure we're passing in opts before we get the value of
+	the opts.
+
+2007-12-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   Move
+	conduit.getPackages until needed, as it takes significant time
+
+2007-12-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: make sure that our repo url has a trailing /,
+	otherwise urljoin does the wrong thing. We should probably append
+	this higher up in the stack, too.  closes rh bug: 421801
+
+2007-12-11  James Antill <james@and.org>
+
+	* plugins/basearchonly/basearchonly.py: Move conduit.getPackages
+	until needed, as it takes significant time
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: make yum-complete-transaction
+	backward compat to yum 3.2.7/3.2.8
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/Makefile: add complete-transaction to doc makefile, too
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, docs/yum-complete-transaction.1,
+	yum-complete-transaction.py, yum-utils.spec: add
+	yum-complete-transaction man page and update specfile/makefile
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   Fix
+	unreferenced variable in repoclosure.py   updated ChangeLog   bumped
+	yum-utils version to 1.1.9   bumped yum-utils version to 1.1.9
+
+2007-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: implement yum-util to clean up
+	unfinished/aborted transactions using
+	transaction-done/transaction-all files.
+
+2007-12-07  Luke Macken <lmacken@redhat.com>
+
+	* repoclosure.py: Fix unreferenced variable in repoclosure.py
+
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: updated ChangeLog
+
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.9
+
+2007-12-07  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.9
+
+2007-12-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: get rid of the confirmation to clean up old
+	dupes when there are no dupes to clean up. rh bug: 328711
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Support multiple mirror
+	excludes in fastestmirror
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog: update fastestmirrors ChangeLog
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Add an 'exclude'
+	configuration option to fastestmirror (Bug #407471)
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Add a maxthreads
+	configuration option to fastestmirror (Bug #227772)
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Actually display the
+	fastest mirrors
+
+2007-12-03  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Remove unused
+	PluginYumExit import
+
+2007-11-23  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Added patch by Ville Skytta to make
+	'package-cleanup --leaves' catch *lib and *libs
+
+2007-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: port yum-builddep to YumUtilBase format. Make it
+	actually, work :) closes rh bug #381291
+
+2007-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: clean up a deprecation
+
+2007-11-19  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/basearchonly/basearchonly.conf,
+	plugins/basearchonly/basearchonly.py: basearchobly patch by Adel
+	Gadllah * Fix system-install-packages crash on F8 * Add wildcard
+	support to whitelist * Add all wine packages to the default
+	whitelist on x86 (wine*)
+
+2007-11-12  Tim Lauridsen <tim@localhost.localdomain>
+
+	* Makefile, plugins/priorities/ChangeLog,
+	plugins/priorities/priorities.py: Added optparser check in
+	priorities plugin (bz #847)
+
+2007-11-05  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/ChangeLog, plugins/priorities/README,
+	plugins/priorities/priorities.py: Make the name.arch checking
+	optional in the priorities plugin. This adds the 'only_samearch'
+	plugin option and the '--samearch-priorities'
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/basearchonly/basearchonly.conf: apply patch from Adel
+	Gadllah to add libflashsupport to basearchonly-plugin whitelist
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: apply patch from Bill Nottingham to make repoquery
+	more silent when --quiet is specified.
+
+2007-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/cleanup.xml,
+	plugins/upgrade-helper/remove-stuff.xml: rename remove-stuff.xml to
+	cleanup.xml
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/upgrade-helper.py: make it work with more
+	recent matchPackageNames than when I originally wrote it
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: left out upgrade-helper from the list of plugins
+
+2007-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/upgrade-helper/remove-stuff.xml,
+	plugins/upgrade-helper/upgrade-helper.conf,
+	plugins/upgrade-helper/upgrade-helper.py, yum-utils.spec: add
+	upgrade-helper - this _should_ work - but I'll be testing it some
+	more before tagging
+
+2007-10-25  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: catch error on download if destdir is not
+	writable. closed rh bug 352911
+
+2007-10-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2007-10-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, yum-utils.spec: bumped yum-utils version to 1.1.8
+
+2007-10-17  Tim Lauridsen <tim@localhost.localdomain>
+
+	* updateonboot/yum-updateonboot.init, yumdownloader.py: Make
+	yumdownloader work as non-root users even if *-source repos is
+	enabled in *.repo files or by --enablerepo.
+
+2007-10-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: catches an error if someone has --enablerepo or
+	--disablerepo set and tries to tell them what to do.
+
+2007-10-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: make sure enabled source repos don't cause
+	yumdownloader --source to not do the right thing
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-rss.py: add config file option to repo-rss
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:
+	provide more verbose failure information with higher debug level
+	check for yum-updatesd being on the bus in case we're using system
+	activation   refresh-updatesd: documentation updates
+	refresh-updatesd: Remove repos_setup check.   refresh-updatesd: some
+	tweaks   fixed issue in debuginfo-install there make it fail with
+	plugins there uses conduit.getPackages() (rhbz #249742)   chmod +x
+	*.py (make it a little easier to test)   fixed UnboundLocalError:
+	local variable 'r_e' referenced before assignment in repoquery
+	(convert unicode -> str)   Make package-cleanup --orphans work as no
+	root (rhbz #253352)   Fixed yumdownloader --url output to show the
+	right url (rhbz #301981)   Allow package name globs on the
+	list-sec/info-sec lines   We need to catch when we install a kmod
+	with a lower VR than a kmod of   Don't print metadata more than once
+
+
+2007-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-rss.py: - apply guid patch from ricky zhou to repo-rss.xml - add -a option
+	to specify arches that repo-rss should use
+
+2007-10-09  Jeremy Katz <katzj@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: provide more verbose
+	failure information with higher debug level
+
+2007-10-09  Jeremy Katz <katzj@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: check for
+	yum-updatesd being on the bus in case we're using system activation
+
+
+2007-09-30  James Bowes <jbowes@redhat.com>
+
+	* plugins/refresh-updatesd/README,
+	plugins/refresh-updatesd/refresh-updatesd.py, yum-utils.spec: 
+	refresh-updatesd: documentation updates
+
+2007-09-30  James Bowes <jbowes@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: refresh-updatesd:
+	Remove repos_setup check.  Since the plugin fires a dbus signal only
+	on posttrans, it will only fire if yum is doing something. This is
+	enough of a check in itself.
+
+2007-09-28  Bill Nottingham <notting@redhat.com>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: refresh-updatesd:
+	some tweaks  1) Be less verbose, as yum-updatesd might not be
+	running 2) Run on posttrans, not close. This stops it continually
+	firing off    when I run repoqeury. (Perhaps repoquery shouldn't
+	initialize    plugins, but...)  Bill
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* debuginfo-install.py: fixed issue in debuginfo-install there make
+	it fail with plugins there uses conduit.getPackages() (rhbz #249742)
+
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* debuginfo-install.py, repo-rss.py, repoclosure.py, repomanage.py,
+	repoquery.py, reposync.py, repotrack.py, yumdownloader.py: chmod +x
+	*.py (make it a little easier to test)
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: fixed UnboundLocalError: local variable 'r_e'
+	referenced before assignment in repoquery (convert unicode -> str)
+
+2007-09-28  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Make package-cleanup --orphans work as no root
+	(rhbz #253352)
+
+2007-09-23  Tim Lauridsen <tla@rasmil.dk>
+
+	* yumdownloader.py: Fixed yumdownloader --url output to show the
+	right url (rhbz #301981)
+
+2007-09-19  James Antill <james@code.and.org>
+
+	Fix merge
+
+2007-09-19  Tim Lauridsen <tla@rasmil.dk>
+
+	Merge branch 'yum-sec-upmd-info-uniq' of
+	http://people.redhat.com/jantill/gits/yum-utils
+
+2007-09-19  James Antill <james@code.and.org>
+
+	* plugins/security/security.py: Allow package name globs on the
+	list-sec/info-sec lines
+
+2007-09-19  Jack Neely <jjneely@ncsu.edu>
+
+	* plugins/fedorakmod/fedorakmod.py: We need to catch when we install
+	a kmod with a lower VR than a kmod of the same name that is already
+	installed.  RPM doesn't like this so we need to toss in an extra
+	flag or the transaction wont proccede.
+
+2007-09-19  James Antill <james@code.and.org>
+
+	* plugins/security/security.py: Don't print metadata more than once
+
+
+2007-09-18  Tim Lauridsen <tla@rasmil.dk>
+
+	* package-cleanup.py: Added patch by Mathew Miller to make
+	package-cleanup return exit code
+
+2007-09-14  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: do not use wildcards for manpages in yum-utils
+	files section to avoid duplicates (rhbz #290171)
+
+2007-09-14  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog, yum-utils.spec: commited yum-utils.spec & Changelog for
+	yum-utils 1.1.7 ( I was some how not committed when i made the
+	release :-(
+
+2007-09-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: add --plugins support to repoquery, too
+
+2007-09-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: add option to enable plugins for reposync (helps with
+	using it with rhn-plugin)
+
+2007-09-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/skip-broken/skip-broken.py: closes rh bug 281881 - don't
+	traceback when skip-broken is enabled
+
+2007-09-06  Tim Lauridsen <tla@rasmil.dk>
+
+	* docs/repoquery.1, repoquery.py: Fixed repoquery help & manpage
+	with --repofrompath=<repoid>,<url / path>
+
+2007-09-06  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Make the --repofrompath take a repoid, so we know
+	what to call the repo'
+
+2007-09-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/repoquery.1, repoquery.py: add --repofrompath and docs to
+	repoquery --repofrompath allows repoquery to query arbitrary paths
+	as repositories
+
+2007-09-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: merge --recursive patch from Thomas Vander-Stichele
+
+
+2007-09-05  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Added patch by Bill Nottingham to silence
+	progressbars in pipes
+
+2007-09-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make debuginfo-install use function for
+	matching correctly
+
+2007-08-17  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: Added patch by Panu (rhbz #246519) to make repoquery
+	--whatprovides work with root level directories.
+
+2007-08-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: change exception from PackageSackError to
+	YumBaseError to close rh bug #251827
+
+2007-08-08  Luke Macken <lmacken@crow.(none)>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: - Add patch from Christopher Aillon to fail quietly when
+	fastestmirror does   not have write access to the timed hostfile.
+	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=237034
+
+2007-08-04  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Repoquery wants to have quiet output by default,
+	it's mostly used in scripts where you don't want any extra junk in
+	the output: - add --verbose option, default to quiet - honor quiet
+	on initialization to avoid messages from plugins as well
+
+2007-08-01  Tim Lauridsen <tla@rasmil.dk>
+
+	* .gitignore: Added .gitignore
+
+2007-08-01  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added basearchonly by Adel Gadllah to the spec
+	file
+
+2007-07-31  Tim Lauridsen <tla@rasmil.dk>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils
+
+2007-07-31  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/basearchonly/basearchonly.conf,
+	plugins/basearchonly/basearchonly.py: Added basearchonly plugin
+	files
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: fixed obsoletes handling (rhbz
+	#247246)
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: revert the latest check_version,
+	it is not totally sane
+
+2007-07-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: Added full version support to
+	priorities plugin (rhbz #249991) Use 'check_versions=1' in
+	priorities.conf to use full nerva check, insted of the default na
+	check.
+
+2007-07-26  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: Make skip-broken work again by
+	deleting depsolver cache in each run.
+
+2007-07-25  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: changed 'archive' Makefile target to work with
+	git-archive (HEAD)
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Fixed git tagging & pushing to work right
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.1.6
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile, tools/README, tools/git2cl: Make the Makefile targets
+	work with git insted of cvs. Added tools\git2cl perl script to
+	create ChangeLog from a git repository
+
+2007-07-24  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Remove .git directory from tarball
+
+2007-07-24  Tim Lauridsen <tim@localhost.localdomain>
+
+	* plugins/security/security.py: Added patch to solve speed issue
+	insecurity plugin by James Antill
+
+2007-07-24  Seth Vidal <skvidal@fedoraproject.org>
+
+	* README: useless test
+
+2007-07-24  Seth Vidal <skvidal@fedoraproject.org>
+
+	* README: add link to yum wiki about yum-utils.
+
+2007-07-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* TODO: more and another test
+
+2007-07-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* README: add tim to the README and test the commits email
+
+2007-07-17  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added Requires: yum-updatesd to
+	yum-refresh-updatesd in spec file rhbz (#248181)
+
+2007-07-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* updateonboot/Makefile: Added patch by Schlomo Schapiro to make
+	yum-utils build on Suse SLES 10 (wrong init.d dir)
+
+2007-07-03  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/versionlock/README, yum-utils.spec: Add versionlock list
+	format documentation (finally...)
+
+2007-06-26  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: clean up some other calls to that particular
+	exception
+
+2007-06-26  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: fix formatting error in repomanage closes rh bug #:
+	245698 I believe this was caused by a change in BaseException in
+	python 2.5
+
+2007-06-26  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: solved issue where '--source' was not working if
+	souce repo was enabled in the .repo files (rhbz #244543). made
+	yumdownloader a little more verbose.
+
+2007-06-22  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/protect-packages/protect-packages.py: added cleanup patch
+	to protect-packages plugin  by Matthew Miller
+
+2007-06-21  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/protect-packages/protect-packages.conf,
+	plugins/protect-packages/protect-packages.py, yum-utils.spec: Added
+	protect-packages plugin by Svetlana Anissimova and Matthew Miller
+
+2007-06-18  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: Make 'yumdownloader --source kernel' work as
+	nonroot with yum 3.2 & and current CVS Head.
+
+2007-06-18  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-06-18  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.5
+
+2007-06-17  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/merge-conf/merge-conf.py: Patch to detech vimdiff by
+	Aurelien Bompard
+
+2007-06-15  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Ugly kludge to force local preferred encoding for
+	stdout when redirected to a file where python defaults to ascii...
+	ick. Mostly fixes rhbz#239744.
+
+2007-06-05  Tim Lauridisen <tla@rasmil.dk>
+
+	* reposync.py: Added patch by Perry Myers: fixes reposync so that it
+	is properly skipping packages that have already been downloaded.
+
+2007-06-05  Tim Lauridisen <tla@rasmil.dk>
+
+	* repotrack.py, yumdownloader.py: Added patch by Perry Myers: fixes
+	repotrack and yumdownloader so that they properly skip packages that
+	have already been downloaded.
+
+2007-05-30  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: Commit 3 patches from Dan Berrange: 1. output better
+	progress callback for the user in reposync 2. allow the user to set
+	the cachedir specifically in reposync 3. allow reposync to delete
+	no-longer-available packages from the local copy
+
+2007-05-28  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py: - filter out packages not updating anything to fix rhbz#238876 -
+	drop extra newline after each changelog entry to make formatting
+	nicer
+
+2007-05-26  Seth Vidal <skvidal@linux.duke.edu>
+
+	* debuginfo-install.py: if the transaction set is empty, don't try
+	to run it. :) closes rh bug: 241466
+
+2007-05-23  James Bowes <jbowes@redhat.com>
+
+	* repoquery.py: repoquery - remove unneeded arguments for option
+	init, and load core plugins
+
+2007-05-17  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: if the user doesn't specify -c then just use
+	whatever the default is for the yum version they have installed.
+	Don't default to /etc/yum.conf anymore.
+
+2007-05-16  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-05-16  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.4
+
+2007-05-16  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/security/security.py: Added patch by James Antill:   It
+	seems that on RHEL5 there are update metadata entries with
+	references == None (in my FC6 testing they were always == []). This
+	gives a traceback with the current code.
+
+2007-05-09  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: removed crap from comment .
+
+2007-05-09  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: make the '--source' work and make it a little
+	smarter so the 'reponame-source' are enabled automaticly for all
+	enabled repos, when '--source' is used. (rhbz #239528)
+
+2007-05-08  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/security/security.py: Added patch to security plugin by
+	Luke Macken
+
+2007-05-08  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/security/security.py: Added patch by James Antill.
+
+2007-05-01  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-05-01  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.3
+
+2007-05-01  Seth Vidal <skvidal@linux.duke.edu>
+
+	* Makefile, yum-util-cli-template, yum-utils.spec: - finish added debuginfo-install to makefile - add
+	yum-util-cli-template to repo and add it to %doc in spec file    -
+	this is a template for folks to easily add more cli-based yum-utils
+
+
+2007-05-01  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: add debuginfo-install to spec file
+
+2007-05-01  Seth Vidal <skvidal@linux.duke.edu>
+
+	* debuginfo-install.py: add debuginfo-install to yum-utils
+
+2007-04-30  Tim Lauridisen <tla@rasmil.dk>
+
+	* docs/Makefile, docs/reposync.1: Added reposync man page by Daniel
+	de Kok (#717)
+
+2007-04-30  Tim Lauridisen <tla@rasmil.dk>
+
+	* reposync.py: Added gpgcheck option to reposync by Daniel de Kok
+	(#715) adding a "-g/--gpgcheck" option that removes a newly
+	downloaded package if the signature is not correct.
+
+2007-04-29  Seth Vidal <skvidal@linux.duke.edu>
+
+	* docs/Makefile: make sure man8 is made before installing the man
+	page for yum-security
+
+2007-04-24  Tim Lauridisen <tla@rasmil.dk>
+
+	* updateonboot/yum-updateonboot.init: Changed yum-updateonboot
+	priorities to 25/75 -> 30/70  rhbz #235509
+
+2007-04-21  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/downloadonly/downloadonly.py: fixed traceback when using
+	--downloaddir rhbz #237367
+
+2007-04-20  Tim Lauridisen <tla@rasmil.dk>
+
+	* docs/Makefile, docs/yum-security.8,
+	plugins/security/security.conf, plugins/security/security.py,
+	yum-utils.spec: Added security plugin written by James Antill
+	<james@and.org>
+
+2007-04-19  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: * Apr 19 2007 Luke Macken <lmacken@redhat.com> - 0.2.7 - Remove
+	TYPE_{INTERFACE,INTERACTIVE}
+
+2007-04-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: create destdir if it not exists
+
+2007-04-12  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-04-12  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: bumped yum-utils version to 1.1.2
+
+2007-04-12  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.2
+
+2007-04-12  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/merge-conf/merge-conf.conf,
+	plugins/merge-conf/merge-conf.py: Added merge-conf plugin written by
+	Aurelien Bompard <abompard@fedoraproject.org>
+
+2007-03-20  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/kernel-module/kernel-module.py: changed
+	getRpmDB().getPackages() -> getRpmDB().returnPackages()
+
+2007-03-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* repoquery.py: make repoquery work, when running as normal user.
+
+2007-03-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: Make the skip-broken a little
+	smarter and the make the output better.
+
+2007-03-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: added cleanup of test/ to Makefile.
+
+2007-03-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.conf,
+	plugins/skip-broken/skip-broken.py: Added 'check_always' option to
+	the skip-broken plugin. Setting 'check_always=1' will make the
+	skip-broken check run every time. (rhbz #231523)
+
+2007-03-01  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: remove special hack to work
+	with current api, they are not nesesary any more.
+
+2007-03-01  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: more clean fix for work with
+	latest yum api
+
+2007-03-01  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: fixed issues with the latest
+	changes in yum cvs head
+
+2007-02-27  Tim Lauridisen <tla@rasmil.dk>
+
+	* test/test-all, test/test-package-cleanup, test/test-repo-graph,
+	test/test-repo-rss, test/test-repoclosure, test/test-repoquery,
+	test/test-reposync, test/test-repotrack, test/test-yumdownloader: 
+	Added some test scripts to test the basic functions of the
+	yum-utils.
+
+2007-02-20  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-02-20  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: bumped yum-utils version to 1.1.1
+
+2007-02-20  Tim Lauridisen <tla@rasmil.dk>
+
+	* repo-rss.py: fixed UnicodeEncodeError: 'ascii' codec can't encode
+	character errors.
+
+2007-02-19  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/kernel-module/kernel-module.py: - fix deprecation warning
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.1
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/changelog/changelog.py, repo-rss.py, repoclosure.py,
+	repoquery.py: changed 'with=' to 'mdtype=' in repos.populateSack
+	calls, because of changes in the yum API in YumPackageSack.populate
+	method to avoid warnings about 'with' is a reserved word in Python
+	2.6.
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: redesigned yumdownloader to use the new
+	yum-utils base class introduced in yum-3.1.1. This version inherit
+	all command line options from the yum-cli and also command line
+	option added by yum plugins.
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.0
+
+2007-02-19  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: - Made 'make release' work with %{?dist} tag in spec. - 'make
+	ChangeLog' will follow CVS HEAD. - Added 'archive' dependency to
+	'make srpm'
+
+2007-02-15  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/versionlock/versionlock.list, yum-utils.spec: removed
+	installation of default versionlock.list
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* repo-rss.py: Add a better formating for description, get rid of
+	the body tag for the xml generated by repo-rss. Thanks to Aurelien
+	Bompard (rhbz #193111).
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/priorities/priorities.py: Make priorities plugin work with
+	multiarch repositories with different repositories. (foo.i386  <>
+	foo.x86_64) rhbz #227540
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/versionlock/versionlock.list, yum-utils.spec: added
+	versionlock.list to versionlock plugin to avoid at lot of bugzilla
+	reports where people have installed all plugins and then yum,pirut
+	etc. are failing because the versionlock.list file dont exist.
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: fixed skip-broken description (--ignore-broken ->
+	--skip-broken)
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* repo-rss.py: Added patch to make repo-rss create one feed per
+	group found in comps.xml. Thanks to Aurelien Bompard (rhbz #191061)
+
+
+2007-02-14  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/downloadonly/downloadonly.py: Added '--downloaddir' option
+	to downloadonly plugin. the option make it posible to change the
+	directory where packages are downloaded. Thanks to Dmitry Butskoy
+	(rhbz #213623)
+
+2007-02-14  James Bowes <jbowes@redhat.com>
+
+	* plugins/refresh-updatesd/README,
+	plugins/refresh-updatesd/refresh-updatesd.conf,
+	plugins/refresh-updatesd/refresh-updatesd.py, yum-utils.spec: Add
+	refresh-updatesd plugin
+
+2007-02-08  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: modified spec til to work with yum-changelog man
+	pages Added missing wildcards, so it can build
+
+2007-02-08  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: modified spec til to work with yum-changelog man
+	pages
+
+2007-02-08  Tim Lauridisen <tla@rasmil.dk>
+
+	* docs/Makefile, docs/yum-changelog.1, docs/yum-changelog.conf.5: 
+	Added yum-changelog man pages by Chitlesh GOORAH and changed the
+	docs Makefile to install them.
+
+2007-02-07  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Updated spec for HEAD to require yum >= 3.1.1 and
+	set the version to 1.1.0
+
+2007-02-06  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added %{?dist} to release in spec file, so the
+	spec can be used as is in Fedora Extras and it dont hurt other
+	distros.
+
+2007-02-05  Tim Lauridisen <tla@rasmil.dk>
+
+	* repoclosure.py: Added patch by Michael Schwendt  to sort
+	repoclosure output (yum bz# 681)
+
+2007-01-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: Fix traceback in yumdownloader using --resolve
+	because rpmdb was not initialized.
+
+2007-01-24  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/README, plugins/fedorakmod/fedorakmod.py: Clean
+	up some comments and debug statements in fedorakmod.py.  Also,
+	updated the TODO list in the README.
+
+2007-01-24  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/tsflags/tsflags.py: - fix deprecation warning on plugin type
+
+2007-01-23  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/fedorakmod.conf,
+	plugins/fedorakmod/fedorakmod.py: fedorakmod.conf: Turn off
+	installallkmods by default.  fedorakmod.py: Work around Yum not
+	populating the provides prco information if that is the case.  With
+	installallkmods on you can type "yum install kmod-sysprof" and have
+	that module installed for all installed kernels and kernel types.
+
+2007-01-11  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* yum-builddep.py: - resurrect builddep by package name (rh #220842) - enable core type
+	plugins (eg to allow for fastestmirror)
+
+2007-01-11  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - fix a stupid typo breaking prco operations
+
+2007-01-03  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: minor change in the Makefile, added Makefile depencies
+	to the upload  section.
+
+2006-12-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2006-12-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.0.2
+
+2006-12-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.py: Changed the CLI option to
+	active the skip-broken from '--ignore-broken' to '--skip-broken',
+	because it make more sense.
+
+2006-12-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - fix deprecation warning
+
+2006-12-02  Seth Vidal <skvidal@linux.duke.edu>
+
+	* docs/yumdownloader.1: close rh bug # 218100 - typo in
+	yumdownloader man page.
+
+2006-11-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/versionlock/versionlock.py: fixed AttributeError:
+	YumAvailablePackageSqlite instance has no attribute 'returnNevra in
+	versionlock plugin yum bugzilla #667
+
+2006-11-13  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added patch from bugzilla #578
+
+2006-11-09  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - fix --cache and --show-dupes options
+
+2006-11-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: add in a 'clean old dupes' option to get rid
+	of version-wise-older dupes in the rpmdb
+
+2006-11-03  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: Fix problem with yumdownloader prints everything
+	twice because doConfigSetup was called twice.
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: add ${RELEASE} tag to filename when uploading srpm
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: Added srpm building and upload to Makefile
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: forgot to update spec file changelog for 1.0.1
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* ChangeLog, yum-utils.spec: bumped yum-utils version to 1.0.1
+
+2006-10-31  Tim Lauridisen <tla@rasmil.dk>
+
+	* Makefile: added tags to make releases more easy
+
+2006-10-27  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added priorities plugin to spec file
+
+2006-10-27  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/priorities/ChangeLog, plugins/priorities/README,
+	plugins/priorities/priorities.conf,
+	plugins/priorities/priorities.py: Added priorities plugin.
+
+2006-10-25  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yumdownloader.py: merge Earl Sammons' patch to add a -c option to
+	yumdownloader
+
+2006-10-25  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py, repotrack.py, yumdownloader.py: check in patch from
+	Mark McLoughlin to fix handling of local repos in reposync,
+	repotrack and yumdownloader.
+
+2006-10-23  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog: 0.2.6
+
+2006-10-23  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: 0.2.6 - Make the
+	instructions less misleading - Support TYPE_INTERFACE for
+	API_VERSION <= 2.3 - Remove cached mirror list in the clean_hook
+
+2006-10-09  Tim Lauridisen <tla@rasmil.dk>
+
+	* package-cleanup.py: fixed some deprecation warnings using the
+	'--oldkernels' option. Use searchNevra() insted of
+	returnTuplebyKeyword()
+
+2006-10-05  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/allowdowngrade/allowdowngrade.py,
+	plugins/downloadonly/downloadonly.py: TYPE_INTERFACE ->
+	TYPE_INTERACTIVE
+
+2006-10-05  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: fix requires
+
+2006-10-05  Seth Vidal <skvidal@linux.duke.edu>
+
+	* ChangeLog: Add a changelog, finally.
+
+2006-10-05  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: - mark as 1.0 - update reqs to require yum 3.0 - since most of them
+	do anyway
+
+2006-10-02  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: merge Ville's patch to handle alternative arches
+	better and deal with build dep closure, too.
+
+2006-09-30  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: my.log -> logger.info
+
+2006-09-29  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/changelog/changelog.py: changed plugin type from
+	TYPE_INTERFACE to TYPE_INTERACTIVE too avoid deprecation warnings.
+
+2006-09-29  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/changelog/changelog.py: fixed plugin to work with current
+	API without deprecation warnings
+
+2006-09-27  Tim Lauridisen <tla@rasmil.dk>
+
+	* yum-utils.spec: Added skip-broken plugin to yum-utils specfile.
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* reposync.py: removed debug line, Thanks Menno :-)
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* reposync.py: fixed reposync to work with the latest yum API
+	(2.9.x)
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* : changed skip-broken.conf CVS property to ASCII
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* : changed skip-broken.conf CVS property to ASCII
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* plugins/skip-broken/skip-broken.conf,
+	plugins/skip-broken/skip-broken.py: Initial import of the
+	skip-broken plugin A plugin there adds an option to yum to skip
+	packages with dependency problems.
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* repo-rss.py: Chnages to make it work with the new Yum API (2.9.x)
+
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* repo-graph.py: Changes to make it work with the new yum API
+	(2.9.x)
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* repoclosure.py: make it work with new Yum API (2.9.x) and replaced
+	print statements with python logging.
+
+2006-09-25  Tim Lauridisen <tla@rasmil.dk>
+
+	* yumdownloader.py: a my.errorlog -> logger.error fix by Andreas
+	Hanke
+
+2006-09-19  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/README, plugins/fedorakmod/fedorakmod.py: 
+	Current fedorakmod pluging work.  Most of the agreed upon
+	functionality is there and the plugin should be easily extendable.
+	There seems to be a Yum bug that's preventing installing a given
+	kmod for all installed kernels to work properly.  Attempting to
+	track that down.
+
+2006-09-18  Jeremy Katz <katzj@redhat.com>
+
+	* repotrack.py: api fixes from tim
+
+2006-09-18  Jeremy Katz <katzj@redhat.com>
+
+	* package-cleanup.py: api change fixes from tim
+
+2006-09-18  Jeremy Katz <katzj@redhat.com>
+
+	* repoquery.py: patch from tim for api changes
+
+2006-09-18  Jeremy Katz <katzj@redhat.com>
+
+	* yumdownloader.py: api fixes from tim
+
+2006-09-18  Jeremy Katz <katzj@redhat.com>
+
+	* yum-builddep.py: tim's fix for api changes
+
+2006-09-06  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/versionlock/versionlock.conf: - disable versionlock plugin by default
+
+2006-09-05  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* yum-utils.spec: - actually install allowdowngrade plugin to buildroot, duh
+
+2006-09-05  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/allowdowngrade/allowdowngrade.conf,
+	plugins/allowdowngrade/allowdowngrade.py,
+	plugins/changelog/changelog.py, yum-utils.spec: - add allowdowngrade plugin - fix traceback in changelog plugin if
+	package has no changelog
+
+2006-08-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: fix the plugins/doc issue
+
+2006-07-20  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/fedorakmod.conf,
+	plugins/fedorakmod/fedorakmod.py: Make pinkernels default to off.
+
+2006-07-07  Jeremy Katz <katzj@redhat.com>
+
+	* repoquery.py: fix for config api changes
+
+2006-07-05  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/README, plugins/fedorakmod/fedorakmod.conf,
+	plugins/fedorakmod/fedorakmod.py: Refactor so that additional
+	functionality can easily be added in. Implement pinning of kernels
+	based on availability of kernel modules.
+
+2006-07-03  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/fedorakmod.py: Update to the latest Fedora
+	Extras Kernel Module specs and the latest Yum API.
+
+2006-06-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - dont try to lookup source rpms of source rpms...
+
+2006-06-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoclosure.py, reposync.py, repotrack.py, yum-builddep.py: - convert repoclosure, reposync, repotrack and yum-builddep to new
+	API
+
+2006-06-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - new --srpm option for automatically locating the source rpm of a
+	given   package and operating on it
+
+2006-06-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - add files() method to querypkg, use it for fmt_list() - with
+	--alldeps, look through files as well for depending packages
+
+2006-06-16  Menno Smits <menno@freshfoo.com>
+
+	* plugins/changelog/changelog.py: - removed registerOpt() usage. This is only required when adding
+	options to   Yum's own configuration files. It is not required for
+	the plugin's own   configuration files. - removed unused imports
+
+2006-06-16  Menno Smits <menno@freshfoo.com>
+
+	* plugins/versionlock/versionlock.py: - changed to UNIX line endings (has DOS line endings) - removed
+	config_hook() and use of registerOpt(). registerOpt() is only for
+	adding options to Yum's main configuration files. It is not required
+	for the   plugin's own configuration file.
+
+2006-06-16  Menno Smits <menno@freshfoo.com>
+
+	* plugins/protectbase/protectbase.py: Added GPL header, author
+	contact note and docstrings.
+
+2006-06-16  Menno Smits <menno@freshfoo.com>
+
+	* plugins/protectbase/protectbase.py: Updated to use new style
+	option definitions.
+
+2006-06-15  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: * Jun 14 2006 Luke Macken <lmacken@redhat.com> - 0.2.5 - Use new yum
+	2.9.0 api
+
+2006-06-13  Paul Nasrat <pnasrat@redhat.com>
+
+	* repoquery.py: new yum api
+
+2006-05-24  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: - merge Nurdin Premji's patch to optparse-ize repomange. - fix minor
+	bug in patch keeping -k from working
+
+2006-05-18  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: make -a do something quasi-correct
+
+2006-05-14  gijs <gijs>
+
+	* yumdownloader.py: Fix bug #469: Make yumdownloader download the
+	correct source rpm if the provided package is a subpackage of
+	another package. For example yumdownloader --source mod_ssl now
+	downloads the httpd src rpm.
+
+2006-05-08  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: make reposync -a work
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* README: update readme for reposync and repotrack
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: fix changelog order
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: clean up the --help output of reposync
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yumdownloader.py: fix multiple packages specified on cli
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-builddep.py: get rid of setConfig and getConfig to kill
+	deprecation warnings
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: add downloadonly subpkg
+
+2006-05-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* plugins/downloadonly/downloadonly.conf,
+	plugins/downloadonly/downloadonly.py: added downloadonly plugin to
+	yum-utils
+
+2006-04-30  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: add in patch to split out each of the plugins into
+	a separate pkg
+
+2006-04-30  Seth Vidal <skvidal@linux.duke.edu>
+
+	* Makefile, yum-utils.spec: update Makefile and spec for reposync
+
+2006-04-30  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: - make it create the subdirs properly - fix it to download all
+	versions by default
+
+2006-04-11  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: - make reposync create subdirs per repo in destination dir - remove
+	confusing --newest 'toggle' for  a simpler --all-versions option
+	that produces the same result
+
+2006-04-11  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yumdownloader.py: add --enablerepo to yumdownloader - similar to
+	patch from Miroslav Prymek - thanks!
+
+2006-04-03  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - resurrect group operations with yum 2.6.x API
+
+2006-03-27  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - workaround for yum returning extra leading dashes for some
+	directories   (which posix allows but it doesn't look good for
+	repoquerys purposes)
+
+2006-03-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - convert tags to lower case (yum bugzilla #548)
+
+2006-03-16  Paul Nasrat <pnasrat@redhat.com>
+
+	* yum-builddep.py: Add option parsing
+
+2006-03-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: reposync todo modification
+
+2006-02-28  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: update TODO list
+
+2006-02-28  Seth Vidal <skvidal@linux.duke.edu>
+
+	* reposync.py: first checkin of reposync. It does, essentially, what
+	repotrack does but it just iterates the package lists for a given
+	repository (set of repositories) and downloads all the ones you
+	don't already have downloaded into a path.
+
+2006-02-24  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: add dupe-checking and output --dupes option
+
+2006-02-23  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: changed yum versioned deps
+
+2006-02-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* yumdownloader.py: - apply patch by Ville Skytta to make yumdownloader compatible with
+	yum-2.5.x
+	(https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=175335)
+
+2006-02-13  Jack Neely <slack@quackmaster.net>
+
+	* plugins/fedorakmod/README, plugins/fedorakmod/fedorakmod.conf,
+	plugins/fedorakmod/fedorakmod.py: A begining of support for the
+	Fedora Extras kernel module proposal.
+
+2006-02-10  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: simplify RepoTrack.findDeps
+
+2006-02-10  Seth Vidal <skvidal@linux.duke.edu>
+
+	* Makefile, yum-utils.spec: added in repotrack, bumped version not
+	finished checking yet, though
+
+2006-02-07  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: * Feb 06 2006 Luke Macken <lmacken@redhat.com> - 0.2.4 - Only write
+	the timedhost file if we've re-pinged the mirrors
+
+2006-02-03  Paul Nasrat <pnasrat@redhat.com>
+
+	* yum-builddep.py: List not individual package
+
+2006-02-02  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: * Feb 02 2006 Luke Macken <lmacken@redhat.com> - 0.2.3 - Added
+	'maxhostfileage' option to specify how many days to keep the
+	hostfile
+
+2006-01-22  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: make urls only print if the file needs to be
+	download and -u is in cli flags.
+
+2006-01-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/repoquery.1, repoquery.py: - add --archlist option for limiting which package architectures to
+	consider in queries.
+
+2006-01-12  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoclosure.py: - remove unnecessary double definition of evrTupletoVer (patch from
+	Brian Long)
+
+2006-01-12  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/Makefile, docs/repo-rss.1, docs/yum-builddep.1,
+	docs/yumdownloader.1: - Add man pages for yumdownloader, yum-builddep and repo-rss from
+	Brian Long
+
+2006-01-10  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/Makefile, docs/package-cleanup.1: - Add package-cleanup manpage from Brian Long
+
+2006-01-10  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* Makefile, repo-graph.py, yum-utils.spec: Apply patch from Brian
+	Long (with slight modifications): - add fastestmirror subpackage -
+	mark config files config(noreplace) - bump version to 0.4 - make
+	lines in repo-graph a bit darker
+
+2006-01-10  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/kernel-module/kernel-module.py: - only look at kernel modules of same arch as the new kernel to be
+	installed   (patch by Tim Lauridsen)
+
+2006-01-10  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror-asyncore.py,
+	plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: - Latest fastestmirror (0.2.2) - Updated configuration file to
+	reflect new hostfilepath option - Removed fastestmirror-asyncore
+	(deprecated and awful)
+
+2006-01-09  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: - make it work with yum 2.4.X, too - fix a bug where -u was erroring
+	out if the destdir didn't exist
+
+2006-01-09  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: update a few comments
+
+2006-01-09  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: clean up some output, check more error cases, make
+	newest-only download the default
+
+2006-01-09  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: make it, you know, actually download things
+
+2006-01-06  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repo-graph.py: - add initial rough-cut version for creating graphviz dot files from
+	repodata   similarly to rpmgraph
+
+2006-01-05  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: rough cut of repotrack
+
+2006-01-04  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/kernel-module/kernel-module.py: - mark kernel-module plugin as type core (patch from Tim Lauridsen)
+
+
+2006-01-02  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/repoquery.1, repoquery.py: - --all is really just a shorthand for '*'
+
+2005-12-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/repoquery.1, repoquery.py: - add --whatobsoletes and --whatconflicts operations to repoquery
+
+2005-12-19  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/versionlock/versionlock.py: - allow the lockfile location to be specified as an url - lockfile
+	format is envra
+
+2005-12-15  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - remove useless self.conf assignment, making repoquery work with
+	both   yum 2.4 and 2.5 (from Ville Skytta)
+
+2005-12-02  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: make -n, --newest check newest to newest so we
+	don't end up getting a provide from something that is older.
+
+2005-11-28  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* yumdownloader.py: - add support for private cache to yumdownloader
+
+2005-11-26  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: typo on the placement of -c option
+
+2005-11-26  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: check in most of patch from Ville Skytta from buy
+	#524, disables payload checking
+
+2005-11-25  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - fix http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=517 - fix
+	http://devel.linux.duke.edu/bugzilla/show_bug.cgi?id=523 (patch from
+	Ville Skyttä)
+
+2005-11-13  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* docs/repoquery.1: - Document -c option in repoquery manpage
+
+2005-11-12  Jeremy Katz <katzj@redhat.com>
+
+	* repoquery.py: allow specifying an alternate config file
+
+2005-11-09  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - fix --resolve option
+
+2005-11-07  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: make repoclosure optionally operate on only the
+	newest packages in the repo
+
+2005-11-04  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: merge David Lutterkort's patch to add a -c
+	conffile option to package-cleanup
+
+2005-11-02  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/kernel-module/kernel-module.conf,
+	plugins/kernel-module/kernel-module.py: Add kernel-module plugin for
+	livna.org style kernel-module-foo-<uname -r> style kernel module
+	packaging.
+
+2005-10-19  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: fix repomanage so it won't output multiples of the
+	same entry
+
+2005-10-17  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* Makefile, docs/Makefile, docs/repoquery.1, yum-utils.spec: - Add initial manpage for repoquery - Install docs in make install
+
+2005-10-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: add option to repomanage to keep latest N packages.
+	so now if you do: repomanage -k 2 -o /some/dir  it will list all but
+	the newest 2 packages (by name, arch)  or if you do: repomanage -k 2
+	-n /some/dir  it will list only the newest 2 packages (by name,
+	arch)  handy for keeping the newest N packages around in a repo
+
+2005-09-06  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py: Avoid causing tracebacks with
+	yumex and pup which don't use ConfigParser
+
+2005-08-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - _prco wasn't really private to pkgQuery so rename it - Have
+	separate query classes for installed and available packages,
+	necessary   because YumInstalledPackage class doesn't have nearly
+	all the methods   Available class does. Now --pkgnarrow can actually
+	function for real. - Clean up some old stuff, use existing yum
+	methods for formatting where   suitable etc.
+
+2005-08-25  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - and same to HEAD
+
+2005-08-23  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/fastestmirror/fastestmirror-asyncore.py,
+	plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Add Luke Macken's
+	fastestmirror plugins (two different implementations)
+
+2005-08-23  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py: Only load otherdata when
+	--changelog is actually used
+
+2005-08-09  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: - Implement --pkgnarrow=available|recent.. option - Add --show-dupes
+	option
+
+2005-07-25  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* yum-utils.spec: - Package changelog plugin, add others as %doc. - Bump version to
+	0.3.
+
+2005-07-25  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py, plugins/tsflags/tsflags.py,
+	plugins/versionlock/versionlock.py: Add plugin type definitions to
+	changelog, tsflags and versionlock plugins.
+
+2005-07-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Don't traceback on unknown conversions.
+
+2005-07-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Add support for rpmquery style string formatting, eg
+	"%-25{name} %{repoid}", date conversions (%{buildtime:date} and
+	:day) and fix changelog time formatting.
+
+2005-07-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Unbreak --qf "%{license}"
+
+2005-07-20  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Add --querytags option. Support \t in --queryformat
+	(Paul Nasrat)
+
+2005-07-17  Menno Smits <menno@freshfoo.com>
+
+	* plugins/protectbase/protectbase.conf,
+	plugins/protectbase/protectbase.py: initial add of protectbase
+	plugin
+
+2005-07-13  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* package-cleanup.py: Add --orphans option to list locally installed
+	packages, eg those which aren't available in any currently
+	configured repositories.
+
+2005-07-13  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repo-rss.py: Add tempcache support to repo-rss.
+
+2005-06-29  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.conf, plugins/changelog/changelog.py: 
+	Add configuration option to changelog plugin to allow viewing the
+	changelog deltas before or after the transaction.
+
+2005-06-27  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py: Doh, changelog dates were being
+	compared as a string values, not ints so it wasn't working at all,
+	except that there was a hardcoded limit of five latest entries so it
+	*appeared* to work. Talk about embarrassing... :)
+
+2005-06-23  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Add private cachedir support to reqoquery (default
+	when non-root)
+
+2005-06-23  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: check in most of Bill Nottingham's patch to make
+	repoclosure work as a class for importing from other programs
+
+2005-06-23  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: properly fix up the returnPackagesByDep() method in
+	the repoquery derived class
+
+2005-06-23  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: make --whatprovides use returnPackagesByDep() method
+	in yum so it will get all possible resolvers for the requested
+	depstring, not just the 'best' one
+
+2005-06-21  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Repoquery: - unbreak group queries - show srpm name
+	with --source like described in help text - querying the source rpm
+	now happens by specifying .src as package arch - add support for
+	"envra" query format
+
+2005-06-21  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.py, plugins/tsflags/tsflags.py,
+	plugins/versionlock/versionlock.py: Changelog plugin: - nicer
+	formatting - add cli option for enabling it  Add GPL notices to my
+	plugins
+
+2005-06-21  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: os.lstat() and just in time to mv to yum itself
+
+2005-06-21  gijs <gijs>
+
+	* COPYING, yum-utils.spec: - Added GPL COPYING file and add it to the spec file
+
+2005-06-21  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: fix up the getCacheDir() dir test to exclude an
+	extremely narrow race condition
+
+2005-06-20  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: make repoclosure use a user yum cache if not
+	running as root.
+
+2005-06-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/tsflags/tsflags.py: Doh, remove extra print :)
+
+2005-06-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/tsflags/tsflags.conf, plugins/tsflags/tsflags.py: Add
+	plugin for setting tsflags from the cli
+
+2005-06-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/changelog/changelog.conf, plugins/changelog/changelog.py: 
+	Add plugin for showing changelog deltas between package updates.
+
+2005-06-16  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* plugins/versionlock/versionlock.conf,
+	plugins/versionlock/versionlock.py: Add versionlock plugin
+
+2005-06-13  gijs <gijs>
+
+	* package-cleanup.py: - Remove old kernel-devel packages together with kernel packages
+	(this can be disabled by using the --keepdevel command line option)
+
+
+2005-06-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* TODO: todo file for yum-utils please add more
+
+2005-06-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repomanage.py: call the 'arch' for src.rpms as 'src' - not the
+	arch it was built on. thanks to Pasi Pirhonen for pointing it out.
+
+2005-06-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: add in a -y to allow removing kernels
+	'automatically'
+
+2005-06-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: various cleanups and edits
+
+2005-06-13  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: add --quiet and optimize getLocalRequires and
+	getKernels
+
+2005-06-12  Seth Vidal <skvidal@linux.duke.edu>
+
+	* package-cleanup.py: migrated the package-cleanup --leaves to use
+	the returnLeafNodes() method in rpmUtils. This returns leaf nodes
+	much faster.
+
+2005-06-11  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repotrack.py: stub for a new yum-util - repotrack
+
+2005-06-09  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Repoquery: - don't treat --qf as a separate
+	operation, it's just formatting of how packages represent
+	themselves. - handle --qf with --whatrequires
+
+2005-06-09  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Dont traceback on repo errors (eg cache out of date)
+
+
+2005-06-09  Paul Nasrat <pnasrat@redhat.com>
+
+	* yum-builddep.py: Error not traceback on non-root
+
+2005-06-05  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: fix spec file for fedora extras
+
+2005-06-04  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: allow repoquery to handle pkg args like yum
+
+2005-06-04  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: add some requires
+
+2005-06-03  Seth Vidal <skvidal@linux.duke.edu>
+
+	* README: readme updates
+
+2005-06-03  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: make repoclosure use -r args for options, instead
+	of just repoids as argv[1], argv[2] etc.
+
+2005-06-03  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoclosure.py: check in bill nottingham's patch to allow to
+	specify arch and a different config file for repoclosure
+
+2005-06-02  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: repoquery: - Catch unknown/unsupported querytags and
+	operations - Support some new ways to query things
+
+2005-06-02  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* README: Add brief description of the included utilities to README.
+
+
+2005-06-02  Seth Vidal <skvidal@linux.duke.edu>
+
+	* plugins/README: Added plugins dir
+
+2005-06-01  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yum-utils.spec: call it 0.2 in the spec file
+
+2005-06-01  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py, yumdownloader.py: yumdownloader: - add --source
+	option - add /usr/share/yum-cli to module search path so it actually
+	works  reqoquery: - remove leftover debug junk
+
+2005-06-01  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: --repoid help text
+
+2005-05-31  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: More repoquery stuff: - add option to run from cache
+	only - get rid of the ugly runtime extensions to
+	yum.AvailablePackage class,   generating new pkgQuery instances
+	seems to be just as fast in practice
+
+2005-05-31  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py: Some fixes to repoquery: - eliminate duplicates from
+	--whatrequires --alldeps - catch various exceptions, print errors to
+	stderr unless --quiet specified
+
+2005-05-30  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* repoquery.py, yum-utils.spec: New version of repoquery: - support
+	some group queries - only set caching when non-root
+
+2005-05-30  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* Makefile, yum-builddep.py: Add yum-builddep for installing package
+	build dependencies
+
+2005-05-30  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repoquery.py: let users specify repos to use repoquery against
+
+2005-05-23  Panu Matilainen <pmatilai@laiskiainen.org>
+
+	* updateonboot/Makefile, updateonboot/yum-updateonboot.init,
+	yum-utils.spec: - add Makefile for updateboot - create a subpackage yum-updateonboot
+	- don't enable updateonboot by default on package install
+
+2005-05-16  gijs <gijs>
+
+	* Makefile, yum-utils.spec: Adding Makefile and spec file (both
+	based on mock)
+
+2005-05-16  gijs <gijs>
+
+	* README, package-cleanup.py: - Created initial version of README file - Added old kernel clean up
+	to package-cleanup
+
+2005-04-26  gijs <gijs>
+
+	* package-cleanup.py: Adding a yum util to list leaf nodes and
+	problems in the local RPM db
+
+2005-04-19  gijs <gijs>
+
+	* yumdownloader.py: Added a first version of dep resolving support
+	to yumdownloader
+
+2005-04-10  Seth Vidal <skvidal@linux.duke.edu>
+
+	* yumdownloader.py: added --urls option to yumdownloader to just
+	print out the urls it would download
+
+2005-04-01  gijs <gijs>
+
+	* yumdownloader.py: Fixed a bug in yumdownloader, causing it not to
+	work if relativepath contains a directory name.
+
+2005-03-24  gijs <gijs>
+
+	* yumdownloader.py: Initial version of yumdownloader
+
+2005-03-22  gijs <gijs>
+
+	* repoquery.py, updateonboot/README,
+	updateonboot/yum-updateonboot.init,
+	updateonboot/yum-updateonboot.sysconfig: Adding initial versions of
+	updateonboot and repoquery scripts
+
+2005-03-22  gijs <gijs>
+
+	* repo-rss.py: Make repo-rss work with sqlite by calling
+	returnChangeLog if no changelog info is loaded for a specific
+	package.
+
+2005-03-22  gijs <gijs>
+
+	* repoclosure.py: Cache already resolved dependencies
+
+2005-03-21  Seth Vidal <skvidal@linux.duke.edu>
+
+	* repo-rss.py, repoclosure.py, repomanage.py: initial import of
+	repo* scripts
+
+2005-03-21  Seth Vidal <skvidal@linux.duke.edu>
+
+	* Initial revision
+
