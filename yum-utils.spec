@@ -33,6 +33,7 @@ waiting until the next early morning cron job.
 Summary: Yum plugin for viewing package changelogs before/after updating
 Group: System Environment/Base
 Requires: yum >= 3.0
+Requires: python-dateutil
 
 %description -n yum-changelog
 This plugin adds a command line option to allow viewing package changelog 
