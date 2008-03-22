@@ -20,15 +20,12 @@
 # Note: For yum 2.2.X with X <= 1 and yum 2.3.X with X <= 2 --problems
 # will report problems with unversioned provides fulfilling versioned
 # requires
-#
-# TODO find a nicer way to see if a package is a lib (tweakeable via command
-# line options, i.e. --exclude-devel)
-#
 
 import yum
 import os
 import sys
 import rpm
+import re
 
 from rpmUtils import miscutils, transaction
 from optparse import OptionParser
@@ -204,16 +201,38 @@ def cleanOldDupes(my, confirmed):
     my.ts.run(progress,'')
                  
 
-    
 
-def listLeaves(all):
+def _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel, exclude_bin):
+    """
+    Determine if the given pkg should be displayed as a leaf or not.
+
+    Return True if the pkg should be shown, False if not.
+    """
+    pos = my.rpmdb.searchNevra(name=pkg[0], epoch=str(pkg[2]), ver=pkg[3],
+            rel=pkg[4], arch=pkg[1])
+    # This should give us an exact match
+    assert len(pos) == 1
+    po = pos[0]
+    name = po.name
+    if exclude_devel and name.endswith('devel'):
+        return False
+    if exclude_bin:
+        for file_name in po.filelist:
+            if file_name.find('bin') != -1:
+                return False
+    if leaf_regex.match(name):
+        return True
+    return False
+
+def listLeaves(my, all, leaf_regex, exclude_devel, exclude_bin):
     """return a packagtuple of any installed packages that
        are not required by any other package on the system"""
     ts = transaction.initReadOnlyTransaction()
     leaves = ts.returnLeafNodes()
     for pkg in leaves:
         name=pkg[0]
-        if all or name.startswith('lib') or name.endswith('lib') or name.endswith('libs'):
+        if all or _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel,
+                exclude_bin):
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
 def listOrphans(my):
@@ -345,10 +364,20 @@ def parseArgs():
     parser = OptionParser()
     parser.add_option("--problems", default=False, dest="problems", action="store_true",
       help='List dependency problems in the local RPM database')
+
+    # Leaf listing options
     parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
       help='List leaf nodes in the local RPM database')
     parser.add_option("--all", default=False, dest="all",action="store_true",
       help='When listing leaf nodes also list leaf nodes that are not libraries')
+    parser.add_option("--leaf-regex", default="(^lib.*)|(.*lib(|s)$)",
+      help='A package name that matches this regular expression is a leaf')
+
+    parser.add_option("--exclude-devel", default=False, action="store_true",
+      help='When listing leaf nodes do not list development packages')
+    parser.add_option("--exclude-bin", default=False, action="store_true",
+      help='When listing leaf nodes do not list packages with files in bin dirs')
+
     parser.add_option("--orphans", default=False, dest="orphans",action="store_true",
       help='List installed packages which are not available from currenly configured repositories.')
     parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
@@ -389,7 +418,8 @@ def main():
         sys.exit(0)
     
     if (opts.leaves):
-        listLeaves(opts.all)
+        listLeaves(my, opts.all, re.compile(opts.leaf_regex),
+                opts.exclude_devel, opts.exclude_bin)
         sys.exit(0)
 
     if (opts.orphans):
