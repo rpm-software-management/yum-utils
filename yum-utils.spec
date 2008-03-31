@@ -411,6 +411,7 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
 %config(noreplace) %{_sysconfdir}/yum/aliases.conf
 /usr/lib/yum-plugins/aliases.*
+%{_mandir}/man1/yum-aliases.1.*
 
 %files -n yum-list-data
 %defattr(-, root, root)
@@ -436,6 +437,9 @@ fi
 %{_mandir}/man1/yum-verify.1.*
 
 %changelog
+* Fri Mar 31 2008 James Antill <james@fedoraproject.org>
+- Add yum-aliases man page
+
 * Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.13
 * Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
