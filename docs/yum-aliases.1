@@ -1,0 +1,73 @@
+.\" yum aliases plugin
+.TH "yum-aliases" "1" "2008 Mar 31" "James Antill" ""
+.SH "NAME"
+yum aliases plugin
+.SH "SYNOPSIS"
+\fByum\fP [options] alias
+.SH "DESCRIPTION"
+.PP 
+This plugin changes other commands in \fByum\fP, much like the alias command in
+bash. There are a couple of notable differences from shell style aliases
+though. The alias command has three forms:
+.br
+.I \fR * alias
+.br
+.I \fR * alias command
+.br
+.I \fR * alias command result
+.br
+.PP 
+The first form lists all current aliases with their final result, the second
+form looks up a "command" and shows it's final result or an error message. The
+last form creates a new alias.
+.PP 
+.br
+.br
+.PP 
+.SH Explanation of alias to final result conversion
+.PP 
+When you type an aliased command, like "yum --disableexcludes UPT lsu" using
+the default aliases, the yum-aliases plugin first takes the first "command", by
+skiping over any options, and then looks up the result (in this case "UPT" is converted to "--enablerepo=updates-tesintg"). If there is a match, then it will
+replace the aliased "command" in the argument list and try again (again
+skipping over any options). By convention, in the default aliases list, alias
+"commands" that are in all CAPS only add options so you can join together a
+chain of them before any real command or aliased command.
+.br
+.PP
+There are two things that can alter the above, if you have the "recursive"
+configuration option set to off then alias processing will stop after the first
+alias to command substitution. Also, like in shell aliases, if the result starts
+with \\ then alias processing will stop.
+.br
+.SH EXAMPLES
+.PP
+To create a new alias command called "rm" which does the same thing as the
+command "remove" use:
+.IP
+yum
+.B alias
+rm remove
+.PP
+To always add the --skip-broken --disableexcludes=all --obsoletes options to
+the update command (but leaving the upgrade option alone), you could use:
+.IP
+yum
+.B alias
+update \\update  --skip-broken --disableexcludes=all --obsoletes
+.PP
+To override the default "up" alias to use the above update command, and never
+ask for confirmation, you could use:
+.IP
+yum
+.B alias
+up update -y
+.br
+
+
+.SH AUTHORS
+.RS
+James Antill <james@and.org>
+.SH "SEE ALSO"
+.BR yum-utils(1)
+.BR yum(1)
