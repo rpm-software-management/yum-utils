@@ -190,6 +190,13 @@ Display changelog data, since a specified time, on a group of packages"""
                    ' stats. %d pkg%s, %d source pkg%s, %d changelog%s' %
                    (self._pkgs, ps, self._spkgs, sps, self._changelogs, cs)]
 
+    def needTs(self, base, basecmd, extcmds):
+        if len(extcmds) and extcmds[0] == 'installed':
+            return False
+        
+        return True
+
+
 def config_hook(conduit):
     conduit.registerCommand(ChangeLogCommand())
     parser = conduit.getOptParser()
