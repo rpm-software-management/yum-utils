@@ -143,6 +143,13 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         self.cmd_end()
 
         return 0, [basecmd + ' done']
+
+    def needTs(self, base, basecmd, extcmds):
+        if len(extcmds) and extcmds[0] == 'installed':
+            return False
+        
+        return True
+
             
 class InfoDataCommands(ListDataCommands):
     def getNames(self):
