@@ -357,7 +357,14 @@ Verify packages and display data on bad verifications"""
         self.show_data(base, msg, ypl.extras,    'Extra Packages')
 
         return 0, [basecmd + ' done']
-            
+
+    def needTs(self, base, basecmd, extcmds):
+        if not len(extcmds) or extcmds[0] != 'extras':
+            return False
+        
+        return True
+
+
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
