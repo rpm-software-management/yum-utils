@@ -135,6 +135,9 @@ class AliasCommand(AliasedCommand):
         
         return 0, [basecmd + ' done']
 
+    def needTs(self, base, basecmd, extcmds):
+        return False
+
 
 def config_hook(conduit):
     global aliases
