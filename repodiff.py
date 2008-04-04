@@ -71,7 +71,8 @@ class DiffYum(yum.YumBase):
             if len(tot) > 1:
                 if oldsack.contains(name=pkg.name):
                     newest_old = oldsack.returnNewestByName(name=pkg.name)[0]
-                    modified.append((pkg, newest_old))
+                    if newest_old.EVR != pkg.EVR:
+                        modified.append((pkg, newest_old))
                 else:
                     add.append(pkg)
 
