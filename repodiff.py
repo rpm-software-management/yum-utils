@@ -143,6 +143,10 @@ def main(args):
 
             
     my = DiffYum()
+    if opts.quiet:
+        my.conf.debuglevel=0
+        my.doLoggingSetup(my.conf.debuglevel, my.conf.errorlevel)
+    
     my.dy_shutdown_all_other_repos()
     my.dy_archlist = opts.archlist
     if not opts.quiet: print 'setting up repos'
@@ -169,13 +173,13 @@ def main(args):
     add_sizechange = 0
     remove_sizechange = 0
     if ygh.add:
-        for pkg in ygh.add:
+        for pkg in sorted(ygh.add):
             print 'New package %s' % pkg.name
             print '        %s' % pkg.summary
             add_sizechange += int(pkg.size)
                 
     if ygh.remove:
-        for pkg in ygh.remove:
+        for pkg in sorted(ygh.remove):
             print 'Removed package %s' % pkg.name
             if ygh.obsoleted.has_key(pkg):
                 print 'Obsoleted by %s' % ygh.obsoleted[pkg]
@@ -183,7 +187,7 @@ def main(args):
                 
     if ygh.modified:
         print 'Updated Packages:\n'
-        for (pkg, oldpkg) in ygh.modified:
+        for (pkg, oldpkg) in sorted(ygh.modified):
             msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
             dashes = "-" * len(msg) 
             msg += "\n%s\n" % dashes
