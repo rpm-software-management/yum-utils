@@ -393,6 +393,7 @@ def exclude_hook(conduit):
             cnt += 1
         else:
             ysp_del_pkg(pkg)
+
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     if cnt:
         conduit.info(2, 'Needed %d of %d packages, for security' % (cnt, tot))
@@ -428,12 +429,38 @@ def preresolve_hook(conduit):
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
     tspkgs = tsinfo.getMembers()
+    # Ok, here we keep any pkgs that pass "ysp" tests, then we keep all
+    # related pkgs ... Ie. "installed" version marked for removal.
+    keep_pkgs = set()
     for tspkg in tspkgs:
         tot += 1
-        if not ysp_should_keep_pkg(opts, tspkg.po, md_info, used_map):
+        if ysp_should_keep_pkg(opts, tspkg.po, md_info, used_map):
+            keep_pkgs.add(tspkg.po)
+
+    mini_depsolve_again = True
+    while mini_depsolve_again:
+        mini_depsolve_again = False
+
+        for tspkg in tspkgs:
+            if tspkg.po in keep_pkgs:
+                # Find any related pkgs, and add them:
+                for (rpkg, reason) in tspkg.relatedto:
+                    if rpkg not in keep_pkgs:
+                        keep_pkgs.add(rpkg)
+                        mini_depsolve_again = True
+            else:
+                # If related to any keep pkgs, add us
+                for (rpkg, reason) in tspkg.relatedto:
+                    if rpkg in keep_pkgs:
+                        keep_pkgs.add(tspkg.po)
+                        mini_depsolve_again = True
+                        break
+
+    for tspkg in tspkgs:
+        if tspkg.po not in keep_pkgs:
             ysp_del_pkg(tspkg)
-        else:
-            cnt += 1
+
+    cnt = len(keep_pkgs)
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
     if cnt:
