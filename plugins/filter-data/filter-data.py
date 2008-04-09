@@ -25,14 +25,9 @@
 #
 #  yum --filter-groups='App*/Sys*' list updates
 
-import yum
 from yum.plugins import TYPE_INTERACTIVE
 
 import fnmatch
-
-# For baseurl
-import urlparse
-
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
