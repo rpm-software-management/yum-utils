@@ -35,13 +35,9 @@
 # yum sec-list security / sec
 
 import yum
-import time
-import textwrap
 import fnmatch
-import sys
 from yum.plugins import TYPE_INTERACTIVE
 from yum.update_md import UpdateMetadata
-from rpmUtils.miscutils import compareEVR
 import logging # for commands
 from yum import logginglevels
 
@@ -188,12 +184,9 @@ class SecurityListCommands:
         ygh = base.doPackageLists('updates')
         self.repos = base.repos
         md_info = ysp_gen_metadata(self)
-        done = False
         logger = logging.getLogger("yum.verbose.main")
         def msg(x):
             logger.log(logginglevels.INFO_2, x)
-        def msg_warn(x):
-            logger.warn(x)
 
         opts, cmdline = base.plugins.cmdline
         ygh.updates.sort(key=lambda x: x.name)
@@ -276,12 +269,8 @@ def config_hook(conduit):
     parser.values.security = False
     def osec(opt, key, val, parser):
          # CVE is a subset of --security on RHEL, but not on Fedora
-        if False and parser.values.cve:
-            raise OptionValueError("can't use %s after --cve" % key)
         parser.values.security = True
     def ocve(opt, key, val, parser):
-        if False and parser.values.security:
-            raise OptionValueError("can't use %s after --security" % key)
         parser.values.cve.append(val)
     def obz(opt, key, val, parser):
         parser.values.bz.append(str(val))
