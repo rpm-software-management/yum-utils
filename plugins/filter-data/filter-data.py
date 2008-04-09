@@ -334,30 +334,55 @@ def preresolve_hook(conduit):
     
     conduit.info(2, 'Limiting package lists to filtered ones')
 
-    def fd_del_pkg(tspkg, which):
+    def fd_del_pkg(tspkg):
         """ Deletes a package within a transaction. """
-        conduit.info(3," --> %s from %s excluded (filter: %s)" %
-                     (tspkg.po, tspkg.po.repoid, which[0]))
+        conduit.info(3," --> %s from %s excluded" %
+                     (tspkg.po, tspkg.po.repoid))
         tsinfo.remove(tspkg.pkgtup)
 
     if opts.filter_groups:
         fd_make_group_data(conduit._base, opts)
     tot = 0
-    cnt = 0
     used_map = fd_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
     tspkgs = tsinfo.getMembers()
+    # Ok, here we keep any pkgs that pass "filter" tests, then we keep all
+    # related pkgs ... Ie. "installed" version marked for removal.
+    keep_pkgs = set()
     for tspkg in tspkgs:
         tot += 1
-        which = fd_should_filter_pkg(conduit._base, opts, tspkg.po, used_map)
-        if which:
-            fd_del_pkg(tspkg, which)
-        else:
-            cnt += 1
+        if not fd_should_filter_pkg(conduit._base, opts, tspkg.po, used_map):
+            keep_pkgs.add(tspkg.po)
+
+    scnt = len(keep_pkgs)
+    mini_depsolve_again = True
+    while mini_depsolve_again:
+        mini_depsolve_again = False
+
+        for tspkg in tspkgs:
+            if tspkg.po in keep_pkgs:
+                # Find any related pkgs, and add them:
+                for (rpkg, reason) in tspkg.relatedto:
+                    if rpkg not in keep_pkgs:
+                        keep_pkgs.add(rpkg)
+                        mini_depsolve_again = True
+            else:
+                # If related to any keep pkgs, add us
+                for (rpkg, reason) in tspkg.relatedto:
+                    if rpkg in keep_pkgs:
+                        keep_pkgs.add(tspkg.po)
+                        mini_depsolve_again = True
+                        break
+
+    for tspkg in tspkgs:
+        if tspkg.po not in keep_pkgs:
+            fd_del_pkg(tspkg)
+
+    acnt = len(keep_pkgs)
     fd_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
-    if cnt:
-        conduit.info(2, 'Left with %d of %d packages, after filters applied' % (cnt, tot))
+    if acnt:
+        conduit.info(2, 'Left with %d (+%d related) of %d packages, after filters applied' % (scnt, acnt - scnt, tot))
     else:
         conduit.info(2, 'No packages passed the filters, %d available' % tot)
     fd_free_group_data()
