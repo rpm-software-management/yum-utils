@@ -413,7 +413,6 @@ def preresolve_hook(conduit):
         tsinfo.remove(tspkg.pkgtup)
 
     tot = 0
-    cnt = 0
     opts.sec_cmds = []
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
@@ -426,6 +425,7 @@ def preresolve_hook(conduit):
         if ysp_should_keep_pkg(opts, tspkg.po, md_info, used_map):
             keep_pkgs.add(tspkg.po)
 
+    scnt = len(keep_pkgs)
     mini_depsolve_again = True
     while mini_depsolve_again:
         mini_depsolve_again = False
@@ -449,13 +449,13 @@ def preresolve_hook(conduit):
         if tspkg.po not in keep_pkgs:
             ysp_del_pkg(tspkg)
 
-    cnt = len(keep_pkgs)
+    acnt = len(keep_pkgs)
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
-    if cnt:
-        conduit.info(2, 'Needed %d of %d packages, for security' % (cnt, tot))
+    if acnt:
+        conduit.info(2, 'Needed %d (+%d related) of %d transaction packages, for security' % (scnt, acnt - scnt, tot))
     else:
-        conduit.info(2, 'No packages needed, for security, %d available' % tot)
+        conduit.info(2, 'No transaction packages needed, for security, %d available' % tot)
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"
