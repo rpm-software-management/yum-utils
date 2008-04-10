@@ -248,6 +248,15 @@ This plugin adds the commands verify, verify-all and verify-rpm. There are
 also a couple of options. This command works like rpm -V, to verify your
 installation.
 
+%package -n yum-keys
+Summary: Yum plugin to deal with signing keys
+Group: System Environment/Base
+Requires: yum >= 3.2.8
+
+%description -n yum-keys
+This plugin adds the commands keys, keys-info, keys-data and keys-remove. They
+allow you to query and remove signing keys.
+
 %prep
 %setup -q
 
@@ -259,7 +268,7 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 # Plugins to install
 plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
          downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo verify"
+         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo verify keys"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
@@ -436,7 +445,15 @@ fi
 /usr/lib/yum-plugins/verify.*
 %{_mandir}/man1/yum-verify.1.*
 
+%files -n yum-keys
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/keys.conf
+/usr/lib/yum-plugins/keys.*
+
 %changelog
+* Fri Apr 10 2008 James Antill <james@fedoraproject.org>
+- Add keys plugin
+
 * Fri Mar 31 2008 James Antill <james@fedoraproject.org>
 - Add yum-aliases man page
 
