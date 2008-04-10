@@ -26,13 +26,19 @@ import yum.pgpmsg
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
 
-def match_one_of(patterns, key):
+def match_keys(patterns, key, globs=True):
     for pat in patterns:
         if pat == key.keyid:
             return True
         if pat == "%s-%x" % (key.keyid, key.createts):
             return True
-        if fnmatch.fnmatch(key.sum_auth, pat):
+        if pat == key.sum_auth:
+            return True
+        if pat == key.sum_auth_name:
+            return True
+        if pat == key.sum_auth_email:
+            return True
+        if globs and fnmatch.fnmatch(key.sum_auth, pat):
             return True
     return False
 
@@ -44,6 +50,17 @@ class Key:
         self.sum_type = sum_type
         self.sum_auth = sum_auth
         self.data     = data
+
+        email_beg = sum_auth.rfind('<')
+        if email_beg == -1:
+            self.sum_auth_name  = sum_auth
+            self.sum_auth_email = ""
+        else:
+            self.sum_auth_name  = sum_auth[:email_beg]
+            if sum_auth[-1] == '>':
+                self.sum_auth_email = sum_auth[email_beg+1:-1]
+            else:
+                self.sum_auth_email = sum_auth[email_beg:]
 
     def __cmp__(self, other):
         if other is None:
@@ -74,12 +91,18 @@ class KeysListCommand:
         pass
 
     def show_hdr(self):
-        print "%-4.4s %-66.66s %s" % ("Type", "Key owner", "Key ID")
+        print "%-40.40s %-21.21s %s" % ("Key owner", "Key email", "Key ID")
 
-    def show_key(self, key):
-        print "%-4.4s %-66.66s %s" % (key.sum_type, key.sum_auth, key.keyid)
+    def match_key(self, patterns, key):
+        return match_keys(patterns, key)
+
+    def show_key(self, base, key):
+        print "%-40.40s %-21.21s %s-%x" % (key.sum_auth_name,key.sum_auth_email,
+                                           key.keyid, key.createts)
 
     def doCommand(self, base, basecmd, extcmds):
+        self.exit_code = 0
+
         keys = []
         ts = rpmUtils.transaction.TransactionWrapper(base.conf.installroot)
         for hdr in ts.dbMatch('name', 'gpg-pubkey'):
@@ -100,13 +123,13 @@ class KeysListCommand:
 
         done = False
         for key in sorted(keys):
-            if not len(extcmds) or match_one_of(extcmds, key):
+            if not len(extcmds) or self.match_key(extcmds, key):
                 if not done:
                     self.show_hdr()
                 done = True
-                self.show_key(key)
+                self.show_key(base, key)
         
-        return 0, [basecmd + ' done']
+        return self.exit_code, [basecmd + ' done']
 
     def needTs(self, base, basecmd, extcmds):
         return False
@@ -122,27 +145,31 @@ class KeysInfoCommand(KeysListCommand):
     def show_hdr(self):
         pass
 
-    def show_key(self, key):
+    def show_key(self, base, key):
+        pkg = "gpg-pubkey-%s-%x" % (key.keyid, key.createts)
         if key.sum_type == '<?>':
             print """\
-Type      : %s
+Type      : Unknown
+Rpm PKG   : %s
 Key owner : %s
-Rpm Key ID: %s
+Key email : %s
 Created   : %s
-""" % (key.sum_type, key.sum_auth, key.keyid, time.ctime(key.createts))
+""" % (pkg, key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
         else:
             gpg_cert = yum.pgpmsg.decode_msg(key.data)
             print """\
 Type       : %s
+Rpm PKG    : %s
 Key owner  : %s
-Rpm Key ID : %s
+Key email  : %s
 Created    : %s
 Version    : PGP Public Key Certificate v%d
 Primary ID : %s
 Algorithm  : %s
 Fingerprint: %s
 Key ID     : %s
-""" % (key.sum_type, key.sum_auth, key.keyid, time.ctime(key.createts),
+""" % (key.sum_type, pkg, key.sum_auth_name, key.sum_auth_email,
+       time.ctime(key.createts),
        gpg_cert.version, gpg_cert.user_id,
        yum.pgpmsg.algo_pk_to_str[gpg_cert.public_key.pk_algo],
        yum.pgpmsg.str_to_hex(gpg_cert.public_key.fingerprint()),
@@ -160,19 +187,42 @@ class KeysDataCommand(KeysListCommand):
     def show_hdr(self):
         pass
 
-    def show_key(self, key):
+    def show_key(self, base, key):
         print """\
 Type     : %s
 Key owner: %s
+Key email: %s
 Key ID   : %s
 Created  : %s
 Raw Data :
   %s
-""" % (key.sum_type, key.sum_auth, key.keyid, time.ctime(key.createts),
+""" % (key.sum_type, key.sum_auth_name, key.sum_auth_email,
+       key.keyid, time.ctime(key.createts),
        key.data.replace('\n', '\n  '))
+
+
+class KeysRemoveCommand(KeysListCommand):
+
+    def getNames(self):
+        return ["keys-remove", "keys-erase"]
+
+    def getSummary(self):
+        return "Remove a public key block for signing data"
+
+    def show_hdr(self):
+        pass
+
+    def show_key(self, base, key):
+        release = "%x" % key.createts
+        base.remove(name='gpg-pubkey', version=key.keyid, release=release)
+        self.exit_code = 2
+
+    def match_key(self, patterns, key):
+        return match_keys(patterns, key, globs=False)
 
 
 def config_hook(conduit):
     conduit.registerCommand(KeysListCommand())
     conduit.registerCommand(KeysInfoCommand())
     conduit.registerCommand(KeysDataCommand())
+    conduit.registerCommand(KeysRemoveCommand())
