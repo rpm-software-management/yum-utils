@@ -220,6 +220,12 @@ class KeysRemoveCommand(KeysListCommand):
     def match_key(self, patterns, key):
         return match_keys(patterns, key, globs=False)
 
+    def doCheck(self, base, basecmd, extcmds):
+        if base.conf.uid:
+            raise PluginYumExit('You need to be root to perform this command.')
+        if not len(extcmds):
+            raise PluginYumExit('You need to specify a key to remove.')
+
 
 def config_hook(conduit):
     conduit.registerCommand(KeysListCommand())
