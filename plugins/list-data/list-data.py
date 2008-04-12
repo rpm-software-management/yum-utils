@@ -42,6 +42,14 @@ def loc_num(x):
     """ Return a string of a number in the readable "locale" format. """
     return locale.format("%d", int(x), True)
 
+def to_str(obj):
+    """ Convert something to a string, if it isn't one. """
+    # NOTE: unicode counts as a string just fine. We just want objects to call
+    # their __str__ methods.
+    if not isinstance(obj, basestring):
+        obj = str(obj)
+    return obj
+
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
@@ -100,7 +108,7 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         fmt = "%%-%ds %%6s (%%3d%%%%)" % maxlen
         for data in sorted(calc):
             val = len(calc[data])
-            msg(fmt % (str(data), loc_num(val), (100 * val) / totlen))
+            msg(fmt % (to_str(data), loc_num(val), (100 * val) / totlen))
             self.show_pkgs(msg, data, calc[data])
 
     # pkg.vendor has weird values, for instance
@@ -110,11 +118,11 @@ Display aggregate data on the %s attribute of a group of packages""" % self.attr
         
         val = getattr(data, self.attr)
         if val is None:
-            return self.unknown
+            return (self.unknown, self.unknown)
         if type(val) == type([]):
             return (self.unknown, self.unknown)
 
-        tval = str(val).strip()
+        tval = to_str(val).strip()
         if tval == "":
             return (self.unknown, self.unknown)
 
@@ -166,7 +174,7 @@ class InfoDataCommands(ListDataCommands):
 
             if type(val) == type([]):
                 val = ", ".join(sorted(val))
-            linelen = len(val) + len(str(pkg))
+            linelen = len(val) + len(to_str(pkg))
             if linelen < 77:
                 msg("  %s %*s%s" % (pkg, 77 - linelen, '', val))
             else:
