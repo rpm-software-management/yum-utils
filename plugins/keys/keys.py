@@ -66,14 +66,14 @@ class Key:
         if other is None:
             return 1
 
-        ret = cmp(self.sum_type, self.sum_type)
+        ret = cmp(self.sum_type, other.sum_type)
         if ret: return ret
-        ret = cmp(self.sum_auth, self.sum_auth)
+        ret = cmp(self.sum_auth, other.sum_auth)
         if ret: return ret
-        ret = cmp(self.keyid, self.keyid)
+        ret = cmp(self.keyid, other.keyid)
         if ret: return ret
         # Never gets here on diff. keys?
-        ret = cmp(self.createts, self.createts)
+        ret = cmp(self.createts, other.createts)
         return ret
 
 class KeysListCommand:
