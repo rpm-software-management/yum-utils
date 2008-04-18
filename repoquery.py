@@ -39,6 +39,7 @@ from rpmUtils.arch import getArchList
 from rpmUtils.miscutils import formatRequire
 import output
 from urlgrabber.progress import TextMeter
+from urlgrabber.progress import format_number
 
 version = "0.0.11"
 
@@ -85,12 +86,12 @@ def _size2val(size, off, ui):
     off = 1024
     if False: pass
     elif size >= (off * 100):
-        return "%f%s" % ((size / off), ui)
+        return "%.0f%s" % ((size / off), ui)
     elif size >= (off *  10):
         return "%.1f%s" % ((size / off), ui)
     return "%.2f%s" % ((size / off), ui)
 def size2k(size):
-    return _size2val(size,                      1024, " K")
+    return _size2val(size,                      1024, " k")
 def size2m(size):
     return _size2val(size,               1024 * 1024, " M")
 def size2g(size):
@@ -98,14 +99,7 @@ def size2g(size):
 def size2t(size):
     return _size2val(size, 1024 * 1024 * 1024 * 1024, " T")
 def size2h(size):
-    size = int(size)
-    if size >= (1024 * 1024 * 1024 * 1024): # Really hope not
-        return size2t(size)
-    if size >= (       1024 * 1024 * 1024):
-        return size2g(size)
-    if size >= (              1024 * 1024):
-        return size2m(size)
-    return size2k(size)
+    return format_number(size)
 
 convertmap = { 'date': sec2date,
                'day':  sec2day,
