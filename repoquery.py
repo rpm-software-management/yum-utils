@@ -85,22 +85,6 @@ convertmap = { 'date': sec2date,
                'isodate':  sec2isodate,
              }
 
-def rpmevr(e, v, r):
-    """
-    Given epoch, version and release strings, return one string
-    representing the combination, possibly omitting any of the three.
-    """
-    et = ""
-    vt = ""
-    rt = ""
-    if e and e != "0":
-        et = "%s:" % e
-    if v:
-        vt = "%s" % v
-    if r:
-        rt = "-%s" % r
-    return "%s%s%s" % (et, vt, rt)
-
 class queryError(exceptions.Exception):
     def __init__(self, msg):
         exceptions.Exception.__init__(self)
@@ -207,6 +191,17 @@ class pkgQuery:
 
     def fmt_list(self, **kw):
         return "\n".join(self.files())
+
+    def fmt_evr(self, **kw):
+        return "%(epoch)s:%(version)s-%(release)s" % self
+    def fmt_nevr(self, **kw):
+        return "%(name)s-%(evr)s" % self
+    def fmt_envr(self, **kw):
+        return "%(epoch)s:%(name)s-%(version)s-%(release)s" % self
+    def fmt_nevra(self, **kw):
+        return "%(nevr)s.%(arch)s" % self
+    def fmt_envra(self, **kw):
+        return "%(envr)s.%(arch)s" % self
 
 class repoPkgQuery(pkgQuery):
     """
