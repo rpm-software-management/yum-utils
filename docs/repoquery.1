@@ -74,8 +74,10 @@ Use name-epoch:version-release.architecture output format (default)
 Use epoch:name-version-release.architecture output format 
 (easier to parse than nevra)
 .IP "\fB\--qf=FORMAT, \-\-queryformat=FORMAT\fP"
-Specify custom output format for queries. Note that you can add ":date", ":day"
-and ":isodate" to all the tags that are a time.
+Specify custom output format for queries. You can add ":date", ":day" and
+":isodate" to all the tags that are a time, and you can add ":k", ":m", ":g",
+":t" and ":h" to sizes. You can also specify field width as in
+sprintf (Eg. %-20{name})
 .PP 
 
 .SH "PACKAGE SELECTION OPTIONS" 

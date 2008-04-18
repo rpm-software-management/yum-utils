@@ -80,9 +80,40 @@ def sec2date(timestr):
 def sec2day(timestr):
     return time.strftime("%a %b %d %Y", time.gmtime(int(timestr)))
 
+def _size2val(size, off, ui):
+    size = float(size)
+    off = 1024
+    if False: pass
+    elif size >= (off * 100):
+        return "%f%s" % ((size / off), ui)
+    elif size >= (off *  10):
+        return "%.1f%s" % ((size / off), ui)
+    return "%.2f%s" % ((size / off), ui)
+def size2k(size):
+    return _size2val(size,                      1024, " K")
+def size2m(size):
+    return _size2val(size,               1024 * 1024, " M")
+def size2g(size):
+    return _size2val(size,        1024 * 1024 * 1024, " G")
+def size2t(size):
+    return _size2val(size, 1024 * 1024 * 1024 * 1024, " T")
+def size2h(size):
+    size = int(size)
+    if size >= (1024 * 1024 * 1024 * 1024): # Really hope not
+        return size2t(size)
+    if size >= (       1024 * 1024 * 1024):
+        return size2g(size)
+    if size >= (              1024 * 1024):
+        return size2m(size)
+    return size2k(size)
+
 convertmap = { 'date': sec2date,
                'day':  sec2day,
                'isodate':  sec2isodate,
+               'k':  size2k,
+               'm':  size2m,
+               'g':  size2g,
+               'h':  size2h,
              }
 
 class queryError(exceptions.Exception):
