@@ -71,6 +71,9 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'relativepath', 'hdrstart', 'hdrend', 'id',
             ]
 
+def sec2isodate(timestr):
+    return time.strftime("%F %T", time.gmtime(int(timestr)))
+
 def sec2date(timestr):
     return time.ctime(int(timestr))
 
@@ -79,6 +82,7 @@ def sec2day(timestr):
 
 convertmap = { 'date': sec2date,
                'day':  sec2day,
+               'isodate':  sec2isodate,
              }
 
 def rpmevr(e, v, r):
