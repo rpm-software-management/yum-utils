@@ -124,7 +124,7 @@ class YumCompleteTransaction(YumUtilBase):
 
     def main(self):
         # Add util commandline options to the yum-cli ones
-        parser = self.getOptionParser() 
+        self.optparser = self.getOptionParser() 
         # Parse the commandline option and setup the basics.
         try:
             opts = self.doUtilConfigSetup()
@@ -132,10 +132,6 @@ class YumCompleteTransaction(YumUtilBase):
             self.logger.error("Cannot handle specific enablerepo/disablerepo options.")
             sys.exit(50)
 
-        # Check if there is anything to do.
-#        if len(self.cmds) < 1: 
-#            parser.print_help()
-#            sys.exit(0)
 
         if self.conf.uid != 0:
             self.logger.error("Error: You must be root to finish transactions")

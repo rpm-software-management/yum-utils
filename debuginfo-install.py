@@ -43,12 +43,12 @@ class DebugInfoInstall(YumUtilBase):
 
     def main(self):
         # Add util commandline options to the yum-cli ones
-        parser = self.getOptionParser() 
+        self.optparser = self.getOptionParser() 
         # Parse the commandline option and setup the basics.
         opts = self.doUtilConfigSetup()
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            parser.print_help()
+            self.optparser.print_help()
             sys.exit(0)
         if os.geteuid() != 0:
             print >> sys.stderr, "You must be root to run this command."

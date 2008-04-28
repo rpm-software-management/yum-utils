@@ -43,9 +43,9 @@ class YumDownloader(YumUtilBase):
 
     def main(self):
         # Add util commandline options to the yum-cli ones
-        parser = self.getOptionParser() 
+        self.optparser = self.getOptionParser() 
         # Add command line option specific to yumdownloader
-        self.addCmdOptions(parser)
+        self.addCmdOptions()
         # Parse the commandline option and setup the basics.
         try:
             opts = self.doUtilConfigSetup()
@@ -55,7 +55,7 @@ class YumDownloader(YumUtilBase):
                 
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            parser.print_help()
+            self.optparser.print_help()
             sys.exit(0)
 
         # make yumdownloader work as non root user.
@@ -262,16 +262,16 @@ class YumDownloader(YumUtilBase):
                 self.repos.disableRepo(repo.id)
                 srcrepo = repo.id
 
-    def addCmdOptions(self,parser):
-        parser.add_option("--destdir", default=".", dest="destdir",
+    def addCmdOptions(self):
+        self.optparser.add_option("--destdir", default=".", dest="destdir",
           help='destination directory (defaults to current directory)')
-        parser.add_option("--urls", default=False, dest="urls", action="store_true",
+        self.optparser.add_option("--urls", default=False, dest="urls", action="store_true",
           help='just list the urls it would download instead of downloading')
-        parser.add_option("--resolve", default=False, dest="resolve", action="store_true",
+        self.optparser.add_option("--resolve", default=False, dest="resolve", action="store_true",
           help='resolve dependencies and download required packages')
-        parser.add_option("--source", default=False, dest="source", action="store_true",
+        self.optparser.add_option("--source", default=False, dest="source", action="store_true",
           help='operate on source packages')
-        parser.add_option("--archlist",
+        self.optparser.add_option("--archlist",
           help="only download packages of certain architecture(s)")        
 if __name__ == '__main__':
     util = YumDownloader()
