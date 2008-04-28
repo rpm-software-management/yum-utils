@@ -15,7 +15,7 @@ yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and 
 more powerful to use. These tools include: debuginfo-install, package-cleanup,
 repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
-repotrack, yum-builddep, yum-complete-transaction, yumdownloader.
+repotrack, yum-builddep, yum-complete-transaction, yumdownloader, yum-debug-dump
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
@@ -309,6 +309,7 @@ fi
 %{_bindir}/repo-rss
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
+%{_bindir}/yum-debug-dump
 %{_sbindir}/yum-complete-transaction
 %{_mandir}/man1/yum-utils.1.*
 %{_mandir}/man1/package-cleanup.1.*
@@ -316,6 +317,7 @@ fi
 %{_mandir}/man1/repoquery.1.*
 %{_mandir}/man1/reposync.1.*
 %{_mandir}/man1/yum-builddep.1.*
+%{_mandir}/man1/yum-debug-dump.1.*
 %{_mandir}/man8/yum-complete-transaction.8.*
 %{_mandir}/man1/yumdownloader.1.*
 
