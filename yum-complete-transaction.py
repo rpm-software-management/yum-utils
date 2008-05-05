@@ -111,6 +111,8 @@ class YumCompleteTransaction(YumUtilBase):
                              YumCompleteTransaction.VERSION,
                              YumCompleteTransaction.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.yumcompletets")                             
+        self.optparser = self.getOptionParser()         
+        self.addCmdOptions()
         self.main()
 
     def clean_up_ts_files(self, timestamp, path):
@@ -121,6 +123,11 @@ class YumCompleteTransaction(YumUtilBase):
         for f in [tsall, tsdone]:
             if os.path.exists(f):
                 os.unlink(f)
+
+    def addCmdOptions(self):
+        self.optparser.add_option("--cleanup-only", default=False, 
+            action="store_true", dest="cleanup",
+            help='Do not complete the transaction just clean up transaction journals')
 
     def main(self):
         # Add util commandline options to the yum-cli ones
@@ -134,9 +141,10 @@ class YumCompleteTransaction(YumUtilBase):
 
 
         if self.conf.uid != 0:
-            self.logger.error("Error: You must be root to finish transactions")
+            self.logger.error("Error: You must be root to run yum-complete-transaction.")
             sys.exit(1)
 
+               
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
         # Do the real action
@@ -148,6 +156,14 @@ class YumCompleteTransaction(YumUtilBase):
         times = find_unfinished_transactions(self.conf.persistdir)
         if not times:
             print "No unfinished transactions left."      
+            sys.exit()
+
+        if opts.cleanup:
+            print "Cleaning up unfinished transaction journals"
+            # nuke ts files in yumlibpath
+            for timestamp in times:
+                print "Cleaning up %s" % timestamp
+                self.clean_up_ts_files(timestamp, self.conf.persistdir)
             sys.exit()
         
         print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)    
