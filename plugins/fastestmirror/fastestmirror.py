@@ -133,6 +133,9 @@ def postreposetup_hook(conduit):
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
     else:
+        opts, commands = conduit.getCmdLine()
+        if opts.cacheonly:
+            return
         conduit.info(2, "Determining fastest mirrors")
     repomirrors = {}
     repos = conduit.getRepos()
