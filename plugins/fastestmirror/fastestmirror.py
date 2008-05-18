@@ -339,6 +339,7 @@ class PollThread(threading.Thread):
         self.parent = parent
         self.mirror = mirror
         self.host = urlparse.urlparse(mirror)[1]
+        self.host = self.host.split('@')[-1]
         uService = urlparse.urlparse(mirror)[0]
         if uService == "http":
             self.port = 80
