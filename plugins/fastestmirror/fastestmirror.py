@@ -129,13 +129,13 @@ def postreposetup_hook(conduit):
     @type loadcache : Boolean
     """
     global loadcache, exclude
+    opts, commands = conduit.getCmdLine()
+    if opts.cacheonly:
+        return
     if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
     else:
-        opts, commands = conduit.getCmdLine()
-        if opts.cacheonly:
-            return
         conduit.info(2, "Determining fastest mirrors")
     repomirrors = {}
     repos = conduit.getRepos()
