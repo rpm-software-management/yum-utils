@@ -453,7 +453,7 @@ fi
 /usr/lib/yum-plugins/keys.*
 
 %changelog
-* Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+* Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.14
 * Fri Apr 10 2008 James Antill <james@fedoraproject.org>
 - Add keys plugin
