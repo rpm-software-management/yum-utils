@@ -2,6 +2,14 @@
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.14
 
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.14
+
 2008-05-19  Luke Macken <lmacken@redhat.com>
 
 	* plugins/fastestmirror/fastestmirror.py: fastestmirror: If we're
