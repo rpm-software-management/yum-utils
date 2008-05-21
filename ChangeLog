@@ -1,3 +1,178 @@
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.14
+
+2008-05-19  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: fastestmirror: If we're
+	using the cache, then don't load cached mirrorlist
+
+2008-05-17  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: fastestmirror: Apply a
+	patch from Tuomo Soini to fix http auth when used in the baseurl
+
+2008-05-15  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: fastestmirror: Don't do
+	anything if the user enabled cacheonly (-C) (rh#440428)
+
+2008-05-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/yum-complete-transaction.8, yum-complete-transaction.py: 
+	yum-complete-transaction --cleanup-only
+
+2008-04-28  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, docs/yum-debug-dump.1, yum-debug-dump.py,
+	yum-utils.spec: yum-debug-dump app, man page, Makefile and spec file
+	edits
+
+2008-04-27  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, yum-builddep.py,
+	yum-complete-transaction.py, yumdownloader.py: make sure all
+	yum-utils using self.getOptionParser set it up as self.optparser not
+	as 'parser' or anything else.  this change is necessary due yum git
+	checkin: 761e58a85937e9c56c7387c4d535e77db1b27c7b
+
+2008-04-18  James Antill <james@and.org>
+
+	* repoquery.py: Use urlgrabber.progress.format_number for human
+	readable output
+
+2008-04-18  James Antill <james@and.org>
+
+	* docs/repoquery.1, repoquery.py: Add k,m,g,t and h ...  and
+	documentation about the special size syntax
+
+2008-04-18  James Antill <james@and.org>
+
+	* repoquery.py: Remove unused function, add nevra format
+
+2008-04-18  James Antill <james@and.org>
+
+	* docs/repoquery.1, repoquery.py: Add isodate and documentation
+	about the special time syntax
+
+2008-04-12  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Fix keys compare/sort
+
+2008-04-12  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Fix None values, don't try and
+	convert unicode to str()
+
+2008-04-12  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Only root can run keys-remove
+
+2008-04-10  James Antill <james@and.org>
+
+	* yum-utils.spec: Add install code for keys
+
+2008-04-10  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Tweak keys* commands, add keys-remove
+	command
+
+2008-04-10  James Antill <james@and.org>
+
+	* plugins/keys/keys.conf, plugins/keys/keys.py: Plugin for yum
+	commands to query info. on installed signing keys
+
+2008-04-09  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py: Minor tidy thanks to pychecker
+
+
+2008-04-09  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py: Merge the security fix into
+	filter-data
+
+2008-04-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Give slightly better messages for
+	update/upgrade
+
+2008-04-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Tidy code, due to pychecker
+
+2008-04-09  James Antill <james@and.org>
+
+	* plugins/security/security.py:  Fix xine-lib / xine-lib-extras-nonfree dep. problem.   Problem:
+	 xine-lib doesn't require, xine-lib-extras-nonfree deps. on it but
+	 due to being in a different repo. isn't _also_ in the security
+	 data.   And due to security filtering we filter the "remove txmbr"
+	 for the old version of xine-libs, which means there's nothing in
+	 the transaction to the check that xine-lib-extras-nonfree deps. on
+	 something that's going.
+
+2008-04-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: - make repodiff sort the output - make -q really mean -q
+
+2008-04-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: fix for listing modified pkgs correctly.
+
+2008-04-02  James Antill <james@and.org>
+
+	* plugins/verify/verify.py: Do needTs logic in verify comand
+
+2008-04-02  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Do the list needTs logic in
+	changelog comand
+
+2008-04-02  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Don't need Ts for alias
+
+2008-04-02  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Do the list needTs logic in
+	list/info-data comands
+
+2008-03-31  James Antill <james@and.org>
+
+	* docs/Makefile, yum-utils.spec: Add install lines of yum-aliases
+	man page
+
+2008-03-31  James Antill <james@and.org>
+
+	* docs/yum-aliases.1: Add docs. for yum-aliases plugin
+
+2008-03-26  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror-asyncore.py: Add an threadless
+	version of fastestmirror that uses the asyncore module
+
+2008-03-22  James Bowes <jbowes@redhat.com>
+
+	* docs/package-cleanup.1, package-cleanup.py: Add more options for
+	control over package-cleanup's --leaves option.  Add the following
+	options for --leaves:  * --exclude-devel :: Any package whose name
+	ends in devel is not a                       leaf.  * --exclude-bin
+	:: Any package that has a file with 'bin' in the
+	name is not a leaf.  * --leaf-regex    :: A regular expression used
+	for deciding if a                       package is a leaf. Use
+	"^(perl)|(python)" to                       examine perl and python
+	packages, for example.                       Defaults to
+	"(^lib.*)|(.*lib(|s)$)".
+
+2008-03-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add python-dateutil requires to yum-changelog for
+	rh bug 438585
+
+2008-03-21  Tim Lauridsen <tim@naboo.local>
+
+	* ChangeLog: updated ChangeLog
+
 2008-03-21  Tim Lauridsen <tim@naboo.local>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.13
