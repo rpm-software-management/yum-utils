@@ -4,6 +4,27 @@
 
 2008-05-21  Tim Lauridsen <tla@rasmil.dk>
 
+	* docs/Makefile: more fixes to make yum utils can build again
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* docs/Makefile: more fixes to make yum utils can build again
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* docs/Makefile, yum-utils.spec: fixed some spec and Makefile
+	issues, so yum utils can build again
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.14
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
 	* ChangeLog: updated ChangeLog
 
 2008-05-21  Tim Lauridsen <tla@rasmil.dk>
