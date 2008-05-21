@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.13
+Version: 1.1.14
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -12,7 +12,7 @@ Requires: python >= 2.4 , yum >= 3.1.1
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
-manager. It includes utilities by different authors that make yum easier and 
+manager. It includes utilities by different authors that make yum easier and
 more powerful to use. These tools include: debuginfo-install, package-cleanup,
 repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, yum-builddep, yum-complete-transaction, yumdownloader, yum-debug-dump
@@ -36,7 +36,7 @@ Requires: yum >= 3.0
 Requires: python-dateutil
 
 %description -n yum-changelog
-This plugin adds a command line option to allow viewing package changelog 
+This plugin adds a command line option to allow viewing package changelog
 deltas before or after updating packages.
 
 %package -n yum-fastestmirror
@@ -54,7 +54,7 @@ Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-fedorakmod
-Plugin for Yum to handle installation of kmod-foo type of kernel modules, when new kernel versions 
+Plugin for Yum to handle installation of kmod-foo type of kernel modules, when new kernel versions
 are installed.
 kmod-foo kernel modules is described by the Fedora Extras packaging standards.
 
@@ -74,7 +74,7 @@ Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-versionlock
-This plugin allows certain packages specified in a file to be protected from being updated by 
+This plugin allows certain packages specified in a file to be protected from being updated by
 newer versions.
 
 %package -n yum-tsflags
@@ -92,7 +92,7 @@ Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-kernel-module
-This plugin handle installation of kernel-module-foo type of kernel modules when new version of 
+This plugin handle installation of kernel-module-foo type of kernel modules when new version of
 kernels are installed.
 
 
@@ -124,12 +124,12 @@ This plugin adds a --skip-broken to yum to make it possible to
 check packages for dependency problems and skip the one with problems.
 
 %package -n yum-priorities
-Summary: plugin to give priorities to packages from different repos 
+Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-priorities
-This plugin allows repositories to have different priorities. 
+This plugin allows repositories to have different priorities.
 Packages in a repository with a lower priority can't be overridden by packages
 from a repository with a higher priority even if repo has a later version.
 
@@ -166,14 +166,14 @@ The options make it possible to limit list/upgrade of packages to specific
 security relevant ones. The commands give you the security information.
 
 %package -n yum-protect-packages
-Summary: Yum plugin to prevents Yum from removing itself and other protected packages 
+Summary: Yum plugin to prevents Yum from removing itself and other protected packages
 Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-protect-packages
 this plugin prevents Yum from removing itself and other protected packages.
 By default, yum is the only package protected, but by extension this
-automatically protects everything on which yum depends (rpm, python, glibc, 
+automatically protects everything on which yum depends (rpm, python, glibc,
 and so on).Therefore, the plugin functions well even without
 compiling careful lists of all important packages.
 
@@ -453,6 +453,8 @@ fi
 /usr/lib/yum-plugins/keys.*
 
 %changelog
+* Fri Mar 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.14
 * Fri Apr 10 2008 James Antill <james@fedoraproject.org>
 - Add keys plugin
 
@@ -490,7 +492,7 @@ fi
 - Add yum-aliases plugin
 
 * Fri Dec 7 2007 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.9 
+- mark as 1.1.9
 * Fri Oct 26 2007 Seth Vidal <skvidal at fedoraproject.org>
 - add upgrade-helper plugin
 * Wed Oct 17 2007 Tim Lauridsen <tla@rasmil.dk>
@@ -566,7 +568,7 @@ fi
 - mark it as 1.0.1
 
 * Fri Oct 27 2006 Tim Lauridsen <tla@rasmil.dk>
-- Added priorities plugin written by Daniel de Kok <danieldk at pobox.com> 
+- Added priorities plugin written by Daniel de Kok <danieldk at pobox.com>
 
 * Wed Oct  4 2006 Seth Vidal <skvidal at linux.duke.edu>
 - mark it as 1.0
