@@ -337,7 +337,7 @@ fi
 %files -n yum-fastestmirror
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
-/usr/lib/yum-plugins/fastestmirror.*
+/usr/lib/yum-plugins/fastestmirror*.*
 
 %files -n yum-fedorakmod
 %defattr(-, root, root)
@@ -453,6 +453,8 @@ fi
 /usr/lib/yum-plugins/keys.*
 
 %changelog
+* Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+  Make yum-fastestmirror %%files handle the fastestmirror-asyncore.py file
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.14
 * Fri Apr 10 2008 James Antill <james@fedoraproject.org>
