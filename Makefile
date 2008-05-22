@@ -58,7 +58,7 @@ test-release:
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
 	@$(MAKE) test-cleanup
 
-test-cleanup:	
+test-cleanup: 
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
