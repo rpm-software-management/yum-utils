@@ -44,15 +44,17 @@ release:
 	@$(MAKE) upload
 
 test-release:
-	@git branch -D release-test
 	@git checkout -b release-test
 	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
 	VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 	@git commit -a -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
 	@git commit -a -m "updated ChangeLog"
-	@$(MAKE) srpm
-#	@git checkout master
+	@$(MAKE) archive
+	@rpmbuild -ta  ${PKGNAME}-${VERSION}.tar.gz
+	@git checkout -f
+	@git checkout master
+	@git branch -D release-test
 	
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
