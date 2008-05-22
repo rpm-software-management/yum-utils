@@ -57,14 +57,12 @@ test-release:
 	# Build RPMS
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
 	@$(MAKE) test-cleanup
-
-test-cleanup: 
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
 	@git checkout master
 	@git branch -D release-test
-	
+
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
 	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/	
