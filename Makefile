@@ -46,7 +46,7 @@ release:
 test-release:
 	@git checkout -b release-test
 	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
-	VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
+	VERSION=$VERSION.test
 	@git commit -a -m "bumped yum-utils version to $(VERSION)"
 	@$(MAKE) ChangeLog
 	@git commit -a -m "updated ChangeLog"
