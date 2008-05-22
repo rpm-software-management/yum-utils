@@ -45,15 +45,19 @@ release:
 
 test-release:
 	@git checkout -b release-test
+	# Add '.test' to Version in spec file
 	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
 	VERSION=$VERSION.test
 	@git commit -a -m "bumped yum-utils version to $(VERSION)"
-	@$(MAKE) ChangeLog
+	# Make Changelog
+	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	@git commit -a -m "updated ChangeLog"
-	@$(MAKE) archive
-	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
+    # Make archive
+	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
+	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
+	# Build RPMS
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.tar.gz
-	@echo "RPM Build completed"
+	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
 	@git checkout master
 	@git branch -D release-test
