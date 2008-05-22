@@ -47,16 +47,15 @@ test-release:
 	@git checkout -b release-test
 	# Add '.test' to Version in spec file
 	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
-	VERSION=$VERSION.test
-	@git commit -a -m "bumped yum-utils version to $(VERSION)"
+	@git commit -a -m "bumped yum-utils version to $(VERSION).test"
 	# Make Changelog
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	@git commit -a -m "updated ChangeLog"
     # Make archive
-	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
-	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
+	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
+	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
 	# Build RPMS
-	@rpmbuild -ta  ${PKGNAME}-${VERSION}.tar.gz
+	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
 	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
 	@git checkout master
