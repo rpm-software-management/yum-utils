@@ -51,7 +51,9 @@ test-release:
 	@$(MAKE) ChangeLog
 	@git commit -a -m "updated ChangeLog"
 	@$(MAKE) archive
+	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.tar.gz
+	@echo "RPM Build completed"
 	@git checkout -f
 	@git checkout master
 	@git branch -D release-test
