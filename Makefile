@@ -56,7 +56,6 @@ test-release:
 	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
 	# Build RPMS
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
-	@$(MAKE) test-cleanup
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
