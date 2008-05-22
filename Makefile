@@ -42,6 +42,17 @@ release:
 	@git tag -a -f -m "Tagged ${PKGNAME}-$(VERSION)" ${PKGNAME}-$(VERSION)
 	@git push --tags origin
 	@$(MAKE) upload
+
+test-release:
+	@git branch -D release-test
+	@git checkout -b release-test
+	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
+	VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
+	@git commit -a -m "bumped yum-utils version to $(VERSION)"
+	@$(MAKE) ChangeLog
+	@git commit -a -m "updated ChangeLog"
+	@$(MAKE) srpm
+#	@git checkout master
 	
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
