@@ -130,7 +130,7 @@ def postreposetup_hook(conduit):
     """
     global loadcache, exclude
     opts, commands = conduit.getCmdLine()
-    if opts.cacheonly:
+    if hasattr(opts, 'cacheonly') and opts.cacheonly:
         return
     if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
