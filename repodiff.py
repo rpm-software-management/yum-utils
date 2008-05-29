@@ -18,6 +18,8 @@ import yum
 import rpmUtils
 import sys
 import time
+import os
+import locale
 
 from optparse import OptionParser
 
@@ -221,6 +223,9 @@ def main(args):
     
       
 if __name__ == "__main__":
+    # Always run in LANG=C, because this tool is not localized 
+    os.environ['LC_ALL'] = 'C'
+    locale.setlocale(locale.LC_ALL, 'C')
     if not sys.stdout.isatty():
         import codecs, locale
         sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
