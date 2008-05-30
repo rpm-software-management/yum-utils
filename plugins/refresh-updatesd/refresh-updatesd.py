@@ -27,7 +27,6 @@ def posttrans_hook(conduit):
     """
     if os.geteuid(): # If we aren't root, we _can't_ have updated anything
        return
-
     try:
         bus = dbus.SystemBus()
     except dbus.DBusException, e:
@@ -35,18 +34,10 @@ def posttrans_hook(conduit):
         conduit.info(6, "%s" %(e,))
         return
     try:
-        o = bus.get_object('org.freedesktop.DBus', '/')
-        if not o.NameHasOwner("edu.duke.linux.yum"):
-            conduit.info(2, "yum-updatesd not on the bus")
-            return
-    except dbus.DBusException, e:
-        conduit.info(2, "Unable to look at what's on dbus")
-        conduit.info(6, "%s" %(e,))
-        return
-    try:
         updatesd_proxy = bus.get_object('edu.duke.linux.yum', '/Updatesd')
         updatesd_iface = dbus.Interface(updatesd_proxy, 'edu.duke.linux.yum')
         updatesd_iface.CheckNow()
-    except dbus.DBusException, e:
+    except Exception, e:
         conduit.info(2, "Unable to send message to yum-updatesd")
         conduit.info(6, "%s" %(e,))
+
