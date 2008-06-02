@@ -223,6 +223,9 @@ def main(args):
     
       
 if __name__ == "__main__":
+    import locale
+    # This test needs to be before locale.getpreferredencoding() as that
+    # does setlocale(LC_CTYPE, "")
     try:
         locale.setlocale(locale.LC_ALL, '')
     except locale.Error, e:
@@ -230,8 +233,11 @@ if __name__ == "__main__":
         print >> sys.stderr, 'Failed to set locale, defaulting to C'
         os.environ['LC_ALL'] = 'C'
         locale.setlocale(locale.LC_ALL, 'C')
-    if not sys.stdout.isatty():
-        import codecs, locale
+        
+    if True: # not sys.stdout.isatty():
+        import codecs
         sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
+        sys.stdout.errors = 'replace'
+
     main(sys.argv[1:])
     
