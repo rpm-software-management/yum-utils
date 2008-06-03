@@ -282,6 +282,12 @@ def postresolve_hook(c):
     installedModules = getInstalledModules(c)
 
     for te in c.getTsInfo().getMembers():
+        isKernel = len(kernelProvides.intersection(te.po.provides_names)) > 0
+        if te.ts_state == 'e' and isKernel:
+            # If a kernel is set to be erased then we don't want to
+            # consider it in our dep checking.
+            c.info(2, "Excluding to be erased: " + str(te.po))
+            installedKernels.remove(te.po)
         if te.ts_state not in ('i', 'u'):
             continue
         if "kernel-modules" in te.po.provides_names:
@@ -289,7 +295,7 @@ def postresolve_hook(c):
             for po in avaModules:
                 if te.po.pkgtup == po.pkgtup:
                     avaModules.remove(po)
-        if kernelProvides.intersection(te.po.provides_names) != Set([]):
+        if isKernel:
             newKernels.append(te.po)
 
     # Install modules for all kernels
