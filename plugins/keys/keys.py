@@ -16,7 +16,7 @@
 #
 # by James Antill
 
-from yum.plugins import TYPE_INTERACTIVE
+from yum.plugins import TYPE_INTERACTIVE, PluginYumExit
 import rpmUtils.transaction
 
 import time
