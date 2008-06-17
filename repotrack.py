@@ -165,7 +165,7 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
-            self._getSacks(archlist=archlist, thisrepo=repo.id)
+            my._getSacks(archlist=archlist, thisrepo=repo.id)
 
     my.doRepoSetup()    
     my._getSacks(archlist=archlist)
