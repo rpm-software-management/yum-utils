@@ -19,9 +19,11 @@ import os
 import subprocess
 import sys
 import yum
+from yum import Errors
 from rpmUtils import miscutils
 import gzip
 import rpm
+from optparse import OptionParser
 
 # maybe use YumQuiet?
 
@@ -30,7 +32,15 @@ class YumDebugDump(yum.YumBase):
     def __init__(self):
         self.file_version = '1'      
         yum.YumBase.__init__(self)
+        self.parse_args()
     
+    def parse_args(self):
+        parser = OptionParser()
+        parser.set_usage("yum-debug-dump [options]")
+        parser.add_option("--norepos", action="store_true", default=False,
+           help="do not attempt to dump the repository contents")
+        self.opts, self.args = parser.parse_args()
+
     def dump_rpmdb(self):
         msg = "%%%%RPMDB\n"
         for po in self.rpmdb:
@@ -41,10 +51,14 @@ class YumDebugDump(yum.YumBase):
     def dump_repos(self):
         msg = "%%%%REPOS\n"
         for repo in self.repos.listEnabled():
-            msg += '%%%s - %s\n' % (repo.id, repo.urls[0])
-            msg += "  excludes: %s\n" % ",".join(repo.exclude)
-            for po in self.pkgSack.returnPackages(repo.id):
-                msg += '  %s:%s-%s-%s.%s\n' % (po.epoch, po.name, po.ver,po.rel, po.arch)
+            try:
+                msg += '%%%s - %s\n' % (repo.id, repo.urls[0])
+                msg += "  excludes: %s\n" % ",".join(repo.exclude)
+                for po in self.pkgSack.returnPackages(repo.id):
+                    msg += '  %s:%s-%s-%s.%s\n' % (po.epoch, po.name, po.ver,po.rel, po.arch)
+            except Errors.RepoError, e:
+                msg += "Error accessing repo %s: %s\n" % (repo, str(e))
+                continue
         return msg
 
     def dump_system_info(self):
@@ -134,7 +148,8 @@ class YumDebugDump(yum.YumBase):
         fo.write(self.dump_yum_config_info())
         fo.write(self.dump_rpm_problems())
         fo.write(self.dump_rpmdb())
-        fo.write(self.dump_repos())
+        if not self.opts.norepos:
+            fo.write(self.dump_repos())
         fo.close()
         return fn
         
