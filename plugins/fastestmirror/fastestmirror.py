@@ -59,6 +59,7 @@ maxhostfileage = 10
 loadcache = False
 maxthreads = 15
 exclude = None
+done_sock_timeout = False
 
 def init_hook(conduit):
     """
@@ -140,6 +141,8 @@ def postreposetup_hook(conduit):
     repomirrors = {}
     repos = conduit.getRepos()
     for repo in repos.listEnabled():
+        if len(repo.urls) == 1:
+            continue
         if not repomirrors.has_key(str(repo)):
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         if exclude:
@@ -154,6 +157,9 @@ def postreposetup_hook(conduit):
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
+    if done_sock_timeout:
+        socket.setdefaulttimeout(None)
+
     if not loadcache:
         write_timedhosts()
 
@@ -244,8 +250,21 @@ class FastestMirror:
         self.mirrorlist = mirrorlist
         self.results = {}
         self.threads = []
-        self.lock = threading.Lock()
-        socket.setdefaulttimeout(socket_timeout)
+
+    # If we don't spawn any threads, we don't need locking...
+    def _init_lock(self):
+        if not hasattr(self, '_results_lock'):
+            self._results_lock = threading.Lock()
+            global done_sock_timeout
+            done_sock_timeout = True
+            socket.setdefaulttimeout(socket_timeout)
+
+    def _acquire_lock(self):
+        if hasattr(self, '_results_lock'):
+            self._results_lock.acquire()
+    def _release_lock(self):
+        if hasattr(self, '_results_lock'):
+            self._results_lock.release()
 
     def get_mirrorlist(self):
         """
@@ -286,9 +305,21 @@ class FastestMirror:
                 if self.threads[0].isAlive():
                     self.threads[0].join()
                 del self.threads[0]
-            pollThread = PollThread(self, mirror)
-            pollThread.start()
-            self.threads.append(pollThread)
+
+            mhost = host(mirror)
+            if timedhosts.has_key(mhost):
+                result = timedhosts[mhost]
+                if verbose:
+                    print "%s already timed: %s" % (mhost, result)
+                self._add_result(mirror, mhost, result)
+            elif mhost == "127.0.0.1":
+                self._add_result(mirror, mhost, result)
+            else:
+                # No cached info. so spawn a thread and find the info. out
+                self._init_locks()
+                pollThread = PollThread(self, mirror)
+                pollThread.start()
+                self.threads.append(pollThread)
         while len(self.threads) > 0:
             if self.threads[0].isAlive():
                 self.threads[0].join()
@@ -313,11 +344,11 @@ class FastestMirror:
         @type timedhosts : List
         """
         global timedhosts
-        self.lock.acquire()
+        self._acquire_lock()
         if verbose: print " * %s : %f secs" % (host, time)
         self.results[mirror] = time
         timedhosts[host] = time
-        self.lock.release()
+        self._release_lock()
 
 class PollThread(threading.Thread):
     """
@@ -338,8 +369,7 @@ class PollThread(threading.Thread):
         threading.Thread.__init__(self)
         self.parent = parent
         self.mirror = mirror
-        self.host = urlparse.urlparse(mirror)[1]
-        self.host = self.host.split('@')[-1]
+        self.host = host(mirror)
         uService = urlparse.urlparse(mirror)[0]
         if uService == "http":
             self.port = 80
@@ -408,12 +438,7 @@ def main():
         print "Usage: %s <mirror1> [mirror2] ... [mirrorN]" % sys.argv[0]
         sys.exit(-1)
 
-    del(sys.argv[0])
-    mirrorlist = []
-
-    for arg in sys.argv:
-        mirrorlist.append(arg)
-
+    mirrorlist = sys.argv[1:]
     print "Result: " + str(FastestMirror(mirrorlist).get_mirrorlist())
 
 if __name__ == '__main__':
