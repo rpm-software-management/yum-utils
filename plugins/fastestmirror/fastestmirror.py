@@ -130,9 +130,12 @@ def postreposetup_hook(conduit):
     @type loadcache : Boolean
     """
     global loadcache, exclude
+
     opts, commands = conduit.getCmdLine()
-    if hasattr(opts, 'cacheonly') and opts.cacheonly:
+    if ((hasattr(opts, 'cacheonly') and opts.cacheonly) or
+        not os.access(hostfilepath, os.W_OK)):
         return
+
     if loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
