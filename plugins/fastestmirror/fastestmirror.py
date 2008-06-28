@@ -316,7 +316,7 @@ class FastestMirror:
                 self._add_result(mirror, mhost, result)
             else:
                 # No cached info. so spawn a thread and find the info. out
-                self._init_locks()
+                self._init_lock()
                 pollThread = PollThread(self, mirror)
                 pollThread.start()
                 self.threads.append(pollThread)
