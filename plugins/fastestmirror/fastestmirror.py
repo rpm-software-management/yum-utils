@@ -142,6 +142,17 @@ def postreposetup_hook(conduit):
         conduit.info(2, "Determining fastest mirrors")
     repomirrors = {}
     repos = conduit.getRepos()
+
+    #  First do all of the URLs as one big list, this way we get as much
+    # parallelism as possible (if we need to do the network tests).
+    all_urls = []
+    for repo in repos.listEnabled():
+        if len(repo.urls) == 1:
+            continue
+        all_urls.extend(repo.urls)
+    all_urls = FastestMirror(all_urls).get_mirrorlist()
+
+    #  This should now just be looking up the cached times.
     for repo in repos.listEnabled():
         if len(repo.urls) == 1:
             continue
