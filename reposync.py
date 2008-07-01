@@ -245,7 +245,12 @@ def main():
             if not opts.quiet:
                 my.logger.info( '[%s: %-5d of %-5d ] Downloading %s' % (repo.id, n, len(download_list), remote))
             pkg.localpath = local # Hack: to set the localpath we want.
-            path = repo.getPackage(pkg)
+            try:
+                path = repo.getPackage(pkg)
+            except yum.Errors.RepoError, e:
+                my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e))
+                continue
+                
             if opts.gpgcheck:
                 result, error = my.sigCheckPkg(pkg)
                 if result != 0:
