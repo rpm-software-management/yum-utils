@@ -110,6 +110,16 @@ def clean_hook(conduit):
 # Get the hostname from a url, stripping away any usernames/passwords
 host = lambda mirror: mirror.split('/')[2].split('@')[-1]
 
+def _can_write_results(fname):
+    if not os.path.exists(fname):
+        try:
+            hostfile = file(hostfilepath, 'w')
+            return True
+        except:
+            return False
+
+    return os.access(fname, os.W_OK)
+
 def postreposetup_hook(conduit):
     """
     This function is called after Yum has initiliazed all the repository information.
@@ -132,7 +142,7 @@ def postreposetup_hook(conduit):
     global loadcache, exclude
 
     opts, commands = conduit.getCmdLine()
-    if conduit._base.conf.cache or not os.access(hostfilepath, os.W_OK):
+    if conduit._base.conf.cache or not _can_write_results(hostfilepath):
         return
 
     if loadcache:
