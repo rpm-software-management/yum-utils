@@ -132,8 +132,7 @@ def postreposetup_hook(conduit):
     global loadcache, exclude
 
     opts, commands = conduit.getCmdLine()
-    if ((hasattr(opts, 'cacheonly') and opts.cacheonly) or
-        not os.access(hostfilepath, os.W_OK)):
+    if conduit._base.conf.cache or not os.access(hostfilepath, os.W_OK):
         return
 
     if loadcache:
