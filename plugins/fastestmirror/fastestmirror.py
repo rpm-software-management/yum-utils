@@ -60,6 +60,7 @@ loadcache = False
 maxthreads = 15
 exclude = None
 done_sock_timeout = False
+done_repos = set()
 
 def init_hook(conduit):
     """
@@ -145,7 +146,9 @@ def postreposetup_hook(conduit):
     if conduit._base.conf.cache or not _can_write_results(hostfilepath):
         return
 
-    if loadcache:
+    if done_repos:
+        conduit.info(2, "Checking for new repos for mirrors")
+    elif loadcache:
         conduit.info(2, "Loading mirror speeds from cached hostfile")
         read_timedhosts()
     else:
@@ -157,6 +160,8 @@ def postreposetup_hook(conduit):
     # parallelism as possible (if we need to do the network tests).
     all_urls = []
     for repo in repos.listEnabled():
+        if repo.id in done_repos:
+            continue
         if len(repo.urls) == 1:
             continue
         all_urls.extend(repo.urls)
@@ -164,6 +169,8 @@ def postreposetup_hook(conduit):
 
     #  This should now just be looking up the cached times.
     for repo in repos.listEnabled():
+        if repo.id in done_repos:
+            continue
         if len(repo.urls) == 1:
             continue
         if not repomirrors.has_key(str(repo)):
@@ -180,6 +187,7 @@ def postreposetup_hook(conduit):
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
+        done_repos.add(repo.id)
     if done_sock_timeout:
         socket.setdefaulttimeout(None)
 
