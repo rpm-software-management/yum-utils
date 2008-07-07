@@ -15,7 +15,7 @@ yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and
 more powerful to use. These tools include: debuginfo-install, package-cleanup,
 repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
-repotrack, yum-builddep, yum-complete-transaction, yumdownloader, yum-debug-dump
+repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader, yum-debug-dump
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
@@ -307,6 +307,7 @@ fi
 %{_bindir}/reposync
 %{_bindir}/repo-graph
 %{_bindir}/repo-rss
+%{_bindir}/verifytree
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
 %{_bindir}/yum-debug-dump
@@ -453,6 +454,9 @@ fi
 /usr/lib/yum-plugins/keys.*
 
 %changelog
+* Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- add verifytree
+
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
   Make yum-fastestmirror %%files handle the fastestmirror-asyncore.py file 
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
