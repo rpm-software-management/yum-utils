@@ -32,6 +32,7 @@ import urlgrabber.grabber
 import tempfile
 import os
 import shutil
+import time
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
@@ -77,16 +78,22 @@ def close_hook(conduit):
         dname.cleanup()
     dnames = []
 
-def add_dir_repo(base, tmp_fname, trepo, log):
+def add_dir_repo(base, trepo, cleanup):
     # Let people do it via. local directories ... we don't want this for
     # HTTP because people _should_ just generate .repo files, but for
     # local CDs of pkgs etc. we'll be nice.
     trepo_path = trepo[len("file:"):]
-    trepo_data = AutoCleanupDir(tempfile.mkdtemp())
+    trepo_data = tempfile.mkdtemp()
+    if cleanup:
+        AutoCleanupDir(trepo_data)
+    else:
+        os.chmod(trepo_data, 0755)
     trepo_name = os.path.basename(os.path.dirname(trepo_path))
+    tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
+    repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
     open(tmp_fname, "wb").write("""\
-[%(basename)s]
-name=Temp. for %(rbasename)s
+[%(repoid)s]
+name=Tmp. repo. for %(path)s
 baseurl=file:%(dname)s
 enabled=1
 gpgcheck=1
@@ -94,31 +101,40 @@ metadata_expire=0
 #  Make cost smaller, as we know it's "local" ... if this isn't good just create
 # your own .repo file. ... then you won't need to createrepo each run either.
 cost=500
-""" % {'basename'  : os.path.basename(tmp_fname),
-       'rbasename' : os.path.basename(trepo_name),
-       'dname'     : trepo_data.dname})
-    print "Creating repodata for directory:", os.path.basename(trepo_name)
-    os.spawnlp(os.P_WAIT, "createrepo", "createrepo", "--baseurl", trepo,
-               "--outputdir", trepo_data.dname, trepo_path)
-    AutoCleanupDir("%s/%s" % (base.conf.cachedir, os.path.basename(tmp_fname)))
+""" % {'basename' : trepo_name,
+       'path'     : trepo_path,
+       'repoid'   : repoid,
+       'dname'    : trepo_data})
+    if cleanup:
+        print "Creating tmp. repodata for:", trepo_path
+    else:
+        print "Creating saved repodata for:", trepo_path
+        print "    * Result is saved here :", tmp_fname
+        
+    os.spawnlp(os.P_WAIT, "createrepo",
+               "createrepo", "--database", "--baseurl", trepo,
+               "--outputdir", trepo_data, trepo_path)
+    AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
+    return tmp_fname
 
-def add_repos(base, log, tmp_repos, tvalidate):
+def add_repos(base, log, tmp_repos, tvalidate, cleanup_dir_temp):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
     for trepo in tmp_repos:
-        tfo   = tempfile.NamedTemporaryFile()
-        fname = tfo.name
         if trepo.startswith("/"):
             trepo = "file:%s" % trepo
         if trepo.startswith("file:") and trepo.endswith("/"):
             if not os.path.isdir(trepo[len("file:"):]):
                 log.warn("Failed to find directory " + trepo[len("file:"):])
                 continue
-            add_dir_repo(base, fname, trepo)
+            fname = add_dir_repo(base, trepo, cleanup_dir_temp)
         else:
             grab = urlgrabber.grabber.URLGrabber()
+            # Need to keep alive until fname is used
+            gc_keep = tempfile.NamedTemporaryFile()
+            fname = gc_keep.name
             try:
-                grab.urlgrab(trepo, fname)
+                fname = grab.urlgrab(trepo, fname)
             except urlgrabber.grabber.URLGrabError, e:
                 log.warn("Failed to retrieve " + trepo)
                 continue
@@ -136,6 +152,7 @@ def config_hook(conduit):
     Add the --tmprepo option.
     '''
     global my_gpgcheck
+    global def_tmp_repos_cleanup
     
     parser = conduit.getOptParser()
     if not parser:
@@ -146,16 +163,28 @@ def config_hook(conduit):
                       type='string', dest='tmp_repos', default=[],
                       help="enable one or more repositories from URLs",
                       metavar='[url]')
+    parser.add_option("--tmprepo-keep-created", action='store_true',
+                      dest='tmp_repos_cleanup', default=False,
+                      help="keep created direcotry based tmp. repos.")
     my_gpgcheck = conduit.confBool('main', 'gpgcheck', default=True)
+    def_tmp_repos_cleanup = conduit.confBool('main', 'cleanup', default=False)
 
+_tmprepo_done = False
 def prereposetup_hook(conduit):
     '''
     Process the tmp repos from --tmprepos.
     '''
 
+    # Stupid group commands doing the explicit setup stuff...
+    global _tmprepo_done
+    if _tmprepo_done: return
+    _tmprepo_done = True
+
     opts, args = conduit.getCmdLine()
     if not opts.tmp_repos:
         return
+
     log = logging.getLogger("yum.verbose.main")
     add_repos(conduit._base, log, opts.tmp_repos,
-              make_validate(log, my_gpgcheck))
+              make_validate(log, my_gpgcheck),
+              not (opts.tmp_repos_cleanup or def_tmp_repos_cleanup))
