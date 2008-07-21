@@ -231,6 +231,7 @@ each category, if any were specified.
 Summary: Yum plugin to add temporary repositories
 Group: System Environment/Base
 Requires: yum >= 3.2.11
+Requires: createrepo
 
 %description -n yum-tmprepo
 This plugin adds the option --tmprepo which takes a url to a .repo file

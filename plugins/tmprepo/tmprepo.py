@@ -30,6 +30,8 @@ from yum import logginglevels
 import logging
 import urlgrabber.grabber
 import tempfile
+import os
+import shutil
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
@@ -54,18 +56,72 @@ def make_validate(log, gpgcheck):
 
     return tvalidate
 
+dnames = []
+class AutoCleanupDir:
+    """
+    Given a directory ... let it exist until "the end", and then clean it up.
+    """
+
+    def __init__(self, dname):
+        self.dname = dname
+        # Want it to live until python shutdown
+        dnames.append(self)
+
+    # Can't use __del__ as python doesn't dtrt. on exit
+    def cleanup(self):
+        shutil.rmtree(self.dname, ignore_errors=True)
+
+def close_hook(conduit):
+    global dnames
+    for dname in dnames:
+        dname.cleanup()
+    dnames = []
+
+def add_dir_repo(base, tmp_fname, trepo, log):
+    # Let people do it via. local directories ... we don't want this for
+    # HTTP because people _should_ just generate .repo files, but for
+    # local CDs of pkgs etc. we'll be nice.
+    trepo_path = trepo[len("file:"):]
+    trepo_data = AutoCleanupDir(tempfile.mkdtemp())
+    trepo_name = os.path.basename(os.path.dirname(trepo_path))
+    open(tmp_fname, "wb").write("""\
+[%(basename)s]
+name=Temp. for %(rbasename)s
+baseurl=file:%(dname)s
+enabled=1
+gpgcheck=1
+metadata_expire=0
+#  Make cost smaller, as we know it's "local" ... if this isn't good just create
+# your own .repo file. ... then you won't need to createrepo each run either.
+cost=500
+""" % {'basename'  : os.path.basename(tmp_fname),
+       'rbasename' : os.path.basename(trepo_name),
+       'dname'     : trepo_data.dname})
+    print "Creating repodata for directory:", os.path.basename(trepo_name)
+    os.spawnlp(os.P_WAIT, "createrepo", "createrepo", "--baseurl", trepo,
+               "--outputdir", trepo_data.dname, trepo_path)
+    AutoCleanupDir("%s/%s" % (base.conf.cachedir, os.path.basename(tmp_fname)))
+
 def add_repos(base, log, tmp_repos, tvalidate):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
     for trepo in tmp_repos:
         tfo   = tempfile.NamedTemporaryFile()
         fname = tfo.name
-        grab = urlgrabber.grabber.URLGrabber()
-        try:
-            grab.urlgrab(trepo, fname)
-        except urlgrabber.grabber.URLGrabError, e:
-            log.warn("Failed to retrieve " + trepo)
-            continue
+        if trepo.startswith("/"):
+            trepo = "file:%s" % trepo
+        if trepo.startswith("file:") and trepo.endswith("/"):
+            if not os.path.isdir(trepo[len("file:"):]):
+                log.warn("Failed to find directory " + trepo[len("file:"):])
+                continue
+            add_dir_repo(base, fname, trepo)
+        else:
+            grab = urlgrabber.grabber.URLGrabber()
+            try:
+                grab.urlgrab(trepo, fname)
+            except urlgrabber.grabber.URLGrabError, e:
+                log.warn("Failed to retrieve " + trepo)
+                continue
 
         base.getReposFromConfigFile(fname, validate=tvalidate)
         added = True
