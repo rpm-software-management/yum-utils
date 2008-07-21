@@ -208,6 +208,8 @@ def _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel, exclude_bin):
 
     Return True if the pkg should be shown, False if not.
     """
+    if pkg[0] == 'gpg-pubkey':
+        return False
     pos = my.rpmdb.searchNevra(name=pkg[0], epoch=str(pkg[2]), ver=pkg[3],
             rel=pkg[4], arch=pkg[1])
     # This should give us an exact match
