@@ -39,11 +39,32 @@ plugin_type = (TYPE_INTERACTIVE,)
 
 def make_validate(log, gpgcheck):
     def tvalidate(repo):
-        if gpgcheck:
-    
-            # Don't allow them to set gpgcheck=False
-            if not repo.gpgcheck:
+        if gpgcheck.lower() not in ('false', 'no', '0'):
+
+            if gpgcheck.lower() not in ('packages', 'pkgs',
+                                        '1', 'yes', 'true',
+                                        'repo', 'repository'):
+                log.warn("GPGcheck set to unknown value: %s" % gpgcheck)
+                return False
+
+            if repo.gpgcheck not in ('packages', 'true', 'repo'):
+                log.warn("Repo %s GPGcheck set to unknown value: %s" %
+                         (repo, gpgcheck))
+                return False
+
+            # Don't ever allow them to set gpgcheck='false'
+            if repo.gpgcheck == 'false':
                 log.warn("Repo %s tried to set gpgcheck=false" % repo)
+                return False
+
+            # Now do the more complicated comparisons...
+            if (gpgcheck.lower() in ('packages', 'pkgs', '1', 'yes', 'true') and
+                repo.gpgcheck == 'repo'):
+                log.warn("Repo %s tried to set gpgcheck=repository" % repo)
+                return False
+            if (gpgcheck.lower() in ('repository', 'repo', '1', 'yes', 'true') and
+                repo.gpgcheck == 'packages'):
+                log.warn("Repo %s tried to set gpgcheck=packages" % repo)
                 return False
             
             # Don't allow them to set gpgkey=anything
@@ -96,7 +117,7 @@ def add_dir_repo(base, trepo, cleanup):
 name=Tmp. repo. for %(path)s
 baseurl=file:%(dname)s
 enabled=1
-gpgcheck=1
+gpgcheck=packages
 metadata_expire=0
 #  Make cost smaller, as we know it's "local" ... if this isn't good just create
 # your own .repo file. ... then you won't need to createrepo each run either.
@@ -117,12 +138,15 @@ cost=500
     AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
     return tmp_fname
 
-def add_repos(base, log, tmp_repos, tvalidate, cleanup_dir_temp):
+def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
     for trepo in tmp_repos:
         if trepo.startswith("/"):
             trepo = "file:%s" % trepo
+        validate = tvalidate
+        if trepo.startswith("file:"):
+            validate = tlocvalidate
         if trepo.startswith("file:") and trepo.endswith("/"):
             if not os.path.isdir(trepo[len("file:"):]):
                 log.warn("Failed to find directory " + trepo[len("file:"):])
@@ -139,19 +163,21 @@ def add_repos(base, log, tmp_repos, tvalidate, cleanup_dir_temp):
                 log.warn("Failed to retrieve " + trepo)
                 continue
 
-        base.getReposFromConfigFile(fname, validate=tvalidate)
+        base.getReposFromConfigFile(fname, validate=validate)
         added = True
 
     # Just do it all again...
     base.setupProgressCallbacks()
 
-my_gpgcheck = True
+rgpgcheck = 'repo' # Remote 
+lgpgcheck = 'packages'
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
     Add the --tmprepo option.
     '''
-    global my_gpgcheck
+    global rgpgcheck
+    global lgpgcheck
     global def_tmp_repos_cleanup
     
     parser = conduit.getOptParser()
@@ -166,7 +192,10 @@ def config_hook(conduit):
     parser.add_option("--tmprepo-keep-created", action='store_true',
                       dest='tmp_repos_cleanup', default=False,
                       help="keep created direcotry based tmp. repos.")
-    my_gpgcheck = conduit.confBool('main', 'gpgcheck', default=True)
+    #  We default to repository for actual repo files, because that's the most
+    # secure, but packages for local dirs./files
+    rgpgcheck  = conduit.confString('main', 'remote_gpgcheck', default='repo')
+    lgpgcheck = conduit.confString('main', 'local_gpgcheck', default='packages')
     def_tmp_repos_cleanup = conduit.confBool('main', 'cleanup', default=False)
 
 _tmprepo_done = False
@@ -187,4 +216,5 @@ def prereposetup_hook(conduit):
     log = logging.getLogger("yum.verbose.main")
     add_repos(conduit._base, log, opts.tmp_repos,
               make_validate(log, my_gpgcheck),
+              make_validate(log, my_dgpgcheck),
               not (opts.tmp_repos_cleanup or def_tmp_repos_cleanup))
