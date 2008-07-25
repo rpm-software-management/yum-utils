@@ -159,7 +159,7 @@ package.
 %package -n yum-security
 Summary: Yum plugin to enable security filters
 Group: System Environment/Base
-Requires: yum >= 3.0.5
+Requires: yum >= 3.2.18
 
 %description -n yum-security
 This plugin adds the options --security, --cve, --bz and --advisory flags

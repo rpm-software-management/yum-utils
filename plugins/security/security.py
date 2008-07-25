@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-# Copyright Red Hat Inc. 2007
+# Copyright Red Hat Inc. 2007, 2008
 #
 # Author: James Antill <james.antill@redhat.com>
 #
@@ -29,10 +29,10 @@
 # yum --bz  235374 --bz 234688 <cmd>
 # yum --advisory FEDORA-2007-420 --advisory FEDORA-2007-346 <cmd>
 #
-# yum sec-list
-# yum sec-list bugzillas / bzs
-# yum sec-list cves
-# yum sec-list security / sec
+# yum list-security
+# yum list-security bugzillas / bzs
+# yum list-security cves
+# yum list-security security / sec
 
 import yum
 import fnmatch
@@ -41,13 +41,30 @@ from yum.update_md import UpdateMetadata
 import logging # for commands
 from yum import logginglevels
 
+import rpmUtils.miscutils
+
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
-def ysp_gen_metadata(conduit):
+def _rpm_tup_vercmp(tup1, tup2):
+    """ Compare two "std." tuples, (n, a, e, v, r). """
+    return rpmUtils.miscutils.compareEVR((tup1[2], tup1[3], tup1[4]),
+                                         (tup2[2], tup2[3], tup2[4]))
+
+class CliError(yum.Errors.YumBaseError):
+
+    """
+    Command line interface related Exception.
+    """
+
+    def __init__(self, args=''):
+        yum.Errors.YumBaseError.__init__(self)
+        self.args = args
+
+def ysp_gen_metadata(repos):
     """ Generate the info. from the updateinfo.xml files. """
     md_info = UpdateMetadata()
-    for repo in conduit.getRepos().listEnabled():
+    for repo in repos:
         if not repo.enabled:
             continue
         
@@ -64,45 +81,46 @@ def ysp__safe_refs(refs):
         return []
     return refs
 
-def ysp_should_filter_pkg(opts, pkg, md, used_map):
+def _match_sec_cmd(sec_cmds, pkgname, notice):
+    for i in sec_cmds:
+        if fnmatch.fnmatch(pkgname, i):
+            return i
+        if notice['update_id'] == i:
+            return i
+    return None
+
+def _has_id(refs, ref_type, ref_ids):
+    ''' Check if the given ID is a match. '''
+    for ref in ysp__safe_refs(refs):
+        if ref['type'] != ref_type:
+            continue
+        if ref['id'] not in ref_ids:
+            continue
+        used_map[ref_type][ref['id']] = True
+        return ref
+    return None
+    
+def ysp_should_filter_pkg(opts, pkgname, notice, used_map):
     """ Do the package filtering for should_show and should_keep. """
     
-    def has_id(refs, ref_type, ref_ids):
-        ''' Check if the given ID is a match. '''
-        for ref in ysp__safe_refs(refs):
-            if ref['type'] != ref_type:
-                continue
-            if ref['id'] not in ref_ids:
-                continue
-            used_map[ref_type][ref['id']] = True
-            return ref
-        return None
-    def match_sec_cmd(sec_cmds, pkg, md):
-        for i in sec_cmds:
-            if fnmatch.fnmatch(pkg.name, i):
-                return i
-            if md['update_id'] == i:
-                return i
-        return None
-    
-    rcmd = match_sec_cmd(opts.sec_cmds, pkg, md)
+    rcmd = _match_sec_cmd(opts.sec_cmds, pkgname, notice)
     if rcmd:
         used_map['cmd'][rcmd] = True
-        return md        
-    elif opts.advisory and md['update_id'] in opts.advisory:
-        used_map['id'][md['update_id']] = True
-        return md
-    elif opts.cve and has_id(md['references'], "cve", opts.cve):
-        return md
-    elif opts.bz and has_id(md['references'], "bugzilla", opts.bz):
-        return md
+        return True
+    elif opts.advisory and notice['update_id'] in opts.advisory:
+        used_map['id'][notice['update_id']] = True
+        return True
+    elif opts.cve and _has_id(notice['references'], "cve", opts.cve):
+        return True
+    elif opts.bz and _has_id(notice['references'], "bugzilla", opts.bz):
+        return True
     elif opts.security:
-        if md['type'] == 'security':
-            return md
+        if notice['type'] == 'security':
+            return True
     elif not (opts.advisory or opts.cve or opts.bz or opts.security or \
               opts.sec_cmds):
-        return md # This is only possible from should_show_pkg
-    return None
+        return True # This is only possible from should_show_pkg
+    return False
 
 def ysp_has_info_md(rname, md):
     if rname == "security":
@@ -113,16 +131,15 @@ def ysp_has_info_md(rname, md):
             continue
         return md
 
-def ysp_should_show_pkg(opts, pkg, md, used_map, rname=None):
+def ysp_should_show_pkgtup(opts, pkgtup, md_info, used_map, rname=None):
     """ Do we want to show this package in list-security. """
     
-    md = md.get_notice((pkg.name, pkg.ver, pkg.rel))
-    if not md:
-        return None
-
-    if rname and not ysp_has_info_md(rname, md):
-        return None
-    return ysp_should_filter_pkg(opts, pkg, md, used_map)
+    name = pkgtup[0]
+    for (pkgtup, notice) in md_info.get_applicable_notices(pkgtup):
+        if rname and not ysp_has_info_md(rname, notice):
+            continue
+        if ysp_should_filter_pkg(opts, name, notice, used_map):
+            yield (pkgtup, notice)
 
 def ysp_gen_used_map(opts):
     used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}, 'cmd' : {}}
@@ -150,7 +167,7 @@ def ysp_chk_used_map(used_map, msg):
         if not used_map['cve'][i]:
             msg('CVE \"%s\" not found applicable for this system' % i)
 
-class SecurityListCommands:
+class SecurityListCommand:
     def getNames(self):
         return ['list-security', 'list-sec']
 
@@ -163,33 +180,28 @@ class SecurityListCommands:
     def doCheck(self, base, basecmd, extcmds):
         pass
 
-    def getRepos(self): # so we can act as a "conduit"
-        return self.repos
-
-    def show_pkg(self, msg, pkg, md, disp=None):
+    def show_pkg(self, msg, pkg, notice, disp=None):
         # Make the list view much smaller
         # ysp_show_pkg_md_info(pkg, md, msg)
-        if disp and ysp_has_info_md(disp, md):
-            for ref in ysp__safe_refs(md['references']):
+        if disp and ysp_has_info_md(disp, notice):
+            for ref in ysp__safe_refs(notice['references']):
                 if ref['type'] != disp:
                     continue
-                msg(" %s %-8s %s" % (str(ref['id']), md['type'], pkg))
+                msg(" %s %-8s %s" % (str(ref['id']), notice['type'], pkg))
         else:
-            msg("%s %-8s %s" % (md['update_id'], md['type'], pkg))
+            msg("%s %-8s %s" % (notice['update_id'], notice['type'], pkg))
 
     def show_pkg_exit(self):
         pass
             
     def doCommand(self, base, basecmd, extcmds):
-        ygh = base.doPackageLists('updates')
         self.repos = base.repos
-        md_info = ysp_gen_metadata(self)
+        md_info = ysp_gen_metadata(self.repos.listEnabled())
         logger = logging.getLogger("yum.verbose.main")
         def msg(x):
             logger.log(logginglevels.INFO_2, x)
 
         opts, cmdline = base.plugins.cmdline
-        ygh.updates.sort(key=lambda x: x.name)
         filt_type = None
         show_type = None
         if len(extcmds) >= 1:
@@ -225,44 +237,146 @@ class SecurityListCommands:
             
         opts.sec_cmds = extcmds
         used_map = ysp_gen_used_map(opts)
-        for pkg in ygh.updates:
-            md = ysp_should_show_pkg(opts, pkg, md_info, used_map,
-                                     filt_type)
-            if not md:
-                continue
-            self.show_pkg(msg, pkg, md, show_type)
+        name2tup = _get_name2oldpkgtup(base)
+        for pkgname in sorted(name2tup):
+            for (pkgtup, notice) in ysp_should_show_pkgtup(opts,
+                                                           name2tup[pkgname],
+                                                           md_info,
+                                                           used_map, filt_type):
+                d = {}
+                (d['n'], d['a'], d['e'], d['v'], d['r']) = pkgtup
+                if d['e'] is None: d['e'] = '0'
+                self.show_pkg(msg, "%(n)s-%(e)s:%(v)s-%(r)s.%(a)s" % d,
+                              notice, show_type)
         ysp_chk_used_map(used_map, msg)
 
         self.show_pkg_exit()
         return 0, [basecmd + ' done']
             
-class SecurityInfoCommands(SecurityListCommands):
+class SecurityInfoCommand(SecurityListCommand):
     show_pkg_info_done = {}
     def getNames(self):
         return ['info-security', 'info-sec']
 
-    def show_pkg(self, msg, pkg, md, disp=None):
-        if md['update_id'] in self.show_pkg_info_done:
+    def show_pkg(self, msg, pkg, notice, disp=None):
+        if notice['update_id'] in self.show_pkg_info_done:
             return
-        self.show_pkg_info_done[md['update_id']] = True
-        msg(md)
+        self.show_pkg_info_done[notice['update_id']] = True
+        # Python-2.4.* doesn't understand str(x) returning unicode *sigh*
+        obj = notice.__str__()
+        msg(obj)
     
     def show_pkg_exit(self):
         self.show_pkg_info_done = {}
-            
+
+# "Borrowed" from yumcommands.py
+def yumcommands_checkRootUID(base):
+    """
+    Verify that the program is being run by the root user.
+
+    @param base: a YumBase object.
+    """
+    if base.conf.uid != 0:
+        base.logger.critical('You need to be root to perform this command.')
+        raise CliError
+def yumcommands_checkGPGKey(base):
+    if not base.gpgKeyCheck():
+        for repo in base.repos.listEnabled():
+            if repo.gpgcheck != 'false' and repo.gpgkey == '':
+                msg = """
+You have enabled checking of packages via GPG keys. This is a good thing. 
+However, you do not have any GPG public keys installed. You need to download
+the keys for packages you wish to install and install them.
+You can do that by running the command:
+    rpm --import public.gpg.key
+
+
+Alternatively you can specify the url to the key you would like to use
+for a repository in the 'gpgkey' option in a repository section and yum 
+will install it for you.
+
+For more information contact your distribution or package provider.
+"""
+                base.logger.critical(msg)
+                raise CliError
+
+#  We need the list of installed pkgs, that are going to be updated
+# (by default). Then we match their names to the above.
+def _get_name2oldpkgtup(base):
+    oupdates = map(lambda x: x[1], base.up.getUpdatesTuples())
+    name2tup = {}
+    for pkgtup in oupdates: # Get the latest "old" pkgtups
+        if (pkgtup[0] in name2tup and
+            _rpm_tup_vercmp(name2tup[pkgtup[0]], pkgtup) > 0):
+            continue
+        name2tup[pkgtup[0]] = pkgtup
+    return name2tup
+
+class SecurityUpdateCommand:
+    def getNames(self):
+        return ['update-minimal']
+
+    def getUsage(self):
+        return "[PACKAGE-wildcard]"
+
+    def getSummary(self):
+        return "Works like update, but goes to the 'newest' package match which fixes a problem that affects your system"
+
+    def doCheck(self, base, basecmd, extcmds):
+        yumcommands_checkRootUID(base)
+        yumcommands_checkGPGKey(base)
+
+    def doCommand(self, base, basecmd, extcmds):
+        md_info       = ysp_gen_metadata(base.repos.listEnabled())
+        opts          = base.plugins.cmdline[0]
+        opts.sec_cmds = []
+        used_map      = ysp_gen_used_map(opts)
+
+        # Minimal on it's own is "just security"
+        if not (opts.security or opts.advisory or opts.bz or opts.cve):
+            opts.security = True
+
+        # NOTE: Not doing obsoletes processing atm. ... maybe we should? --
+        # Also worth pointing out we don't go backwards for obsoletes in the:
+        # update --security case etc.
+
+        # obsoletes = base.up.getObsoletesTuples(newest=False)
+        # for (obsoleting, installed) in sorted(obsoletes, key=lambda x: x[0]):
+        #   pass
+
+        # Tuples == (n, a, e, v, r)
+        oupdates  = map(lambda x: x[1], base.up.getUpdatesTuples())
+        for oldpkgtup in sorted(oupdates):
+            for (pkgtup, notice) in md_info.get_applicable_notices(oldpkgtup):
+                if extcmds and not _match_sec_cmd(extcmds, pkgtup[0], notice):
+                    continue
+                if not ysp_should_filter_pkg(opts, pkgtup[0], notice, used_map):
+                    continue
+                base.update(name=pkgtup[0], arch=pkgtup[1], epoch=pkgtup[2],
+                            version=pkgtup[3], release=pkgtup[4])
+                break
+
+        if len(base.tsInfo) > 0:
+            msg = '%d packages marked for minimal Update' % len(base.tsInfo)
+            return 2, [msg]
+        else:
+            return 0, ['No Packages marked for minimal Update']
+
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
     Setup the option parser with the '--advisory', '--bz', '--cve', and
-    '--security' command line options. And the 'sec-list' command.
+    '--security' command line options. And the 'list-security',
+    'info-security', and 'update-minimal' commands.
     '''
 
     parser = conduit.getOptParser()
     if not parser:
         return
 
-    conduit.registerCommand(SecurityListCommands())
-    conduit.registerCommand(SecurityInfoCommands())
+    conduit.registerCommand(SecurityListCommand())
+    conduit.registerCommand(SecurityInfoCommand())
+    conduit.registerCommand(SecurityUpdateCommand())
     parser.values.advisory = []
     parser.values.cve      = []
     parser.values.bz       = []
@@ -300,14 +414,13 @@ def config_hook(conduit):
 #
 # __but__ that doesn't work for lists ... so we do it two ways
 #
-def ysp_should_keep_pkg(opts, pkg, md, used_map):
+def ysp_should_keep_pkg(opts, pkgtup, md_info, used_map):
     """ Do we want to keep this package to satisfy the security limits. """
-    
-    md = md.get_notice((pkg.name, pkg.ver, pkg.rel))
-    if not md:
-        return False
-    
-    return ysp_should_filter_pkg(opts, pkg, md, used_map)
+    name = pkgtup[0]
+    for (pkgtup, notice) in md_info.get_applicable_notices(pkgtup):
+        if ysp_should_filter_pkg(opts, name, notice, used_map):
+            return True
+    return False
 
 def ysp_check_func_enter(conduit):
     """ Stuff we need to do in both list and update modes. """
@@ -323,6 +436,11 @@ def ysp_check_func_enter(conduit):
         if ((args[0] == "info") and (args[1] == "updates")):
             ret = {"skip": ndata, "list_cmd": True}
     if len(args):
+
+        # All the args. stuff is done in our command:
+        if (args[0] == "update-minimal"):
+            return (opts, {"skip": True, "list_cmd": False, "msg": True})
+            
         if (args[0] == "check-update"):
             ret = {"skip": ndata, "list_cmd": True}
         if (args[0] in ["update", "upgrade"]):
@@ -356,7 +474,7 @@ def exclude_hook(conduit):
     
     conduit.info(2, 'Limiting package lists to security relevant ones')
     
-    md_info = ysp_gen_metadata(conduit)
+    md_info = ysp_gen_metadata(conduit.getRepos().listEnabled())
 
     def ysp_del_pkg(pkg):
         """ Deletes a package from all trees that yum knows about """
@@ -366,22 +484,28 @@ def exclude_hook(conduit):
 
     opts.sec_cmds = []
     used_map = ysp_gen_used_map(opts)
+
     # The official API is:
     #
     # pkgs = conduit.getPackages()
     #
     # ...however that is _extremely_ slow, deleting all packages. So we ask
-    # for the list of update packages, which is all we care about.
+    # for the list of update packages, which is all we care about.    
     upds = conduit._base.doPackageLists(pkgnarrow='updates')
     pkgs = upds.updates
+
+    name2tup = _get_name2oldpkgtup(conduit._base)
+    
     tot = 0
     cnt = 0
     for pkg in pkgs:
         tot += 1
-        if ysp_should_keep_pkg(opts, pkg, md_info, used_map):
-            cnt += 1
-        else:
+        name = pkg.name
+        if (name not in name2tup or
+            not ysp_should_keep_pkg(opts, name2tup[name], md_info, used_map)):
             ysp_del_pkg(pkg)
+            continue
+        cnt += 1
 
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     if cnt:
@@ -404,7 +528,7 @@ def preresolve_hook(conduit):
     
     conduit.info(2, 'Limiting packages to security relevant ones')
 
-    md_info = ysp_gen_metadata(conduit)
+    md_info = ysp_gen_metadata(conduit.getRepos().listEnabled())
 
     def ysp_del_pkg(tspkg):
         """ Deletes a package within a transaction. """
@@ -417,13 +541,18 @@ def preresolve_hook(conduit):
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
     tspkgs = tsinfo.getMembers()
-    # Ok, here we keep any pkgs that pass "ysp" tests, then we keep all
+    #  Ok, here we keep any pkgs that pass "ysp" tests, then we keep all
     # related pkgs ... Ie. "installed" version marked for removal.
     keep_pkgs = set()
+
+    name2tup = _get_name2oldpkgtup(conduit._base)
     for tspkg in tspkgs:
         tot += 1
-        if ysp_should_keep_pkg(opts, tspkg.po, md_info, used_map):
-            keep_pkgs.add(tspkg.po)
+        name = tspkg.po.name
+        if (name not in name2tup or
+            not ysp_should_keep_pkg(opts, name2tup[name], md_info, used_map)):
+            continue
+        keep_pkgs.add(tspkg.po)
 
     scnt = len(keep_pkgs)
     mini_depsolve_again = True
