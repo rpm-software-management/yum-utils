@@ -59,6 +59,7 @@ maxhostfileage = 10
 loadcache = False
 maxthreads = 15
 exclude = None
+downgrade_ftp = True
 done_sock_timeout = False
 done_repos = set()
 
@@ -86,7 +87,7 @@ def init_hook(conduit):
 
     """
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
-    global maxthreads, exclude
+    global maxthreads, exclude, downgrade_ftp
     verbose = conduit.confBool('main', 'verbose', default=False)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
@@ -94,6 +95,7 @@ def init_hook(conduit):
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
+    downgrade_ftp = conduit.confBool('main', 'downgrade_ftp', default=True)
     # If the file hostfilepath exists and is newer than the maxhostfileage,
     # then load the cache.
     if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
@@ -120,6 +122,15 @@ def _can_write_results(fname):
             return False
 
     return os.access(fname, os.W_OK)
+
+def _len_non_ftp(urls):
+    ''' Count the number of urls, which aren't ftp. '''
+    num = 0
+    for url in urls:
+        if url.startswith("ftp:"):
+            continue
+        num += 1
+    return 0
 
 def postreposetup_hook(conduit):
     """
@@ -162,6 +173,8 @@ def postreposetup_hook(conduit):
     for repo in repos.listEnabled():
         if repo.id in done_repos:
             continue
+        if downgrade_ftp and _len_non_ftp(repo.urls) == 1:
+            continue
         if len(repo.urls) == 1:
             continue
         all_urls.extend(repo.urls)
@@ -171,9 +184,12 @@ def postreposetup_hook(conduit):
     for repo in repos.listEnabled():
         if repo.id in done_repos:
             continue
+        if downgrade_ftp and _len_non_ftp(repo.urls) == 1:
+            repo.urls = sorted(repo.urls, reverse=True) # ftp comes before http
+            continue
         if len(repo.urls) == 1:
             continue
-        if not repomirrors.has_key(str(repo)):
+        if str(repo) not in repomirrors:
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         if exclude:
             for mirror in repomirrors[str(repo)]:
@@ -239,7 +255,7 @@ def write_timedhosts():
     global timedhosts
     try:
         hostfile = file(hostfilepath, 'w')
-        for host in timedhosts.keys():
+        for host in timedhosts:
             hostfile.write('%s %s\n' % (host, timedhosts[host]))
         hostfile.close()
     except IOError:
@@ -338,13 +354,18 @@ class FastestMirror:
                 del self.threads[0]
 
             mhost = host(mirror)
-            if timedhosts.has_key(mhost):
+            if downgrade_ftp and mirror.startswith("ftp:"):
+                # One less than "dead"
+                self._add_result(mirror, mhost, 99999999998)
+                continue
+
+            if mhost in timedhosts:
                 result = timedhosts[mhost]
                 if verbose:
                     print "%s already timed: %s" % (mhost, result)
                 self._add_result(mirror, mhost, result)
-            elif mhost == "127.0.0.1":
-                self._add_result(mirror, mhost, result)
+            elif mhost in ("127.0.0.1", "::1", "localhost"):
+                self._add_result(mirror, mhost, 0)
             else:
                 # No cached info. so spawn a thread and find the info. out
                 self._init_lock()
@@ -429,12 +450,12 @@ class PollThread(threading.Thread):
             - L{FastestMirror._poll_mirrors()}
         """
         try:
-            if timedhosts.has_key(self.host):
+            if self.host in timedhosts:
                 result = timedhosts[self.host]
                 if verbose:
                     print "%s already timed: %s" % (self.host, result)
             else:
-                if self.host == "127.0.0.1" :
+                if self.host in ("127.0.0.1", "::1", "localhost"):
                     result = 0
                 else:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
