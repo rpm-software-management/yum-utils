@@ -45,11 +45,19 @@ def exclude_hook(conduit):
     except urlgrabber.grabber.URLGrabError, e:
         raise PluginYumExit('Unable to read version lock configuration: %s' % e)
 
-    for pkg in locklist:
-        (n, v, r, e, a) = splitFilename("%s" % pkg)
+    pkgs = {}
+    for ent in locklist:
+        (n, v, r, e, a) = splitFilename(ent)
         if e == '': 
             e = '0'
-        for pkg in vl_search(conduit, n):
-            if compareEVR((pkg.epoch, pkg.version, pkg.release), (e, v, r)):
+        pkgs.setdefault(n, []).append((e, v, r))
+
+    for pkgname in pkgs:
+        for pkg in vl_search(conduit, pkgname):
+            found = False
+            for tup in pkgs[pkgname]:
+                if not compareEVR((pkg.epoch, pkg.version, pkg.release), tup):
+                    found = True
+            if not found:
                 conduit.delPackage(pkg)
                 conduit.info(5, 'Excluding package %s due to version lock' % pkg)
