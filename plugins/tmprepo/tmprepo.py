@@ -34,36 +34,34 @@ import os
 import shutil
 import time
 
+from yum.config import CaselessSelectionOption
+
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
 def make_validate(log, gpgcheck):
     def tvalidate(repo):
-        if gpgcheck.lower() not in ('false', 'no', '0'):
+        if gpgcheck != 'none':
 
-            if gpgcheck.lower() not in ('packages', 'pkgs',
-                                        '1', 'yes', 'true',
-                                        'repo', 'repository'):
+            if gpgcheck not in ('packages', 'all', 'repo'):
                 log.warn("GPGcheck set to unknown value: %s" % gpgcheck)
                 return False
 
-            if repo.gpgcheck not in ('packages', 'true', 'repo'):
+            if repo.gpgcheck not in ('packages', 'all', 'repo'):
                 log.warn("Repo %s GPGcheck set to unknown value: %s" %
                          (repo, gpgcheck))
                 return False
 
             # Don't ever allow them to set gpgcheck='false'
-            if repo.gpgcheck == 'false':
+            if repo.gpgcheck == 'none':
                 log.warn("Repo %s tried to set gpgcheck=false" % repo)
                 return False
 
             # Now do the more complicated comparisons...
-            if (gpgcheck.lower() in ('packages', 'pkgs', '1', 'yes', 'true') and
-                repo.gpgcheck == 'repo'):
+            if gpgcheck() in ('packages', 'all') and repo.gpgcheck == 'repo':
                 log.warn("Repo %s tried to set gpgcheck=repository" % repo)
                 return False
-            if (gpgcheck.lower() in ('repository', 'repo', '1', 'yes', 'true') and
-                repo.gpgcheck == 'packages'):
+            if gpgcheck in ('repo', 'all') and repo.gpgcheck == 'packages':
                 log.warn("Repo %s tried to set gpgcheck=packages" % repo)
                 return False
             
@@ -194,8 +192,25 @@ def config_hook(conduit):
                       help="keep created direcotry based tmp. repos.")
     #  We default to repository for actual repo files, because that's the most
     # secure, but packages for local dirs./files
-    rgpgcheck  = conduit.confString('main', 'remote_gpgcheck', default='repo')
+    rgpgcheck = conduit.confString('main', 'remote_gpgcheck', default='repo')
     lgpgcheck = conduit.confString('main', 'local_gpgcheck', default='packages')
+
+    rgpgcheck = CaselessSelectionOption('none',
+                                       ('none', 'all', 'packages', 'repo'),
+                                       {'0'          : 'none',
+                                        'no'         : 'none',
+                                        '1'          : 'all',
+                                        'yes'        : 'all',
+                                        'pkgs'       : 'packages',
+                                        'repository' : 'repo'}).parse(rgpgcheck)
+    lgpgcheck = CaselessSelectionOption('none',
+                                       ('none', 'all', 'packages', 'repo'),
+                                       {'0'          : 'none',
+                                        'no'         : 'none',
+                                        '1'          : 'all',
+                                        'yes'        : 'all',
+                                        'pkgs'       : 'packages',
+                                        'repository' : 'repo'}).parse(lgpgcheck)
     def_tmp_repos_cleanup = conduit.confBool('main', 'cleanup', default=False)
 
 _tmprepo_done = False
