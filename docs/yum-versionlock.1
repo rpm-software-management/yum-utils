@@ -1,0 +1,42 @@
+.\" PROCESS THIS FILE WITH
+.\" groff -man -Tascii yum-versionlock.1
+.\"
+.TH YUM-VERSIONLOCK 1 "27 JULY 2008" "" "User Manuals"
+.SH NAME
+.B yum-versionlock
+.SH SYNOPSIS
+The
+.B yum-versionlock
+package
+.SH DESCRIPTION
+.BR yum-versionlock(1)
+is a Yum plugin that takes a set of name/versions for packages and excludes all
+other versions of those packages (including optionally following obsoletes).
+This allows you to protect packages from being updated by newer versions,
+for example.
+.SH FILES
+.I /etc/yum/pluginconf.d/versionlock.conf
+.RS
+The system wide configuration file. See
+.BR yum-versionlock.conf(5)
+for more information.
+.RE
+.I /etc/yum/pluginconf.d/versionlock.list
+.RS
+The default place to put package version lock information (one package and
+version per. line).
+.RE
+.SH BUGS
+If you happen to run across a bug, you can report it via yum@lists.linux.duke.edu or filed in bugzilla.
+.SH AVAILABILITY
+yum-versionlock is available via:
+.nf
+# yum install yum-versionlock
+.fi
+.SH AUTHORS
+.RS
+Panu Matilainen <pmatilai@laiskiainen.org>
+.br
+James Antill <james@and.org>
+.SH "SEE ALSO"
+.BR yum(1)

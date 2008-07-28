@@ -74,8 +74,10 @@ Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-versionlock
-This plugin allows certain packages specified in a file to be protected from being updated by
-newer versions.
+This plugin takes a set of name/versions for packages and excludes all other
+versions of those packages (including optionally following obsoletes). This
+allows you to protect packages from being updated by newer versions,
+for example.
 
 %package -n yum-tsflags
 Summary: Yum plugin to add tsflags by a commandline option
@@ -357,6 +359,8 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.list
 /usr/lib/yum-plugins/versionlock.*
+%{_mandir}/man1/yum-versionlock.1.*
+%{_mandir}/man5/yum-versionlock.conf.5.*
 
 %files -n yum-tsflags
 %defattr(-, root, root)

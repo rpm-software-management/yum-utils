@@ -1,0 +1,51 @@
+.\" PROCESS THIS FILE WITH
+.\" groff -man -Tascii yum-changelog.conf.5
+.\"
+.TH YUM-VERSIONLOCK.CONF 5 "27 JULY 2008" "" "File Formats"
+.SH NAME
+.B yum-versionlock.conf(5)
+
+.SH SYNOPSIS
+.B yum-versionlock.conf(5)
+is the configuration file for
+.B yum-versionlock(1)
+Yum plugin for excluding packages that aren't listed in the versionlock file.
+The plugin will walk each line of the versionlock file, parse out the name
+and version of the package. It will then exclude any package by that name that
+doesn't match one of the versions listed within the file (or, optionally, any
+obsoleter of that package).
+This is basically the same as doing an exclude for the package name itself (as
+you cannot exclude installed packages), but yum will still see the versions you
+have installed/versionlocked as available so that "yum reinstall" will still
+work, etc.
+.SH FILES
+.I /etc/yum/pluginconf.d/versionlock.conf
+.SH FILE FORMAT
+.B yum-versionlock.conf(5)
+utilizes configuration options in the form of
+.IP OPTION=VALUE
+.SH OPTION
+.IP follow_obsoletes
+This option is a boolean flag which specifies if the versionlock plugin should
+look at all the obsoletes, and see if any of the packages specified have an
+obsoleter. If an obsoleter is found then all versions of that package will be
+excluded. This option is off by default, as
+.B yum-versionlock(1)
+will take some time to do the obsoletes processing, and for non-rename
+obsoletes any issues you had which kept you at a specific version of a package
+should be different with another package.
+.SH OPTION
+.IP locklist
+This option is a string with points to the file which will have the versionlock
+information in it. Note that the file
+.B has
+to exist (or the versionlock plugin will make yum exit). However it can be
+empty.
+.SH AUTHOR
+.RS
+Chitlesh Goorah <chitlesh@fedoraproject.org>
+.br
+James Antill <james@fedoraproject.org>
+.RS
+.SH SEE ALSO
+.BR yum-versionlock(1)
