@@ -52,6 +52,17 @@ def exclude_hook(conduit):
             e = '0'
         pkgs.setdefault(n, []).append((e, v, r))
 
+    if conduit.confBool('main', 'follow_obsoletes', default=False):
+        #  If anything obsoletes something that we have versionlocked ... then
+        # remove all traces of that too.
+        obs = conduit._base.pkgSack.returnObsoletes()
+        for ob in obs:
+            for po in obs[ob]:
+                if po.name not in pkgs:
+                    continue
+                # If anyone versions a pkg this, they need a good kicking
+                pkgs.setdefault(ob[0], []).append(('0', '0', '0'))
+
     for pkgname in pkgs:
         for pkg in vl_search(conduit, pkgname):
             found = False
