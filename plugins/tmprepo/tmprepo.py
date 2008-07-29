@@ -195,22 +195,18 @@ def config_hook(conduit):
     rgpgcheck = conduit.confString('main', 'remote_gpgcheck', default='repo')
     lgpgcheck = conduit.confString('main', 'local_gpgcheck', default='packages')
 
-    rgpgcheck = CaselessSelectionOption('none',
+    opt_gpg  = CaselessSelectionOption('all',
                                        ('none', 'all', 'packages', 'repo'),
                                        {'0'          : 'none',
                                         'no'         : 'none',
+                                        'false'      : 'none',
                                         '1'          : 'all',
                                         'yes'        : 'all',
+                                        'true'       : 'all',
                                         'pkgs'       : 'packages',
-                                        'repository' : 'repo'}).parse(rgpgcheck)
-    lgpgcheck = CaselessSelectionOption('none',
-                                       ('none', 'all', 'packages', 'repo'),
-                                       {'0'          : 'none',
-                                        'no'         : 'none',
-                                        '1'          : 'all',
-                                        'yes'        : 'all',
-                                        'pkgs'       : 'packages',
-                                        'repository' : 'repo'}).parse(lgpgcheck)
+                                        'repository' : 'repo'}).parse
+    rgpgcheck = opt_gpg(rgpgcheck)
+    lgpgcheck = opt_gpg(lgpgcheck)
     def_tmp_repos_cleanup = conduit.confBool('main', 'cleanup', default=False)
 
 _tmprepo_done = False
