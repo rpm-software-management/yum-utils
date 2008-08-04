@@ -33,6 +33,8 @@
 # yum list-security bugzillas / bzs
 # yum list-security cves
 # yum list-security security / sec
+#
+# yum update-minimal --security
 
 import yum
 import fnmatch
@@ -245,8 +247,11 @@ class SecurityListCommand:
                                                            used_map, filt_type):
                 d = {}
                 (d['n'], d['a'], d['e'], d['v'], d['r']) = pkgtup
-                if d['e'] is None: d['e'] = '0'
-                self.show_pkg(msg, "%(n)s-%(e)s:%(v)s-%(r)s.%(a)s" % d,
+                if d['e'] is None:
+                    d['epoch'] = ''
+                else:
+                    d['epoch'] = "%s:" % d['e']
+                self.show_pkg(msg, "%(n)s-%(epoch)s%(v)s-%(r)s.%(a)s" % d,
                               notice, show_type)
         ysp_chk_used_map(used_map, msg)
 
