@@ -137,7 +137,7 @@ def ysp_should_show_pkgtup(opts, pkgtup, md_info, used_map, rname=None):
     """ Do we want to show this package in list-security. """
     
     name = pkgtup[0]
-    for (pkgtup, notice) in md_info.get_applicable_notices(pkgtup):
+    for (pkgtup, notice) in reversed(md_info.get_applicable_notices(pkgtup)):
         if rname and not ysp_has_info_md(rname, notice):
             continue
         if ysp_should_filter_pkg(opts, name, notice, used_map):
