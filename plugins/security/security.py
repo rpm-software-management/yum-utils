@@ -332,9 +332,7 @@ class SecurityUpdateCommand:
         opts.sec_cmds = []
         used_map      = ysp_gen_used_map(opts)
 
-        # Minimal on it's own is "just security"
-        if not (opts.security or opts.advisory or opts.bz or opts.cve):
-            opts.security = True
+        ndata = not (opts.security or opts.advisory or opts.bz or opts.cve)
 
         # NOTE: Not doing obsoletes processing atm. ... maybe we should? --
         # Also worth pointing out we don't go backwards for obsoletes in the:
@@ -347,10 +345,16 @@ class SecurityUpdateCommand:
         # Tuples == (n, a, e, v, r)
         oupdates  = map(lambda x: x[1], base.up.getUpdatesTuples())
         for oldpkgtup in sorted(oupdates):
-            for (pkgtup, notice) in md_info.get_applicable_notices(oldpkgtup):
-                if extcmds and not _match_sec_cmd(extcmds, pkgtup[0], notice):
+            data = md_info.get_applicable_notices(oldpkgtup)
+            if ndata: # No options means pick the oldest update
+                data.reverse()
+
+            for (pkgtup, notice) in data:
+                name = pkgtup[0]
+                if extcmds and not _match_sec_cmd(extcmds, name, notice):
                     continue
-                if not ysp_should_filter_pkg(opts, pkgtup[0], notice, used_map):
+                if (not ndata and
+                    not ysp_should_filter_pkg(opts, name, notice, used_map)):
                     continue
                 base.update(name=pkgtup[0], arch=pkgtup[1], epoch=pkgtup[2],
                             version=pkgtup[3], release=pkgtup[4])
