@@ -247,7 +247,7 @@ class SecurityListCommand:
                                                            used_map, filt_type):
                 d = {}
                 (d['n'], d['a'], d['e'], d['v'], d['r']) = pkgtup
-                if d['e'] is None:
+                if d['e'] == '0':
                     d['epoch'] = ''
                 else:
                     d['epoch'] = "%s:" % d['e']
