@@ -117,9 +117,12 @@ class YumBuildDep(YumUtilBase):
             exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), srcnames, casematch=1)
             srpms += exact + match
             
-            if len(unmatch) > 0:
-                self.logger.error("No such package(s): %s" % ", ".join(unmatch))
-                sys.exit(1)
+            if len(unmatch):
+                exact, match, unmatch = yum.packages.parsePackages(self.rpmdb.returnPackages(), unmatch, casematch=1)
+                if len(unmatch):
+                    self.logger.error("No such package(s): %s" %
+                                      ", ".join(unmatch))
+                    sys.exit(1)
 
         for srpm in srpms:
             for dep in srpm.requiresList():
