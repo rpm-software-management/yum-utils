@@ -21,6 +21,7 @@ from yum.misc import getCacheDir, checksum
 import urlparse
 from yum import Errors
 from optparse import OptionParser
+import ConfigParser
 
 ####
 # take a file path to a repo as an option, verify all the metadata vs repomd.xml
@@ -69,7 +70,43 @@ def checkfileurl(pkg):
     
     return True
 
+def treeinfo_checksum(treeinfo):
+    # read treeinfo file into cp
+    # take checksums section
+    cp = ConfigParser.ConfigParser()
+    try:
+        cp.read(treeinfo)
+    except ConfigParser.MissingSectionHeaderError:
+        # Generally this means we failed to access the file
+        print "  could not find sections in treeinfo file %s" % treeinfo
+        return
+    except ConfigParser.Error:
+        print "  could not parse treeinfo file %s" % treeinfo
+        return
+    
+    if not cp.has_section('checksums'):
+        print "  no checksums section in treeinfo file %s" % treeinfo
+        return
+    
+    dir_path = os.path.dirname(treeinfo)
+    for opt in cp.options('checksums'):
 
+        fnpath = dir_path + '/%s' % opt
+        fnpath = os.path.normpath(fnpath)
+        csuminfo = cp.get('checksums', opt).split(':')
+        if len(csuminfo) < 2:
+            print "  checksum information doesn't make any sense for %s." % opt
+            continue
+
+        if not os.path.exists(fnpath):
+            print "  cannot find file %s listed in treeinfo" % fnpath
+            continue
+        
+        csum = checksum(csuminfo[0], fnpath)
+        if csum != csuminfo[1]:
+            print "  file %s %s does not match:\n   ondisk %s vs treeinfo: %s" % (opt, csuminfo[0], csum, csuminfo[1])
+            continue
+    
 def main():
     parser = OptionParser()
     parser.usage = """
@@ -81,6 +118,8 @@ def main():
             help="Check all packages in the repo")
     parser.add_option("-t","--testopia",action="store",type="int",
             help="Report results to the given testopia run number")
+    parser.add_option("-r","--treeinfo", action="store_true", default=False,
+            help="check the checksums of listed files in a .treeinfo file, if available")
     opts, args = parser.parse_args()
     if not args: 
         print "Must provide a file url to the repo"
@@ -198,6 +237,12 @@ def main():
             report('COMPS','FAILED')
         else:
             report('COMPS','PASSED')
+
+    # if we've got a .treeinfo file and we are told to check it, then do so
+    tr_path = basedir + '/.treeinfo'
+    if opts.treeinfo and os.path.exists(tr_path):
+        print "Checking checksums of files in .treeinfo"
+        treeinfo_checksum(tr_path)
 
     sack = []
     packages_ok = True
