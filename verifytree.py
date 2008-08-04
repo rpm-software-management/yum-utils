@@ -73,20 +73,21 @@ def checkfileurl(pkg):
 def treeinfo_checksum(treeinfo):
     # read treeinfo file into cp
     # take checksums section
+    result = 0
     cp = ConfigParser.ConfigParser()
     try:
         cp.read(treeinfo)
     except ConfigParser.MissingSectionHeaderError:
         # Generally this means we failed to access the file
         print "  could not find sections in treeinfo file %s" % treeinfo
-        return
+        return BAD_IMAGES
     except ConfigParser.Error:
         print "  could not parse treeinfo file %s" % treeinfo
-        return
+        return BAD_IMAGES
     
     if not cp.has_section('checksums'):
         print "  no checksums section in treeinfo file %s" % treeinfo
-        return
+        return BAD_IMAGES
     
     dir_path = os.path.dirname(treeinfo)
     for opt in cp.options('checksums'):
@@ -96,16 +97,21 @@ def treeinfo_checksum(treeinfo):
         csuminfo = cp.get('checksums', opt).split(':')
         if len(csuminfo) < 2:
             print "  checksum information doesn't make any sense for %s." % opt
+            result = BAD_IMAGES
             continue
 
         if not os.path.exists(fnpath):
             print "  cannot find file %s listed in treeinfo" % fnpath
+            result = BAD_IMAGES
             continue
         
         csum = checksum(csuminfo[0], fnpath)
         if csum != csuminfo[1]:
             print "  file %s %s does not match:\n   ondisk %s vs treeinfo: %s" % (opt, csuminfo[0], csum, csuminfo[1])
+            result = BAD_IMAGES
             continue
+    
+    return result
     
 def main():
     parser = OptionParser()
@@ -142,6 +148,8 @@ def main():
     if url[-1] != '/':
         url += '/'
 
+    basedir = url.replace('file://', '') # for a normal path thing
+
     my = yum.YumBase()
     my.conf.cachedir = getCacheDir()
     my.repos.disableRepo('*')
@@ -168,30 +176,6 @@ def main():
         report = lambda case,result: testopia_report(run_id,case,result)
     else:
         report = lambda case,result: None
-
-    # Check boot images (independent of metadata)
-    print "Checking boot images:"
-    images_ok = True
-    basedir = url.replace('file://', '')
-    imagedir = basedir + 'images/'
-    for filename in ("boot.iso", "stage2.img"):
-        fullpath = imagedir + filename
-        try:
-            f = open(fullpath)
-            data = f.read(1024)
-            f.close()
-            if len(data) < 1024:
-                raise IOError
-            print "  verifying %s is a non-empty file" % filename
-        except IOError, OSError:
-            print "  verifying %s FAILED: missing or unreadable" % filename
-            images_ok = False
-
-    if images_ok:
-        report('BOOT_IMAGES','PASSED')
-    else:
-        report('BOOT_IMAGES','FAILED')
-        retval = retval | BAD_IMAGES
 
 
     # Check the metadata
@@ -242,7 +226,8 @@ def main():
     tr_path = basedir + '/.treeinfo'
     if opts.treeinfo and os.path.exists(tr_path):
         print "Checking checksums of files in .treeinfo"
-        treeinfo_checksum(tr_path)
+        tr_val = treeinfo_checksum(tr_path)
+        retval = tr_val | retval
 
     sack = []
     packages_ok = True
