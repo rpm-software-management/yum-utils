@@ -115,6 +115,8 @@ def parseArgs():
         help="Output as little as possible")
     parser.add_option("-l", "--plugins", default=False, action="store_true", 
         help="enable yum plugin support")
+    parser.add_option("-m", "--downloadcomps", default=False, action="store_true",
+        help="also download comps.xml")
         
     (opts, args) = parser.parse_args()
     return (opts, args)
@@ -201,6 +203,23 @@ def main():
                 if not opts.quiet:
                     my.logger.info("Removing obsolete %s", pkg)
                 os.unlink(current_pkgs[pkg]['path'])
+
+        if opts.downloadcomps:
+            try: # download comps.xml
+               compsfile = repo.getGroups()
+
+               if not os.path.exists(local_repo_path):
+                   try:
+                       os.makedirs(local_repo_path)
+                   except IOError, e:
+                       my.logger.error("Could not make repo subdir: %s" % e)
+                       my.closeRpmDB()
+                       sys.exit(1)
+    
+               shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
+            except yum.Errors.RepoMDError:
+               if not opts.quiet:
+                  my.logger.error("Unable to fetch comps.xml")
 
         download_list.sort(sortPkgObj)
         n = 0
