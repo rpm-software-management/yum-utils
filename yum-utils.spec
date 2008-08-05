@@ -270,9 +270,31 @@ make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
 # Plugins to install
-plugins="changelog fastestmirror fedorakmod protectbase versionlock tsflags kernel-module \
-         downloadonly allowdowngrade skip-broken priorities refresh-updatesd merge-conf \
-         security protect-packages basearchonly upgrade-helper aliases list-data filter-data tmprepo verify keys"
+plugins="\
+ changelog \
+ fastestmirror \
+ fedorakmod \
+ protectbase \
+ versionlock \
+ tsflags \
+ kernel-module \
+ downloadonly \
+ allowdowngrade \
+ skip-broken \
+ priorities \
+ refresh-updatesd \
+ merge-conf \
+ security \
+ protect-packages \
+ basearchonly \
+ upgrade-helper \
+ aliases \
+ list-data \
+ filter-data \
+ tmprepo \
+ verify \
+ keys \
+"
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 
