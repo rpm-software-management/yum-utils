@@ -15,7 +15,8 @@ yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and
 more powerful to use. These tools include: debuginfo-install, package-cleanup,
 repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
-repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader, yum-debug-dump
+repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader,
+yum-debug-dump
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
