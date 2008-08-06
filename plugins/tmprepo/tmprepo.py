@@ -34,37 +34,22 @@ import os
 import shutil
 import time
 
-from yum.config import CaselessSelectionOption
-
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
-def make_validate(log, gpgcheck):
+def make_validate(log, pkgs_gpgcheck, repo_gpgcheck):
     def tvalidate(repo):
-        if gpgcheck != 'none':
-
-            if gpgcheck not in ('packages', 'all', 'repo'):
-                log.warn("GPGcheck set to unknown value: %s" % gpgcheck)
-                return False
-
-            if repo.gpgcheck not in ('packages', 'all', 'repo'):
-                log.warn("Repo %s GPGcheck set to unknown value: %s" %
-                         (repo, gpgcheck))
-                return False
+        if pkgs_gpgcheck or repo_gpgcheck:
 
             # Don't ever allow them to set gpgcheck='false'
-            if repo.gpgcheck == 'none':
+            if pkgs_gpgcheck and not repo.gpgcheck:
                 log.warn("Repo %s tried to set gpgcheck=false" % repo)
                 return False
 
-            # Now do the more complicated comparisons...
-            if gpgcheck() in ('packages', 'all') and repo.gpgcheck == 'repo':
-                log.warn("Repo %s tried to set gpgcheck=repository" % repo)
+            if repo_gpgcheck and not repo.repo_gpgcheck:
+                log.warn("Repo %s tried to set repo_gpgcheck=false" % repo)
                 return False
-            if gpgcheck in ('repo', 'all') and repo.gpgcheck == 'packages':
-                log.warn("Repo %s tried to set gpgcheck=packages" % repo)
-                return False
-            
+
             # Don't allow them to set gpgkey=anything
             for key in repo.gpgkey:
                 if not key.startswith('file:/'):
@@ -115,7 +100,8 @@ def add_dir_repo(base, trepo, cleanup):
 name=Tmp. repo. for %(path)s
 baseurl=file:%(dname)s
 enabled=1
-gpgcheck=packages
+gpgcheck=true
+repo_gpgcheck=false
 metadata_expire=0
 #  Make cost smaller, as we know it's "local" ... if this isn't good just create
 # your own .repo file. ... then you won't need to createrepo each run either.
@@ -167,15 +153,19 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
     # Just do it all again...
     base.setupProgressCallbacks()
 
-rgpgcheck = 'repo' # Remote 
-lgpgcheck = 'packages'
+rpgpgcheck = True # Remote 
+rrgpgcheck = True # Remote 
+lpgpgcheck = True
+lrgpgcheck = False
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
     Add the --tmprepo option.
     '''
-    global rgpgcheck
-    global lgpgcheck
+    global rpgpgcheck
+    global rrgpgcheck
+    global lpgpgcheck
+    global lrgpgcheck
     global def_tmp_repos_cleanup
     
     parser = conduit.getOptParser()
@@ -192,21 +182,12 @@ def config_hook(conduit):
                       help="keep created direcotry based tmp. repos.")
     #  We default to repository for actual repo files, because that's the most
     # secure, but packages for local dirs./files
-    rgpgcheck = conduit.confString('main', 'remote_gpgcheck', default='repo')
-    lgpgcheck = conduit.confString('main', 'local_gpgcheck', default='packages')
-
-    opt_gpg  = CaselessSelectionOption('all',
-                                       ('none', 'all', 'packages', 'repo'),
-                                       {'0'          : 'none',
-                                        'no'         : 'none',
-                                        'false'      : 'none',
-                                        '1'          : 'all',
-                                        'yes'        : 'all',
-                                        'true'       : 'all',
-                                        'pkgs'       : 'packages',
-                                        'repository' : 'repo'}).parse
-    rgpgcheck = opt_gpg(rgpgcheck)
-    lgpgcheck = opt_gpg(lgpgcheck)
+    rpgpgcheck = conduit.confBool('main', 'pkgs_gpgcheck', default=True)
+    rrgpgcheck = conduit.confBool('main', 'repo_gpgcheck', default=True)
+    lpgpgcheck = conduit.confBool('main', 'pkgs_local_gpgcheck',
+                                  default=rpgpgcheck)
+    lrgpgcheck = conduit.confBool('main', 'repo_local_gpgcheck',
+                                  default=False)
     def_tmp_repos_cleanup = conduit.confBool('main', 'cleanup', default=False)
 
 _tmprepo_done = False
@@ -226,6 +207,6 @@ def prereposetup_hook(conduit):
 
     log = logging.getLogger("yum.verbose.main")
     add_repos(conduit._base, log, opts.tmp_repos,
-              make_validate(log, my_gpgcheck),
-              make_validate(log, my_dgpgcheck),
+              make_validate(log, rpgpgcheck, rrgpgcheck),
+              make_validate(log, lpgpgcheck, lrgpgcheck),
               not (opts.tmp_repos_cleanup or def_tmp_repos_cleanup))
