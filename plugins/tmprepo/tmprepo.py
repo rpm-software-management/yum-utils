@@ -46,7 +46,8 @@ def make_validate(log, pkgs_gpgcheck, repo_gpgcheck):
                 log.warn("Repo %s tried to set gpgcheck=false" % repo)
                 return False
 
-            if repo_gpgcheck and not repo.repo_gpgcheck:
+            if (repo_gpgcheck and hasattr(repo, 'repo_gpgcheck') and
+                not repo.repo_gpgcheck):
                 log.warn("Repo %s tried to set repo_gpgcheck=false" % repo)
                 return False
 
