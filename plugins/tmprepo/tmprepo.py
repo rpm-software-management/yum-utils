@@ -126,6 +126,8 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
     for trepo in tmp_repos:
+        if trepo.startswith("~/"):
+            trepo = "%s%s" % (os.environ['HOME'], trepo[1:])
         if trepo.startswith("/"):
             trepo = "file:%s" % trepo
         validate = tvalidate
