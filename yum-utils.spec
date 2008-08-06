@@ -55,8 +55,8 @@ Group: System Environment/Base
 Requires: yum >= 3.0
 
 %description -n yum-fedorakmod
-Plugin for Yum to handle installation of kmod-foo type of kernel modules, when new kernel versions
-are installed.
+Plugin for Yum to handle installation of kmod-foo type of kernel modules,
+when new kernel versions are installed.
 kmod-foo kernel modules is described by the Fedora Extras packaging standards.
 
 %package -n yum-protectbase
