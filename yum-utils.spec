@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.14
+Version: 1.1.15
 Release: 1%{?dist}
 License: GPL
 Group: Development/Tools
@@ -482,6 +482,8 @@ fi
 /usr/lib/yum-plugins/keys.*
 
 %changelog
+* Thu Aug 7 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.15
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - add verifytree
 
