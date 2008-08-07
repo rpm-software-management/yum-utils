@@ -7,6 +7,9 @@ RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
 WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
 
+NMPROG=yum-NetworkManager-dispatcher
+NMPATH=/etc/NetworkManager/dispatcher.d
+
 clean:
 	rm -f *.pyc *.pyo *~
 	rm -f test/*~
@@ -24,6 +27,8 @@ install:
 	done
 
 	for d in $(SUBDIRS); do make DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
+	mkdir -p $(NMPATH)
+	install -m 755 $(NMPROG) $(NMPATH)
 
 archive:
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz

@@ -261,6 +261,17 @@ Requires: yum >= 3.2.8
 This plugin adds the commands keys, keys-info, keys-data and keys-remove. They
 allow you to query and remove signing keys.
 
+%package -n yum-NetworkManager-dispatcher
+Summary: Yum plugin to deal with changing networks with NetworkManager
+Group: System Environment/Base
+Requires: yum >= 3.2.17
+
+%description -n yum-NetworkManager-dispatcher
+This plugin forces yum to check it's cache if/when a new network connection
+happens in NetworkManager. Note that currently there is no checking of
+previous data, so if your WiFi keeps going up and down (or you suspend/resume
+a lot) yum will recheck it's cached data a lot.
+
 %prep
 %setup -q
 
@@ -480,6 +491,10 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/keys.conf
 /usr/lib/yum-plugins/keys.*
+
+%files -n yum-NetworkManager-dispatcher
+%defattr(-, root, root)
+/etc/NetworkManager/dispatcher.d/*
 
 %changelog
 * Thu Aug 7 2008 Tim Lauridsen <timlau@fedoraproject.org>
