@@ -1,3 +1,319 @@
+2008-08-07  tla@dk.ibm.com <tla@tlaws.local>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.15
+
+2008-08-06  James Antill <james@and.org>
+
+	* yum-utils.spec: Put the tmprepo version back to the right version
+
+
+2008-08-06  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py, yum-utils.spec: Due to repo_gpgcheck
+	we can make tmprepo fully backwards compat.
+
+2008-08-06  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Allow --tmprepo=~/blah/... to be nice
+
+
+2008-08-06  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Fix tmprepo gpgcheck to use the new
+	new, config.
+
+2008-08-06  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix minor text overflow in yum-fedorakmod specfile
+	description
+
+2008-08-05  James Antill <james@and.org>
+
+	* yum-utils.spec: Split specfile plugins variable across multiple
+	lines to help patch/diff out
+
+2008-08-05  James Antill <james@and.org>
+
+	* yum-utils.spec: Tidy up description overflow in specfile
+
+2008-08-04  James Antill <james@and.org>
+
+	* plugins/security/security.py: Test for '0' epochs and not None in
+	list-security
+
+2008-08-04  James Antill <james@and.org>
+
+	* plugins/security/security.py: Output list-security data in oldest
+	to newest pkgs
+
+2008-08-04  James Antill <james@and.org>
+
+	* plugins/security/security.py:  Don't show 0: for 0 epochs in list-security
+
+2008-08-05  tla@dk.ibm.com <tla@tlaws.local>
+
+	* reposync.py: Add option to fetch comps.xml to reposync by Mohd
+	Izhar Firdaus Ismail (duke bz#856)
+
+2008-08-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* verifytree.py: clean out the manual image checking and make the
+	treeinfo check return the BAD_IMAGES value
+
+2008-08-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* verifytree.py: add optional .treeinfo [checksums] parsing
+
+2008-08-04  James Antill <james@and.org>
+
+	* yum-builddep.py: Allow yum-builddep to use "extras"
+	(installed/not-available pacakges
+
+2008-08-04  James Antill <james@and.org>
+
+	* docs/yum-security.8, plugins/security/security.py:  Change the yum-security documentation to reflect the new behaviour.
+	 Make update-minimal default to the true updateinfo minimal case
+	 (takes the oldest notice data).
+
+2008-07-25  James Antill <james@and.org>
+
+	* plugins/security/security.py, yum-utils.spec:  Initial WFM. Security plugin overhaul:    Go back to all previous
+	 updates looking for matches.    Add update-minimal which will do a
+	 minimal update given the specs. (security only by default).   Eg.
+	 Given:  pkgA-1 installed pkgA-2 (security update, BZ 69) pkgA-3
+	 (Bugfix update, BZ 69) pkgA-4 (security update) pkgA-5 (Bugfix
+	 update) pkgA-6 (Bugfix update)  ...then (assuming we see all of the
+	 above, and "update" would move us to pkgA-6):  1. update --security
+	 will now move from pkgA-1 to pkgA-6  2. update-minimal will move
+	 from pkgA-1 to pkgA-4  3. update --bz=69 will now move from pkgA-1
+	 to pkgA-6  4. update-minimal --bz=69 will now move from pkgA-1 to
+	 pkgA-3  ...list-sec will also list all relevant notices from the
+	 installed version to the latest available version.   Also minor
+	 i18n python-2.4.z fix.   Requires yum-3.2.18
+
+2008-07-29  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Make true/false work for gpgcheck in
+	tmprepo
+
+2008-07-28  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py, yum-utils.spec: Update tmprepo to use
+	CaselessSelectionOption() and understand the new gpgcheck
+
+2008-07-28  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yum-changelog.conf.5, docs/yum-versionlock.1,
+	docs/yum-versionlock.conf.5, plugins/versionlock/versionlock.py,
+	yum-utils.spec: Add versionlock man pages
+
+2008-07-27  James Antill <james@and.org>
+
+	* docs/yum-changelog.1: Remove copy and pasted extra text from
+	yum-changelog man page
+
+2008-07-27  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.conf,
+	plugins/versionlock/versionlock.py: Optionally do obsoletes
+	processing for versionlock
+
+2008-07-27  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Allow locking to multiple
+	EVR's
+
+2008-07-25  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Add downgrade_ftp option,
+	so that they are still usable ... but never used
+
+2008-07-25  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.conf, plugins/tmprepo/tmprepo.py: Merge
+	the gpgcheck upstream config. changes into tmprepo
+
+2008-07-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: fix for bug number rh #456062. This is fine in
+	more current yum's but it is an easy step-around for fc8.
+
+2008-07-21  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py:  Add a --tmprepo-keep-created option to do the unthinkable.  Fix
+	 tmprepo with local files.  Tweak the repoid's generated to be more
+	 usable.  Do the DB generation in createrepo, esp. for "saved tmp.
+	 repos"  Don't do everything twice when group funcs make yum call
+	 reposetup twice.
+
+2008-07-21  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py, yum-utils.spec: Add _local_ directory
+	support to tmprepo, requires createrepo.
+
+2008-07-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add verifytree to spec file
+
+2008-07-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, verifytree.py: add verifytree to yum-utils
+
+2008-07-03  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Skip testing mirrors
+	twice, when postreposetup_hook() is called twice
+
+2008-07-01  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Don't skip just because
+	the file doesn't exist, stupid os.access()
+
+2008-07-01  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Do as much parallelism as
+	possible on testing URLs
+
+2008-07-01  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Use _base.conf.cache not
+	the option, works in yumm/yumex/pirut
+
+2008-07-01  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: if we hit a repoerror downloading a package, just
+	output the error and move along don't make it fatal
+
+2008-06-27  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Work in cacheonly mode if
+	we can't write to the datafile
+
+2008-06-27  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Fix typo in fastestmirror
+
+
+2008-06-26  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py:  Make fastestmirror faster, mostly in the cached case, now CentOS
+	 has made it mandatory without speaking to anyone:  . Skip
+	 processing of repos with only a single URL  . Do
+	 socket.setdefaulttimeout() once.   Restore to the "default"
+	 socket.setdefaulttimeout() if we change it.  . Resolve the cached
+	 timeout data within the main thread (main fix).   Don't do any
+	 locking if we don't spawn any threads.  . Use the host() function
+	 in PollThread.
+
+2008-06-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-debug-dump.py:  - make yum-debug-dump not traceback when run and repositories are
+	 not    accessible  - add a --norepos option to not dump out the
+	 repositories.
+
+2008-06-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repotrack.py: fixed Traceback, caused by use of self outside class
+	(rhbz #451725)
+
+2008-06-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/keys/keys.py: import PluginYumExit from plugins in keys
+
+2008-06-03  Jack Neely <jjneely@ncsu.edu>
+
+	* plugins/fedorakmod/fedorakmod.py: Port from upstream changes to
+	ignore kernels that are to be erased.
+
+2008-06-02  Tim Lauridsen <tla@rasmil.dk>
+
+	* repoquery.py: fixes unicode error when running as LANG=C
+
+2008-06-02  Tim Lauridsen <tla@rasmil.dk>
+
+	* debuginfo-install.py, repodiff.py, yum-complete-transaction.py,
+	yumdownloader.py: Used the same cli setup (LANG,UTF-8) as in yum-cli
+	(rhbz #445916)
+
+2008-05-30  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: revert previous
+	commit and add another solution
+
+2008-05-30  Tim Lauridsen <tla@rasmil.dk>
+
+	* plugins/refresh-updatesd/refresh-updatesd.py: Make the plugin a
+	little simpler so it dont fails (rhbz #437254)
+
+2008-05-29  Tim Lauridsen <tim@naboo.local>
+
+	* repodiff.py: more same way of setting locale (i hope)
+
+2008-05-29  Tim Lauridsen <tla@rasmil.dk>
+
+	* repodiff.py: Make repodiff always run in LANG=C
+
+2008-05-23  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: [fastestmirror] Make sure
+	the 'cacheonly' option exists before checking it (rh#448062)
+
+2008-05-23  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror-asyncore.py,
+	plugins/fastestmirror/fastestmirror-asyncore/fastestmirror-asyncore
+	.py: Hide the fastestmirror-asyncore plugin until we're ready to
+	ship it
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target a little better
+
+2008-05-22  Tim Lauridsen <tla@rasmil.dk>
+
+	* Makefile: Make test-release target to Makefile, to make it easier
+	test the build of a releases without sending it to HEAD
+
+2008-05-21  Tim Lauridsen <tla@rasmil.dk>
+
+	* ChangeLog: updated ChangeLog
+
 2008-05-21  Tim Lauridsen <tla@rasmil.dk>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.14
