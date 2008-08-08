@@ -353,7 +353,10 @@ class FastestMirror:
                     self.threads[0].join()
                 del self.threads[0]
 
-            mhost = host(mirror)
+            if mirror.startswith("file:"):
+                mhost = "127.0.0.1"
+            else:
+                mhost = host(mirror)
             if downgrade_ftp and mirror.startswith("ftp:"):
                 # One less than "dead"
                 self._add_result(mirror, mhost, 99999999998)
