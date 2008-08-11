@@ -114,4 +114,6 @@ James Antill <james.antill@redhat.com>.
 .SH "BUGS"
 The update-minimal command ignores the --obsoletes flag.
 
+The update-minimal command can only directly affect things atm., so if you update pkgA minimally but that requires an update to pkgB then pkgB will be updated to the newest version by the depsolver. Also the above will happen even if you've also minimally updated pkgB, if either the direct (minimal) update for pkgB happens after or if the minimal update for pkgB doesn't satisy the requirements of pkgA.
+
 The main "problem" is that if the data is not correct the plugin cannot work correctly. For instance "--bz 123" will not fix BZ 123 if a package is updated to fix that BZ without referencing that it does so in the updateinfo.xml.
