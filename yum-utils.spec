@@ -2,7 +2,7 @@ Summary: Utilities based around the yum package manager
 Name: yum-utils
 Version: 1.1.15
 Release: 1%{?dist}
-License: GPL
+License: GPLv2+
 Group: Development/Tools
 Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
