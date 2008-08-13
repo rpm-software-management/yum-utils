@@ -600,7 +600,7 @@ def main(args):
                       help="no-op for rpmquery compatibility")
     parser.add_option("-a", "--all", action="store_true",
                       help="query all packages/groups")
-    parser.add_option("--requires", action="store_true",
+    parser.add_option("-R", "--requires", action="store_true",
                       help="list package dependencies")
     parser.add_option("--provides", action="store_true",
                       help="list capabilities this package provides")
