@@ -371,9 +371,9 @@ def parseArgs():
     parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
       help='List leaf nodes in the local RPM database')
     parser.add_option("--all", default=False, dest="all",action="store_true",
-      help='When listing leaf nodes also list leaf nodes that are not libraries')
-    parser.add_option("--leaf-regex", default="(^lib.*)|(.*lib(|s)$)",
-      help='A package name that matches this regular expression is a leaf')
+      help='When listing leaf nodes also list leaf nodes that do not match leaf-regex')
+    parser.add_option("--leaf-regex", default="(^(compat-)?lib.+|.*libs?[\d-]*$)",
+      help='A package name that matches this regular expression (case insensitively) is a leaf')
 
     parser.add_option("--exclude-devel", default=False, action="store_true",
       help='When listing leaf nodes do not list development packages')
@@ -420,7 +420,7 @@ def main():
         sys.exit(0)
     
     if (opts.leaves):
-        listLeaves(my, opts.all, re.compile(opts.leaf_regex),
+        listLeaves(my, opts.all, re.compile(opts.leaf_regex, re.IGNORECASE),
                 opts.exclude_devel, opts.exclude_bin)
         sys.exit(0)
 
