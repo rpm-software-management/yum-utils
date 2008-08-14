@@ -26,6 +26,7 @@
 #  yum --filter-groups='App*/Sys*' list updates
 
 from yum.plugins import TYPE_INTERACTIVE
+from yum.misc import to_unicode, to_utf8, to_str
 
 import fnmatch
 
@@ -45,12 +46,12 @@ def fd__get_data(pkg, attr, strip=True):
     if type(val) == type([]):
         return fd__unknown
 
-    tval = str(val).strip()
+    tval = to_str(val).strip()
     if tval == "":
         return fd__unknown
 
     if strip:
-        return tval
+        return to_utf8(tval)
 
     return val
 
