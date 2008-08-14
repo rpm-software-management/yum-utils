@@ -85,27 +85,6 @@ def fd_free_group_data():
 def fd_should_filter_pkg(base, opts, pkg, used_map):
     """ Do the package filtering for. """
 
-    for (attrs, attr) in [('vendors', 'vendor'),
-                          ('rpm-groups', 'group'),
-                          ('packagers', 'packager'),
-                          ('licenses', 'license'),
-                          ('arches', 'arch'),
-                          ('committers', 'committer'),
-                          ('buildhosts', 'buildhost'),
-                          ('urls', 'url')]:
-        pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
-        filt = len(pats)
-        if not filt: # Don't load the data needed for all the attrs.
-            continue
-        data = fd__get_data(pkg, attr)
-        for pat in pats:
-            if data == fd__unknown or fnmatch.fnmatch(data, pat):
-                used_map[attrs][pat] = True
-                filt = False
-                break
-        if filt:
-            return (attrs, attr)
-
     for (attrs, attr) in [('package-sizes', 'packagesize'),
                           ('archive-sizes', 'archivesize'),
                           ('installed-sizes', 'installedsize')]:
@@ -117,6 +96,27 @@ def fd_should_filter_pkg(base, opts, pkg, used_map):
         for rang in rangs:
             if data == fd__unknown or range_match(data, rang):
                 used_map[attrs][rang] = True
+                filt = False
+                break
+        if filt:
+            return (attrs, attr)
+
+    for (attrs, attr) in [('vendors', 'vendor'),
+                          ('rpm-groups', 'group'),
+                          ('packagers', 'packager'),
+                          ('licenses', 'license'),
+                          ('arches', 'arch'),
+                          ('buildhosts', 'buildhost'),
+                          ('urls', 'url'), # The above are all in primary
+                          ('committers', 'committer')]
+        pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
+        filt = len(pats)
+        if not filt: # Don't load the data needed for all the attrs.
+            continue
+        data = fd__get_data(pkg, attr)
+        for pat in pats:
+            if data == fd__unknown or fnmatch.fnmatch(data, pat):
+                used_map[attrs][pat] = True
                 filt = False
                 break
         if filt:
