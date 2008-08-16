@@ -50,7 +50,7 @@ class YumDownloader(YumUtilBase):
         try:
             opts = self.doUtilConfigSetup()
         except yum.Errors.RepoError, e:
-            self.logger.error("Cannot handle specific enablerepo/disablerepo options.")
+            self.logger.error(str(e))
             sys.exit(50)
                 
         # Check if there is anything to do.
