@@ -26,8 +26,10 @@ from yum.plugins import TYPE_INTERACTIVE
 from yum import logginglevels
 import logging
 
-import dateutil.parser
-
+try:
+    import dateutil.parser as dateutil_parser
+except ImportError:
+    dateutil_parser = None
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
@@ -170,7 +172,10 @@ Display changelog data, since a specified time, on a group of packages"""
                     raise ValueError
                 self._since_num = num
             except:
-                self._since_dto = dateutil.parser.parse(since, fuzzy=True)
+                if dateutil_parser is None:
+                    msg = "Dateutil module not available, so can't parse dates"
+                    raise PluginYumExit(msg)
+                self._since_dto = dateutil_parser.parse(since, fuzzy=True)
                 tt = self._since_dto.timetuple()
                 self._since_tt = time.mktime(tt)
 
