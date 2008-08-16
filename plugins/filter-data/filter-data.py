@@ -26,6 +26,7 @@
 #  yum --filter-groups='App*/Sys*' list updates
 
 from yum.plugins import TYPE_INTERACTIVE
+from yum.misc import to_unicode, to_utf8, to_str
 
 import fnmatch
 
@@ -45,12 +46,12 @@ def fd__get_data(pkg, attr, strip=True):
     if type(val) == type([]):
         return fd__unknown
 
-    tval = str(val).strip()
+    tval = to_str(val).strip()
     if tval == "":
         return fd__unknown
 
     if strip:
-        return tval
+        return to_utf8(tval)
 
     return val
 
@@ -84,34 +85,38 @@ def fd_free_group_data():
 def fd_should_filter_pkg(base, opts, pkg, used_map):
     """ Do the package filtering for. """
 
-    for (attrs, attr) in [('vendors', 'vendor'),
-                          ('rpm-groups', 'group'),
-                          ('packagers', 'packager'),
-                          ('licenses', 'license'),
-                          ('arches', 'arch'),
-                          ('committers', 'committer'),
-                          ('buildhosts', 'buildhost'),
-                          ('urls', 'url')]:
-        pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
-        filt = len(pats)
-        data = fd__get_data(pkg, attr)
-        for pat in pats:
-            if data == fd__unknown or fnmatch.fnmatch(data, pat):
-                used_map[attrs][pat] = True
-                filt = False
-                break
-        if filt:
-            return (attrs, attr)
-
     for (attrs, attr) in [('package-sizes', 'packagesize'),
                           ('archive-sizes', 'archivesize'),
                           ('installed-sizes', 'installedsize')]:
         rangs = getattr(opts, 'filter_' + attrs.replace('-', '_'))
         filt = len(rangs)
+        if not filt: # Don't load the data needed for all the attrs.
+            continue
         data = fd__get_data(pkg, attr, strip=False)
         for rang in rangs:
             if data == fd__unknown or range_match(data, rang):
                 used_map[attrs][rang] = True
+                filt = False
+                break
+        if filt:
+            return (attrs, attr)
+
+    for (attrs, attr) in [('vendors', 'vendor'),
+                          ('rpm-groups', 'group'),
+                          ('packagers', 'packager'),
+                          ('licenses', 'license'),
+                          ('arches', 'arch'),
+                          ('buildhosts', 'buildhost'),
+                          ('urls', 'url'), # The above are all in primary
+                          ('committers', 'committer')]
+        pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
+        filt = len(pats)
+        if not filt: # Don't load the data needed for all the attrs.
+            continue
+        data = fd__get_data(pkg, attr)
+        for pat in pats:
+            if data == fd__unknown or fnmatch.fnmatch(data, pat):
+                used_map[attrs][pat] = True
                 filt = False
                 break
         if filt:
@@ -221,8 +226,9 @@ def fd_check_func_enter(conduit):
             ret = {"skip": ndata, "list_cmd": True,
                    "ret_pkg_lists": ["updates"] + args[1:]}
 
-    # FIXME: delPackage() only works for updates atm.
-    valid_list_cmds = ["list", "info"]
+    # FIXME: delPackage() only works for pkgSack only atm.
+    valid_list_cmds     = ["list", "info"]
+    valid_list_sub_cmds = ["updates", "available", "recent"]
     for cmd in ["vendors", 'rpm-groups', 'packagers', 'licenses', 'arches',
                 'committers', 'buildhosts', 'baseurls', 'package-sizes',
                 'archive-sizes', 'installed-sizes', 'security', 'sec',
@@ -230,7 +236,8 @@ def fd_check_func_enter(conduit):
         valid_list_cmds.append("list-" + cmd)
         valid_list_cmds.append("info-" + cmd)
 
-    if (len(args) >= 2 and args[0] in valid_list_cmds and args[1] == "updates"):
+    if (len(args) >= 2 and args[0] in valid_list_cmds and 
+        args[1] in valid_list_sub_cmds):
         ret = {"skip": ndata, "list_cmd": True, "ret_pkg_lists": args[1:]}
 
     if ret:

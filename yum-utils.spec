@@ -222,7 +222,7 @@ installed-sizes.
 %package -n yum-filter-data
 Summary: Yum plugin to list filter based on package data
 Group: System Environment/Base
-Requires: yum >= 3.0.5
+Requires: yum >= 3.2.17
 
 %description -n yum-filter-data
 This plugin adds the options --filter- vendors, groups, packagers, licenses,
