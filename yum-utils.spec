@@ -16,7 +16,7 @@ manager. It includes utilities by different authors that make yum easier and
 more powerful to use. These tools include: debuginfo-install, package-cleanup,
 repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader,
-yum-debug-dump
+yum-debug-dump and yum-groups-manager.
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
@@ -348,6 +348,7 @@ fi
 %{_bindir}/yumdownloader
 %{_bindir}/yum-builddep
 %{_bindir}/yum-debug-dump
+%{_bindir}/yum-groups-manager
 %{_sbindir}/yum-complete-transaction
 %{_mandir}/man1/yum-utils.1.*
 %{_mandir}/man1/package-cleanup.1.*
@@ -497,6 +498,9 @@ fi
 /etc/NetworkManager/dispatcher.d/*
 
 %changelog
+* Wed Aug 20 2008 James Antill <james@fedoraproject.org>
+- add yum-groups-manager
+
 * Thu Aug 7 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.15
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
