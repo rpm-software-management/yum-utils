@@ -44,6 +44,9 @@ def setup_opts():
                       action="store_true", default=None,
                       help="print the result to stdout")
 
+    parser.add_option("--remove", action="store_true", default=False,
+                      help="remove the listed package instead of adding them")
+
     parser.add_option("--translated-name", action="append",
                       dest="i18nname",
                       help="name for the group, translated")
@@ -102,7 +105,7 @@ def req2pkgs(yb, req):
         providers = matches.keys()
         # provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
     except yum.Errors.YumBaseError, err:
-        print >>sys.stderr, "No package provides %s" % req
+        yb.logger.error("No package provides %s" % req)
         return []
 
     __req2pkgs[req] = providers
@@ -180,30 +183,46 @@ def main():
     if opts.merge:
         opts.load.insert(0, opts.merge)
 
+    loaded_files = False
     for fname in opts.load:
         if not os.path.exists(fname):
-            print >>sys.stderr, "File not found:", fname
+            yb.logger.error("File not found: %s" % fname)
             continue
-        print 'Loading %s' % fname
         if fname.endswith('.gz'):
             fname = gzip.open(cf)
         comps.add(srcfile=fname)
+        loaded_files = True
 
-    group = yum.comps.Group()
-    if opts.name:
-        group.name = opts.name
-
-    if opts.id:
-        group.groupid = opts.id
-    elif group.name:
-        group.groupid = group.name.lower()
-        alnum = string.ascii_lowercase + string.digits
-        group.groupid = re.sub('[^' + alnum + '-_.:]', '',
-                               group.groupid)
-    else:
-        yb.logger.error("No name or id for group")
+    if not loaded_files and opts.remove:
+        yb.logger.error("Can't remove package(s) when we havn't loaded any")
         sys.exit(50)
 
+    group = None
+    if opts.id:
+        group = comps.return_group(opts.id)
+    if group is None and opts.name:
+        group = comps.return_group(opts.name)
+    if group is None and opts.remove:
+        yb.logger.error("Can't remove package(s) from non-existant group")
+        sys.exit(50)
+
+    if group is None:
+        group = yum.comps.Group()
+
+        if opts.id:
+            group.groupid = opts.id
+        elif opts.name:
+            group.groupid = opts.name.lower()
+            alnum = string.ascii_lowercase + string.digits
+            group.groupid = re.sub('[^' + alnum + '-_.:]', '',
+                                   group.groupid)
+        else:
+            yb.logger.error("No name or id for group")
+            sys.exit(50)
+        comps.add_group(group)
+
+    if opts.name:
+        group.name = opts.name
     if opts.description:
         group.description = opts.description
     if opts.display_order:
@@ -215,7 +234,12 @@ def main():
         lang, text = trans_data(yb, td)
         group.translated_description[lang] = text
 
-    pkgs     = yb.pkgSack.returnNewestByName(patterns=sys.argv[1:])
+    try:
+        pkgs     = yb.pkgSack.returnNewestByName(patterns=args)
+    except yum.packageSack.PackageSackError, e:
+        yb.logger.error(e)
+        sys.exit(50)
+
     pkgnames = set([pkg.name for pkg in pkgs])
 
     if opts.dependencies:
@@ -227,7 +251,10 @@ def main():
                 pkgnames.update([pkg.name for pkg in req2pkgs(yb, rname)])
 
     for pkgname in pkgnames:
-        if False: pass
+        if opts.remove:
+            group.mandatory_packages.pop(pkgname, 0)
+            group.optional_packages.pop(pkgname, 0)
+            group.default_packages.pop(pkgname, 0)
         elif opts.mandatory:
             group.mandatory_packages[pkgname] = 1
         elif opts.optional:
@@ -235,7 +262,6 @@ def main():
         else:
             group.default_packages[pkgname]   = 1
 
-    comps.add_group(group)
     if opts.save:
         fo = open(opts.save, "wb")
         fo.write(comps.xml())
