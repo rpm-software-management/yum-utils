@@ -19,9 +19,14 @@
 from yum.plugins import TYPE_INTERACTIVE, PluginYumExit
 import rpmUtils.transaction
 
+import os
 import time
 import fnmatch
 import yum.pgpmsg
+try:
+    import gpgme
+except:
+    gpgme = None
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
@@ -44,12 +49,17 @@ def match_keys(patterns, key, globs=True):
 
 class Key:
 
-    def __init__(self, keyid, createts, sum_type, sum_auth, data):
+    def __init__(self, keyid, createts, sum_type, sum_auth, data,
+                 gpgctx=None, gpgkey=None, gpgsubkey=None, repo="installed"):
         self.keyid    = keyid
         self.createts = createts
         self.sum_type = sum_type
         self.sum_auth = sum_auth
         self.data     = data
+        self.gpgctx   = gpgctx
+        self.gpgkey   = gpgkey
+        self.gpgsubkey = gpgsubkey
+        self.repo     = repo
 
         email_beg = sum_auth.rfind('<')
         if email_beg == -1:
@@ -91,14 +101,16 @@ class KeysListCommand:
         pass
 
     def show_hdr(self):
-        print "%-40.40s %-21.21s %s" % ("Key owner", "Key email", "Key ID")
+        print "%-15s %-22s %-22s %17s" % ("Key owner", "Key email",
+                                          "Repo", "Key ID")
 
     def match_key(self, patterns, key):
         return match_keys(patterns, key)
 
     def show_key(self, base, key):
-        print "%-40.40s %-21.21s %s-%x" % (key.sum_auth_name,key.sum_auth_email,
-                                           key.keyid, key.createts)
+        columns = [(key.sum_auth_name, -15), (key.sum_auth_email, -22),
+                   (key.repo, -22), ("%s-%x" % (key.keyid, key.createts),17)]
+        print base.fmtColumns(columns)
 
     def doCommand(self, base, basecmd, extcmds):
         self.exit_code = 0
@@ -120,6 +132,23 @@ class KeysListCommand:
             data = hdr['description']
 
             keys.append(Key(keyid, createts, sum_type, sum_auth, data))
+        if gpgme is not None:
+            for repo in base.repos.listEnabled():
+                gpgdir = '%s/gpgdir' % repo.cachedir
+                if not os.path.exists(gpgdir):
+                    continue
+
+                # Borrowed from misc.return_keyids_from_pubring()
+                os.environ['GNUPGHOME'] = gpgdir
+                ctx = gpgme.Context()
+                for k in ctx.keylist():
+                    auth  = "%s <%s>" % (k.uids[0].name, k.uids[0].email)
+                    for subkey in k.subkeys:
+                        if subkey.can_sign:
+                            keyid = "%08x" % (int(subkey.keyid,16) & 0xFFFFFFFF)
+                            keys.append(Key(keyid, subkey.timestamp,
+                                            "GPG", auth, "<not-implemented>",
+                                            ctx, k, subkey, repo.id))
 
         done = False
         for key in sorted(keys):
@@ -147,14 +176,27 @@ class KeysInfoCommand(KeysListCommand):
 
     def show_key(self, base, key):
         pkg = "gpg-pubkey-%s-%x" % (key.keyid, key.createts)
-        if key.sum_type == '<?>':
+        if key.repo != "installed":
+            print """\
+Type       : %s
+Rpm Key-ID : %s-%x
+Key owner  : %s
+Key email  : %s
+Created    : %s
+Fingerprint: %x
+Key ID     : %x
+""" % (key.sum_type, key.keyid, key.createts,
+       key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts),
+       int(key.gpgsubkey.fpr, 16), int(key.gpgsubkey.keyid, 16))
+        elif key.sum_type == '<?>':
             print """\
 Type      : Unknown
 Rpm PKG   : %s
 Key owner : %s
 Key email : %s
 Created   : %s
-""" % (pkg, key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
+""" % (key.sum_type, pkg,
+       key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
         else:
             gpg_cert = yum.pgpmsg.decode_msg(key.data)
             print """\
@@ -213,9 +255,12 @@ class KeysRemoveCommand(KeysListCommand):
         pass
 
     def show_key(self, base, key):
-        release = "%x" % key.createts
-        base.remove(name='gpg-pubkey', version=key.keyid, release=release)
-        self.exit_code = 2
+        if key.repo == "installed":
+            release = "%x" % key.createts
+            base.remove(name='gpg-pubkey', version=key.keyid, release=release)
+            self.exit_code = 2
+        else:
+            pass # Use gpgme to remove key...
 
     def match_key(self, patterns, key):
         return match_keys(patterns, key, globs=False)

@@ -255,7 +255,7 @@ installation.
 %package -n yum-keys
 Summary: Yum plugin to deal with signing keys
 Group: System Environment/Base
-Requires: yum >= 3.2.8
+Requires: yum >= 3.2.19
 
 %description -n yum-keys
 This plugin adds the commands keys, keys-info, keys-data and keys-remove. They
