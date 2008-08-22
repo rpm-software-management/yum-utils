@@ -16,8 +16,8 @@ from urlgrabber.progress import TextMeter
 
 def setup_opts():
     version = "0.0.1"
-    vers_txt = "Create groups data version %s" % version
-    usage_txt = "%prog <pkg-wildcard>..."
+    vers_txt = "Manage yum groups data version %s" % version
+    usage_txt = "%prog [pkg-wildcard]..."
     parser =  optparse.OptionParser(usage = usage_txt, version = vers_txt)
 
     parser.add_option("-n", "--name", help="group name")
@@ -115,9 +115,6 @@ def main():
 
     parser = setup_opts()
     (opts, args) = parser.parse_args()
-    if len(args) < 1:
-        parser.print_help()
-        sys.exit(1)
 
     comps = yum.comps.Comps()
 
@@ -185,6 +182,7 @@ def main():
 
     loaded_files = False
     for fname in opts.load:
+      try:
         if not os.path.exists(fname):
             yb.logger.error("File not found: %s" % fname)
             continue
@@ -192,6 +190,9 @@ def main():
             fname = gzip.open(cf)
         comps.add(srcfile=fname)
         loaded_files = True
+      except IOError, e:
+        yb.logger.error(e)
+        sys.exit(50)
 
     if not loaded_files and opts.remove:
         yb.logger.error("Can't remove package(s) when we havn't loaded any")
@@ -235,7 +236,10 @@ def main():
         group.translated_description[lang] = text
 
     try:
-        pkgs     = yb.pkgSack.returnNewestByName(patterns=args)
+        if args:
+            pkgs = yb.pkgSack.returnNewestByName(patterns=args)
+        else:
+            pkgs = []
     except yum.packageSack.PackageSackError, e:
         yb.logger.error(e)
         sys.exit(50)
@@ -263,13 +267,21 @@ def main():
             group.default_packages[pkgname]   = 1
 
     if opts.save:
+      try:
         fo = open(opts.save, "wb")
         fo.write(comps.xml())
         del fo
+      except IOError, e:
+        yb.logger.error(e)
+        sys.exit(50)
     if opts.merge:
+      try:
         fo = open(opts.merge, "wb")
         fo.write(comps.xml())
         del fo
+      except IOError, e:
+        yb.logger.error(e)
+        sys.exit(50)
 
     if (opts.print2stdout or
         (opts.print2stdout is None and not (opts.save or opts.merge))):
