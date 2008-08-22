@@ -50,7 +50,7 @@ def match_keys(patterns, key, globs=True):
 class Key:
 
     def __init__(self, keyid, createts, sum_type, sum_auth, data,
-                 gpgctx=None, gpgkey=None, gpgsubkey=None, repo="installed"):
+                 gpgctx=None, gpgkey=None, gpgsubkey=None, repoid="installed"):
         self.keyid    = keyid
         self.createts = createts
         self.sum_type = sum_type
@@ -59,7 +59,7 @@ class Key:
         self.gpgctx   = gpgctx
         self.gpgkey   = gpgkey
         self.gpgsubkey = gpgsubkey
-        self.repo     = repo
+        self.repoid   = repoid
 
         email_beg = sum_auth.rfind('<')
         if email_beg == -1:
@@ -109,7 +109,7 @@ class KeysListCommand:
 
     def show_key(self, base, key):
         columns = [(key.sum_auth_name, -15), (key.sum_auth_email, -22),
-                   (key.repo, -22), ("%s-%x" % (key.keyid, key.createts),17)]
+                   (key.repoid, -22), ("%s-%x" % (key.keyid, key.createts),17)]
         print base.fmtColumns(columns)
 
     def doCommand(self, base, basecmd, extcmds):
@@ -176,10 +176,10 @@ class KeysInfoCommand(KeysListCommand):
 
     def show_key(self, base, key):
         pkg = "gpg-pubkey-%s-%x" % (key.keyid, key.createts)
-        if key.repo != "installed":
+        if key.repoid != "installed":
             print """\
 Type       : %s
-Rpm Key-ID : %s-%x
+Rpm Key ID : %s-%x
 Key owner  : %s
 Key email  : %s
 Created    : %s
@@ -255,12 +255,15 @@ class KeysRemoveCommand(KeysListCommand):
         pass
 
     def show_key(self, base, key):
-        if key.repo == "installed":
+        if key.repoid == "installed":
             release = "%x" % key.createts
             base.remove(name='gpg-pubkey', version=key.keyid, release=release)
             self.exit_code = 2
         else:
-            pass # Use gpgme to remove key...
+            print "Delete key %s-%x from %s?" % (key.keyid, key.createts,
+                                                 key.repoid)
+            if base.userconfirm():
+                key.gpgctx.delete(key.gpgkey)
 
     def match_key(self, patterns, key):
         return match_keys(patterns, key, globs=False)
