@@ -16,7 +16,7 @@ from urlgrabber.progress import TextMeter
 
 def setup_opts():
     version = "0.0.1"
-    vers_txt = "Manage yum groups data version %s" % version
+    vers_txt = "Manage yum groups metadata version %s" % version
     usage_txt = "%prog [pkg-wildcard]..."
     parser =  optparse.OptionParser(usage = usage_txt, version = vers_txt)
 
@@ -29,17 +29,21 @@ def setup_opts():
                       help="make the package names be in the optional section")
     parser.add_option("--dependencies", action="store_true",
                       help="add the dependencies for this package")
-    parser.add_option("--not-user-visible", action="store_false", default=True,
+    parser.add_option("--user-visible", dest="user_visible",
+                      action="store_true", default=None,
+                      help="make this a user visible group (default)")
+    parser.add_option("--not-user-visible", dest="user_visible",
+                      action="store_false", default=None,
                       help="make this a non-user visible group")
     parser.add_option("--description", help="description for the group")
     parser.add_option("--display-order", help="sort order override")
 
     parser.add_option("--load", action="append", default=[],
-                      help="load groups data from file and merge")
-    parser.add_option("--save",
-                      help="save groups data to file (don't print)")
+                      help="load groups metadata from file")
+    parser.add_option("--save", action="append", default=[],
+                      help="save groups metadata to file (don't print)")
     parser.add_option("--merge",
-                      help="load and save groups data to file (don't print)")
+                      help="load and save groups metadata to file (don't print)")
     parser.add_option("--print", dest="print2stdout",
                       action="store_true", default=None,
                       help="print the result to stdout")
@@ -71,7 +75,8 @@ def setup_opts():
                       help="run from cache only")
     parser.add_option("--tempcache", action="store_true",
                       help="use private cache (default when used as non-root)")
-    parser.add_option("-c", dest="conffile", help="config file location")
+    parser.add_option("-c", "--config",
+                      dest="conffile", help="config file location")
 
     return parser
 
@@ -179,6 +184,7 @@ def main():
 
     if opts.merge:
         opts.load.insert(0, opts.merge)
+        opts.save.append(opts.merge)
 
     loaded_files = False
     for fname in opts.load:
@@ -228,6 +234,8 @@ def main():
         group.description = opts.description
     if opts.display_order:
         group.display_order = int(opts.display_order)
+    if opts.user_visible is not None:
+        group.user_visible = opts.user_visible
     for tn in opts.i18nname or []:
         lang, text = trans_data(yb, tn)
         group.translated_name[lang] = text
@@ -266,25 +274,16 @@ def main():
         else:
             group.default_packages[pkgname]   = 1
 
-    if opts.save:
+    for fname in opts.save:
       try:
-        fo = open(opts.save, "wb")
-        fo.write(comps.xml())
-        del fo
-      except IOError, e:
-        yb.logger.error(e)
-        sys.exit(50)
-    if opts.merge:
-      try:
-        fo = open(opts.merge, "wb")
+        fo = open(fname, "wb")
         fo.write(comps.xml())
         del fo
       except IOError, e:
         yb.logger.error(e)
         sys.exit(50)
 
-    if (opts.print2stdout or
-        (opts.print2stdout is None and not (opts.save or opts.merge))):
+    if (opts.print2stdout or (opts.print2stdout is None and not opts.save)):
         print comps.xml()
 
 if __name__ == "__main__":
