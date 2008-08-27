@@ -3,7 +3,7 @@ PKGNAME = yum-utils
 UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff yum-debug-dump verifytree yum-groups-manager
 UTILSROOT = yum-complete-transaction 
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
-RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
+RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec | awk -F% '{print $$1}')
 WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
 
@@ -36,6 +36,7 @@ archive:
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	
 srpm: archive
+NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
 	rm -f ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm
 	rpmbuild -ts  ${PKGNAME}-${VERSION}.tar.gz
 
