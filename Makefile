@@ -4,7 +4,7 @@ UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-
 UTILSROOT = yum-complete-transaction 
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk -F%: '/Release:/ { print $$2 }' ${PKGNAME}.spec ')
-SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }')
+SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }' ${PKGNAME}.spec )
 SRPM_FILE = ${PKGNAME}-${VERSION}-${SRPM_RELEASE}.src.rpm
 WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
@@ -73,6 +73,10 @@ test-cleanup:
 	@git checkout master
 	@git branch -D release-test
 
+tla-test:
+	@echo "Test"
+	@echo " SRPM : $(SRPM_RELEASE)"
+    
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
 	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/${SRPM_FILE}
