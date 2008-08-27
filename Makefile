@@ -72,10 +72,6 @@ test-cleanup:
 	@git checkout -f
 	@git checkout master
 	@git branch -D release-test
-
-tla-test:
-	@echo "Test"
-	@echo " SRPM : $(SRPM_RELEASE)"
     
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
