@@ -8,7 +8,7 @@ WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
 
 NMPROG=yum-NetworkManager-dispatcher
-NMPATH=/etc/NetworkManager/dispatcher.d
+NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
 
 clean:
 	rm -f *.pyc *.pyo *~
