@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.15
+Version: 1.1.16
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -499,6 +499,8 @@ fi
 /etc/NetworkManager/dispatcher.d/*
 
 %changelog
+* Wed Aug 27 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.16
 * Wed Aug 20 2008 James Antill <james@fedoraproject.org>
 - add yum-groups-manager
 
