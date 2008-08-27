@@ -3,7 +3,9 @@ PKGNAME = yum-utils
 UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff yum-debug-dump verifytree yum-groups-manager
 UTILSROOT = yum-complete-transaction 
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
-RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec | awk -F% '{print $$1}')
+RELEASE=$(shell awk -F%: '/Release:/ { print $$2 }' ${PKGNAME}.spec ')
+SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }')
+SRPM_FILE = ${PKGNAME}-${VERSION}-${SRPM_RELEASE}.src.rpm
 WEBHOST = login.dulug.duke.edu
 WEBPATH = /home/groups/yum/web/download/yum-utils/
 
@@ -36,7 +38,6 @@ archive:
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	
 srpm: archive
-NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
 	rm -f ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm
 	rpmbuild -ts  ${PKGNAME}-${VERSION}.tar.gz
 
@@ -74,7 +75,7 @@ test-cleanup:
 
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
-	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/	
+	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/${SRPM_FILE}
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	
 ChangeLog: FORCE
