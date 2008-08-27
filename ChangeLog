@@ -1,3 +1,145 @@
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.16
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: Make the uploaded srpm have the right name
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: strip the %{dist} from release
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: Added  to make the build work
+
+2008-08-27  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Fix follow_obsoletes in
+	versionlock
+
+2008-08-27  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Fix follow_obsoletes in
+	versionlock
+
+2008-08-27  James Antill <james@and.org>
+
+	* yum-NetworkManager-dispatcher: Add the NetworkManager dispatcher
+	script
+
+2008-08-26  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: Added separate 'test-cleanup' Makefile tag to make it
+	easier to cleaup a failed 'make test-release'  Use 'make
+	test-release' to test that every thing builds ok.  if something
+	fails then use make 'test-cleanup' to cleanup
+
+2008-08-23  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix the yum-groups-manager man page filename in
+	the specfile
+
+2008-08-23  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yum-groups-manager.1, yum-groups-manager.py,
+	yum-utils.spec: Write man page for yum-groups-manger, tweak the cmd
+	a bit to match docs
+
+2008-08-22  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Allow keys plugin to remove repo. GPG keys
+
+2008-08-22  James Antill <james@and.org>
+
+	* plugins/keys/keys.py, yum-utils.spec: List/info keys used for
+	repo. signing, as well as rpm ones
+
+2008-08-21  James Antill <james@and.org>
+
+	* yum-groups-manager.py:  Trap IO exceptions, allow just group metadata changes (no package
+	 name additions/removals).
+
+2008-08-21  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Allow yum-groups-manager to remove packages
+	and rename. Also some tweaks
+
+2008-08-20  James Antill <james@and.org>
+
+	* Makefile, yum-utils.spec: Add yum-groups-manager into the
+	build/install
+
+2008-08-20  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Add the initial version of the
+	yum-groups-manager command, seems to work :)
+
+2008-08-16  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Allow changelog's dateutil to be a
+	soft dependency, for RHEL/CentOS
+
+2008-08-16  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yumdownloader.py: print a more sane error message on RepoError (rh
+	#458501)
+
+2008-08-13  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py: Improve default leaf regex, make it case
+	insensitive.  Signed-off-by: Ville Skyttä <ville.skytta@iki.fi>
+
+2008-08-16  Tim Lauridsen <timlau@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils
+
+2008-08-13  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/repoquery.1, repoquery.py: Alias -R to --requires.
+	Signed-off-by: Ville Skyttä <ville.skytta@iki.fi>
+
+2008-08-14  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py: Minor speedup when filtering
+	on committer as well as another thing(s)
+
+2008-08-14  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py, yum-utils.spec: Use to_str
+	instead of just str() so we don't try and go from unicode to str
+
+2008-08-14  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py:  Allow available/recent list commands.  Don't require other MD
+	 download if we aren't using it.
+
+2008-08-12  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog, yum-utils.spec: fixed license tag
+
+2008-08-11  James Antill <james@and.org>
+
+	* docs/yum-security.8: Explain the update-minimal problem of deps.
+	bringing in the newest versions
+
+2008-08-10  James Antill <james@and.org>
+
+	* repoquery.py, yum-utils.spec: Use the new setup_locale yum call,
+	and bump the requires version
+
+2008-08-08  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Do special handling for
+	file: before starting the threading
+
+2008-08-07  James Antill <james@and.org>
+
+	* Makefile, yum-utils.spec: Add yum-NetworkManager-dispatcher pkg,
+	closes bug#437808
+
 2008-08-07  tla@dk.ibm.com <tla@tlaws.local>
 
 	* ChangeLog: updated ChangeLog
