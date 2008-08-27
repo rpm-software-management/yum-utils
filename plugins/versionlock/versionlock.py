@@ -56,7 +56,7 @@ def exclude_hook(conduit):
     if conduit.confBool('main', 'follow_obsoletes', default=False):
         #  If anything obsoletes something that we have versionlocked ... then
         # remove all traces of that too.
-        for (pkgtup, instTup) in conduit._base.up.returnObsoletes():
+        for (pkgtup, instTup) in conduit._base.up.getObsoletesTuples():
             if instTup[0] not in pkgs:
                 continue
             # If anyone versions a pkg this, they need a good kicking
