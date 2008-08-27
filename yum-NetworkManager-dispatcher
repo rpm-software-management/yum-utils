@@ -1,0 +1,6 @@
+#! /bin/bash
+
+#  Really we should check the IP and see if it's the same, and if so
+# don't bother. etc. ... whatever. This should keep people happyish.
+[ "$2" = "up" ] && yum clean expire-cache 2>&1 > /dev/null
+
