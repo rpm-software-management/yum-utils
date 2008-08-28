@@ -46,7 +46,7 @@ release:
 	@$(MAKE) ChangeLog
 	@git commit -a -m "updated ChangeLog"
 	@git push
-	@git tag -a -f -m "Tagged ${PKGNAME}-$(VERSION)" ${PKGNAME}-$(VERSION)
+	@git tag -s -f -m "Tagged ${PKGNAME}-$(VERSION)" ${PKGNAME}-$(VERSION)
 	@git push --tags origin
 	@$(MAKE) upload
 
