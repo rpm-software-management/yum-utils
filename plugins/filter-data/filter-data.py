@@ -108,7 +108,7 @@ def fd_should_filter_pkg(base, opts, pkg, used_map):
                           ('arches', 'arch'),
                           ('buildhosts', 'buildhost'),
                           ('urls', 'url'), # The above are all in primary
-                          ('committers', 'committer')]
+                          ('committers', 'committer')]:
         pats = getattr(opts, 'filter_' + attrs.replace('-', '_'))
         filt = len(pats)
         if not filt: # Don't load the data needed for all the attrs.
