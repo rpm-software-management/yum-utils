@@ -267,7 +267,7 @@ def main():
             try:
                 path = repo.getPackage(pkg)
             except yum.Errors.RepoError, e:
-                my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e))
+                my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e)))
                 continue
                 
             if opts.gpgcheck:
