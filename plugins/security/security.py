@@ -43,6 +43,8 @@ from yum.update_md import UpdateMetadata
 import logging # for commands
 from yum import logginglevels
 
+from yum.constants import *
+
 import rpmUtils.miscutils
 
 requires_api_version = '2.5'
@@ -546,6 +548,7 @@ def preresolve_hook(conduit):
         tsinfo.remove(tspkg.pkgtup)
 
     tot = 0
+    cnt = 0
     opts.sec_cmds = []
     used_map = ysp_gen_used_map(opts)
     tsinfo = conduit.getTsInfo()
@@ -554,16 +557,25 @@ def preresolve_hook(conduit):
     # related pkgs ... Ie. "installed" version marked for removal.
     keep_pkgs = set()
 
+    count_states = set(TS_INSTALL_STATES + [TS_ERASE])
+    count_pkgs = set()
+    for tspkg in tspkgs:
+        if tspkg.output_state in count_states:
+            count_pkgs.add(tspkg.po)
+
     name2tup = _get_name2oldpkgtup(conduit._base)
     for tspkg in tspkgs:
-        tot += 1
+        if tspkg.output_state in count_states:
+            tot += 1
         name = tspkg.po.name
         if (name not in name2tup or
             not ysp_should_keep_pkg(opts, name2tup[name], md_info, used_map)):
             continue
+        if tspkg.output_state in count_states:
+            cnt += 1
         keep_pkgs.add(tspkg.po)
 
-    scnt = len(keep_pkgs)
+    scnt = cnt
     mini_depsolve_again = True
     while mini_depsolve_again:
         mini_depsolve_again = False
@@ -573,12 +585,16 @@ def preresolve_hook(conduit):
                 # Find any related pkgs, and add them:
                 for (rpkg, reason) in tspkg.relatedto:
                     if rpkg not in keep_pkgs:
+                        if rpkg in count_pkgs:
+                            cnt += 1
                         keep_pkgs.add(rpkg)
                         mini_depsolve_again = True
             else:
                 # If related to any keep pkgs, add us
                 for (rpkg, reason) in tspkg.relatedto:
                     if rpkg in keep_pkgs:
+                        if rpkg in count_pkgs:
+                            cnt += 1
                         keep_pkgs.add(tspkg.po)
                         mini_depsolve_again = True
                         break
@@ -587,13 +603,12 @@ def preresolve_hook(conduit):
         if tspkg.po not in keep_pkgs:
             ysp_del_pkg(tspkg)
 
-    acnt = len(keep_pkgs)
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
-    if acnt:
-        conduit.info(2, 'Needed %d (+%d related) of %d transaction packages, for security' % (scnt, acnt - scnt, tot))
+    if cnt:
+        conduit.info(2, 'Needed %d (+%d related) of %d packages (so far), for security' % (scnt, cnt - scnt, tot))
     else:
-        conduit.info(2, 'No transaction packages needed, for security, %d available' % tot)
+        conduit.info(2, 'No packages needed, for security, of %d packages (so far)' % tot)
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"
