@@ -175,42 +175,46 @@ class KeysInfoCommand(KeysListCommand):
         pass
 
     def show_key(self, base, key):
-        pkg = "gpg-pubkey-%s-%x" % (key.keyid, key.createts)
+        rpmkeyid = "%s-%x" % (key.keyid, key.createts)
         if key.repoid != "installed":
             print """\
 Type       : %s
-Rpm Key ID : %s-%x
+Rpm Key ID : %s
 Key owner  : %s
 Key email  : %s
+Repo       : %s
 Created    : %s
 Fingerprint: %x
 Key ID     : %x
-""" % (key.sum_type, key.keyid, key.createts,
-       key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts),
+""" % (key.sum_type, rpmkeyid,
+       key.sum_auth_name, key.sum_auth_email, key.repoid,
+       time.ctime(key.createts),
        int(key.gpgsubkey.fpr, 16), int(key.gpgsubkey.keyid, 16))
         elif key.sum_type == '<?>':
             print """\
 Type      : Unknown
-Rpm PKG   : %s
+Rpm Key ID: %s
 Key owner : %s
 Key email : %s
+Repo      : installed
 Created   : %s
-""" % (key.sum_type, pkg,
+""" % (key.sum_type, rpmkeyid,
        key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
         else:
             gpg_cert = yum.pgpmsg.decode_msg(key.data)
             print """\
 Type       : %s
-Rpm PKG    : %s
+Rpm Key ID : %s
 Key owner  : %s
 Key email  : %s
+Repo       : installed
 Created    : %s
 Version    : PGP Public Key Certificate v%d
 Primary ID : %s
 Algorithm  : %s
 Fingerprint: %s
 Key ID     : %s
-""" % (key.sum_type, pkg, key.sum_auth_name, key.sum_auth_email,
+""" % (key.sum_type, rpmkeyid, key.sum_auth_name, key.sum_auth_email,
        time.ctime(key.createts),
        gpg_cert.version, gpg_cert.user_id,
        yum.pgpmsg.algo_pk_to_str[gpg_cert.public_key.pk_algo],
@@ -235,11 +239,12 @@ Type     : %s
 Key owner: %s
 Key email: %s
 Key ID   : %s
+Repo     : %s
 Created  : %s
 Raw Data :
   %s
 """ % (key.sum_type, key.sum_auth_name, key.sum_auth_email,
-       key.keyid, time.ctime(key.createts),
+       key.keyid, key.repoid, time.ctime(key.createts),
        key.data.replace('\n', '\n  '))
 
 
