@@ -512,6 +512,7 @@ fi
 %files -n yum-remove-with-leaves
 %defattr(-, root, root)
 /usr/lib/yum-plugins/remove-with-leaves.*
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
 %changelog
 * Mon Sep  8 2008 Seth Vidal <skvidal at fedoraproject.org>
