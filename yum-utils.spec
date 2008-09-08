@@ -261,6 +261,16 @@ Requires: yum >= 3.2.19
 This plugin adds the commands keys, keys-info, keys-data and keys-remove. They
 allow you to query and remove signing keys.
 
+%package -n yum-remove-with-leaves
+Summary: Yum plugin to remove dependencies which are no longer used because of a removal
+Group: System Environment/Base
+Requires: yum >= 3.2.19
+
+%description -n yum-remove-with-leaves
+This plugin removes any unused dependencies that were brought in by an install
+but would not normally be removed. It helps to keep a system clean of unused
+libraries and packages.
+
 %package -n yum-NetworkManager-dispatcher
 Summary: Yum plugin to deal with changing networks with NetworkManager
 Group: System Environment/Base
@@ -305,6 +315,7 @@ plugins="\
  tmprepo \
  verify \
  keys \
+ remove-with-leaves \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -498,7 +509,14 @@ fi
 %defattr(-, root, root)
 /etc/NetworkManager/dispatcher.d/*
 
+%files -n yum-remove-with-leaves
+%defattr(-, root, root)
+/usr/lib/yum-plugins/remove-with-leaves.*
+
 %changelog
+* Mon Sep  8 2008 Seth Vidal <skvidal at fedoraproject.org>
+- add yum-remove-with-leaves plugin
+
 * Wed Aug 27 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.16
 * Wed Aug 20 2008 James Antill <james@fedoraproject.org>
