@@ -22,11 +22,11 @@ not in use by any other package.
 """
 
 
-from yum.plugins import TYPE_CORE, TYPE_INTERACTIVE, PluginYumExit
+from yum.plugins import TYPE_CORE
 from yum.constants import *
 
 requires_api_version = '2.4'
-plugin_type = (TYPE_CORE, TYPE_INTERACTIVE)
+plugin_type = (TYPE_CORE,)
 
 _requires_cache = {}
 ignore_list = ['glibc', 'bash', 'libgcc']
