@@ -93,7 +93,7 @@ def _match_sec_cmd(sec_cmds, pkgname, notice):
             return i
     return None
 
-def _has_id(refs, ref_type, ref_ids):
+def _has_id(used_map, refs, ref_type, ref_ids):
     ''' Check if the given ID is a match. '''
     for ref in ysp__safe_refs(refs):
         if ref['type'] != ref_type:
@@ -114,9 +114,9 @@ def ysp_should_filter_pkg(opts, pkgname, notice, used_map):
     elif opts.advisory and notice['update_id'] in opts.advisory:
         used_map['id'][notice['update_id']] = True
         return True
-    elif opts.cve and _has_id(notice['references'], "cve", opts.cve):
+    elif opts.cve and _has_id(used_map, notice['references'], "cve", opts.cve):
         return True
-    elif opts.bz and _has_id(notice['references'], "bugzilla", opts.bz):
+    elif opts.bz and _has_id(used_map, notice['references'],"bugzilla",opts.bz):
         return True
     elif opts.security:
         if notice['type'] == 'security':
