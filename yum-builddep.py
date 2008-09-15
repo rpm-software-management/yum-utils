@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
-from yum.misc import getCacheDir
+from yum.misc import getCacheDir, setup_locale
 
 from cli import *
 from utils import YumUtilBase
@@ -139,22 +139,7 @@ class YumBuildDep(YumUtilBase):
     
     
 if __name__ == '__main__':
-    import locale
-    # This test needs to be before locale.getpreferredencoding() as that
-    # does setlocale(LC_CTYPE, "")
-    try:
-        locale.setlocale(locale.LC_ALL, '')
-    except locale.Error, e:
-        # default to C locale if we get a failure.
-        print >> sys.stderr, 'Failed to set locale, defaulting to C'
-        os.environ['LC_ALL'] = 'C'
-        locale.setlocale(locale.LC_ALL, 'C')
-        
-    if True: # not sys.stdout.isatty():
-        import codecs
-        sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-        sys.stdout.errors = 'replace'
-
+    setup_locale()
     util = YumBuildDep()
         
        
