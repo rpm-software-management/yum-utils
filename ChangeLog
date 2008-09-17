@@ -1,3 +1,81 @@
+2008-09-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.17
+
+2008-09-16  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Use calcColumns in keys plugin
+
+2008-09-15  James Antill <james@and.org>
+
+	* plugins/security/security.py: Pass used_map to _has_id from
+	ysp_should_filter_pkg, fixes bug 462372
+
+2008-09-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: do the same for y-c-t -
+	setup_locale()
+
+2008-09-15  James Antill <james@and.org>
+
+	* yum-builddep.py: Use the setup_locale call instead of copy&paste
+
+2008-09-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: add all the crazy locale code from
+	yum-complete-transaction to yum-build-dep so our confirmation can
+	work on non-C and on-US locales.
+
+2008-09-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: get rid of
+	interactive - since it isn't really interactive
+
+2008-09-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add conf file, too
+
+2008-09-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.conf,
+	plugins/remove-with-leaves/remove-with-leaves.py, yum-utils.spec: 
+	add remove-with-leaves plugin and update spec file
+
+2008-09-02  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Add repoid data to info/data output. Don't
+	display the gpg-pubkey noise
+
+2008-08-29  James Antill <james@and.org>
+
+	* plugins/security/security.py: Count packages in the transaction
+	like listTransaction does
+
+2008-08-28  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile:  make a gpg signed tag when using 'make release'
+
+2008-08-28  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: add a parens to unbreak reposync
+
+2008-08-27  James Antill <james@and.org>
+
+	* plugins/filter-data/filter-data.py: Fix typo in filter-data plugin
+
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: remove some test stuff from Makefile
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: fix the awk voodoo, to do the right thing
+
+2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2008-08-27  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.16
