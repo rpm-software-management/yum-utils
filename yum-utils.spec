@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.16
+Version: 1.1.17
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -515,6 +515,9 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
 %changelog
+* Wed Sep 17 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.17
+
 * Mon Sep  8 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add yum-remove-with-leaves plugin
 
