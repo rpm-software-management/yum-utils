@@ -16,6 +16,12 @@
 # Copyright 2008 Red Hat, Inc
 # written by Seth Vidal <skvidal@fedoraproject.org>
 
+#FIXME:
+# When two requirements of a pkg being removed mutually require each other
+# there's no way to have one know about the other and have this know to remove both
+# ex: foo is being removed. it requires bar. bar requires baz. baz requires bar. 
+#     nothing other than foo and baz require bar. 
+
 """
 This plugin allows packages to clean up dependencies they pulled in which are
 not in use by any other package.
@@ -76,9 +82,6 @@ def postresolve_hook(conduit):
                         pkgtups = [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=TS_REMOVE_STATES) ]
                         if req_pkgtup not in pkgtups:
                             non_removed_requires.append(req_pkgtup)
-
-                    #FIXME - go through the non_removed_requires and see if any of them are in the list of 
-                    #        requirements, too
 
                     if not non_removed_requires:
                         conduit.info(2, 'removing %s. It is not required by anything else.' % pkg)
