@@ -301,7 +301,6 @@ plugins="\
  kernel-module \
  downloadonly \
  allowdowngrade \
- skip-broken \
  priorities \
  refresh-updatesd \
  merge-conf \
@@ -429,11 +428,6 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/allowdowngrade.conf
 /usr/lib/yum-plugins/allowdowngrade.*
 
-%files -n yum-skip-broken
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/skip-broken.conf
-/usr/lib/yum-plugins/skip-broken.*
-
 %files -n yum-priorities
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
@@ -515,6 +509,9 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
 %changelog
+* Fri Sep 19 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- removed skip-broken plugin
+
 * Wed Sep 17 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.17
 
@@ -532,7 +529,7 @@ fi
 - add verifytree
 
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
-  Make yum-fastestmirror %%files handle the fastestmirror-asyncore.py file 
+  Make yum-fastestmirror %%files handle the fastestmirror-asyncore.py file
 * Wed May 21 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.14
 * Fri Apr 10 2008 James Antill <james@fedoraproject.org>
