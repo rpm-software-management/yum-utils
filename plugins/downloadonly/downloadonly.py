@@ -40,5 +40,6 @@ def postreposetup_hook(conduit):
 
 def postdownload_hook(conduit):
     opts, commands = conduit.getCmdLine()
-    if opts.dlonly:
+    # Don't die on errors, or we'll never see them.
+    if not conduit.getErrors() and opts.dlonly:
         raise PluginYumExit('exiting because --downloadonly specified ')
