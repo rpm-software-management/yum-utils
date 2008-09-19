@@ -88,6 +88,9 @@ class Key:
 
 class KeysListCommand:
 
+    def __init__(self):
+        self.columns = None
+
     def getNames(self):
         return ["keys", "keys-list"]
 
@@ -100,16 +103,16 @@ class KeysListCommand:
     def doCheck(self, base, basecmd, extcmds):
         pass
 
-    def show_hdr(self):
-        print "%-15s %-22s %-22s %17s" % ("Key owner", "Key email",
-                                          "Repo", "Key ID")
+    def show_hdr(self, base):
+        columns = zip(("Key owner", "Key email", "Repo", "Key ID"),self.columns)
+        print base.fmtColumns(columns)
 
     def match_key(self, patterns, key):
         return match_keys(patterns, key)
 
     def show_key(self, base, key):
-        columns = [(key.sum_auth_name, -15), (key.sum_auth_email, -22),
-                   (key.repoid, -22), ("%s-%x" % (key.keyid, key.createts),17)]
+        columns = zip((key.sum_auth_name, key.sum_auth_email, key.repoid,
+                       ("%s-%x" % (key.keyid, key.createts))), self.columns)
         print base.fmtColumns(columns)
 
     def doCommand(self, base, basecmd, extcmds):
@@ -150,11 +153,29 @@ class KeysListCommand:
                                             "GPG", auth, "<not-implemented>",
                                             ctx, k, subkey, repo.id))
 
+        if self.columns is None and not hasattr(base, 'calcColumns'):
+            self.columns = (-15, -22, -22, 17)
+        elif self.columns is None:
+            data = {'owner' : {}, 'email' : {}, 'rid' : {}, 'kid' : {}}
+            for key in keys:
+                if len(extcmds) and not self.match_key(extcmds, key):
+                    continue
+                for (d, v) in (("owner", len(key.sum_auth_name)),
+                               ("email", len(key.sum_auth_email)),
+                               ("rid", len(key.repoid)),
+                               ("kid", (len(key.keyid) + 1 +
+                                        len("%x" % key.createts)))):
+                    data[d].setdefault(v, 0)
+                    data[d][v] += 1
+            data = [data['owner'], data['email'], data['rid'], data['kid']]
+            columns = base.calcColumns(data)
+            self.columns = [-columns[0], -columns[1], -columns[2], columns[3]]
+
         done = False
         for key in sorted(keys):
             if not len(extcmds) or self.match_key(extcmds, key):
                 if not done:
-                    self.show_hdr()
+                    self.show_hdr(base)
                 done = True
                 self.show_key(base, key)
         
@@ -165,13 +186,16 @@ class KeysListCommand:
 
 class KeysInfoCommand(KeysListCommand):
 
+    def __init__(self):
+        self.columns = [1] * 4
+
     def getNames(self):
         return ["keys-info"]
 
     def getSummary(self):
         return "Full information keys for signing data"
 
-    def show_hdr(self):
+    def show_hdr(self, base):
         pass
 
     def show_key(self, base, key):
@@ -224,13 +248,16 @@ Key ID     : %s
 
 class KeysDataCommand(KeysListCommand):
 
+    def __init__(self):
+        self.columns = [1] * 4
+
     def getNames(self):
         return ["keys-data"]
 
     def getSummary(self):
         return "Show public key block information for signing data"
 
-    def show_hdr(self):
+    def show_hdr(self, base):
         pass
 
     def show_key(self, base, key):
@@ -250,13 +277,16 @@ Raw Data :
 
 class KeysRemoveCommand(KeysListCommand):
 
+    def __init__(self):
+        self.columns = [1] * 4
+
     def getNames(self):
         return ["keys-remove", "keys-erase"]
 
     def getSummary(self):
         return "Remove a public key block for signing data"
 
-    def show_hdr(self):
+    def show_hdr(self, base):
         pass
 
     def show_key(self, base, key):
