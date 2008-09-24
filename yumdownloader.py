@@ -18,6 +18,7 @@ sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
 from yum.misc import getCacheDir
+from yum.packages import parsePackages
 
 from cli import *
 from utils import YumUtilBase
@@ -27,6 +28,7 @@ from urlgrabber.progress import TextMeter
 import shutil
 
 import rpmUtils
+import logging
 
 class YumDownloader(YumUtilBase):
     NAME = 'yumdownloader'
@@ -38,12 +40,15 @@ class YumDownloader(YumUtilBase):
                              YumDownloader.NAME,
                              YumDownloader.VERSION,
                              YumDownloader.USAGE)
-        self.logger = logging.getLogger("yum.verbose.cli.yumdownloader")                             
+        self.logger = logging.getLogger("yum.verbose.cli.yumdownloader")  
+        
+        self.localPackages = []
+                          
+        # Add util commandline options to the yum-cli ones
+        self.optparser = self.getOptionParser() 
         self.main()
 
     def main(self):
-        # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser() 
         # Add command line option specific to yumdownloader
         self.addCmdOptions()
         # Parse the commandline option and setup the basics.
@@ -174,7 +179,6 @@ class YumDownloader(YumUtilBase):
         # downloaded into the cachedir (is there a way around this)
         if opts.resolve:
             self.doTsSetup()
-            self.localPackages = []
             # Act as if we were to install the packages in toDownload
             for po in toDownload:
                 self.tsInfo.addInstall(po)
@@ -260,7 +264,6 @@ class YumDownloader(YumUtilBase):
             if repo.id.endswith('-source'):
                 repo.close()
                 self.repos.disableRepo(repo.id)
-                srcrepo = repo.id
 
     def addCmdOptions(self):
         self.optparser.add_option("--destdir", default=".", dest="destdir",
@@ -274,12 +277,12 @@ class YumDownloader(YumUtilBase):
         self.optparser.add_option("--archlist",
           help="only download packages of certain architecture(s)")        
 if __name__ == '__main__':
-    import locale
+    import locale,os
     # This test needs to be before locale.getpreferredencoding() as that
     # does setlocale(LC_CTYPE, "")
     try:
         locale.setlocale(locale.LC_ALL, '')
-    except locale.Error, e:
+    except locale.Error, ex:
         # default to C locale if we get a failure.
         print >> sys.stderr, 'Failed to set locale, defaulting to C'
         os.environ['LC_ALL'] = 'C'

@@ -80,6 +80,9 @@ upload: archive srpm
 	
 ChangeLog: FORCE
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
+
+pylint:
+	@pylint --rcfile=test/yum-utils-pylintrc yumdownloader.py
 	
 	
 FORCE:	
