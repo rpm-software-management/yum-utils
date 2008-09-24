@@ -29,7 +29,6 @@ import re
 
 from rpmUtils import miscutils, transaction
 from optparse import OptionParser
-from yum.packages import YumInstalledPackage
 from yum import Errors
 from yum.misc import getCacheDir
 
@@ -65,7 +64,7 @@ def getLocalRequires(my):
     pkgs = {}
     for po in my.rpmdb.returnPackages():
         tup = po.pkgtup
-        header= po.hdr
+        header = po.hdr
         requires = zip(
             header[rpm.RPMTAG_REQUIRENAME],
             header[rpm.RPMTAG_REQUIREFLAGS],
@@ -87,7 +86,8 @@ def buildProviderList(my, pkgs, reportProblems):
             if ver == '':
                 ver = None
             rflags = flags & 15
-            if req.startswith('rpmlib'): continue # ignore rpmlib deps
+            if req.startswith('rpmlib'):
+                continue # ignore rpmlib deps
             
             if not providers.has_key((req,rflags,ver)):
                 resolve_sack = my.rpmdb.whatProvides(req,rflags,ver)
@@ -150,7 +150,7 @@ def printDupes(my):
         for (e,v,r) in dupedict[(n,a)]:
             po = my.getInstalledPackageObject((n,a,e,v,r))
             if po.name.startswith('kernel'):
-               continue
+                continue
             if po.name == 'gpg-pubkey':
                 continue
             dupes.append(po)
@@ -226,14 +226,14 @@ def _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel, exclude_bin):
         return True
     return False
 
-def listLeaves(my, all, leaf_regex, exclude_devel, exclude_bin):
+def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
     """return a packagtuple of any installed packages that
        are not required by any other package on the system"""
     ts = transaction.initReadOnlyTransaction()
     leaves = ts.returnLeafNodes()
     for pkg in leaves:
-        name=pkg[0]
-        if all or _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel,
+        name = pkg[0]
+        if all_nodes or _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel,
                 exclude_bin):
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
@@ -370,7 +370,7 @@ def parseArgs():
     # Leaf listing options
     parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
       help='List leaf nodes in the local RPM database')
-    parser.add_option("--all", default=False, dest="all",action="store_true",
+    parser.add_option("--all", default=False, dest="all_nodes",action="store_true",
       help='When listing leaf nodes also list leaf nodes that do not match leaf-regex')
     parser.add_option("--leaf-regex", default="(^(compat-)?lib.+|.*libs?[\d-]*$)",
       help='A package name that matches this regular expression (case insensitively) is a leaf')
@@ -420,7 +420,7 @@ def main():
         sys.exit(0)
     
     if (opts.leaves):
-        listLeaves(my, opts.all, re.compile(opts.leaf_regex, re.IGNORECASE),
+        listLeaves(my, opts.all_nodes, re.compile(opts.leaf_regex, re.IGNORECASE),
                 opts.exclude_devel, opts.exclude_bin)
         sys.exit(0)
 

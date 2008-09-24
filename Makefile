@@ -84,6 +84,6 @@ ChangeLog: FORCE
 pylint:
 	@pylint --rcfile=test/yum-utils-pylintrc \
 		yumdownloader.py yum-complete-transaction.py yum-debug-dump.py yum-builddep.py \
-                debuginfo-install.py
+                debuginfo-install.py package-cleanup.py
 	
 FORCE:	
