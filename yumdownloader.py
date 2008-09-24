@@ -20,7 +20,6 @@ import yum
 from yum.misc import getCacheDir
 from yum.packages import parsePackages
 
-from cli import *
 from utils import YumUtilBase
 
 from urlparse import urljoin
