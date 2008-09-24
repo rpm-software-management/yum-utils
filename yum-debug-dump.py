@@ -32,6 +32,8 @@ class YumDebugDump(yum.YumBase):
     def __init__(self):
         self.file_version = '1'
         yum.YumBase.__init__(self)
+        self.opts = None
+        self.args = None
         self.parse_args()
 
     def parse_args(self):
@@ -83,7 +85,7 @@ class YumDebugDump(yum.YumBase):
         pkgs = {}
         for po in self.rpmdb.returnPackages():
             tup = po.pkgtup
-            header= po.hdr
+            header = po.hdr
             requires = zip(
                 header[rpm.RPMTAG_REQUIRENAME],
                 header[rpm.RPMTAG_REQUIREFLAGS],
@@ -101,7 +103,8 @@ class YumDebugDump(yum.YumBase):
                 if ver == '':
                     ver = None
                 rflags = flags & 15
-                if req.startswith('rpmlib'): continue # ignore rpmlib deps
+                if req.startswith('rpmlib'): 
+                    continue # ignore rpmlib deps
 
                 if not providers.has_key((req,rflags,ver)):
                     resolve_sack = self.rpmdb.whatProvides(req,rflags,ver)
