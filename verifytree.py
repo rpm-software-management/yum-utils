@@ -40,7 +40,7 @@ case_numbers = {'REPODATA': 56, 'CORE_PACKAGES': 57, 'COMPS': 58,
                 'BOOT_IMAGES': 59}
 
 # URL for the RELAX NG schema for comps
-SCHEMA='http://cvs.fedoraproject.org/viewcvs/*checkout*/comps/comps.rng'
+SCHEMA = 'http://cvs.fedoraproject.org/viewcvs/*checkout*/comps/comps.rng'
 
 def testopia_create_run(plan):
     '''Create a run of the given test plan. Returns the run ID.'''
@@ -160,7 +160,7 @@ def main():
     newrepo.metadata_expire = 0
     newrepo.enablegroups = 1
     # we want *all* metadata
-    newrepo.mdpolicy='group:all'
+    newrepo.mdpolicy = 'group:all'
 
     # add our new repo
     my.repos.add(newrepo)
@@ -213,7 +213,7 @@ def main():
 
     if not (retval & BAD_COMPS):
         print "  verifying comps.xml grammar with xmllint"
-        comps=newrepo.getGroups()
+        comps = newrepo.getGroups()
         r = os.system("xmllint --noout --nowarning --relaxng %s %s" % 
             (SCHEMA,comps))
         if r != 0:
@@ -268,5 +268,5 @@ def main():
     return retval
 
 if __name__ == "__main__":
-    r = main()
-    sys.exit(r)
+    rc = main()
+    sys.exit(rc)
