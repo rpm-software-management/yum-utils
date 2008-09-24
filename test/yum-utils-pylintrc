@@ -13,7 +13,7 @@
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-#init-hook='import sys.path; sys.path.insert(0,"/usr/share/yum-cli")'
+#init-hook=="execfile('test/pylint-setup.py')"
 
 # Profiled execution.
 profile=no

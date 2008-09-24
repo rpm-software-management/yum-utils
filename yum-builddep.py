@@ -18,13 +18,12 @@ import sys
 sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
-from yum.misc import getCacheDir, setup_locale
+from yum.misc import setup_locale
 
-from cli import *
 from utils import YumUtilBase
 
-from urlparse import urljoin
-from urlgrabber.progress import TextMeter
+import logging
+import rpmUtils
 
 
 class YumBuildDep(YumUtilBase):
@@ -38,11 +37,11 @@ class YumBuildDep(YumUtilBase):
                              YumBuildDep.VERSION,
                              YumBuildDep.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.yumbuildep")                             
+        # Add util commandline options to the yum-cli ones
+        self.optparser = self.getOptionParser() 
         self.main()
 
     def main(self):
-        # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser() 
         # Parse the commandline option and setup the basics.
         try:
             opts = self.doUtilConfigSetup()
@@ -126,7 +125,8 @@ class YumBuildDep(YumUtilBase):
 
         for srpm in srpms:
             for dep in srpm.requiresList():
-                if dep.startswith("rpmlib("): continue
+                if dep.startswith("rpmlib("): 
+                    continue
                 try:
                     pkg = self.returnPackageByDep(dep)
                     print pkg
