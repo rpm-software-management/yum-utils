@@ -87,5 +87,6 @@ pylint:
                 debuginfo-install.py package-cleanup.py yum-groups-manager.py \
 		plugins/remove-with-leaves/remove-with-leaves.py \
 		plugins/upgrade-helper/upgrade-helper.py \
+		plugins/security/security.py \
 	
 FORCE:	
