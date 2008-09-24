@@ -42,7 +42,6 @@ import yum
 import yum.Errors
 from yum.misc import getCacheDir
 from yum.constants import *
-from yum.packages import parsePackages
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
@@ -64,18 +63,18 @@ class RepoSync(yum.YumBase):
         self.logger = logging.getLogger('yum.verbose.reposync')
         self.opts = opts
 
-def localpkgs(dir):
-    names = os.listdir(dir)
+def localpkgs(directory):
+    names = os.listdir(directory)
 
     cache = {}
     for name in names:
-        fn = os.path.join(dir, name)
+        fn = os.path.join(directory, name)
         try:
             st = os.lstat(fn)
         except os.error:
             continue
         if stat.S_ISDIR(st.st_mode):
-            subcache= localpkgs(fn)
+            subcache = localpkgs(fn)
             for pkg in subcache.keys():
                 cache[pkg] = subcache[pkg]
         elif stat.S_ISREG(st.st_mode) and name.endswith(".rpm"):
@@ -206,20 +205,19 @@ def main():
 
         if opts.downloadcomps:
             try: # download comps.xml
-               compsfile = repo.getGroups()
+                compsfile = repo.getGroups()
+                if not os.path.exists(local_repo_path):
+                    try:
+                        os.makedirs(local_repo_path)
+                    except IOError, e:
+                        my.logger.error("Could not make repo subdir: %s" % e)
+                        my.closeRpmDB()
+                        sys.exit(1)
 
-               if not os.path.exists(local_repo_path):
-                   try:
-                       os.makedirs(local_repo_path)
-                   except IOError, e:
-                       my.logger.error("Could not make repo subdir: %s" % e)
-                       my.closeRpmDB()
-                       sys.exit(1)
-    
-               shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
+                shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
             except yum.Errors.RepoMDError:
-               if not opts.quiet:
-                  my.logger.error("Unable to fetch comps.xml")
+                if not opts.quiet:
+                    my.logger.error("Unable to fetch comps.xml")
 
         download_list.sort(sortPkgObj)
         n = 0
