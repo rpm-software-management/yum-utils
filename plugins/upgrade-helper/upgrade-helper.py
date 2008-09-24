@@ -38,7 +38,7 @@
 
 from yum.plugins import TYPE_CORE
 from yum.constants import *
-from yum import config
+
 import rpmUtils.arch
 from yum.repoMDObject import ns_cleanup
 
