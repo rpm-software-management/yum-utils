@@ -20,7 +20,6 @@ sys.path.insert(0,'/usr/share/yum-cli')
 import yum
 from yum.misc import setup_locale
 
-from cli import *
 from utils import YumUtilBase
 
 import logging
@@ -110,6 +109,7 @@ class YumCompleteTransaction(YumUtilBase):
                              YumCompleteTransaction.VERSION,
                              YumCompleteTransaction.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.yumcompletets")
+        # Add util commandline options to the yum-cli ones
         self.optparser = self.getOptionParser()
         self.addCmdOptions()
         self.main()
@@ -129,8 +129,6 @@ class YumCompleteTransaction(YumUtilBase):
             help='Do not complete the transaction just clean up transaction journals')
 
     def main(self):
-        # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser()
         # Parse the commandline option and setup the basics.
         try:
             opts = self.doUtilConfigSetup()

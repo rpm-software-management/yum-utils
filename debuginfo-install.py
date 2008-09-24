@@ -21,8 +21,10 @@ sys.path.insert(0,'/usr/share/yum-cli/')
 import yum
 import yum.Errors
 
-from cli import *
 from utils import YumUtilBase
+
+import logging
+import rpmUtils
 
 
 class DebugInfoInstall(YumUtilBase):
@@ -39,11 +41,11 @@ class DebugInfoInstall(YumUtilBase):
                              DebugInfoInstall.VERSION,
                              DebugInfoInstall.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.debuginfoinstall")
+        # Add util commandline options to the yum-cli ones
+        self.optparser = self.getOptionParser() 
         self.main()
 
     def main(self):
-        # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser() 
         # Parse the commandline option and setup the basics.
         opts = self.doUtilConfigSetup()
         # Check if there is anything to do.
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     # does setlocale(LC_CTYPE, "")
     try:
         locale.setlocale(locale.LC_ALL, '')
-    except locale.Error, e:
+    except locale.Error, ex:
         # default to C locale if we get a failure.
         print >> sys.stderr, 'Failed to set locale, defaulting to C'
         os.environ['LC_ALL'] = 'C'
