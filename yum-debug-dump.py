@@ -30,10 +30,10 @@ from optparse import OptionParser
 class YumDebugDump(yum.YumBase):
 
     def __init__(self):
-        self.file_version = '1'      
+        self.file_version = '1'
         yum.YumBase.__init__(self)
         self.parse_args()
-    
+
     def parse_args(self):
         parser = OptionParser()
         parser.set_usage("yum-debug-dump [options]")
@@ -45,7 +45,7 @@ class YumDebugDump(yum.YumBase):
         msg = "%%%%RPMDB\n"
         for po in self.rpmdb:
             msg += '  %s:%s-%s-%s.%s\n' % (po.epoch, po.name, po.ver,po.rel, po.arch)
-        
+
         return msg
 
     def dump_repos(self):
@@ -67,17 +67,17 @@ class YumDebugDump(yum.YumBase):
         msg += "  rpm ver: %s\n" % subprocess.Popen(["rpm", "--version"], stdout=subprocess.PIPE).communicate()[0].strip()
         msg += "  python ver: %s\n" % sys.version.replace('\n', '')
         return msg
-        
+
     def dump_yum_config_info(self):
         msg = "%%%%YUM INFO\n"
         msg += "  arch: %s\n" % self.conf.yumvar['arch']
-        msg += "  basearch: %s\n" % self.conf.yumvar['basearch']        
+        msg += "  basearch: %s\n" % self.conf.yumvar['basearch']
         msg += "  releasever: %s\n" % self.conf.yumvar['releasever']
         msg += "  yum ver: %s\n" % yum.__version__
         msg += "  enabled plugins: %s\n" % ",".join(self.plugins._plugins.keys())
         msg += "  global excludes: %s\n" % ",".join(self.conf.exclude)
         return msg
-    
+
     def dump_rpm_problems(self):
 
         pkgs = {}
@@ -93,7 +93,7 @@ class YumDebugDump(yum.YumBase):
 
 
         errors = []
-        providers = {} # To speed depsolving, don't recheck deps that have 
+        providers = {} # To speed depsolving, don't recheck deps that have
                        # already been checked
         provsomething = {}
         for (pkg,reqs) in pkgs.items():
@@ -102,12 +102,12 @@ class YumDebugDump(yum.YumBase):
                     ver = None
                 rflags = flags & 15
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
-                
+
                 if not providers.has_key((req,rflags,ver)):
                     resolve_sack = self.rpmdb.whatProvides(req,rflags,ver)
                 else:
                     resolve_sack = providers[(req,rflags,ver)]
-                    
+
                 if len(resolve_sack) < 1:
                     errors.append("Package %s requires %s" % (pkg[0],
                       miscutils.formatRequire(req,ver,rflags)))
@@ -130,18 +130,18 @@ class YumDebugDump(yum.YumBase):
         return msg
 
 
-    
+
     def create_debug_file(self, fn=None):
         """create debug txt file and compress it, place it at yum_debug_dump.txt.gz
            unless fn is specified"""
         if not fn:
             fn = 'yum_debug_dump.txt.gz'
-        
+
         if not fn.startswith('/'):
             fn = '%s/%s' % (os.getcwd(), fn)
-        
+
         fo = gzip.GzipFile(fn, 'w')
-        
+
         msg = "yum-debug-dump version %s\n" % self.file_version
         fo.write(msg)
         fo.write(self.dump_system_info())
@@ -152,12 +152,12 @@ class YumDebugDump(yum.YumBase):
             fo.write(self.dump_repos())
         fo.close()
         return fn
-        
+
 def main():
     my = YumDebugDump()
     fn = my.create_debug_file()
     print "Output written to: %s" % fn
-    
+
 if __name__ == "__main__":
     main()
 

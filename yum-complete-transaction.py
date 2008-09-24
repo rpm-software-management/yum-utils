@@ -18,32 +18,31 @@ import sys
 sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
-from yum.misc import getCacheDir, setup_locale
+from yum.misc import setup_locale
 
 from cli import *
 from utils import YumUtilBase
 
-from urlparse import urljoin
-from urlgrabber.progress import TextMeter
+import logging
 
 
 try:
-   from yum.misc import find_unfinished_transactions, find_ts_remaining
+    from yum.misc import find_unfinished_transactions, find_ts_remaining
 except ImportError:
 
     import glob
     import os
     import os.path
-        
+
     def find_unfinished_transactions(yumlibpath='/var/lib/yum'):
-        """returns a list of the timestamps from the filenames of the unfinished 
+        """returns a list of the timestamps from the filenames of the unfinished
            transactions remaining in the yumlibpath specified.
         """
-        timestamps = []    
+        timestamps = []
         tsallg = '%s/%s' % (yumlibpath, 'transaction-all*')
-        tsdoneg = '%s/%s' % (yumlibpath, 'transaction-done*')
+        #tsdoneg = '%s/%s' % (yumlibpath, 'transaction-done*') # not used remove ?
         tsalls = glob.glob(tsallg)
-        tsdones = glob.glob(tsdoneg)
+        #tsdones = glob.glob(tsdoneg) # not used remove ?
 
         for fn in tsalls:
             trans = os.path.basename(fn)
@@ -52,86 +51,86 @@ except ImportError:
 
         timestamps.sort()
         return timestamps
-        
+
     def find_ts_remaining(timestamp, yumlibpath='/var/lib/yum'):
-        """this function takes the timestamp of the transaction to look at and 
+        """this function takes the timestamp of the transaction to look at and
            the path to the yum lib dir (defaults to /var/lib/yum)
            returns a list of tuples(action, pkgspec) for the unfinished transaction
            elements. Returns an empty list if none.
 
         """
-        
+
         to_complete_items = []
-        tsallpath = '%s/%s.%s' % (yumlibpath, 'transaction-all', timestamp)    
+        tsallpath = '%s/%s.%s' % (yumlibpath, 'transaction-all', timestamp)
         tsdonepath = '%s/%s.%s' % (yumlibpath,'transaction-done', timestamp)
         tsdone_items = []
 
         if not os.path.exists(tsallpath):
             # something is wrong, here, probably need to raise _something_
-            return to_complete_items    
+            return to_complete_items
 
-                
+
         if os.path.exists(tsdonepath):
             tsdone_fo = open(tsdonepath, 'r')
             tsdone_items = tsdone_fo.readlines()
-            tsdone_fo.close()     
-        
+            tsdone_fo.close()
+
         tsall_fo = open(tsallpath, 'r')
         tsall_items = tsall_fo.readlines()
         tsall_fo.close()
-        
+
         for item in tsdone_items:
             # this probably shouldn't happen but it's worth catching anyway
             if item not in tsall_items:
-                continue        
+                continue
             tsall_items.remove(item)
-            
+
         for item in tsall_items:
             item = item.replace('\n', '')
             if item == '':
                 continue
             (action, pkgspec) = item.split()
             to_complete_items.append((action, pkgspec))
-        
+
         return to_complete_items
 
 class YumCompleteTransaction(YumUtilBase):
     NAME = 'yum-complete-transactions'
     VERSION = '1.0'
     USAGE = """
-    yum-complete-transaction: completes unfinished yum transactions which occur due to error, failure 
+    yum-complete-transaction: completes unfinished yum transactions which occur due to error, failure
                               or act of $deity
-    
+
     usage: yum-complete-transaction
     """
-    
+
     def __init__(self):
         YumUtilBase.__init__(self,
                              YumCompleteTransaction.NAME,
                              YumCompleteTransaction.VERSION,
                              YumCompleteTransaction.USAGE)
-        self.logger = logging.getLogger("yum.verbose.cli.yumcompletets")                             
-        self.optparser = self.getOptionParser()         
+        self.logger = logging.getLogger("yum.verbose.cli.yumcompletets")
+        self.optparser = self.getOptionParser()
         self.addCmdOptions()
         self.main()
 
     def clean_up_ts_files(self, timestamp, path):
-    
-        # clean up the transactions 
+
+        # clean up the transactions
         tsdone = '%s/transaction-done.%s' % (path, timestamp)
-        tsall = '%s/transaction-all.%s' % (path, timestamp)        
+        tsall = '%s/transaction-all.%s' % (path, timestamp)
         for f in [tsall, tsdone]:
             if os.path.exists(f):
                 os.unlink(f)
 
     def addCmdOptions(self):
-        self.optparser.add_option("--cleanup-only", default=False, 
+        self.optparser.add_option("--cleanup-only", default=False,
             action="store_true", dest="cleanup",
             help='Do not complete the transaction just clean up transaction journals')
 
     def main(self):
         # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser() 
+        self.optparser = self.getOptionParser()
         # Parse the commandline option and setup the basics.
         try:
             opts = self.doUtilConfigSetup()
@@ -144,7 +143,7 @@ class YumCompleteTransaction(YumUtilBase):
             self.logger.error("Error: You must be root to run yum-complete-transaction.")
             sys.exit(1)
 
-               
+
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
         # Do the real action
@@ -155,7 +154,7 @@ class YumCompleteTransaction(YumUtilBase):
         # run it
         times = find_unfinished_transactions(self.conf.persistdir)
         if not times:
-            print "No unfinished transactions left."      
+            print "No unfinished transactions left."
             sys.exit()
 
         if opts.cleanup:
@@ -165,49 +164,49 @@ class YumCompleteTransaction(YumUtilBase):
                 print "Cleaning up %s" % timestamp
                 self.clean_up_ts_files(timestamp, self.conf.persistdir)
             sys.exit()
-        
-        print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)    
-        
+
+        print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)
+
         timestamp = times[-1]
         remaining = find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
         print "The remaining transaction had %d elements left to run" % len(remaining)
         for (action, pkgspec) in remaining:
             if action == 'install':
-               try:
-                   self.install(pattern=pkgspec)
-               except yum.Errors.InstallError, e:
-                   pass
+                try:
+                    self.install(pattern=pkgspec)
+                except yum.Errors.InstallError, e:
+                    pass
 
             if action == 'erase':
-               (e, m, u) = self.rpmdb.matchPackageNames([pkgspec])
-               for pkg in e:
-                   self.remove(po=pkg)
-                   
-                  
+                (e, m, u) = self.rpmdb.matchPackageNames([pkgspec])
+                for pkg in e:
+                    self.remove(po=pkg)
+
+
 
         self.buildTransaction()
         if len(self.tsInfo) < 1:
             print 'Nothing in the unfinished transaction to cleanup.'
-            print "Cleaning up completed transaction file"            
+            print "Cleaning up completed transaction file"
             self.clean_up_ts_files(timestamp, self.conf.persistdir)
             sys.exit()
-            
-        else:            
+
+        else:
             if self.doTransaction() == 0:
-                print "Cleaning up completed transaction file"            
+                print "Cleaning up completed transaction file"
                 self.clean_up_ts_files(timestamp, self.conf.persistdir)
                 sys.exit()
             else:
                 print "Not removing old transaction files"
                 sys.exit()
-                             
 
 
-        
-        
-    
+
+
+
+
 if __name__ == '__main__':
     setup_locale()
     util = YumCompleteTransaction()
-        
-       
+
+

@@ -82,7 +82,7 @@ ChangeLog: FORCE
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 
 pylint:
-	@pylint --rcfile=test/yum-utils-pylintrc yumdownloader.py
+	@pylint --rcfile=test/yum-utils-pylintrc yumdownloader.py yum-complete-transaction.py
 	
 	
 FORCE:	
