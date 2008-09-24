@@ -2,10 +2,19 @@
 # Test script to test yumdownloader
 echo "*********************  Testing yumdownloader  ***************************"
 echo "****  yumdownloader.py yum  (basic package download in current dir"
-rm yum*.rpm 
 python yumdownloader.py yum
+echo "*************************************************************************"
+echo "****  yumdownloader.py yum --source (packag source download)"
+python yumdownloader.py yum --source
+echo "*************************************************************************"
+echo "****  yumdownloader.py yum --destdir(packag source download)"
+mkdir dnl-tst
+python yumdownloader.py yum --destdir=dnl-tst
+dir dnl-tst/yum*
+rm -rf dnl-tst
 echo "*************************************************************************"
 echo "****  yumdownloader.py --resolve --url kdetoys (testing --resolv and --url)"
 python yumdownloader.py --resolve --url kdetoys
 echo "*************************************************************************"
+rm yum*.rpm 
 
