@@ -85,6 +85,7 @@ pylint:
 	@pylint --rcfile=test/yum-utils-pylintrc \
 		yumdownloader.py yum-complete-transaction.py yum-debug-dump.py yum-builddep.py \
                 debuginfo-install.py package-cleanup.py yum-groups-manager.py verifytree.py \
+		repotrack.py \
 		plugins/remove-with-leaves/remove-with-leaves.py \
 		plugins/upgrade-helper/upgrade-helper.py \
 		plugins/security/security.py \

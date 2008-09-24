@@ -62,7 +62,7 @@ class RepoTrack(yum.YumBase):
             dict[reqs] = [list of satisfying pkgs]"""
         
    
-        reqs = po.returnPrco('requires');
+        reqs = po.returnPrco('requires')
         reqs.sort()
         pkgresults = {}
         
