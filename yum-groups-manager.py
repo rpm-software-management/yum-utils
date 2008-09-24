@@ -79,9 +79,9 @@ def setup_opts():
                       dest="conffile", help="config file location")
 
     return parser
-
-def trans_data(yb, input):
-    data = input.split(':', 2)
+    
+def trans_data(yb, inp):
+    data = inp.split(':', 2)
     if len(data) != 2:
         yb.logger.error("Error: Incorrect translated data, should be: 'lang:text'")
         sys.exit(50)
@@ -188,17 +188,17 @@ def main():
 
     loaded_files = False
     for fname in opts.load:
-      try:
-        if not os.path.exists(fname):
-            yb.logger.error("File not found: %s" % fname)
-            continue
-        if fname.endswith('.gz'):
-            fname = gzip.open(cf)
-        comps.add(srcfile=fname)
-        loaded_files = True
-      except IOError, e:
-        yb.logger.error(e)
-        sys.exit(50)
+        try:
+            if not os.path.exists(fname):
+                yb.logger.error("File not found: %s" % fname)
+                continue
+            if fname.endswith('.gz'):
+                fname = gzip.open(fname)
+            comps.add(srcfile=fname)
+            loaded_files = True
+        except IOError, e:
+            yb.logger.error(e)
+            sys.exit(50)
 
     if not loaded_files and opts.remove:
         yb.logger.error("Can't remove package(s) when we havn't loaded any")
@@ -275,13 +275,13 @@ def main():
             group.default_packages[pkgname]   = 1
 
     for fname in opts.save:
-      try:
-        fo = open(fname, "wb")
-        fo.write(comps.xml())
-        del fo
-      except IOError, e:
-        yb.logger.error(e)
-        sys.exit(50)
+        try:
+            fo = open(fname, "wb")
+            fo.write(comps.xml())
+            del fo
+        except IOError, e:
+            yb.logger.error(e)
+            sys.exit(50)
 
     if (opts.print2stdout or (opts.print2stdout is None and not opts.save)):
         print comps.xml()
