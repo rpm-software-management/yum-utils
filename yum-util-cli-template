@@ -20,7 +20,6 @@ sys.path.insert(0,'/usr/share/yum-cli/')
 import yum
 import yum.Errors
 
-from cli import *
 from utils import YumUtilBase
 
 
