@@ -58,7 +58,7 @@ test-release:
 	# Make Changelog
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	@git commit -a -m "updated ChangeLog"
-    # Make archive
+    	# Make archive
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
 	# Build RPMS
@@ -84,6 +84,7 @@ ChangeLog: FORCE
 pylint:
 	@pylint --rcfile=test/yum-utils-pylintrc \
 		yumdownloader.py yum-complete-transaction.py yum-debug-dump.py yum-builddep.py \
-                debuginfo-install.py package-cleanup.py yum-groups-manager.py
+                debuginfo-install.py package-cleanup.py yum-groups-manager.py \
+		plugins/remove-with-leaves/remove-with-leaves.py 
 	
 FORCE:	
