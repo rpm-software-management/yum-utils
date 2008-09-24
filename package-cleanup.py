@@ -86,9 +86,7 @@ def buildProviderList(my, pkgs, reportProblems):
             if ver == '':
                 ver = None
             rflags = flags & 15
-            if req.startswith('rpmlib'):
-                continue # ignore rpmlib deps
-            
+            if req.startswith('rpmlib'): continue # ignore rpmlib deps
             if not providers.has_key((req,rflags,ver)):
                 resolve_sack = my.rpmdb.whatProvides(req,rflags,ver)
             else:
