@@ -20,6 +20,7 @@ import sys
 import time
 import os
 import locale
+import shutil
 
 from optparse import OptionParser
 
@@ -39,6 +40,12 @@ class DiffYum(yum.YumBase):
         repoid = repotype + str (len(self.dy_repos[repotype]) + 1)
         self.dy_repos[repotype].append(repoid)
      
+        #  The problem here is that we are arbitrarily changing the repos
+        # that are backed by the new1/old1 etc. repoids ... yum thinks they
+        # are the same repo. and thus. treats them accordingly.
+        shutil.rmtree("%s/%s" % (self.dy_basecachedir, repoid),
+                      ignore_errors=True)
+
         # make our new repo obj
         newrepo = yum.yumRepo.YumRepository(repoid)
         newrepo.name = repoid
