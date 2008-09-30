@@ -78,7 +78,7 @@ def getInstalledKernels(c):
     return _whatProvides(c, kernelProvides)
 
 def getInstalledModules(c):
-    return _whatProvides(c, ["kernel-modules"])
+    return _whatProvides(c, ["kernel-modules", "kernel-modules-for-kernel"])
 
 def getKernelProvides(po):
     """Pass in a package header.  This function will return a list of
@@ -274,7 +274,9 @@ def init_hook(c):
 
 def postresolve_hook(c):
 
-    avaModules = c.getRepos().getPackageSack().searchProvides("kernel-modules")
+    avaModules = []
+    for name in ("kernel-modules", "kernel-modules-for-kernel"):
+        avaModules += c.getRepos().getPackageSack().searchProvides(name)
     newModules = []
     newKernels = []
 
@@ -290,7 +292,8 @@ def postresolve_hook(c):
             installedKernels.remove(te.po)
         if te.ts_state not in ('i', 'u'):
             continue
-        if "kernel-modules" in te.po.provides_names:
+        if ("kernel-modules" in te.po.provides_names or
+            "kernel-modules-for-kernel" in te.po.provides_names):
             newModules.append(te.po)
             for po in avaModules:
                 if te.po.pkgtup == po.pkgtup:
