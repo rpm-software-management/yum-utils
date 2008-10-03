@@ -23,6 +23,14 @@ from yum import Errors
 from optparse import OptionParser
 import ConfigParser
 
+# Subclass ConfigParser so that the options don't get lowercased.  This is
+# important given that they are path names.
+class LocalConfigParser(ConfigParser.ConfigParser):
+    """A subclass of ConfigParser which does not lowercase options"""
+
+    def optionxform(self, optionstr):
+        return optionstr
+
 ####
 # take a file path to a repo as an option, verify all the metadata vs repomd.xml
 # optionally go through packages and verify them vs the checksum in the primary
@@ -74,7 +82,7 @@ def treeinfo_checksum(treeinfo):
     # read treeinfo file into cp
     # take checksums section
     result = 0
-    cp = ConfigParser.ConfigParser()
+    cp = LocalConfigParser()
     try:
         cp.read(treeinfo)
     except ConfigParser.MissingSectionHeaderError:
