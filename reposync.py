@@ -116,7 +116,9 @@ def parseArgs():
         help="enable yum plugin support")
     parser.add_option("-m", "--downloadcomps", default=False, action="store_true",
         help="also download comps.xml")
-        
+    parser.add_option("","--download-metadata", dest="downloadmd", 
+        default=False, action="store_true", 
+        help="download all the non-default metadata")
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -203,9 +205,8 @@ def main():
                     my.logger.info("Removing obsolete %s", pkg)
                 os.unlink(current_pkgs[pkg]['path'])
 
-        if opts.downloadcomps:
-            try: # download comps.xml
-                compsfile = repo.getGroups()
+        if opts.downloadcomps or opts.downloadmd:
+            try: # download random other metadata
                 if not os.path.exists(local_repo_path):
                     try:
                         os.makedirs(local_repo_path)
@@ -213,11 +214,22 @@ def main():
                         my.logger.error("Could not make repo subdir: %s" % e)
                         my.closeRpmDB()
                         sys.exit(1)
-
-                shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
-            except yum.Errors.RepoMDError:
+                if opts.downloadcomps:
+                    compsfile = repo.getGroups()
+                    shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
+                if opts.downloadmd:
+                    for ftype in repo.repoXML.fileTypes():
+                        if ftype in ['primary', 'primary_db', 'filelists',
+                                     'filelists_db', 'other', 'other_db']:
+                            continue
+                        if opts.downloadcomps and ftype == 'group':
+                            continue
+                        resultfile = repo.retrieveMD(ftype)
+                        basename  = os.path.basename(resultfile)
+                        shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
+            except yum.Errors.RepoMDError,e :
                 if not opts.quiet:
-                    my.logger.error("Unable to fetch comps.xml")
+                    my.logger.error("Unable to fetch metadata: %s" % e)
 
         download_list.sort(sortPkgObj)
         n = 0
