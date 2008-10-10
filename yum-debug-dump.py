@@ -158,6 +158,7 @@ class YumDebugDump(yum.YumBase):
 
 def main():
     my = YumDebugDump()
+    my.doConfigSetup(init_plugins=True)
     fn = my.create_debug_file()
     print "Output written to: %s" % fn
 
