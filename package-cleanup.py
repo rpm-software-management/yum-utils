@@ -35,7 +35,7 @@ from yum.misc import getCacheDir
 
 def initYum(opts):
     my = yum.YumBase()
-    my.doConfigSetup(opts.conffile,init_plugins=False)
+    my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins)
     if opts.orphans:
         # make it work as non root user.
         if my.conf.uid != 0:
@@ -379,7 +379,9 @@ def parseArgs():
       help='When listing leaf nodes do not list packages with files in bin dirs')
 
     parser.add_option("--orphans", default=False, dest="orphans",action="store_true",
-      help='List installed packages which are not available from currenly configured repositories.')
+      help='List installed packages which are not available from currenly configured repositories')
+    parser.add_option("--noplugins", default=False, dest="noplugins",action="store_true",
+      help='Turn plugin support off')
     parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
       help='Print out nothing unecessary')
     parser.add_option("-y", default=False, dest="confirmed",action="store_true",
