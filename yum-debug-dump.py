@@ -45,18 +45,18 @@ class YumDebugDump(yum.YumBase):
 
     def dump_rpmdb(self):
         msg = "%%%%RPMDB\n"
-        for po in self.rpmdb:
+        for po in sorted(self.rpmdb):
             msg += '  %s:%s-%s-%s.%s\n' % (po.epoch, po.name, po.ver,po.rel, po.arch)
 
         return msg
 
     def dump_repos(self):
         msg = "%%%%REPOS\n"
-        for repo in self.repos.listEnabled():
+        for repo in sorted(self.repos.listEnabled()):
             try:
                 msg += '%%%s - %s\n' % (repo.id, repo.urls[0])
                 msg += "  excludes: %s\n" % ",".join(repo.exclude)
-                for po in self.pkgSack.returnPackages(repo.id):
+                for po in sorted(self.pkgSack.returnPackages(repo.id)):
                     msg += '  %s:%s-%s-%s.%s\n' % (po.epoch, po.name, po.ver,po.rel, po.arch)
             except Errors.RepoError, e:
                 msg += "Error accessing repo %s: %s\n" % (repo, str(e))
@@ -98,7 +98,7 @@ class YumDebugDump(yum.YumBase):
         providers = {} # To speed depsolving, don't recheck deps that have
                        # already been checked
         provsomething = {}
-        for (pkg,reqs) in pkgs.items():
+        for (pkg,reqs) in sorted(pkgs.items()):
             for (req,flags,ver)  in reqs:
                 if ver == '':
                     ver = None
@@ -124,15 +124,12 @@ class YumDebugDump(yum.YumBase):
                     # package has the same requirement
                     providers[(req,rflags,ver)] = resolve_sack
 
-
         msg = "%%%%RPMDB PROBLEMS\n"
         for error in errors:
             msg += "%s\n" % error
 
         # possibly list all verify failures, too
         return msg
-
-
 
     def create_debug_file(self, fn=None):
         """create debug txt file and compress it, place it at yum_debug_dump.txt.gz
