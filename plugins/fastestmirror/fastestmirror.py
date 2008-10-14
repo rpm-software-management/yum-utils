@@ -192,11 +192,13 @@ def postreposetup_hook(conduit):
         if str(repo) not in repomirrors:
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         if exclude:
-            for mirror in repomirrors[str(repo)]:
+            def excludeCheck(mirror):
                 if filter(lambda exp: exp in host(mirror),
                           exclude.replace(',', ' ').split()):
                     conduit.info(2, "Excluding mirror: %s" % host(mirror))
-                    repomirrors[str(repo)].remove(mirror)
+                    return False
+                return True
+            repomirrors[str(repo)] = filter(excludeCheck,repomirrors[str(repo)])
         repo.urls = repomirrors[str(repo)]
         if len(repo.urls):
             conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
@@ -209,6 +211,7 @@ def postreposetup_hook(conduit):
 
     if not loadcache:
         write_timedhosts()
+
 
 def read_timedhosts():
     """
