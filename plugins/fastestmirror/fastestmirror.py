@@ -130,7 +130,7 @@ def _len_non_ftp(urls):
         if url.startswith("ftp:"):
             continue
         num += 1
-    return 0
+    return num
 
 def postreposetup_hook(conduit):
     """
