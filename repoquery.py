@@ -570,7 +570,10 @@ class YumBaseQuery(yum.YumBase):
         loc = []
         for pkg in self.returnByName(name):
             repo = self.repos.getRepo(pkg['repoid'])
-            loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
+            if pkg['basepath']:
+                loc.append("%s/%s" % (pkg['basepath'], pkg['relativepath']))
+            else:
+                loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
 
 def main(args):
