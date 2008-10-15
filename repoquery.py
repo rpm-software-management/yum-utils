@@ -768,6 +768,7 @@ def main(args):
             newrepo.name = repopath
             newrepo.baseurl = baseurl
             newrepo.basecachedir = repoq.conf.cachedir
+            newrepo.metadata_expire = 0
             repoq.repos.add(newrepo)
             repoq.repos.enableRepo(newrepo.id)
             repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))

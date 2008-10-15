@@ -35,7 +35,7 @@ from yum.misc import getCacheDir
 
 def initYum(opts):
     my = yum.YumBase()
-    my.doConfigSetup(opts.conffile,init_plugins=False)
+    my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins)
     if opts.orphans:
         # make it work as non root user.
         if my.conf.uid != 0:
@@ -236,15 +236,15 @@ def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
             print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
 
 def listOrphans(my):
-    installed = my.rpmdb.simplePkgList()
-    for pkgtup in installed:
-        (n,a,e,v,r) = pkgtup
-        if n == "gpg-pubkey":
+    """ This is "yum list extras". """
+    avail = my.pkgSack.simplePkgList()
+    avail = set(avail)
+    for po in sorted(my.rpmdb.returnPackages()):
+        (n,a,e,v,r) = po.pkgtup
+        if n == "gpg-pubkey": # Not needed as of at least 3.2.19, but meh
             continue
 
-        try:
-            po = my.getPackageObject(pkgtup)
-        except Errors.DepError:
+        if po.pkgtup not in avail:
             print "%s-%s-%s.%s" % (n, v, r, a)
 
 def getKernels(my):
@@ -379,7 +379,9 @@ def parseArgs():
       help='When listing leaf nodes do not list packages with files in bin dirs')
 
     parser.add_option("--orphans", default=False, dest="orphans",action="store_true",
-      help='List installed packages which are not available from currenly configured repositories.')
+      help='List installed packages which are not available from currenly configured repositories')
+    parser.add_option("--noplugins", default=False, dest="noplugins",action="store_true",
+      help='Turn plugin support off')
     parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
       help='Print out nothing unecessary')
     parser.add_option("-y", default=False, dest="confirmed",action="store_true",
