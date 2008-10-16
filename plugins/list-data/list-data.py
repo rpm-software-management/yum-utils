@@ -56,9 +56,10 @@ plugin_type = (TYPE_INTERACTIVE,)
 class ListDataCommands:
     unknown = "-- Unknown --"
     
-    def __init__(self, name, attr):
+    def __init__(self, name, attr, help=None):
         self.name = name
         self.attr = attr
+        self.__help = help
 
     def cmd_beg(self):
         pass
@@ -73,6 +74,8 @@ class ListDataCommands:
         return "[PACKAGE|all|installed|updates|extras|obsoletes|recent]"
 
     def _getSummary(self):
+        if self.__help is not None:
+            return self.__help
         return """\
 Display aggregate data on the %s attribute of a group of packages""" % self.attr
 
@@ -289,8 +292,11 @@ def yum_group_get_data(self, pkg):
         return (self.unknown, self.unknown)
     return (all_yum_grp_mbrs[pkg.name], all_yum_grp_mbrs[pkg.name])
 
-def _list_data_custom(conduit, data, func, beg=None, end=None):
-    cmd = ListDataCommands(*data)
+def _list_data_custom(conduit, data, func, beg=None, end=None, help=None):
+    if help is not None:
+        cmd = ListDataCommands(data[0], data[1], help=help)
+    else:
+        cmd = ListDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
     if beg:
@@ -299,7 +305,10 @@ def _list_data_custom(conduit, data, func, beg=None, end=None):
         cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
 
-    cmd = InfoDataCommands(*data)
+    if help is not None:
+        cmd = InfoDataCommands(data[0], data[1], help=help)
+    else:
+        cmd = InfoDataCommands(*data)
     cmd.oget_data = cmd.get_data 
     cmd.get_data  = types.MethodType(func, cmd)
     if beg:
@@ -308,7 +317,6 @@ def _list_data_custom(conduit, data, func, beg=None, end=None):
         cmd.cmd_end = types.MethodType(end, cmd)
     conduit.registerCommand(cmd)
     
-        
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
@@ -331,9 +339,10 @@ def config_hook(conduit):
     _list_data_custom(conduit, ('archive-sizes', 'archivesize'), size_get_data)
     _list_data_custom(conduit, ('installed-sizes', 'installedsize'),
                       size_get_data)
-    
+
     _list_data_custom(conduit, ('groups', conduit._base),
                       yum_group_get_data,
-                      beg=yum_group_make_data, end=yum_group_free_data)
+                      beg=yum_group_make_data, end=yum_group_free_data,
+                      help='Display aggregate group data, for matching members')
     
     # Buildtime/installtime/committime?
