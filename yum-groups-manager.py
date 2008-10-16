@@ -8,6 +8,7 @@ import optparse
 import gzip
 
 import yum
+from yum.misc import to_unicode
 import yum.comps
 
 sys.path.insert(0, '/usr/share/yum-cli')
@@ -91,7 +92,7 @@ def trans_data(yb, inp):
     if not lang:
         yb.logger.error("Error: Incorrect/empty language for translated data")
         sys.exit(50)
-    return lang, text
+    return lang, to_unicode(text)
 
 __req2pkgs = {}
 def req2pkgs(yb, req):
