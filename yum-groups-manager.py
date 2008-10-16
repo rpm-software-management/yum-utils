@@ -285,7 +285,9 @@ def main():
             sys.exit(50)
 
     if (opts.print2stdout or (opts.print2stdout is None and not opts.save)):
-        print comps.xml()
+        # Why the to_unicode()? Why is it converting at all?
+        # Why doesn't setup_locale() fix this? ... all good questions
+        print to_unicode(comps.xml())
 
 if __name__ == "__main__":
     main()
