@@ -1,0 +1,19 @@
+#action_key:transaction_state:command
+# action_key can be: pkgglob, /path/to/file (wildcards allowed)
+# transaction_state can be: install,update,remove,any
+# command can be: any shell command
+# file matches cannot be used with removes b/c we don't have the info available
+
+zsh:install:touch /tmp/zsh-installed
+zsh:remove:touch /tmp/zsh-removed
+zsh:install:touch /tmp/zsh-installed-also
+/bin/z*h:install:touch /tmp/bin-zsh-installed
+z*h:any:touch /tmp/bin-zsh-any
+
+# THOUGHTS FOR LATER:
+# - what about options/vars to pass to the commands based on the pkg being changed?
+# - prcos?
+# - figure out a way to do filelists for removed pkgs?
+# - allow multiple states per line?
+
+
