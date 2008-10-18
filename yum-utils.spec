@@ -8,7 +8,7 @@ Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://linux.duke.edu/yum/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python >= 2.4 , yum >= 3.2.19
+Requires: python >= 2.4 , yum >= 3.2.20
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
