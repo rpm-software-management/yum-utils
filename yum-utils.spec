@@ -365,6 +365,7 @@ fi
 %{_mandir}/man1/package-cleanup.1.*
 %{_mandir}/man1/repo-rss.1.*
 %{_mandir}/man1/repoquery.1.*
+%{_mandir}/man1/repodiff.1.*
 %{_mandir}/man1/reposync.1.*
 %{_mandir}/man1/yum-builddep.1.*
 %{_mandir}/man1/yum-debug-dump.1.*
