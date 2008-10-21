@@ -182,7 +182,7 @@ class YumCompleteTransaction(YumUtilBase):
 
 
 
-        self.buildTransaction()
+        self.buildTransaction(unfinished_transactions_check=False)
         if len(self.tsInfo) < 1:
             print 'Nothing in the unfinished transaction to cleanup.'
             print "Cleaning up completed transaction file"
