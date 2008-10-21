@@ -21,6 +21,7 @@ import time
 import os
 import locale
 import shutil
+from yum.misc import to_unicode
 
 from optparse import OptionParser
 
@@ -211,7 +212,8 @@ def main(args):
                 clogdelta = []
                 for (t, author, content) in  pkg.changelog:
                       if t > oldtime:
-                          msg += "* %s %s\n%s\n\n" % (time.ctime(int(t)), author, content)
+                          msg += "* %s %s\n%s\n\n" % (time.ctime(int(t)), 
+                            to_unicode(author), to_unicode(content))
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 total_sizechange += sizechange
