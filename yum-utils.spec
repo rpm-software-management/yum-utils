@@ -361,6 +361,7 @@ fi
 %{_bindir}/yum-groups-manager
 %{_sbindir}/yum-complete-transaction
 %{_mandir}/man1/yum-utils.1.*
+%{_mandir}/man1/debuginfo-install.1.*
 %{_mandir}/man1/package-cleanup.1.*
 %{_mandir}/man1/repo-rss.1.*
 %{_mandir}/man1/repoquery.1.*

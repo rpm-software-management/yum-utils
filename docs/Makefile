@@ -1,5 +1,5 @@
 DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changelog reposync \
-       yum-list-data yum-filter-data yum-verify yum-utils yum-aliases yum-debug-dump yum-versionlock yum-groups-manager
+       yum-list-data yum-filter-data yum-verify yum-utils yum-aliases yum-debug-dump yum-versionlock yum-groups-manager debuginfo-install
 DOCS5 = yum-changelog.conf yum-versionlock.conf
 DOCS8 = yum-security yum-complete-transaction 
 
