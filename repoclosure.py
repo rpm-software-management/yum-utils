@@ -171,6 +171,8 @@ def main():
             newrepo.name = repopath
             newrepo.baseurl = baseurl
             newrepo.basecachedir = my.conf.cachedir
+            newrepo.metadata_expire = 0
+            newrepo.timestamp_check = False
             my.repos.add(newrepo)
             my.repos.enableRepo(newrepo.id)
             my.logger.info( "Added %s repo from %s" % (repoid,repopath))

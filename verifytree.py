@@ -166,6 +166,7 @@ def main():
     newrepo.baseurl = [url]
     newrepo.basecachedir = my.conf.cachedir
     newrepo.metadata_expire = 0
+    newrepo.timestamp_check = False
     newrepo.enablegroups = 1
     # we want *all* metadata
     newrepo.mdpolicy = 'group:all'
