@@ -6,8 +6,8 @@ VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk -F%: '/Release:/ { print $$2 }' ${PKGNAME}.spec ')
 SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }' ${PKGNAME}.spec )
 SRPM_FILE = ${PKGNAME}-${VERSION}-${SRPM_RELEASE}.src.rpm
-WEBHOST = login.dulug.duke.edu
-WEBPATH = /home/groups/yum/web/download/yum-utils/
+WEBHOST = yum.baseurl.org
+WEBPATH = /srv/projects/yum/web/download/yum-utils/
 
 NMPROG=yum-NetworkManager-dispatcher
 NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d

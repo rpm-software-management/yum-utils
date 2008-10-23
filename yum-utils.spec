@@ -4,8 +4,8 @@ Version: 1.1.17
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
-Source: http://linux.duke.edu/yum/download/yum-utils/%{name}-%{version}.tar.gz
-URL: http://linux.duke.edu/yum/download/yum-utils/
+Source: http://yum.baseurl.org/download/yum-utils/%{name}-%{version}.tar.gz
+URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 Requires: python >= 2.4 , yum >= 3.2.20
@@ -271,6 +271,15 @@ This plugin removes any unused dependencies that were brought in by an install
 but would not normally be removed. It helps to keep a system clean of unused
 libraries and packages.
 
+%package -n yum-post-transaction-actions
+Summary: Yum plugin to run arbitrary commands when certain pkgs are acted on
+Group: System Environment/Base
+Requires: yum >= 3.2.19
+
+%description -n yum-post-transaction-actions
+This plugin allows the user to run arbitrary actions immediately following a
+transaction when specified packages are changed.
+
 %package -n yum-NetworkManager-dispatcher
 Summary: Yum plugin to deal with changing networks with NetworkManager
 Group: System Environment/Base
@@ -315,6 +324,7 @@ plugins="\
  verify \
  keys \
  remove-with-leaves \
+ post-transaction-actions \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -509,6 +519,13 @@ fi
 %defattr(-, root, root)
 /usr/lib/yum-plugins/remove-with-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
+
+%files -n yum-post-transaction-actions
+%defattr(-, root, root)
+/usr/lib/yum-plugins/post-transaction-actions.*
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
+%doc plugins/post-transaction-actions/sample.action
+
 
 %changelog
 * Fri Sep 19 2008 Tim Lauridsen <timlau@fedoraproject.org>
