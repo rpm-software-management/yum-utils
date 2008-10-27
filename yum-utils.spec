@@ -291,6 +291,15 @@ happens in NetworkManager. Note that currently there is no checking of
 previous data, so if your WiFi keeps going up and down (or you suspend/resume
 a lot) yum will recheck it's cached data a lot.
 
+%package -n yum-rpm-warm-cache
+Summary: Yum plugin to access the rpmdb files early to warm up access to the db 
+Group: System Environment/Base
+Requires: yum >= 3.2.19
+
+%description -n yum-rpm-warm-cache
+This plugin reads the rpmdb files into the system cache before accessing the
+rpmdb directly. In some cases this should speed up access to rpmdb information
+
 %prep
 %setup -q
 
@@ -325,6 +334,7 @@ plugins="\
  keys \
  remove-with-leaves \
  post-transaction-actions \
+ rpm-warm-cache \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -526,8 +536,16 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
 %doc plugins/post-transaction-actions/sample.action
 
+%files -n yum-rpm-warm-cache
+%defattr(-, root, root)
+/usr/lib/yum-plugins/rpm-warm-cache
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
+
 
 %changelog
+* Mon Oct 27 2008 Seth Vidal <skvidal at fedoraproject.org>
+- add rpm-warm-cache plugin
+
 * Fri Sep 19 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - removed skip-broken plugin
 
