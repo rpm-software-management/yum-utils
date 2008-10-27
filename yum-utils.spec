@@ -538,7 +538,7 @@ fi
 
 %files -n yum-rpm-warm-cache
 %defattr(-, root, root)
-/usr/lib/yum-plugins/rpm-warm-cache
+/usr/lib/yum-plugins/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
 
 
