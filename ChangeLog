@@ -1,3 +1,297 @@
+2008-10-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.18
+
+2008-10-27  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: forgot the .*
+
+2008-10-27  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/rpm-warm-cache/rpm-warm-cache.conf,
+	plugins/rpm-warm-cache/rpm-warm-cache.py, yum-utils.spec: 
+	rpm-warm-cache plugin
+
+2008-10-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, yum-utils.spec: - change urls - add post-transaction-actions to the spec file
+
+2008-10-22  James Antill <james@and.org>
+
+	* repoclosure.py, verifytree.py: More timestamp_check usage, really
+	need a repofrompath type helper function
+
+2008-10-22  James Antill <james@and.org>
+
+	* repodiff.py, repoquery.py: Use the new timestamp_check repo option
+	for the repoids that need it
+
+2008-10-21  James Antill <james@and.org>
+
+	* docs/debuginfo-install.1: Actaully add the debuginfo-install man
+	page
+
+2008-10-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/package-cleanup.1, docs/repo-rss.1, docs/repodiff.1,
+	docs/repoquery.1, docs/reposync.1, docs/yum-builddep.1,
+	docs/yum-complete-transaction.8, docs/yum-debug-dump.1,
+	docs/yum-groups-manager.1, docs/yumdownloader.1: 
+	yum-utils.baseurl.org doesn't exist
+
+2008-10-21  James Antill <james@and.org>
+
+	* docs/Makefile, docs/repodiff.1, yum-utils.spec: Add repodiff man
+	page
+
+2008-10-21  James Antill <james@and.org>
+
+	* docs/package-cleanup.1, docs/repo-rss.1, docs/repoquery.1,
+	docs/reposync.1, docs/yum-builddep.1, docs/yum-changelog.1,
+	docs/yum-complete-transaction.8, docs/yum-debug-dump.1,
+	docs/yum-groups-manager.1, docs/yum-list-data.1,
+	docs/yum-versionlock.1, docs/yumdownloader.1: Update documentation
+	for duke.edu => baseurl.org change
+
+2008-10-21  James Antill <james@and.org>
+
+	* docs/Makefile, yum-utils.spec: Add debuginfo-install man page
+
+2008-10-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Don't check
+	for unfinished transactions when completing transactions
+
+2008-10-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: fix unicode issues on outputting changelogs
+
+2008-10-17  James Antill <james@and.org>
+
+	* yum-complete-transaction.py, yum-utils.spec: Don't check for
+	unfinished transactions when completing transactions
+
+2008-10-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/post-transaction-actions/post-transaction-actions.conf,
+	plugins/post-transaction-actions/post-transaction-actions.py,
+	plugins/post-transaction-actions/sample.action: add
+	post-transaction-actions - but don't add it to be built, yet
+
+2008-10-16  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Fix groups-manager again, for loads this
+	time
+
+2008-10-16  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Fix translated names with full utf-8 in
+	them
+
+2008-10-16  James Antill <james@and.org>
+
+	* plugins/list-data/list-data.py: Don't output the cli object in the
+	help, fixes bug 467191
+
+2008-10-16  Jan Hutař <jhutar@redhat.com>
+
+	* docs/yum-groups-manager.1: Fix typo in groups-manager man page
+
+2008-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:
+	[fastestmirror] Return the correct value from _len_non_ftp   Fix
+	fastestmirror's exclusion code.   Sort the dump output, to it's
+	consistent   Enable plugins, so we can print out which are enabled
+	(and spacewalk works)   Speedup package-cleanup --orphans, as yum
+	list extras is   Turn plugins on in package-cleanup, and add an
+	option to turn them off   Always refresh the cache for a manual
+	repo. For repoquery;createrepo;repoquery
+
+2008-10-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make sure --location returns the proper location if
+	we have a basepath
+
+2008-10-14  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: [fastestmirror] Return the
+	correct value from _len_non_ftp
+
+2008-10-14  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: Fix fastestmirror's
+	exclusion code.  This fixes the exclusion code to to avoid changing
+	the array that is being iterated.  Thanks to Johnny Casey for
+	pointing this out to me and offering up a potential solution.
+
+2008-10-10  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Sort the dump output, to it's consistent
+
+2008-10-10  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Enable plugins, so we can print out which are
+	enabled (and spacewalk works)
+
+2008-10-10  James Antill <james@and.org>
+
+	* package-cleanup.py: Speedup package-cleanup --orphans, as yum list
+	extras is
+
+2008-10-10  James Antill <james@and.org>
+
+	* package-cleanup.py: Turn plugins on in package-cleanup, and add an
+	option to turn them off
+
+2008-10-10  James Antill <james@and.org>
+
+	* repoquery.py: Always refresh the cache for a manual repo. For
+	repoquery;createrepo;repoquery
+
+2008-10-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* verifytree.py: apply patch from jkeating to make config parser use
+	in verifytree stop being case insensitive due to file path names in
+	the config verifytree is reading
+
+2008-10-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: add option --download-metadata to grab all metadata
+	that is not   primary*, filelist*, other* useful for syncing over
+	updateinfo, comps, etc.
+
+2008-09-30  James Antill <james@and.org>
+
+	* plugins/fedorakmod/fedorakmod.py: Add other kernel-modules virtual
+	provide, bug 462099
+
+2008-09-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: make sure we
+	don't remove if things are just being updated :)
+
+2008-09-25  James Antill <james@and.org>
+
+	* repodiff.py: Delete any "old" repo. data in the repodiff repo.
+	dirs.
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, reposync.py: add reposync to pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, repotrack.py: add repotrack to pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, verifytree.py: add verifytree to pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc: add security to pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, plugins/upgrade-helper/upgrade-helper.py: add
+	upgrade-helper to pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc: add remove-with-leaves to
+	pylint check
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py, test/yum-utils-pylintrc: disable *More than
+	one statement on a single line* pylint warning an undo some crazy
+	stuff
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* test/test-yumdownloader: make the test-yumdownloader script a
+	little better
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc, yum-groups-manager.py: 
+	yum-groups-manager.py to pylint check and cleaned it up
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, package-cleanup.py, test/yum-utils-pylintrc: add
+	package-cleanup.py to pylint check and cleaned it up
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, debuginfo-install.py, test/yum-utils-pylintrc,
+	yum-complete-transaction.py: add debuginfo-install to pylint check
+	and cleaned up the problems also fixed some issues in
+	yum-complete-transaction
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-util-cli-template: remove cli wildcard import
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc, yum-builddep.py: add
+	yum-builddep to pylint check and cleaned up the problems
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc, yum-debug-dump.py: add
+	yum-debug-dump to pylint check and cleaned up the problems
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc, yum-complete-transaction.py,
+	yum-debug-dump.py: add yum-complete-transaction to pylint check and
+	cleaned up the problems
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yumdownloader.py: remove cli wildcard import
+
+2008-09-24  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc, yumdownloader.py: Added
+	'pylint' target to Makefile Added pylint rc file yumdownloader
+	cleanup based on pylint messages
+
+2008-09-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: removed skip-broken plugin
+
+2008-09-19  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils  * 'master'
+	of ssh://login.linux.duke.edu/home/groups/yum/git/yum-utils:   Don't
+	hide download errors in downloadonly mode   updated ChangeLog
+	bumped yum-utils version to 1.1.17   Use calcColumns in keys plugin
+	Pass used_map to _has_id from ysp_should_filter_pkg, fixes bug
+	462372
+
+2008-09-19  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: document the
+	fixme a bit better
+
+2008-09-19  James Antill <james@and.org>
+
+	* plugins/downloadonly/downloadonly.py: Don't hide download errors
+	in downloadonly mode
+
+2008-09-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2008-09-17  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.17
