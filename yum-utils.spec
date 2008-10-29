@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.17
+Version: 1.1.18
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -543,6 +543,9 @@ fi
 
 
 %changelog
+* Wed Oct 29 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.18
+
 * Mon Oct 27 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add rpm-warm-cache plugin
 
