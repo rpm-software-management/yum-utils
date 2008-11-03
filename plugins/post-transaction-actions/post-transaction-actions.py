@@ -12,8 +12,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#TODO: pass options to exec'd commands for use on cli: $name $arch $process, etc, etc
-
 # Copyright 2008 Red Hat, Inc
 # written by Seth Vidal <skvidal@fedoraproject.org>
 
@@ -26,11 +24,11 @@ the transaction.
 from yum.plugins import TYPE_CORE
 from yum.constants import *
 import yum.misc
+from yum.parser import varReplace
 from yum.packages import parsePackages
 import fnmatch
 import re
 import os
-import subprocess
 import glob
 import shlex
 
@@ -68,6 +66,33 @@ def _get_installed_po(rpmdb, pkgtup):
         return _just_installed[pkgtup]
     return rpmdb.searchNevra(name=n, arch=a, epoch=e, ver=v, rel=r)[0]
 
+def _convert_vars(txmbr, command):
+    """converts %options on the command to their values from the package it
+       is running it for: takes $name, $arch, $ver, $rel, $epoch, 
+       $state, $repoid"""
+    state_dict = { TS_INSTALL: 'install',
+                   TS_TRUEINSTALL: 'install',
+                   TS_OBSOLETING: 'obsoleting',
+                   TS_UPDATE: 'updating',
+                   TS_ERASE: 'remove',
+                   TS_OBSOLETED: 'obsoleted',
+                   TS_UPDATED: 'updated'}
+    try:
+        state = state_dict[txmbr.output_state]
+    except KeyError:
+        state = 'unknown - %s' % txmbr.output_state
+
+    vardict = {'name': txmbr.name,
+               'arch': txmbr.arch,
+               'ver': txmbr.version,
+               'rel': txmbr.release,
+               'epoch': txmbr.epoch,
+               'repoid': txmbr.repoid,
+               'state':  state }
+
+    result = varReplace(command, vardict)
+    return result
+            
 def posttrans_hook(conduit):
     # we have provides/requires for everything
     # we do not have filelists for erasures
@@ -110,12 +135,14 @@ def posttrans_hook(conduit):
         
                 if not yum.misc.re_glob(a_k):
                     if a_k in thispo.filelist + thispo.dirlist + thispo.ghostlist:
-                        commands_to_run[a_c] = 1
+                        thiscommand = _convert_vars(txmbr, a_c)
+                        commands_to_run[thiscommand] = 1
                         matched = True
                 else:
                     for name in thispo.filelist + thispo.dirlist + thispo.ghostlist:
                         if c_string.match(name):
-                            commands_to_run[a_c] = 1
+                            thiscommand = _convert_vars(txmbr, a_c)
+                            commands_to_run[thiscommand] = 1
                             matched = True
                             break
                 
@@ -123,11 +150,14 @@ def posttrans_hook(conduit):
                     break
             continue
         
-        if a_k.find('//') == -1: # pkgspec
+        if a_k.find('/') == -1: # pkgspec
             pkgs = [ txmbr.po for txmbr in pkgset ]
             e,m,u = parsePackages(pkgs, [a_k])
             if not u:
-                commands_to_run[a_c] = 1
+                for pkg in e+m:
+                    for txmbr in ts.getMembers(pkgtup=pkg.pkgtup):
+                        thiscommand = _convert_vars(txmbr, a_c)
+                        commands_to_run[thiscommand] = 1
             continue
 
     for comm in commands_to_run.keys():
@@ -138,7 +168,7 @@ def posttrans_hook(conduit):
             continue
         #try
         conduit.info(2,'Running post transaction command: %s' % comm)
-        p = subprocess.Popen(args)
+        p = os.system(comm)
         #except?
 
 
