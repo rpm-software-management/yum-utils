@@ -20,18 +20,28 @@ Report program version and exit.
 Specify which repository to query. Using this option disables all repositories
 not explicitly enabled with --repoid option (can be used multiple times). By
 default repoquery uses whatever repositories are enabled in YUM configuration.
+.IP "\fB\-\-enablerepo=<repo>\fP"
+In addition to the default set, query the given additional repository, even if
+it is disabled in YUM configuration.  Can be used multiple times.
+.IP "\fB\-\-disablerepo=<repo>\fP"
+Do not query the given repository, even if it is enabled in YUM
+configuration.  Can be used multiple times.
 .IP "\fB\-\-repofrompath=<repoid>,<path/url>\fP"
 Specify a path or url to a repository (same path as in a baseurl) to add to
 the repositories for this query. This option can be used multiple times. If
 you want to view only the pkgs from this repository combine this with
 --repoid. The repoid for the repository is specified by <repoid>.
-.IP "\fB\-q\fP"
+.IP "\fB\-\-plugins\fP"
+Enable YUM plugin support.
+.IP "\fB\-q, \-\-query\fP"
 For rpmquery compatibility, doesn't do anything.
 .IP "\fB\-h, \-\-help\fP"
 Help; display a help message and then quit\&.
 .IP "\fB\-\-quiet\fP" 
 Run quietly: no warnings printed to stderr.
-.IP "\fB\-C\fP" 
+.IP "\fB\-\-verbose\fP"
+Produce verbose output.
+.IP "\fB\-C, \-\-cache\fP" 
 Tells repoquery to run entirely from YUM cache - does not download any metadata
 or update the cache. Queries in this mode can fail or give partial/incorrect
 results if the cache isn't fully populated beforehand with eg "yum makecache".
@@ -64,6 +74,8 @@ Show a location where the package could be downloaded from.
 For example: \fBwget `repoquery --location yum`\fP
 .IP "\fB\-s, \-\-source\fP"
 Show package source RPM name. 
+.IP "\fB\-\-srpm\fP"
+Operate on corresponding source RPM.
 .IP "\fB\-\-groupmember PACKAGE\fP"
 List the repodata groups (yumgroups.xml) belongs to (if any).
 .IP "\fB\-\-nvr\fP"
@@ -81,7 +93,7 @@ sprintf (Eg. %-20{name})
 .PP 
 
 .SH "PACKAGE SELECTION OPTIONS" 
-.IP "\fB\-a\fP"
+.IP "\fB\-a, \-\-all\fP"
 Query all available packages (for rpmquery compatibility / shorthand for 
 repoquery '*')
 .IP "\fB\-f, \-\-file FILE\fP"
@@ -97,6 +109,8 @@ Query all packages that require CAPABILITY.
 .IP "\fB\-\-alldeps\fP"
 When used with --whatrequires, use both automatic and manual dependencies
 for the query.
+.IP "\fB\-\-recursive\fP"
+When used with --whatrequires, query packages recursively.
 .IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
 Limit the query to packages of given architecture(s). Valid values are all
 architectures known to rpm/yum such as 'i386' and 'src' for
@@ -104,7 +118,7 @@ source RPMS.
 .IP "\fB\-\-pkgnarrow=WHAT\fP"
 Limit what packages are considered for the query. Valid values for WHAT are:
 installed, available, recent, updates, extras, all and repository (default).
-.IP "\fB\-\-show-dupes\fP"
+.IP "\fB\-\-show-dupes, \-\-show\-duplicates\fP"
 Query all versions of package. By default only newest packages are
 considered.
 
@@ -125,7 +139,7 @@ List groups required by group.
 .PP
 .IP "\fB\-a\fP"
 Query all available groups.
-.IP "\fB\-g\fP"
+.IP "\fB\-g, \-\-group\fP"
 Query groups instead of packages.
 .PP
 
