@@ -88,7 +88,7 @@ def trans_data(yb, inp):
         sys.exit(50)
     lang, text = data
     alnum = string.ascii_letters + string.digits
-    lang = re.sub('[^' + alnum + '-_.@]', '', lang)
+    lang = re.sub('[^-' + alnum + '_.@]', '', lang)
     if not lang:
         yb.logger.error("Error: Incorrect/empty language for translated data")
         sys.exit(50)
@@ -116,6 +116,12 @@ def req2pkgs(yb, req):
 
     __req2pkgs[req] = providers
     return providers
+
+def txt2id(txt):
+    groupid = txt.lower()
+    alnum = string.ascii_lowercase + string.digits
+    groupid = re.sub('[^-' + alnum + '_.:]', '', groupid)
+    return groupid
 
 def main():
 
@@ -218,18 +224,28 @@ def main():
         group = yum.comps.Group()
 
         if opts.id:
-            group.groupid = opts.id
+            groupid = txt2id(opts.id)
+            if not groupid:
+                yb.logger.error("No valid id for group")
+                sys.exit(50)
+            group.groupid = groupid
+            group.name = groupid
         elif opts.name:
-            group.groupid = opts.name.lower()
-            alnum = string.ascii_lowercase + string.digits
-            group.groupid = re.sub('[^' + alnum + '-_.:]', '',
-                                   group.groupid)
+            group.groupid = txt2id(opts.name)
+            if not group.groupid:
+                yb.logger.error("No valid id for group")
+                sys.exit(50)
         else:
             yb.logger.error("No name or id for group")
             sys.exit(50)
         comps.add_group(group)
 
     if opts.name:
+        if ',' in opts.name:
+            yb.logger.error("Group name has a comma in it")
+        if '*' in opts.name or  '?' in opts.name:
+            yb.logger.error("Group name has a wildcard in it, ? or *")
+
         group.name = opts.name
     if opts.description:
         group.description = opts.description
@@ -239,6 +255,12 @@ def main():
         group.user_visible = opts.user_visible
     for tn in opts.i18nname or []:
         lang, text = trans_data(yb, tn)
+        if ',' in text:
+            yb.logger.error("Translated group name (%s) has a comma in it"%lang)
+        if '*' in text or  '?' in text:
+            yb.logger.error("Translated group name (%s) has a wildcard in it"
+                            ", ? or *" % lang)
+
         group.translated_name[lang] = text
     for td in opts.i18ndescription or []:
         lang, text = trans_data(yb, td)
