@@ -23,15 +23,14 @@ from yum.misc import setup_locale
 from utils import YumUtilBase
 
 import logging
-
+import os
+import os.path
 
 try:
     from yum.misc import find_unfinished_transactions, find_ts_remaining
 except ImportError:
 
     import glob
-    import os
-    import os.path
 
     def find_unfinished_transactions(yumlibpath='/var/lib/yum'):
         """returns a list of the timestamps from the filenames of the unfinished
