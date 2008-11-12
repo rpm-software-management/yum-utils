@@ -136,6 +136,7 @@ class KeysListCommand:
 
             keys.append(Key(keyid, createts, sum_type, sum_auth, data))
         if gpgme is not None:
+            base.repos.doSetup() # Without this repo.cachedir is empty *sigh*
             for repo in base.repos.listEnabled():
                 gpgdir = '%s/gpgdir' % repo.cachedir
                 if not os.path.exists(gpgdir):
