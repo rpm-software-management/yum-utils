@@ -46,6 +46,7 @@ from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
 from urlgrabber.progress import TextMeter
+import urlgrabber
 
 # for yum 2.4.X compat
 def sortPkgObj(pkg1 ,pkg2):
@@ -231,6 +232,20 @@ def main():
                 if not opts.quiet:
                     my.logger.error("Unable to fetch metadata: %s" % e)
 
+        remote_size = 0
+        local_size  = 0
+        if not opts.urls:
+            for pkg in download_list:
+                remote = pkg.returnSimple('relativepath')
+                local = local_repo_path + '/' + remote
+                sz = int(pkg.returnSimple('packagesize'))
+                if os.path.exists(local) and os.path.getsize(local) == sz:
+                    continue
+                remote_size += sz
+
+        if hasattr(urlgrabber.progress, 'text_meter_total_size'):
+            urlgrabber.progress.text_meter_total_size(remote_size)
+
         download_list.sort(sortPkgObj)
         n = 0
         for pkg in download_list:
@@ -242,9 +257,8 @@ def main():
             if not os.path.exists(localdir):
                 os.makedirs(localdir)
 
-            if (os.path.exists(local) and 
-                os.path.getsize(local) == int(pkg.returnSimple('packagesize'))):
-                
+            sz = int(pkg.returnSimple('packagesize'))
+            if os.path.exists(local) and os.path.getsize(local) == sz:
                 
                 if not opts.quiet:
                     my.logger.error("[%s: %-5d of %-5d ] Skipping existing %s" % (repo.id, n, len(download_list), remote))
@@ -278,8 +292,12 @@ def main():
                 path = repo.getPackage(pkg)
             except yum.Errors.RepoError, e:
                 my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e)))
+                local_size += sz
                 continue
-                
+
+            local_size += sz
+            if hasattr(urlgrabber.progress, 'text_meter_total_size'):
+                urlgrabber.progress.text_meter_total_size(remote_size, local_size)
             if opts.gpgcheck:
                 result, error = my.sigCheckPkg(pkg)
                 if result != 0:
