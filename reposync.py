@@ -178,7 +178,12 @@ def main():
 
     my.doRpmDBSetup()
     my.doRepoSetup()
-    my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
+    try:
+        my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
+    except yum.Errors.RepoError, e:
+        print >> sys.stderr, "Error setting up repositories: %s" % e
+        # maybe this shouldn't be entirely fatal
+        sys.exit(1)
     
     for repo in my.repos.listEnabled():
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
