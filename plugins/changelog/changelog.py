@@ -22,6 +22,7 @@
 import time
 from rpmUtils.miscutils import splitFilename
 from yum.plugins import TYPE_INTERACTIVE
+from yum.plugins import PluginYumExit
 
 from yum import logginglevels
 import logging
