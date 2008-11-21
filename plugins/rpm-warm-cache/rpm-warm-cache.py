@@ -31,9 +31,10 @@ def postreposetup_hook(conduit):
     try:
         cmd = commands[0]
     except IndexError:
-        # No command given, don't do anything
-        return
-    if cmd in ('upgrade', 'install', 'remove'):
+        # No command given, do it as it's cheap enough
+        cmd = 'install'
+    if (cmd in ('upgrade', 'install', 'remove', 'search') or
+        cmd.startswith('list') or cmd.startswith('info')):
         try:
             for root, dirs, files in walk('/var/lib/rpm'):
                 for file in files:
