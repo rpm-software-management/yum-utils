@@ -19,7 +19,7 @@ sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
 from yum.misc import setup_locale
-
+import yum.Errors
 from utils import YumUtilBase
 
 import logging
@@ -90,7 +90,11 @@ class YumBuildDep(YumUtilBase):
                 # Setup the repo, without a cache
                 r.setup(0)
                 # Setup pkgSack with 'src' in the archlist
-                self._getSacks(archlist=archlist,thisrepo=r.id)
+                try:
+                    self._getSacks(archlist=archlist,thisrepo=r.id)
+                except yum.Errors.RepoError, e:
+                    print "Could not setup repo %s: %s" % (r.id, e)
+                    sys.exit(1)
 
     # go through each of the pkgs, figure out what they are/where they are 
     # if they are not a local package then run
