@@ -28,7 +28,12 @@ plugin_type = (TYPE_CORE,)
 
 def postreposetup_hook(conduit):
     opts, commands = conduit.getCmdLine()
-    if commands[0] in ('upgrade', 'install', 'remove'):
+    try:
+        cmd = commands[0]
+    except IndexError:
+        # No command given, don't do anything
+        return
+    if cmd in ('upgrade', 'install', 'remove'):
         try:
             for root, dirs, files in walk('/var/lib/rpm'):
                 for file in files:
