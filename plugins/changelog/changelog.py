@@ -176,7 +176,11 @@ Display changelog data, since a specified time, on a group of packages"""
                 if dateutil_parser is None:
                     msg = "Dateutil module not available, so can't parse dates"
                     raise PluginYumExit(msg)
-                self._since_dto = dateutil_parser.parse(since, fuzzy=True)
+                try:
+                    self._since_dto = dateutil_parser.parse(since, fuzzy=True)
+                except ValueError:
+                    msg = "Argument -- %s -- is not \"all\", a positive number or a date" % since
+                    raise PluginYumExit(msg)
                 tt = self._since_dto.timetuple()
                 self._since_tt = time.mktime(tt)
 
