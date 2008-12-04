@@ -338,6 +338,7 @@ plugins="\
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
 
 cd plugins
 for plug in $plugins; do
@@ -535,6 +536,8 @@ fi
 /usr/lib/yum-plugins/post-transaction-actions.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
 %doc plugins/post-transaction-actions/sample.action
+# Default *.action file dropping dir.
+%dir %{_sysconfdir}/yum/post-actions
 
 %files -n yum-rpm-warm-cache
 %defattr(-, root, root)
