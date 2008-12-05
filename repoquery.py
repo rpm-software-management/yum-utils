@@ -371,6 +371,10 @@ class YumBaseQuery(yum.YumBase):
         """
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoquery")
+        console_stderr = logging.StreamHandler(sys.stderr)
+        console_stderr.setFormatter(logging.Formatter("%(message)s"))
+        self.logger.propagate = False
+        self.logger.addHandler(console_stderr)
         self.options = options
         self.pkgops = pkgops
         self.sackops = sackops
