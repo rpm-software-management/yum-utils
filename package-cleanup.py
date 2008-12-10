@@ -34,8 +34,14 @@ from yum.misc import getCacheDir
 
 
 def initYum(opts):
+    debuglevel=2
+    errorlevel=2
+    if opts.quiet:
+        debuglevel=0
+        errorlevel=0
     my = yum.YumBase()
-    my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins)
+    my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins,
+                     debuglevel=debuglevel,errorlevel=errorlevel)
     if opts.orphans:
         # make it work as non root user.
         if my.conf.uid != 0:
