@@ -366,6 +366,7 @@ fi
 %doc COPYING
 %doc plugins/README
 %{_bindir}/debuginfo-install
+%{_bindir}/find-repos-of-install
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repodiff
@@ -546,6 +547,9 @@ fi
 
 
 %changelog
+* Wed Dec 10 2008 Seth Vidal <skvidal at fedoraproject.org>
+- add find-repos-of-install from James' stash of misc stuff
+
 * Wed Oct 29 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.18
 
