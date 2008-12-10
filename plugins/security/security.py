@@ -50,6 +50,11 @@ import rpmUtils.miscutils
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
+# newpackages is weird, in that we'll never display that because we filter to
+# things relevant to installed pkgs...
+__update_info_types__ = ("security", "bugfix", "enhancement",
+                         "recommended", "newpackages")
+
 def _rpm_tup_vercmp(tup1, tup2):
     """ Compare two "std." tuples, (n, a, e, v, r). """
     return rpmUtils.miscutils.compareEVR((tup1[2], tup1[3], tup1[4]),
@@ -118,17 +123,19 @@ def ysp_should_filter_pkg(opts, pkgname, notice, used_map):
         return True
     elif opts.bz and _has_id(used_map, notice['references'],"bugzilla",opts.bz):
         return True
-    elif opts.security:
-        if notice['type'] == 'security':
-            return True
-    elif not (opts.advisory or opts.cve or opts.bz or opts.security or \
-              opts.sec_cmds):
+    # FIXME: Add opts for enhancement/etc.? -- __update_info_types__
+    elif opts.security and notice['type'] == 'security':
+        return True
+    elif opts.bugfixes and notice['type'] == 'bugfix':
+        return True
+    elif not (opts.advisory or opts.cve or opts.bz or
+              opts.security or opts.bugfixes or opts.sec_cmds):
         return True # This is only possible from should_show_pkg
     return False
 
 def ysp_has_info_md(rname, md):
-    if rname == "security":
-        if md['type'] == 'security':
+    if rname in __update_info_types__:
+        if md['type'] == rname:
             return md
     for ref in ysp__safe_refs(md['references']):
         if ref['type'] != rname:
@@ -225,7 +232,7 @@ class SecurityListCommand:
             
             elif filt_type == "sec":
                 filt_type = "security"
-            elif filt_type == "security":
+            elif filt_type in __update_info_types__:
                 pass
             
             elif filt_type == "cves":
@@ -236,7 +243,7 @@ class SecurityListCommand:
                 extcmds = [filt_type] + extcmds
                 filt_type = None
             show_type = filt_type
-            if filt_type and filt_type == "security":
+            if filt_type and filt_type in __update_info_types__:
                 show_type = None
             
         opts.sec_cmds = extcmds
@@ -339,7 +346,8 @@ class SecurityUpdateCommand:
         opts.sec_cmds = []
         used_map      = ysp_gen_used_map(opts)
 
-        ndata = not (opts.security or opts.advisory or opts.bz or opts.cve)
+        ndata = not (opts.security or opts.bugfixes or
+                     opts.advisory or opts.bz or opts.cve)
 
         # NOTE: Not doing obsoletes processing atm. ... maybe we should? --
         # Also worth pointing out we don't go backwards for obsoletes in the:
@@ -392,9 +400,12 @@ def config_hook(conduit):
     parser.values.cve      = []
     parser.values.bz       = []
     parser.values.security = False
+    parser.values.bugfixes = False
     def osec(opt, key, val, parser):
          # CVE is a subset of --security on RHEL, but not on Fedora
         parser.values.security = True
+    def obug(opt, key, val, parser):
+        parser.values.bugfixes = True
     def ocve(opt, key, val, parser):
         parser.values.cve.append(val)
     def obz(opt, key, val, parser):
@@ -405,6 +416,9 @@ def config_hook(conduit):
     parser.add_option('--security', action="callback",
                       callback=osec, dest='security', default=False,
                       help='Include security relevant packages')
+    parser.add_option('--bugfixes', action="callback",
+                      callback=obug, dest='bugfixes', default=False,
+                      help='Include bugfix relevant packages')
     parser.add_option('--cve', action="callback", type="string",
                       callback=ocve, dest='cve', default=[],
                       help='Include packages needed to fix the given CVE')
@@ -438,7 +452,8 @@ def ysp_check_func_enter(conduit):
     
     opts, args = conduit.getCmdLine()
 
-    ndata = not (opts.security or opts.advisory or opts.bz or opts.cve)
+    ndata = not (opts.security or opts.bugfixes or
+                 opts.advisory or opts.bz or opts.cve)
     
     ret = None
     if len(args) >= 2:

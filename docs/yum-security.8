@@ -35,7 +35,7 @@ both of the last two take these \fIsub-commands\fPs:
 .IP "\fB<advisory> [advisory...]\fP"
 Is used to display information about one or more advisories.
 .PP 
-.IP "\fBlist-sec\fP" "\fBinfo-sec\fP"
+.IP "\fBlist-security\fP" "\fBinfo-security\fP"
 Is used to list all of the relevant errata notice information, from the
 updateinfo.xml data in yum. This includes bugzillas, CVEs and security updates.
 .IP 
@@ -47,6 +47,12 @@ Is the subset of the security information, pertaining to the CVEs.
 .IP 
 .IP "\fBsecurity / sec\fP"
 Is the subset of the security information, pertaining to security.
+.IP "\fBbugfix\fP"
+Is the subset of the security information, pertaining to bugfixes.
+.IP "\fBenhancement\fP"
+Is the subset of the security information, pertaining to enhancements.
+.IP "\fBrecommended\fP"
+Is the subset of the security information, pertaining to recommended updates.
 .IP
 .PP
 .SH "GENERAL OPTIONS"
@@ -58,6 +64,8 @@ This option includes packages coresponding to the advisory ID, Eg. FEDORA-2201-1
 This option includes packages that say they fix a Bugzilla ID, Eg. 123.
 .IP "\fB\--cve\fP"
 This option includes packages that say they fix a CVE - Common Vulnerabilities and Exposures ID (http://cve.mitre.org/about/), Eg. CVE-2201-0123.
+.IP "\fB\--bugfixes\fP"
+This option includes packages that say they fix a bugfix issue.
 .IP "\fB\--security\fP"
 This option includes packages that say they fix a security issue.
 .PP
