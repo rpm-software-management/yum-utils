@@ -1,3 +1,130 @@
+2008-12-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.19
+
+2008-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Fixup the
+	security documentation for --bugfix etc.   Allow list-security to
+	specify bugfix/enhancement/recommended/etc.
+
+2008-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, find-repos-of-install.py, yum-utils.spec: add
+	find-repos-of-install
+
+2008-12-10  James Antill <james@and.org>
+
+	* docs/yum-security.8: Fixup the security documentation for --bugfix
+	etc.
+
+2008-12-10  James Antill <james@and.org>
+
+	* plugins/security/security.py:  Allow list-security to specify bugfix/enhancement/recommended/etc.
+	 Add a --bugfixes option.
+
+2008-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: make -q in package-cleanup actually be quiet
+	closes rh bug #471244
+
+2008-12-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Have the
+	post-trans-actions plugin create/own it's action config. dir   Don't
+	traceback on "changelog 0" and give a nice message.
+
+2008-12-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make logger outputs go to stderr, not stdout.
+
+2008-12-04  James Antill <james@and.org>
+
+	* yum-utils.spec: Have the post-trans-actions plugin create/own it's
+	action config. dir
+
+2008-11-25  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Don't traceback on "changelog 0"
+	and give a nice message.
+
+2008-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   If we don't
+	have a command, or it's search/list/info, warm the rpm DB cache
+	Fix rpm warm cache plugin when no commands are there   Import
+	PluginYumExit so we can use it
+
+2008-11-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: catch yum.Errors.RepoError when setting up the
+	package sacks.
+
+2008-11-21  James Antill <james@and.org>
+
+	* plugins/rpm-warm-cache/rpm-warm-cache.py: If we don't have a
+	command, or it's search/list/info, warm the rpm DB cache
+
+2008-11-21  Ralf Ertzinger <ralf@camperquake.de>
+
+	* plugins/rpm-warm-cache/rpm-warm-cache.py: Fix rpm warm cache
+	plugin when no commands are there
+
+2008-11-20  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Import PluginYumExit so we can use
+	it
+
+2008-11-14  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: clean up a common traceback when talking to rhn :(
+
+2008-11-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/yumdownloader.1: link to yum for rest of options to
+	yumdownloader - closes ticket2
+
+2008-11-12  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Setup the default repos. so we list the
+	repo. keys
+
+2008-11-12  James Antill <james@and.org>
+
+	* reposync.py: Add total download percentage like "normal" yum
+	download
+
+2008-11-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: fix import error from rh bug #470458
+
+
+2008-11-06  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Fix the regexps, due to - ... add warnings
+	for bad chars.
+
+2008-11-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/repoquery.1, repoquery.py: apply documentation patch from
+	Ville Skyttä closes bug #459022
+
+2008-11-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/post-transaction-actions/post-transaction-actions.py,
+	plugins/post-transaction-actions/sample.action: - add $vars to commands that can be run. Update the sample.action
+	file
+
+2008-10-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2008-10-29  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.18
