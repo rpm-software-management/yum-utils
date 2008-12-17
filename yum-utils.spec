@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.18
+Version: 1.1.19
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -547,6 +547,9 @@ fi
 
 
 %changelog
+* Wed Dec 17 2008 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.19
+
 * Wed Dec 10 2008 Seth Vidal <skvidal at fedoraproject.org>
 - add find-repos-of-install from James' stash of misc stuff
 
