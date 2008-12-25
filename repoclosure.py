@@ -58,15 +58,18 @@ def parseArgs():
                       help="check only the newest packages in the repos")
     parser.add_option("--repofrompath", action="append",
                       help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
+    parser.add_option("-p", "--pkg", action="append",
+                      help="check closure for this package only")
     (opts, args) = parser.parse_args()
     return (opts, args)
 
 class RepoClosure(yum.YumBase):
-    def __init__(self, arch = [], config = "/etc/yum.conf", builddeps = False):
+    def __init__(self, pkgonly, arch = [], config = "/etc/yum.conf", builddeps = False ):
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.arch = arch
         self.builddeps = builddeps
+        self.pkgonly = pkgonly
         self.doConfigSetup(fn = config,init_plugins=False)
         if hasattr(self.repos, 'sqlite'):
             self.repos.sqlite = False
@@ -118,6 +121,9 @@ class RepoClosure(yum.YumBase):
         if self.builddeps:
             pkgs = filter(lambda x: x.arch == 'src', pkgs)
 
+        if self.pkgonly:
+            pkgs = filter(lambda x: x.name == self.pkgonly[0], pkgs)
+
         for pkg in pkgs:
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
@@ -155,7 +161,7 @@ class RepoClosure(yum.YumBase):
 
 def main():
     (opts, cruft) = parseArgs()
-    my = RepoClosure(arch = opts.arch, config = opts.config, builddeps = opts.builddeps)
+    my = RepoClosure(arch = opts.arch, config = opts.config, builddeps = opts.builddeps, pkgonly = opts.pkg)
 
     if opts.repofrompath:
         # setup the fake repos
