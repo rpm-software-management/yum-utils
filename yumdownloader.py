@@ -129,7 +129,17 @@ class YumDownloader(YumUtilBase):
         packages = self.cmds
         for pkg in packages:
             toActOn = []
-            exactmatch, matched, unmatched = parsePackages(self.pkgSack.returnPackages(), [pkg])
+
+            if not pkg or pkg[0] != '@':
+                pkgnames = [pkg]
+            else:
+                group_string = pkg[1:]
+                pkgnames = set()
+                for grp in self.comps.return_groups(group_string):
+                    pkgnames.update(grp.packages)
+
+            pos = self.pkgSack.returnPackages(patterns=pkgnames)
+            exactmatch, matched, unmatched = parsePackages(pos, pkgnames)
             installable = yum.misc.unique(exactmatch + matched)
             if len(unmatched) > 0: # if we get back anything in unmatched, it fails
                 self.logger.error('No Match for argument %s' % pkg)
