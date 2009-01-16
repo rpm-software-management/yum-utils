@@ -137,6 +137,9 @@ class YumDownloader(YumUtilBase):
                 pkgnames = set()
                 for grp in self.comps.return_groups(group_string):
                     pkgnames.update(grp.packages)
+                if not pkgnames:
+                    self.logger.error('No packages for group %s' % group_string)
+                    continue
 
             pos = self.pkgSack.returnPackages(patterns=pkgnames)
             exactmatch, matched, unmatched = parsePackages(pos, pkgnames)
