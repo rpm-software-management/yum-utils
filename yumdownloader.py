@@ -142,6 +142,10 @@ class YumDownloader(YumUtilBase):
                         pkgnames.update(grp.default_packages)
                     if 'optional' in self.conf.group_package_types:
                         pkgnames.update(grp.optional_packages)
+                    if self.conf.enable_group_conditionals:
+                        for condreq, cond in grp.conditional_packages.iteritems():
+                            if self.isPackageInstalled(cond):
+                                pkgnames.add(condreq)
 
                 if not pkgnames:
                     self.logger.error('No packages for group %s' % group_string)
