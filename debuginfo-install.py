@@ -87,12 +87,13 @@ class DebugInfoInstall(YumUtilBase):
         di_name = '%s-debuginfo' % po.name
         if self.pkgSack.searchNevra(name=di_name, arch=po.arch):
             test_name = di_name
+            ver, rel = po.version, po.release
         else:
-            srpm_name = rpmUtils.miscutils.splitFilename(po.sourcerpm)[0] # take the srpmname
+            srpm_data = rpmUtils.miscutils.splitFilename(po.sourcerpm) # take the srpmname
+            srpm_name, ver, rel = srpm_data[0], srpm_data[1], srpm_data[2]
             test_name = '%s-debuginfo' % srpm_name
-        self.install(name=test_name, arch=po.arch, version=po.version, release=po.release)            
-                
-        
+        self.install(name=test_name, arch=po.arch, version=ver, release=rel)
+
     def debugInfo_main(self):
         """for each package specified, walk the package's list of deps and install
            all the -debuginfo pkgs that match it and its debuginfo"""
