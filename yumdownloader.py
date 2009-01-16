@@ -136,7 +136,13 @@ class YumDownloader(YumUtilBase):
                 group_string = pkg[1:]
                 pkgnames = set()
                 for grp in self.comps.return_groups(group_string):
-                    pkgnames.update(grp.packages)
+                    if 'mandatory' in self.conf.group_package_types:
+                        pkgnames.update(grp.mandatory_packages)
+                    if 'default' in self.conf.group_package_types:
+                        pkgnames.update(grp.default_packages)
+                    if 'optional' in self.conf.group_package_types:
+                        pkgnames.update(grp.optional_packages)
+
                 if not pkgnames:
                     self.logger.error('No packages for group %s' % group_string)
                     continue
