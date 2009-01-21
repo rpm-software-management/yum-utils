@@ -232,12 +232,12 @@ def main(args):
             verfile[pkgtuple] = []
         verfile[pkgtuple].append(pkg)
         
-        for natup in pkgdict.keys():
-            evrlist = pkgdict[natup]
-            if len(evrlist) > 1:
-                evrlist = misc.unique(evrlist)
-                evrlist.sort(sortByEVR)
-                pkgdict[natup] = evrlist
+    for natup in pkgdict.keys():
+        evrlist = pkgdict[natup]
+        if len(evrlist) > 1:
+            evrlist = misc.unique(evrlist)
+            evrlist.sort(sortByEVR)
+            pkgdict[natup] = evrlist
                 
     del ts
 
