@@ -95,6 +95,8 @@ def parseArgs():
         help='config file to use (defaults to /etc/yum.conf)')
     parser.add_option("-a", "--arch", default=None,
         help='act as if running the specified arch (default: current arch, note: does not override $releasever)')
+    parser.add_option("--source", default=False, dest="source", action="store_true",
+                      help='operate on source packages')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-e", "--cachedir",
@@ -179,7 +181,10 @@ def main():
     my.doRpmDBSetup()
     my.doRepoSetup()
     try:
-        my.doSackSetup(rpmUtils.arch.getArchList(opts.arch))
+        arches = rpmUtils.arch.getArchList(opts.arch)
+        if opts.source:
+            arches +=  ['src']
+        my.doSackSetup(arches)
     except yum.Errors.RepoError, e:
         print >> sys.stderr, "Error setting up repositories: %s" % e
         # maybe this shouldn't be entirely fatal
