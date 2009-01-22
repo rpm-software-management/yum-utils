@@ -41,23 +41,6 @@ class Error(Exception):
 
 def errorprint(stuff):
     print >> sys.stderr, stuff
-
-def hdr2pkgTuple(hdr):
-    name = hdr['name']
-    if hdr[rpm.RPMTAG_SOURCEPACKAGE] == 1:
-        arch = 'src'
-    else:
-        arch = hdr['arch']
-
-    ver = str(hdr['version']) # convert these to strings to be sure
-    rel = str(hdr['release'])
-    epoch = hdr['epoch']
-    if epoch is None:
-        epoch = '0'
-    else:
-        epoch = str(epoch)
-
-    return (name, arch, epoch, ver, rel)
     
     
 def getFileList(path, ext, filelist):
@@ -172,7 +155,7 @@ def main(args):
             errorprint(e.message)
             continue
         
-        pkgtuple = hdr2pkgTuple(hdr)
+        pkgtuple = rpmUtils.miscutils.pkgTupleFromHeader(hdr)
         (n,a,e,v,r) = pkgtuple
         del hdr
         
