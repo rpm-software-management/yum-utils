@@ -24,9 +24,9 @@ import os
 import sys
 import rpm
 import fnmatch
-import types
 import string
 import getopt
+import rpmUtils
 from yum import misc
 from exceptions import Exception
 
@@ -42,43 +42,6 @@ class Error(Exception):
 def errorprint(stuff):
     print >> sys.stderr, stuff
 
-def rpmOutToStr(arg):
-    if type(arg) != types.StringType:
-    # and arg is not None:
-        arg = str(arg)
-        
-    return arg
-
-def compareEVR((e1, v1, r1), (e2, v2, r2)):
-    # return 1: a is newer than b
-    # 0: a and b are the same version
-    # -1: b is newer than a
-    e1 = rpmOutToStr(e1)
-    v1 = rpmOutToStr(v1)
-    r1 = rpmOutToStr(r1)
-    e2 = rpmOutToStr(e2)
-    v2 = rpmOutToStr(v2)
-    r2 = rpmOutToStr(r2)
-    #print '%s, %s, %s vs %s, %s, %s' % (e1, v1, r1, e2, v2, r2)
-    rc = rpm.labelCompare((e1, v1, r1), (e2, v2, r2))
-    #print '%s, %s, %s vs %s, %s, %s = %s' % (e1, v1, r1, e2, v2, r2, rc)
-    return rc
-
-def returnHdr(ts, package):
-    """hand back the rpm header or raise an Error if the pkg is fubar"""
-    try:
-        fdno = os.open(package, os.O_RDONLY)
-    except OSError, e:
-        raise Error, "Error opening file %s" % package
-    try:
-        hdr = ts.hdrFromFdno(fdno)
-    except rpm.error, e:
-        raise Error, "Error opening package %s" % package
-    if type(hdr) != rpm.hdr:
-        raise Error, "Error opening package %s" % package
-    os.close(fdno)
-    return hdr
-    
 def hdr2pkgTuple(hdr):
     name = hdr['name']
     if hdr[rpm.RPMTAG_SOURCEPACKAGE] == 1:
@@ -178,17 +141,6 @@ def parseargs(args):
         
     return (opts, args)
 
-def sortByEVR(evr1, evr2):
-    """sorts a list of evr tuples"""
-    
-    rc = compareEVR(evr1, evr2)
-    if rc == 0:
-        return 0
-    if rc < 0:
-        return -1
-    if rc > 0:
-        return 1
-
 
 def main(args):
     
@@ -215,8 +167,8 @@ def main(args):
         ts.setVSFlags(~(rpm.RPMVSF_NOMD5|rpm.RPMVSF_NEEDPAYLOAD))
     for pkg in rpmList:
         try:
-            hdr = returnHdr(ts, pkg)
-        except Error, e:
+            hdr = rpmUtils.miscutils.hdrFromPackage(ts, pkg)
+        except rpmUtils.RpmUtilsError, e:
             errorprint(e.message)
             continue
         
@@ -236,7 +188,7 @@ def main(args):
         evrlist = pkgdict[natup]
         if len(evrlist) > 1:
             evrlist = misc.unique(evrlist)
-            evrlist.sort(sortByEVR)
+            evrlist.sort(rpmUtils.miscutils.compareEVR)
             pkgdict[natup] = evrlist
                 
     del ts
