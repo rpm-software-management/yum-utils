@@ -52,6 +52,7 @@ requires_api_version = '2.5'
 plugin_type = (TYPE_CORE,)
 
 verbose = False
+always_print_best_host = True
 socket_timeout = 3
 timedhosts = {}
 hostfilepath = ''
@@ -89,6 +90,8 @@ def init_hook(conduit):
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
     global maxthreads, exclude, downgrade_ftp
     verbose = conduit.confBool('main', 'verbose', default=False)
+    always_print_best_host = conduit.confBool('main', 'always_print_best_host',
+                                              default=True)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
             default='/var/cache/yum/timedhosts')
@@ -201,7 +204,10 @@ def postreposetup_hook(conduit):
             repomirrors[str(repo)] = filter(excludeCheck,repomirrors[str(repo)])
         repo.urls = repomirrors[str(repo)]
         if len(repo.urls):
-            conduit.info(2, " * %s: %s" % (str(repo), host(repo.urls[0])))
+            lvl = 3
+            if always_print_best_host:
+                lvl = 2
+            conduit.info(lvl, " * %s: %s" % (str(repo), host(repo.urls[0])))
         repo.failovermethod = 'priority'
         repo.check()
         repo.setupGrab()
