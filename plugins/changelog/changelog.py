@@ -63,12 +63,12 @@ def show_changes(conduit, msg):
             srpms[name] = [tsmem.po]
 
     conduit.info(2, "\n%s\n" % msg)
-    for name in srpms.keys():
+    for name in sorted(srpms.keys()):
         rpms = []
         if origpkgs.has_key(name):
             for rpm in srpms[name]:
                 rpms.append("%s" % rpm)
-            conduit.info(2, ", ".join(rpms))
+            conduit.info(2, ", ".join(sorted(rpms)))
             for line in changelog_delta(srpms[name][0], origpkgs[name]):
                 conduit.info(2, "%s\n" % line)
 
