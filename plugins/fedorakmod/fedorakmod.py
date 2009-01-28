@@ -78,7 +78,9 @@ def getInstalledKernels(c):
     return _whatProvides(c, kernelProvides)
 
 def getInstalledModules(c):
-    return _whatProvides(c, ["kernel-modules", "kernel-modules-for-kernel"])
+    # "kernel-modules-for-kernel" is supposed to mark things installonly, see:
+    # https://bugzilla.redhat.com/show_bug.cgi?id=482893
+    return _whatProvides(c, ["kernel-modules"])
 
 def getKernelProvides(po):
     """Pass in a package header.  This function will return a list of
