@@ -18,6 +18,7 @@
 import os
 import subprocess
 import sys
+import time
 import yum
 from yum import Errors
 from yum.misc import getCacheDir
@@ -136,12 +137,16 @@ class YumDebugDump(yum.YumBase):
         """create debug txt file and compress it, place it at yum_debug_dump.txt.gz
            unless fn is specified"""
         if not fn:
-            fn = 'yum_debug_dump.txt.gz'
+            now = time.strftime("%Y-%m-%d_%T", time.localtime(time.time()))
+            fn = 'yum_debug_dump-%s-%s.txt.gz' % (os.uname()[1], now)
 
         if not fn.startswith('/'):
             fn = '%s/%s' % (os.getcwd(), fn)
 
-        fo = gzip.GzipFile(fn, 'w')
+        if fn.endswith('.gz'):
+            fo = gzip.GzipFile(fn, 'w')
+        else:
+            fo = open(fn, 'w')
 
         msg = "yum-debug-dump version %s\n" % self.file_version
         fo.write(msg)
@@ -171,7 +176,10 @@ def main():
         # make sure the repos know about it, too
         my.repos.setCache(0)
 
-    fn = my.create_debug_file()
+    filename = None
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+    fn = my.create_debug_file(fn=filename)
     print "Output written to: %s" % fn
 
 if __name__ == "__main__":
