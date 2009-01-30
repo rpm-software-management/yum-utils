@@ -20,6 +20,7 @@ import subprocess
 import sys
 import yum
 from yum import Errors
+from yum.misc import getCacheDir
 from rpmUtils import miscutils
 import gzip
 import rpm
@@ -161,7 +162,7 @@ def main():
     if my.conf.uid != 0:
         cachedir = getCacheDir()
         if cachedir is None:
-            self.logger.error("Error: Could not make cachedir, exiting")
+            my.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
         my.repos.setCacheDir(cachedir)
 
