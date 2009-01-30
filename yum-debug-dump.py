@@ -156,6 +156,20 @@ class YumDebugDump(yum.YumBase):
 def main():
     my = YumDebugDump()
     my.doConfigSetup(init_plugins=True)
+
+    # make yum-debug-dump work as non root user.
+    if my.conf.uid != 0:
+        cachedir = getCacheDir()
+        if cachedir is None:
+            self.logger.error("Error: Could not make cachedir, exiting")
+            sys.exit(50)
+        my.repos.setCacheDir(cachedir)
+
+        # Turn off cache
+        my.conf.cache = 0
+        # make sure the repos know about it, too
+        my.repos.setCache(0)
+
     fn = my.create_debug_file()
     print "Output written to: %s" % fn
 
