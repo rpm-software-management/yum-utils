@@ -37,6 +37,7 @@ plugin_type = (TYPE_CORE,)
 _requires_cache = {}
 ignore_list = ['glibc', 'bash', 'libgcc']
 
+exclude_bin = False
 
 def _requires_this_package(rpmdb, pkg):
     if _requires_cache.has_key(pkg):
@@ -59,6 +60,13 @@ def _requires_this_package(rpmdb, pkg):
     return requirers.keys()
 
 def postresolve_hook(conduit):
+    
+    global exclude_bin
+    opts, commands = conduit.getCmdLine()
+    if hasattr(opts,'exclude_bin'):
+        if exclude_bin or opts.exclude_bin:
+            exclude_bin = True
+
     # get all the items in 
     tsInfo  = conduit.getTsInfo()
     rpmdb = conduit.getRpmDB()
@@ -82,10 +90,27 @@ def postresolve_hook(conduit):
                         pkgtups = [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]
                         if req_pkgtup not in pkgtups:
                             non_removed_requires.append(req_pkgtup)
+                    if exclude_bin: # if this pkg is a binary of some kind, skip it
+                        is_bin=False
+                        for file_name in pkg.filelist:
+                            if file_name.find('bin') != -1:
+                                is_bin = True
+                        if is_bin:
+                            continue
 
                     if not non_removed_requires:
                         conduit.info(2, 'removing %s. It is not required by anything else.' % pkg)
                         conduit._base.remove(pkg)
+
+def config_hook(conduit):
+    global exclude_bin
+    exclude_bin  = conduit.confBool('main', 'exclude_bin', default=False)
+    parser = conduit.getOptParser()
+    if parser:
+        parser.add_option("", "--leaves-exclude-bin", dest="exclude_bin",
+                action="store_true", default=False, 
+                help="do not remove leaf packages which contain executable binaries")
+
 
 
 
