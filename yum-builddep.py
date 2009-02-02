@@ -62,7 +62,12 @@ class YumBuildDep(YumUtilBase):
         self.doUtilYumSetup()
         # Do the real action
         # solve for each srpm and put the pkgs into a ts
-        self.get_build_deps()
+        try:
+            self.get_build_deps()
+        except yum.Errors.MiscError, e:
+            msg = "There was a problem getting the build deps, exiting:\n   %s" % e
+            self.logger.error(msg)
+            sys.exit(1)
 
         self.buildTransaction()
         if len(self.tsInfo) < 1:
@@ -109,7 +114,11 @@ class YumBuildDep(YumUtilBase):
         srpms = []
         for arg in self.cmds:
             if arg.endswith('.src.rpm'):
-                srpms.append(yum.packages.YumLocalPackage(self.ts, arg))
+                try:
+                    srpms.append(yum.packages.YumLocalPackage(self.ts, arg))
+                except yum.Errors.MiscError, e:
+                    self.logger.error("Error: Could not open %s" % arg)
+                    raise
             elif arg.endswith('.src'):
                 srcnames.append(arg)
             else:
