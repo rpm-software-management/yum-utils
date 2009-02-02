@@ -286,10 +286,10 @@ Group: System Environment/Base
 Requires: yum >= 3.2.17
 
 %description -n yum-NetworkManager-dispatcher
-This plugin forces yum to check it's cache if/when a new network connection
+This plugin forces yum to check its cache if/when a new network connection
 happens in NetworkManager. Note that currently there is no checking of
 previous data, so if your WiFi keeps going up and down (or you suspend/resume
-a lot) yum will recheck it's cached data a lot.
+a lot) yum will recheck its cached data a lot.
 
 %package -n yum-rpm-warm-cache
 Summary: Yum plugin to access the rpmdb files early to warm up access to the db 
