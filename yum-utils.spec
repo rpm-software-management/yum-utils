@@ -300,6 +300,16 @@ Requires: yum >= 3.2.19
 This plugin reads the rpmdb files into the system cache before accessing the
 rpmdb directly. In some cases this should speed up access to rpmdb information
 
+%package -n yum-plugin-auto-update-debuginfo
+Summary: Yum plugin to enable automatic updates to installed debuginfo packages
+Group: System Environment/Base
+Requires: yum >= 3.2.19
+
+%description -n yum-plugin-auto-update-debuginfo
+This plugin looks to see if any debuginfo packages are installed, and if there
+are it enables all debuginfo repositories that are "children" of enabled
+repositories.
+
 %prep
 %setup -q
 
@@ -335,6 +345,7 @@ plugins="\
  remove-with-leaves \
  post-transaction-actions \
  rpm-warm-cache \
+ auto-update-debuginfo \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -545,8 +556,16 @@ fi
 /usr/lib/yum-plugins/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
 
+%files -n yum-plugin-auto-update-debuginfo
+%defattr(-, root, root)
+/usr/lib/yum-plugins/auto-update-debuginfo.*
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/auto-update-debuginfo.conf
+
 
 %changelog
+* Tue Feb  3 2009 James Antill <james@fedoraproject.org>
+- add auto-update-debuginfo plugin
+
 * Wed Dec 17 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.19
 
