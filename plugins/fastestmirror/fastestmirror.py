@@ -340,9 +340,14 @@ class FastestMirror:
         response time.
         """
         self._poll_mirrors()
-        mirrors = [(v, k) for k, v in self.results.items()]
+        if not downgrade_ftp:
+            mirrors = [(v, k) for k, v in self.results.items()]
+        else:
+            # False comes before True
+            mirrors = [(k.startswith("ftp"), v, k) for k, v in
+                       self.results.items()]
         mirrors.sort()
-        return [x[1] for x in mirrors]
+        return [x[-1] for x in mirrors]
 
     def _poll_mirrors(self):
         """
@@ -366,10 +371,6 @@ class FastestMirror:
                 mhost = "127.0.0.1"
             else:
                 mhost = host(mirror)
-            if downgrade_ftp and mirror.startswith("ftp:"):
-                # One less than "dead"
-                self._add_result(mirror, mhost, 99999999998)
-                continue
 
             if mhost in timedhosts:
                 result = timedhosts[mhost]
