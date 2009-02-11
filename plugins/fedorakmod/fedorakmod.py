@@ -22,7 +22,6 @@
 
 import os
 import rpmUtils
-from sets import Set
 from yum import packages
 from yum.constants import TS_INSTALL
 from yum.plugins import TYPE_CORE, PluginYumExit
@@ -31,7 +30,7 @@ from rpm import RPMPROB_FILTER_OLDPACKAGE
 requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
 
-kernelProvides = Set([ "kernel-%s" % a for a in rpmUtils.arch.arches.keys() ])
+kernelProvides = set([ "kernel-%s" % a for a in rpmUtils.arch.arches.keys() ])
 
 # We shouldn't need this if we didn't have to fake stuff so much
 kernelVariants = ["bigmem", "enterprise", "smp", "hugemem", "PAE",
@@ -222,7 +221,7 @@ def pinKernels(c, newKernels, installedKernels, modules):
             kmods = [ po.kmodName for po in table[prov] ]
         else:
             kmods = []
-        if Set(kmods) != Set(names):
+        if set(kmods) != set(names):
             c.info(2, "Removing kernel %s from install set" % str(prov))
             # XXX: This wants a pkgtuple which will probably change RSN
             c.getTsInfo().remove(kpo.pkgtup)

@@ -6,12 +6,12 @@ details.
 
 If you encounter any problems using these utilities feel free to send 
 an e-mail to the yum mailing list: 
-https://lists.linux.duke.edu/mailman/listinfo/yum
+http://lists.baseurl.org/mailman/listinfo/yum
 
 If you have created an utility related to yum and you'd like to look
 into getting it included into this set please e-mail the yum-devel 
 mailing list:
-https://lists.linux.duke.edu/mailman/listinfo/yum-devel
+http://lists.baseurl.org/mailman/listinfo/yum-devel
 
 
 -- Description of the utilities --
