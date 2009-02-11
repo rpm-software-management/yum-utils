@@ -84,6 +84,8 @@ class DebugInfoInstall(YumUtilBase):
         self.doTransaction()
         self.doUnlock()    
     def di_try_install(self, po):
+        if po.name.endswith('-debuginfo'): # Wildcard matches produce this
+            return
         di_name = '%s-debuginfo' % po.name
         if self.pkgSack.searchNevra(name=di_name, arch=po.arch):
             test_name = di_name
