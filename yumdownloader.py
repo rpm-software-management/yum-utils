@@ -32,7 +32,7 @@ import logging
 class YumDownloader(YumUtilBase):
     NAME = 'yumdownloader'
     VERSION = '1.0'
-    USAGE = '"usage: yumdownloader [options] package1 [package2] [package..]'
+    USAGE = '"yumdownloader [options] package1 [package2] [package..]'
     
     def __init__(self):
         YumUtilBase.__init__(self,
