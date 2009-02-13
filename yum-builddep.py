@@ -29,7 +29,7 @@ import rpmUtils
 class YumBuildDep(YumUtilBase):
     NAME = 'yum-builddep'
     VERSION = '1.0'
-    USAGE = '"usage: yum-builddep [options] package1 [package2] [package..]'
+    USAGE = 'yum-builddep [options] package1 [package2] [package..]'
     
     def __init__(self):
         YumUtilBase.__init__(self,

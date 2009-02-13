@@ -251,7 +251,7 @@ def main(options, args):
 
 
 if __name__ == "__main__":
-    usage = "usage: repo-rss.py [options] repoid1 repoid2"
+    usage = "repo-rss.py [options] repoid1 repoid2"
     
     parser = OptionParser(usage=usage)
     parser.add_option("-f", action="store", type="string", dest="filename",
