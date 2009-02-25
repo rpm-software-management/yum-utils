@@ -49,16 +49,6 @@ Requires: yum >= 3.0
 This plugin sorts each repository's mirrorlist by connection speed
 prior to downloading packages.
 
-%package -n yum-fedorakmod
-Summary: Yum plugin to handle fedora kernel modules.
-Group: System Environment/Base
-Requires: yum >= 3.0
-
-%description -n yum-fedorakmod
-Plugin for Yum to handle installation of kmod-foo type of kernel modules,
-when new kernel versions are installed.
-kmod-foo kernel modules is described by the Fedora Extras packaging standards.
-
 %package -n yum-protectbase
 Summary: Yum plugin to protect packages from certain repositories.
 Group: System Environment/Base
@@ -89,16 +79,6 @@ Requires: yum >= 3.0
 This plugin allows you to specify optional transaction flags on the yum
 command line
 
-%package -n yum-kernel-module
-Summary: Yum plugin to handle kernel-module-foo type of kernel module
-Group: System Environment/Base
-Requires: yum >= 3.0
-
-%description -n yum-kernel-module
-This plugin handle installation of kernel-module-foo type of kernel modules when new version of
-kernels are installed.
-
-
 %package -n yum-downloadonly
 Summary: Yum plugin to add downloadonly command option
 Group: System Environment/Base
@@ -116,15 +96,6 @@ Requires: yum >= 3.0
 %description -n yum-allowdowngrade
 This plugin adds a --allow-downgrade flag to yum to make it possible to
 manually downgrade packages to specific versions.
-
-%package -n yum-skip-broken
-Summary: Yum plugin to handle skiping packages with dependency problems
-Group: System Environment/Base
-Requires: yum >= 3.0
-
-%description -n yum-skip-broken
-This plugin adds a --skip-broken to yum to make it possible to
-check packages for dependency problems and skip the one with problems.
 
 %package -n yum-priorities
 Summary: plugin to give priorities to packages from different repos
@@ -322,11 +293,9 @@ make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 plugins="\
  changelog \
  fastestmirror \
- fedorakmod \
  protectbase \
  versionlock \
  tsflags \
- kernel-module \
  downloadonly \
  allowdowngrade \
  priorities \
@@ -424,11 +393,6 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
 /usr/lib/yum-plugins/fastestmirror*.*
 
-%files -n yum-fedorakmod
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fedorakmod.conf
-/usr/lib/yum-plugins/fedorakmod.*
-
 %files -n yum-protectbase
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protectbase.conf
@@ -447,11 +411,6 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
 /usr/lib/yum-plugins/tsflags.*
-
-%files -n yum-kernel-module
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/kernel-module.conf
-/usr/lib/yum-plugins/kernel-module.*
 
 %files -n yum-downloadonly
 %defattr(-, root, root)
@@ -563,6 +522,10 @@ fi
 
 
 %changelog
+* Wed Feb 25 2009 Tim Lauridsen <timlau@fedoraproject.org> 
+- Remove yum-kernel-module & yum-fedorakmod plugins (no obsoleting yet)
+- Remove yum-skip-broken plugin leftovers
+
 * Tue Feb  3 2009 James Antill <james@fedoraproject.org>
 - add auto-update-debuginfo plugin
 
