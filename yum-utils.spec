@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.19
+Version: 1.1.20
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -18,236 +18,282 @@ repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader,
 yum-debug-dump and yum-groups-manager.
 
-%package -n yum-updateonboot
+%package -n yum-plugin-updateonboot
 Summary: Run yum update on system boot
 Group: System Environment/Base
+Provides: yum-updateonboot
+Obsoletes: yum-updateonboot <= 1.1.19
 Requires: python, yum >= 2.4
 Requires(pre): chkconfig
 Requires(post): chkconfig
 
-%description -n yum-updateonboot
+%description -n yum-plugin-updateonboot
 Runs yum update on system boot. This allows machines that have been turned
 off for an extended amount of time to become secure immediately, instead of
 waiting until the next early morning cron job.
 
-%package -n yum-changelog
+%package -n yum-plugin-changelog
 Summary: Yum plugin for viewing package changelogs before/after updating
 Group: System Environment/Base
+Provides: yum-changelog
+Obsoletes: yum-changelog <= 1.1.19
 Requires: yum >= 3.0
 Requires: python-dateutil
 
-%description -n yum-changelog
+%description -n yum-plugin-changelog
 This plugin adds a command line option to allow viewing package changelog
 deltas before or after updating packages.
 
-%package -n yum-fastestmirror
+%package -n yum-plugin-fastestmirror
 Summary: Yum plugin which chooses fastest repository from a mirrorlist
 Group: System Environment/Base
+Provides: yum-fastestmirror
+Obsoletes: yum-fastestmirror <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-fastestmirror
+%description -n yum-plugin-fastestmirror
 This plugin sorts each repository's mirrorlist by connection speed
 prior to downloading packages.
 
-%package -n yum-protectbase
+%package -n yum-plugin-protectbase
 Summary: Yum plugin to protect packages from certain repositories.
 Group: System Environment/Base
+Provides: yum-protectbase
+Obsoletes: yum-protectbase <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-protectbase
+%description -n yum-plugin-protectbase
 This plugin allows certain repositories to be protected. Packages in the
 protected repositories can't be overridden by packages in non-protected
 repositories even if the non-protected repo has a later version.
 
-%package -n yum-versionlock
+%package -n yum-plugin-versionlock
 Summary: Yum plugin to lock specified packages from being updated
 Group: System Environment/Base
+Provides: yum-versionlock
+Obsoletes: yum-versionlock <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-versionlock
+%description -n yum-plugin-versionlock
 This plugin takes a set of name/versions for packages and excludes all other
 versions of those packages (including optionally following obsoletes). This
 allows you to protect packages from being updated by newer versions,
 for example.
 
-%package -n yum-tsflags
+%package -n yum-plugin-tsflags
 Summary: Yum plugin to add tsflags by a commandline option
 Group: System Environment/Base
+Provides: yum-tsflags
+Obsoletes: yum-tsflags <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-tsflags
+%description -n yum-plugin-tsflags
 This plugin allows you to specify optional transaction flags on the yum
 command line
 
-%package -n yum-downloadonly
+%package -n yum-plugin-downloadonly
 Summary: Yum plugin to add downloadonly command option
 Group: System Environment/Base
+Provides: yum-downloadonly
+Obsoletes: yum-downloadonly <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-downloadonly
+%description -n yum-plugin-downloadonly
 This plugin adds a --downloadonly flag to yum so that yum will only download
 the packages and not install/update them.
 
-%package -n yum-allowdowngrade
+%package -n yum-plugin-allowdowngrade
 Summary: Yum plugin to enable manual downgrading of packages
 Group: System Environment/Base
+Provides: yum-allowdowngrade
+Obsoletes: yum-allowdowngrade <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-allowdowngrade
+%description -n yum-plugin-allowdowngrade
 This plugin adds a --allow-downgrade flag to yum to make it possible to
 manually downgrade packages to specific versions.
 
 %package -n yum-priorities
 Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
+Provides: yum-priorities
+Obsoletes: yum-priorities <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-priorities
+%description -n yum-plugin-priorities
 This plugin allows repositories to have different priorities.
 Packages in a repository with a lower priority can't be overridden by packages
 from a repository with a higher priority even if repo has a later version.
 
-%package -n yum-refresh-updatesd
+%package -n yum-plugin-refresh-updatesd
 Summary: Tell yum-updatesd to check for updates when yum exits
 Group: System Environment/Base
+Provides: yum-refresh-updatesd
+Obsoletes: yum-refresh-updatesd <= 1.1.19
 Requires: yum >= 3.0
 Requires: yum-updatesd
 
-%description -n yum-refresh-updatesd
+%description -n yum-plugin-refresh-updatesd
 yum-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
 This way, if you run 'yum update' and install all available updates, puplet
 will almost instantly update itself to reflect this.
 
-%package -n yum-merge-conf
+%package -n yum-plugin-merge-conf
 Summary: Yum plugin to merge configuration changes when installing packages
 Group: System Environment/Base
+Provides: yum-merge-conf
+Obsoletes: yum-merge-conf <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-merge-conf
+%description -n yum-plugin-merge-conf
 This yum plugin adds the "--merge-conf" command line option. With this option,
 Yum will ask you what to do with config files which have changed on updating a
 package.
 
-%package -n yum-security
+%package -n yum-plugin-security
 Summary: Yum plugin to enable security filters
 Group: System Environment/Base
+Provides: yum-security
+Obsoletes: yum-security <= 1.1.19
 Requires: yum >= 3.2.18
 
-%description -n yum-security
+%description -n yum-plugin-security
 This plugin adds the options --security, --cve, --bz and --advisory flags
 to yum and the list-security and info-security commands.
 The options make it possible to limit list/upgrade of packages to specific
 security relevant ones. The commands give you the security information.
 
-%package -n yum-protect-packages
+%package -n yum-plugin-protect-packages
 Summary: Yum plugin to prevents Yum from removing itself and other protected packages
 Group: System Environment/Base
+Provides: yum-protect-packages
+Obsoletes: yum-protect-packages <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-protect-packages
+%description -n yum-plugin-protect-packages
 this plugin prevents Yum from removing itself and other protected packages.
 By default, yum is the only package protected, but by extension this
 automatically protects everything on which yum depends (rpm, python, glibc,
 and so on).Therefore, the plugin functions well even without
 compiling careful lists of all important packages.
 
-%package -n yum-basearchonly
+%package -n yum-plugin-basearchonly
 Summary: Yum plugin to let Yum install only basearch packages.
 Group: System Environment/Base
+Provides: yum-basearchonly
+Obsoletes: yum-basearchonly <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-basearchonly
+%description -n yum-plugin-basearchonly
 this plugin makes Yum only install basearch packages on multiarch systems.
 If you type 'yum install foo' on a x68_64 system, only 'foo-x.y.x86_46.rpm' is installed.
 If you want to install the foo-x.y.i386.rpm, you have to type 'yum install foo.i386'.
 The plugin only works with 'yum install'.
 
-%package -n yum-upgrade-helper
+%package -n yum-plugin-upgrade-helper
 Summary: Yum plugin to help upgrades to the next distribution version
 Group: System Environment/Base
+Provides: yum-upgrade-helper
+Obsoletes: yum-upgrade-helper <= 1.1.19
 Requires: yum >= 3.0
 
-%description -n yum-upgrade-helper
+%description -n yum-plugin-upgrade-helper
 this plugin allows yum to erase specific packages on install/update based on an additional
 metadata file in repositories. It is used to simplify distribution upgrade hangups.
 
-%package -n yum-aliases
+%package -n yum-plugin-aliases
 Summary: Yum plugin to enable aliases filters
 Group: System Environment/Base
+Provides: yum-aliases
+Obsoletes: yum-aliases <= 1.1.19
 Requires: yum >= 3.0.5
 
-%description -n yum-aliases
+%description -n yum-plugin-aliases
 This plugin adds the command alias, and parses the aliases config. file to
 enable aliases.
 
-%package -n yum-list-data
+%package -n yum-plugin-list-data
 Summary: Yum plugin to list aggregate package data
 Group: System Environment/Base
+Provides: yum-list-data
+Obsoletes: yum-list-data <= 1.1.19
 Requires: yum >= 3.0.5
 
-%description -n yum-list-data
+%description -n yum-plugin-list-data
 This plugin adds the commands list- vendors, groups, packagers, licenses,
 arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
 installed-sizes.
 
-%package -n yum-filter-data
+%package -n yum-plugin-filter-data
 Summary: Yum plugin to list filter based on package data
 Group: System Environment/Base
+Provides: yum-filter-data
+Obsoletes: yum-filter-data <= 1.1.19
 Requires: yum >= 3.2.17
 
-%description -n yum-filter-data
+%description -n yum-plugin-filter-data
 This plugin adds the options --filter- vendors, groups, packagers, licenses,
 arches, committers, buildhosts, baseurls, package-sizes, archive-sizes and
 installed-sizes. Note that each package must match at least one pattern/range in
 each category, if any were specified.
 
-%package -n yum-tmprepo
+%package -n yum-plugin-tmprepo
 Summary: Yum plugin to add temporary repositories
 Group: System Environment/Base
+Provides: yum-tmprepo
+Obsoletes: yum-tmprepo <= 1.1.19
 Requires: yum >= 3.2.11
 Requires: createrepo
 
-%description -n yum-tmprepo
+%description -n yum-plugin-tmprepo
 This plugin adds the option --tmprepo which takes a url to a .repo file
 downloads it and enables it for a single run. This plugin tries to ensure
 that temporary repositories are safe to use, by default, by not allowing
 gpg checking to be disabled.
 
-%package -n yum-verify
+%package -n yum-plugin-verify
 Summary: Yum plugin to add verify command, and options
 Group: System Environment/Base
+Provides: yum-verify
+Obsoletes: yum-verify <= 1.1.19
 Requires: yum >= 3.2.12
 
-%description -n yum-verify
+%description -n yum-plugin-verify
 This plugin adds the commands verify, verify-all and verify-rpm. There are
 also a couple of options. This command works like rpm -V, to verify your
 installation.
 
-%package -n yum-keys
+%package -n yum-plugin-keys
 Summary: Yum plugin to deal with signing keys
 Group: System Environment/Base
+Provides: yum-keys
+Obsoletes: yum-keys <= 1.1.19
 Requires: yum >= 3.2.19
 
-%description -n yum-keys
+%description -n yum-plugin-keys
 This plugin adds the commands keys, keys-info, keys-data and keys-remove. They
 allow you to query and remove signing keys.
 
-%package -n yum-remove-with-leaves
+%package -n yum-plugin-remove-with-leaves
 Summary: Yum plugin to remove dependencies which are no longer used because of a removal
 Group: System Environment/Base
+Provides: yum-remove-with-leaves
+Obsoletes: yum-remove-with-leaves <= 1.1.19
 Requires: yum >= 3.2.19
 
-%description -n yum-remove-with-leaves
+%description -n yum-plugin-remove-with-leaves
 This plugin removes any unused dependencies that were brought in by an install
 but would not normally be removed. It helps to keep a system clean of unused
 libraries and packages.
 
-%package -n yum-post-transaction-actions
+%package -n yum-plugin-post-transaction-actions
 Summary: Yum plugin to run arbitrary commands when certain pkgs are acted on
 Group: System Environment/Base
+Provides: yum-post-transaction-actions
+Obsoletes: yum-post-transaction-actions <= 1.1.19
 Requires: yum >= 3.2.19
 
-%description -n yum-post-transaction-actions
+%description -n yum-plugin-post-transaction-actions
 This plugin allows the user to run arbitrary actions immediately following a
 transaction when specified packages are changed.
 
@@ -262,12 +308,14 @@ happens in NetworkManager. Note that currently there is no checking of
 previous data, so if your WiFi keeps going up and down (or you suspend/resume
 a lot) yum will recheck its cached data a lot.
 
-%package -n yum-rpm-warm-cache
+%package -n yum-plugin-rpm-warm-cache
 Summary: Yum plugin to access the rpmdb files early to warm up access to the db 
 Group: System Environment/Base
+Provides: yum-rpm-warm-cache
+Obsoletes: yum-rpm-warm-cache <= 1.1.19
 Requires: yum >= 3.2.19
 
-%description -n yum-rpm-warm-cache
+%description -n yum-plugin-rpm-warm-cache
 This plugin reads the rpmdb files into the system cache before accessing the
 rpmdb directly. In some cases this should speed up access to rpmdb information
 
@@ -375,30 +423,30 @@ fi
 %{_mandir}/man1/yum-groups-manager.1.*
 %{_mandir}/man1/yumdownloader.1.*
 
-%files -n yum-updateonboot
+%files -n yum-plugin-updateonboot
 %defattr(-, root, root)
 %doc updateonboot/README
 %config(noreplace) %{_sysconfdir}/sysconfig/yum-updateonboot
 %{_initrddir}/yum-updateonboot
 
-%files -n yum-changelog
+%files -n yum-plugin-changelog
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
 /usr/lib/yum-plugins/changelog.*
 %{_mandir}/man1/yum-changelog.1.*
 %{_mandir}/man5/yum-changelog.conf.5.*
 
-%files -n yum-fastestmirror
+%files -n yum-plugin-fastestmirror
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
 /usr/lib/yum-plugins/fastestmirror*.*
 
-%files -n yum-protectbase
+%files -n yum-plugin-protectbase
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protectbase.conf
 /usr/lib/yum-plugins/protectbase.*
 
-%files -n yum-versionlock
+%files -n yum-plugin-versionlock
 %defattr(-, root, root)
 %doc plugins/versionlock/README
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
@@ -407,88 +455,88 @@ fi
 %{_mandir}/man1/yum-versionlock.1.*
 %{_mandir}/man5/yum-versionlock.conf.5.*
 
-%files -n yum-tsflags
+%files -n yum-plugin-tsflags
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
 /usr/lib/yum-plugins/tsflags.*
 
-%files -n yum-downloadonly
+%files -n yum-plugin-downloadonly
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
 /usr/lib/yum-plugins/downloadonly.*
 
-%files -n yum-allowdowngrade
+%files -n yum-plugin-allowdowngrade
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/allowdowngrade.conf
 /usr/lib/yum-plugins/allowdowngrade.*
 
-%files -n yum-priorities
+%files -n yum-plugin-priorities
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
 /usr/lib/yum-plugins/priorities.*
 
-%files -n yum-refresh-updatesd
+%files -n yum-plugin-refresh-updatesd
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
 /usr/lib/yum-plugins/refresh-updatesd.*
 
-%files -n yum-merge-conf
+%files -n yum-plugin-merge-conf
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
 /usr/lib/yum-plugins/merge-conf.*
 
-%files -n yum-security
+%files -n yum-plugin-security
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
 /usr/lib/yum-plugins/security.*
 %{_mandir}/man8/yum-security.8.*
 
-%files -n yum-protect-packages
+%files -n yum-plugin-protect-packages
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protect-packages.conf
 /usr/lib/yum-plugins/protect-packages.*
 
-%files -n yum-basearchonly
+%files -n yum-plugin-basearchonly
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/basearchonly.conf
 /usr/lib/yum-plugins/basearchonly.*
 
-%files -n yum-upgrade-helper
+%files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
 /usr/lib/yum-plugins/upgrade-helper.*
 
-%files -n yum-aliases
+%files -n yum-plugin-aliases
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
 %config(noreplace) %{_sysconfdir}/yum/aliases.conf
 /usr/lib/yum-plugins/aliases.*
 %{_mandir}/man1/yum-aliases.1.*
 
-%files -n yum-list-data
+%files -n yum-plugin-list-data
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
 %{_mandir}/man1/yum-list-data.1.*
 
-%files -n yum-filter-data
+%files -n yum-plugin-filter-data
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
 /usr/lib/yum-plugins/filter-data.*
 %{_mandir}/man1/yum-filter-data.1.*
 
-%files -n yum-tmprepo
+%files -n yum-plugin-tmprepo
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
 /usr/lib/yum-plugins/tmprepo.*
 
-%files -n yum-verify
+%files -n yum-plugin-verify
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/verify.conf
 /usr/lib/yum-plugins/verify.*
 %{_mandir}/man1/yum-verify.1.*
 
-%files -n yum-keys
+%files -n yum-plugin-keys
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/keys.conf
 /usr/lib/yum-plugins/keys.*
@@ -497,12 +545,12 @@ fi
 %defattr(-, root, root)
 /etc/NetworkManager/dispatcher.d/*
 
-%files -n yum-remove-with-leaves
+%files -n yum-plugin-remove-with-leaves
 %defattr(-, root, root)
 /usr/lib/yum-plugins/remove-with-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
-%files -n yum-post-transaction-actions
+%files -n yum-plugin-post-transaction-actions
 %defattr(-, root, root)
 /usr/lib/yum-plugins/post-transaction-actions.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
@@ -510,7 +558,7 @@ fi
 # Default *.action file dropping dir.
 %dir %{_sysconfdir}/yum/post-actions
 
-%files -n yum-rpm-warm-cache
+%files -n yum-plugin-rpm-warm-cache
 %defattr(-, root, root)
 /usr/lib/yum-plugins/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
