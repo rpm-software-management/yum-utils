@@ -298,15 +298,15 @@ This plugin allows the user to run arbitrary actions immediately following a
 transaction when specified packages are changed.
 
 %package -n yum-NetworkManager-dispatcher
-Summary: Yum plugin to deal with changing networks with NetworkManager
+Summary: NetworkManager script which tells yum to check it's cache on network change
 Group: System Environment/Base
 Requires: yum >= 3.2.17
 
 %description -n yum-NetworkManager-dispatcher
-This plugin forces yum to check its cache if/when a new network connection
-happens in NetworkManager. Note that currently there is no checking of
-previous data, so if your WiFi keeps going up and down (or you suspend/resume
-a lot) yum will recheck its cached data a lot.
+This NetworkManager "dispatch script" forces yum to check its cache if/when a
+new network connection happens in NetworkManager. Note that currently there is
+no checking of previous data, so if your WiFi keeps going up and down (or you
+suspend/resume a lot) yum will recheck its cached data a lot.
 
 %package -n yum-plugin-rpm-warm-cache
 Summary: Yum plugin to access the rpmdb files early to warm up access to the db 
