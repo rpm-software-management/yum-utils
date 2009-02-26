@@ -27,9 +27,14 @@ requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
 
+always = False
 def config_hook(conduit):
     parser = conduit.getOptParser()
     if parser:
+        if conduit.confBool('main', 'always', default=False):
+            global always
+            always = True
+            return
         parser.add_option('--merge-conf', action='store_true', 
                    dest="merge_conf", default=False,                         
                    help='Merge configuration changes after installation')
@@ -39,7 +44,7 @@ def posttrans_hook(conduit):
     opts, args = conduit.getCmdLine()
     # if we're not invoked or if assumeyes is set then don't run 
     conf = conduit.getConf()
-    if not opts.merge_conf:
+    if not always and not opts.merge_conf:
         return
     if conf.assumeyes:
         return    

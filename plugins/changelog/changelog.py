@@ -35,7 +35,7 @@ requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
 origpkgs = {}
-changelog = 0
+changelog = False
 
 def changelog_delta(pkg, olddate):
     out = []
@@ -206,18 +206,21 @@ Display changelog data, since a specified time, on a group of packages"""
         
         return True
 
-
 def config_hook(conduit):
     conduit.registerCommand(ChangeLogCommand())
     parser = conduit.getOptParser()
     if parser:
+        if conduit.confBool('main', 'always', default=False):
+            global changelog
+            changelog = True
+            return
         parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
 
 def postreposetup_hook(conduit):
     global changelog
     opts, args = conduit.getCmdLine()
-    if opts:
+    if not changelog and opts:
         changelog = opts.changelog
 
     if changelog:
