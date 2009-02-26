@@ -39,7 +39,7 @@ Group: System Environment/Base
 Provides: yum-changelog
 Obsoletes: yum-changelog < 1.1.20-0
 Conflicts: yum-changelog < 1.1.20-0
-Requires: yum >= 3.0
+Requires: yum >= 3.2.19
 Requires: python-dateutil
 
 %description -n yum-plugin-changelog

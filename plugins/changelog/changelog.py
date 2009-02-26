@@ -27,6 +27,8 @@ from yum.plugins import PluginYumExit
 from yum import logginglevels
 import logging
 
+from yum.i18n import to_unicode
+
 try:
     import dateutil.parser as dateutil_parser
 except ImportError:
@@ -68,9 +70,16 @@ def show_changes(conduit, msg):
         if origpkgs.has_key(name):
             for rpm in srpms[name]:
                 rpms.append("%s" % rpm)
-            conduit.info(2, ", ".join(sorted(rpms)))
+            done = False
+            kvf = conduit._base.fmtKeyValFill
+            rpm_names = ", ".join(sorted(rpms))
             for line in changelog_delta(srpms[name][0], origpkgs[name]):
-                conduit.info(2, "%s\n" % line)
+                if not done:
+                    conduit.info(2,kvf("ChangeLog for: ", rpm_names))
+                done = True
+                conduit.info(2, "%s\n" % to_unicode(line))
+            if not done:
+                conduit.info(2, "%s\n" % kvf("** No ChangeLog for: ",rpm_names))
 
 class ChangeLogCommand:
 
