@@ -217,17 +217,15 @@ def config_hook(conduit):
         parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
 
-def postreposetup_hook(conduit):
+def _setup_changelog_from_cmdline(conduit):
     global changelog
     opts, args = conduit.getCmdLine()
     if not changelog and opts:
         changelog = opts.changelog
 
-    if changelog:
-        repos = conduit.getRepos()
-        repos.populateSack(mdtype='otherdata')
-
 def postresolve_hook(conduit):
+    _setup_changelog_from_cmdline(conduit)
+
     if not changelog: 
         return
 
