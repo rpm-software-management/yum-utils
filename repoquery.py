@@ -35,6 +35,7 @@ import yum.misc as misc
 import yum.config
 import yum.Errors
 import yum.packages
+from yum.i18n import to_unicode
 from rpmUtils.arch import getArchList
 from rpmUtils.miscutils import formatRequire
 import output
@@ -76,10 +77,10 @@ def sec2isodate(timestr):
     return time.strftime("%F %T", time.gmtime(int(timestr)))
 
 def sec2date(timestr):
-    return time.ctime(int(timestr))
+    return to_unicode(time.ctime(int(timestr)))
 
 def sec2day(timestr):
-    return time.strftime("%a %b %d %Y", time.gmtime(int(timestr)))
+    return to_unicode(time.strftime("%a %b %d %Y", time.gmtime(int(timestr))))
 
 def _size2val(size, off, ui):
     size = float(size)
@@ -262,7 +263,9 @@ class repoPkgQuery(pkgQuery):
     def fmt_changelog(self, **kw):
         changelog = []
         for date, author, message in self.pkg.returnChangelog():
-            changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
+            changelog.append("* %s %s\n%s\n" % (sec2day(date),
+                                                to_unicode(author),
+                                                to_unicode(message)))
         return "\n".join(changelog)
 
 class instPkgQuery(pkgQuery):
@@ -498,7 +501,7 @@ class YumBaseQuery(yum.YumBase):
         for pkg in pkgs:
             for oper in self.pkgops:
                 try:
-                    print pkg.doQuery(oper)
+                    print to_unicode(pkg.doQuery(oper))
                 except queryError, e:
                     self.logger.error( e.msg)
         for prco in items:
