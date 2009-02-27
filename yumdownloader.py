@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
-from yum.misc import getCacheDir
+from yum.misc import getCacheDir, setup_locale
 from yum.packages import parsePackages
 
 from utils import YumUtilBase
@@ -59,7 +59,7 @@ class YumDownloader(YumUtilBase):
                 
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            self.optparser.print_help()
+            print self.optparser.format_help()
             sys.exit(0)
 
         # make yumdownloader work as non root user.
@@ -298,23 +298,9 @@ class YumDownloader(YumUtilBase):
           help='operate on source packages')
         self.optparser.add_option("--archlist",
           help="only download packages of certain architecture(s)")        
-if __name__ == '__main__':
-    import locale,os
-    # This test needs to be before locale.getpreferredencoding() as that
-    # does setlocale(LC_CTYPE, "")
-    try:
-        locale.setlocale(locale.LC_ALL, '')
-    except locale.Error, ex:
-        # default to C locale if we get a failure.
-        print >> sys.stderr, 'Failed to set locale, defaulting to C'
-        os.environ['LC_ALL'] = 'C'
-        locale.setlocale(locale.LC_ALL, 'C')
-        
-    if True: # not sys.stdout.isatty():
-        import codecs
-        sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-        sys.stdout.errors = 'replace'
 
+if __name__ == '__main__':
+    setup_locale()
     util = YumDownloader()
         
         

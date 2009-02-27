@@ -50,7 +50,7 @@ class DebugInfoInstall(YumUtilBase):
         opts = self.doUtilConfigSetup()
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            self.optparser.print_help()
+            print self.optparser.format_help()
             sys.exit(0)
         if os.geteuid() != 0:
             print >> sys.stderr, "You must be root to run this command."

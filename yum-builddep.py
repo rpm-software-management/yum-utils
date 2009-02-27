@@ -51,7 +51,7 @@ class YumBuildDep(YumUtilBase):
 
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            self.optparser.print_help()
+            print self.optparser.format_help()
             sys.exit(0)
 
         if self.conf.uid != 0:
