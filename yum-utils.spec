@@ -447,7 +447,7 @@ fi
 %{_mandir}/man1/yum-groups-manager.1.*
 %{_mandir}/man1/yumdownloader.1.*
 
-%files -n yum-plugin-updateonboot
+%files -n yum-updateonboot
 %defattr(-, root, root)
 %doc updateonboot/README
 %config(noreplace) %{_sysconfdir}/sysconfig/yum-updateonboot
