@@ -121,7 +121,7 @@ Requires: yum >= 3.0
 This plugin adds a --allow-downgrade flag to yum to make it possible to
 manually downgrade packages to specific versions.
 
-%package -n yum-priorities
+%package -n yum-plugin-priorities
 Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
 Provides: yum-priorities
