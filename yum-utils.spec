@@ -18,7 +18,7 @@ repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader,
 yum-debug-dump and yum-groups-manager.
 
-%package -n yum-plugin-updateonboot
+%package -n yum-updateonboot
 Summary: Run yum update on system boot
 Group: System Environment/Base
 Provides: yum-updateonboot
@@ -28,7 +28,7 @@ Requires: python, yum >= 2.4
 Requires(pre): chkconfig
 Requires(post): chkconfig
 
-%description -n yum-plugin-updateonboot
+%description -n yum-updateonboot
 Runs yum update on system boot. This allows machines that have been turned
 off for an extended amount of time to become secure immediately, instead of
 waiting until the next early morning cron job.
