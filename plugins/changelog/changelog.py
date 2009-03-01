@@ -235,7 +235,7 @@ def _setup_changelog_from_cmdline(conduit):
 def postresolve_hook(conduit):
     _setup_changelog_from_cmdline(conduit)
 
-    if not changelog: 
+    if not changelog or conduit.resultcode == 1:
         return
 
     # Find currently installed versions of packages we're about to update
