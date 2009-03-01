@@ -1,3 +1,243 @@
+2009-03-01  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.20
+
+2009-03-01  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: updateonboot is not a plugin
+
+2009-02-28  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: fixed package naming
+
+2009-02-28  Tim Lauridsen <tim@naboo.local>
+
+	* yum-utils.spec: fixed package naming
+
+2009-02-27  James Antill <james@and.org>
+
+	* repoquery.py: Fix unicode bugs in repoquery changelog, BZ 483157
+
+2009-02-27  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, yum-builddep.py, yumdownloader.py: make sure
+	we're not using print_help() anywhere - use format_help() instead as
+	print_help breaks unicode - closes rh bug #470934
+
+2009-02-26  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py, yum-utils.spec: Cleanup the
+	ChangeLog output, also fix unicode issue (bad/no utf8 *sigh*)
+
+2009-02-26  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Only download changelog data for
+	repos. we need it from
+
+2009-02-26  James Antill <james@and.org>
+
+	* docs/yum-changelog.conf.5, plugins/changelog/changelog.conf,
+	plugins/changelog/changelog.py, plugins/merge-conf/merge-conf.conf,
+	plugins/merge-conf/merge-conf.py: Add setting for
+	changelog/merge-conf to always work. BZ#483550
+
+2009-02-26  James Antill <james@and.org>
+
+	* yum-utils.spec: Change the version of obsoletes, and add conflicts
+	for RHEL
+
+2009-02-26  James Antill <james@and.org>
+
+	* yum-utils.spec:  Change yum-NetworkManager-dispatcher summary and description to
+	 make it obvious that it's a "plugin" of the NetworkManager variety,
+	 not a yum plugin.
+
+2009-02-26  James Antill <james@and.org>
+
+	* yum-utils.spec: Do big rename for plugins to include plugins in
+	their name
+
+2009-02-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: removed yum-fedorakmod & yum-kernel-module from
+	spec file
+
+2009-02-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-rss.py, yum-builddep.py: fixed duplicate 'Usage' in repo-rss
+	and yum-builddep, too
+
+2009-02-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: remove duplicate 'usage' rh bug #485415
+
+2009-02-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Simple hacky
+	workaround for BZ 484603, debuginfo-install x x-debuginfo   Fix the
+	way we downgrade ftp mirrors, for hosts which give us both
+
+2009-02-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* README, plugins/fedorakmod/fedorakmod.py: apply patch from Felix
+	Schwarz to fix deprecation warnings in fedorakmod plugin and a wrong
+	url in the README
+
+2009-02-09  James Antill <james@and.org>
+
+	* debuginfo-install.py: Simple hacky workaround for BZ 484603,
+	debuginfo-install x x-debuginfo
+
+2009-02-06  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Fix the way we downgrade
+	ftp mirrors, for hosts which give us both
+
+2009-02-03  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.conf,
+	plugins/auto-update-debuginfo/auto-update-debuginfo.py,
+	yum-utils.spec: Add auto-update-debuginfo plugin, BZ 432806
+
+2009-02-02  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix stupid english grammar rules in spec file
+
+2009-02-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: make yum-builddep behave a bit better when it
+	hits a srpm signed by an unknown key.
+
+2009-02-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.conf,
+	plugins/remove-with-leaves/remove-with-leaves.py: add
+	--leaves-exclude-bin and exclude_bin option to remove with leaves
+	closing bug 481465
+
+2009-01-30  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Allow filenames to yum-debug-dump, make default
+	filename "unique"
+
+2009-01-30  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Fix copy and paste typos.
+
+2009-01-30  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Allow yum-debug-dump to work as non-root
+
+2009-01-28  James Antill <james@and.org>
+
+	* plugins/fedorakmod/fedorakmod.py: Remove kernel-modules-for-kernel
+	provides from kmod, BZ 482893
+
+2009-01-26  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Sort packages in --changelog
+	output
+
+2009-01-26  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.conf: Add "live documentation"
+	about new always_print_best_host config.
+
+2009-01-26  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Allow fastestmirror
+	config. for printing hosts, rhbz #481282
+
+2009-01-26  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/fastestmirror/fastestmirror.py: REVERT: make fastestmirror
+	less verbose (rhbz #481282)
+
+2009-01-26  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/fastestmirror/fastestmirror.py: make fastestmirror less
+	verbose (rhbz #481282)
+
+2009-01-23  James Antill <james@and.org>
+
+	* yum-utils.spec: Bump requires due to usage of hdr2pkgTuple
+
+2009-01-22  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repomanage.py: Replace hdr2pkgTuple() with
+	rpmUtils.miscutils.pkgTupleFromHeader().
+
+2009-01-22  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repomanage.py: Replace several internal functions with ones from
+	rpmUtils.
+
+2009-01-21  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repomanage.py: Uniquify+sort EVR list for each NA only once, not
+	once for each found file.
+
+2009-01-22  James Antill <james@and.org>
+
+	* docs/reposync.1: Document --source in reposync
+
+2009-01-22  James Antill <james@and.org>
+
+	* reposync.py: Add --source option, to reposync
+
+2009-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: And group conditionals (until they die!)
+
+2009-01-16  Jason Parker <jparker@digium.com>
+
+	* yumdownloader.py: Obey conf.group_package_types in yumdownloader
+	@cmdline syntax
+
+2009-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: Don't fail for @core, due to ppc64 pkgs etc.
+
+2009-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: Add UI for bad/empty groups
+
+2009-01-16  James Antill <james@and.org>
+
+	* yumdownloader.py: Allow @mygroup syntax on yumdownloader cmdline
+
+2009-01-16  James Antill <james@and.org>
+
+	* debuginfo-install.py: For debuginfo for .src.rpm get ver/rel from
+	same, fixes BZ 480316
+
+2008-12-29  Warren Togami <wtogami@redhat.com>
+
+	* yum-NetworkManager-dispatcher: Fix the script exiting non-zero
+
+2008-12-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repoclosure.py: Check for the repoclosure of a single package
+	patch by Kedar Sovani
+
+2008-12-19  Michael Schwendt <mschwendt@gmail.com>
+
+	* repodiff.py: Print only the date, as that's all the info. we have
+
+
+2008-12-19  Panu Matilainen <pmatilai@redhat.com>
+
+	* plugins/nofsync/nofsync.conf, plugins/nofsync/nofsync.py: Add
+	plugin for disabling rpmdb sync during transaction - gives a nice
+	fat speed-boost for throw-away chroot installs and such, never   to
+	be used on live systems though...
+
+2008-12-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2008-12-17  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.19
