@@ -594,6 +594,10 @@ fi
 
 
 %changelog
+* Sun Mar 1 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.20
+- rename plugins from yum-name to yum-plugin-name
+
 * Wed Feb 25 2009 Tim Lauridsen <timlau@fedoraproject.org> 
 - Remove yum-kernel-module & yum-fedorakmod plugins (no obsoleting yet)
 - Remove yum-skip-broken plugin leftovers
