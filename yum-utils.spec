@@ -21,9 +21,6 @@ yum-debug-dump and yum-groups-manager.
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
 Group: System Environment/Base
-Provides: yum-updateonboot
-Obsoletes: yum-updateonboot < 1.1.20-0
-Conflicts: yum-updateonboot < 1.1.20-0
 Requires: python, yum >= 2.4
 Requires(pre): chkconfig
 Requires(post): chkconfig
@@ -36,7 +33,7 @@ waiting until the next early morning cron job.
 %package -n yum-plugin-changelog
 Summary: Yum plugin for viewing package changelogs before/after updating
 Group: System Environment/Base
-Provides: yum-changelog
+Provides: yum-changelog = %{version}-%{release}
 Obsoletes: yum-changelog < 1.1.20-0
 Conflicts: yum-changelog < 1.1.20-0
 Requires: yum >= 3.2.19
@@ -49,7 +46,7 @@ deltas before or after updating packages.
 %package -n yum-plugin-fastestmirror
 Summary: Yum plugin which chooses fastest repository from a mirrorlist
 Group: System Environment/Base
-Provides: yum-fastestmirror
+Provides: yum-fastestmirror = %{version}-%{release}
 Obsoletes: yum-fastestmirror < 1.1.20-0
 Conflicts: yum-fastestmirror < 1.1.20-0
 Requires: yum >= 3.0
@@ -61,7 +58,7 @@ prior to downloading packages.
 %package -n yum-plugin-protectbase
 Summary: Yum plugin to protect packages from certain repositories.
 Group: System Environment/Base
-Provides: yum-protectbase
+Provides: yum-protectbase = %{version}-%{release}
 Obsoletes: yum-protectbase < 1.1.20-0
 Conflicts: yum-protectbase < 1.1.20-0
 Requires: yum >= 3.0
@@ -74,7 +71,7 @@ repositories even if the non-protected repo has a later version.
 %package -n yum-plugin-versionlock
 Summary: Yum plugin to lock specified packages from being updated
 Group: System Environment/Base
-Provides: yum-versionlock
+Provides: yum-versionlock = %{version}-%{release}
 Obsoletes: yum-versionlock < 1.1.20-0
 Conflicts: yum-versionlock < 1.1.20-0
 Requires: yum >= 3.0
@@ -88,7 +85,7 @@ for example.
 %package -n yum-plugin-tsflags
 Summary: Yum plugin to add tsflags by a commandline option
 Group: System Environment/Base
-Provides: yum-tsflags
+Provides: yum-tsflags = %{version}-%{release}
 Obsoletes: yum-tsflags < 1.1.20-0
 Conflicts: yum-tsflags < 1.1.20-0
 Requires: yum >= 3.0
@@ -100,7 +97,7 @@ command line
 %package -n yum-plugin-downloadonly
 Summary: Yum plugin to add downloadonly command option
 Group: System Environment/Base
-Provides: yum-downloadonly
+Provides: yum-downloadonly = %{version}-%{release}
 Obsoletes: yum-downloadonly < 1.1.20-0
 Conflicts: yum-downloadonly < 1.1.20-0
 Requires: yum >= 3.0
@@ -112,7 +109,7 @@ the packages and not install/update them.
 %package -n yum-plugin-allowdowngrade
 Summary: Yum plugin to enable manual downgrading of packages
 Group: System Environment/Base
-Provides: yum-allowdowngrade
+Provides: yum-allowdowngrade = %{version}-%{release}
 Obsoletes: yum-allowdowngrade < 1.1.20-0
 Conflicts: yum-allowdowngrade < 1.1.20-0
 Requires: yum >= 3.0
@@ -124,7 +121,7 @@ manually downgrade packages to specific versions.
 %package -n yum-plugin-priorities
 Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
-Provides: yum-priorities
+Provides: yum-priorities = %{version}-%{release}
 Obsoletes: yum-priorities < 1.1.20-0
 Conflicts: yum-priorities < 1.1.20-0
 Requires: yum >= 3.0
@@ -137,7 +134,7 @@ from a repository with a higher priority even if repo has a later version.
 %package -n yum-plugin-refresh-updatesd
 Summary: Tell yum-updatesd to check for updates when yum exits
 Group: System Environment/Base
-Provides: yum-refresh-updatesd
+Provides: yum-refresh-updatesd = %{version}-%{release}
 Obsoletes: yum-refresh-updatesd < 1.1.20-0
 Conflicts: yum-refresh-updatesd < 1.1.20-0
 Requires: yum >= 3.0
@@ -151,7 +148,7 @@ will almost instantly update itself to reflect this.
 %package -n yum-plugin-merge-conf
 Summary: Yum plugin to merge configuration changes when installing packages
 Group: System Environment/Base
-Provides: yum-merge-conf
+Provides: yum-merge-conf = %{version}-%{release}
 Obsoletes: yum-merge-conf < 1.1.20-0
 Conflicts: yum-merge-conf < 1.1.20-0
 Requires: yum >= 3.0
@@ -164,7 +161,7 @@ package.
 %package -n yum-plugin-security
 Summary: Yum plugin to enable security filters
 Group: System Environment/Base
-Provides: yum-security
+Provides: yum-security = %{version}-%{release}
 Obsoletes: yum-security < 1.1.20-0
 Conflicts: yum-security < 1.1.20-0
 Requires: yum >= 3.2.18
@@ -178,7 +175,7 @@ security relevant ones. The commands give you the security information.
 %package -n yum-plugin-protect-packages
 Summary: Yum plugin to prevents Yum from removing itself and other protected packages
 Group: System Environment/Base
-Provides: yum-protect-packages
+Provides: yum-protect-packages = %{version}-%{release}
 Obsoletes: yum-protect-packages < 1.1.20-0
 Conflicts: yum-protect-packages < 1.1.20-0
 Requires: yum >= 3.0
@@ -193,7 +190,7 @@ compiling careful lists of all important packages.
 %package -n yum-plugin-basearchonly
 Summary: Yum plugin to let Yum install only basearch packages.
 Group: System Environment/Base
-Provides: yum-basearchonly
+Provides: yum-basearchonly = %{version}-%{release}
 Obsoletes: yum-basearchonly < 1.1.20-0
 Conflicts: yum-basearchonly < 1.1.20-0
 Requires: yum >= 3.0
@@ -207,7 +204,7 @@ The plugin only works with 'yum install'.
 %package -n yum-plugin-upgrade-helper
 Summary: Yum plugin to help upgrades to the next distribution version
 Group: System Environment/Base
-Provides: yum-upgrade-helper
+Provides: yum-upgrade-helper = %{version}-%{release}
 Obsoletes: yum-upgrade-helper < 1.1.20-0
 Conflicts: yum-upgrade-helper < 1.1.20-0
 Requires: yum >= 3.0
@@ -219,7 +216,7 @@ metadata file in repositories. It is used to simplify distribution upgrade hangu
 %package -n yum-plugin-aliases
 Summary: Yum plugin to enable aliases filters
 Group: System Environment/Base
-Provides: yum-aliases
+Provides: yum-aliases = %{version}-%{release}
 Obsoletes: yum-aliases < 1.1.20-0
 Conflicts: yum-aliases < 1.1.20-0
 Requires: yum >= 3.0.5
@@ -231,7 +228,7 @@ enable aliases.
 %package -n yum-plugin-list-data
 Summary: Yum plugin to list aggregate package data
 Group: System Environment/Base
-Provides: yum-list-data
+Provides: yum-list-data = %{version}-%{release}
 Obsoletes: yum-list-data < 1.1.20-0
 Conflicts: yum-list-data < 1.1.20-0
 Requires: yum >= 3.0.5
@@ -244,7 +241,7 @@ installed-sizes.
 %package -n yum-plugin-filter-data
 Summary: Yum plugin to list filter based on package data
 Group: System Environment/Base
-Provides: yum-filter-data
+Provides: yum-filter-data = %{version}-%{release}
 Obsoletes: yum-filter-data < 1.1.20-0
 Conflicts: yum-filter-data < 1.1.20-0
 Requires: yum >= 3.2.17
@@ -258,7 +255,7 @@ each category, if any were specified.
 %package -n yum-plugin-tmprepo
 Summary: Yum plugin to add temporary repositories
 Group: System Environment/Base
-Provides: yum-tmprepo
+Provides: yum-tmprepo = %{version}-%{release}
 Obsoletes: yum-tmprepo < 1.1.20-0
 Conflicts: yum-tmprepo < 1.1.20-0
 Requires: yum >= 3.2.11
@@ -273,7 +270,7 @@ gpg checking to be disabled.
 %package -n yum-plugin-verify
 Summary: Yum plugin to add verify command, and options
 Group: System Environment/Base
-Provides: yum-verify
+Provides: yum-verify = %{version}-%{release}
 Obsoletes: yum-verify < 1.1.20-0
 Conflicts: yum-verify < 1.1.20-0
 Requires: yum >= 3.2.12
@@ -286,7 +283,7 @@ installation.
 %package -n yum-plugin-keys
 Summary: Yum plugin to deal with signing keys
 Group: System Environment/Base
-Provides: yum-keys
+Provides: yum-keys = %{version}-%{release}
 Obsoletes: yum-keys < 1.1.20-0
 Conflicts: yum-keys < 1.1.20-0
 Requires: yum >= 3.2.19
@@ -298,7 +295,7 @@ allow you to query and remove signing keys.
 %package -n yum-plugin-remove-with-leaves
 Summary: Yum plugin to remove dependencies which are no longer used because of a removal
 Group: System Environment/Base
-Provides: yum-remove-with-leaves
+Provides: yum-remove-with-leaves = %{version}-%{release}
 Obsoletes: yum-remove-with-leaves < 1.1.20-0
 Conflicts: yum-remove-with-leaves < 1.1.20-0
 Requires: yum >= 3.2.19
@@ -311,7 +308,7 @@ libraries and packages.
 %package -n yum-plugin-post-transaction-actions
 Summary: Yum plugin to run arbitrary commands when certain pkgs are acted on
 Group: System Environment/Base
-Provides: yum-post-transaction-actions
+Provides: yum-post-transaction-actions = %{version}-%{release}
 Obsoletes: yum-post-transaction-actions < 1.1.20-0
 Conflicts: yum-post-transaction-actions < 1.1.20-0
 Requires: yum >= 3.2.19
@@ -334,7 +331,7 @@ suspend/resume a lot) yum will recheck its cached data a lot.
 %package -n yum-plugin-rpm-warm-cache
 Summary: Yum plugin to access the rpmdb files early to warm up access to the db 
 Group: System Environment/Base
-Provides: yum-rpm-warm-cache
+Provides: yum-rpm-warm-cache = %{version}-%{release}
 Obsoletes: yum-rpm-warm-cache < 1.1.20-0
 Conflicts: yum-rpm-warm-cache < 1.1.20-0
 Requires: yum >= 3.2.19
@@ -594,6 +591,11 @@ fi
 
 
 %changelog
+* Mon Mar 2 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- set yum require to 3.2.21 (the 3.2.21 in rawhide is patched to yum head, so it matches the need yum 3.2.22 code)
+- Added versioned Provides: yum-<pluginname> to make rpm/yum happy.
+- yum-updateonboot is not renamed and dont need Obsoletes/Conflicts/Provides
+
 * Sun Mar 1 2009 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.20
 - rename plugins from yum-name to yum-plugin-name
