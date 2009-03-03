@@ -63,8 +63,10 @@ def parseArgs():
     (opts, args) = parser.parse_args()
     return (opts, args)
 
+#  Note that this is a "real" API, used by spam-o-matic etc.
+# so we have to do at least some API guarantee stuff.
 class RepoClosure(yum.YumBase):
-    def __init__(self, pkgonly, arch = [], config = "/etc/yum.conf", builddeps = False ):
+    def __init__(self, arch=[], config="/etc/yum.conf", builddeps=False, pkgonly=None):
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.arch = arch
