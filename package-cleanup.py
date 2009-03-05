@@ -121,6 +121,21 @@ def buildProviderList(my, pkgs, reportProblems):
             sys.exit(0)
     return provsomething
 
+singleLib = ['i386','i486','i586','i686','noarch']  # single lib duplicates
+multiLib = ['x86_64','noarch']                      # multi lib duplicates            
+
+def isDuplicate(a1,a2):
+    """ check is a1 is a duplicate arch to a2 """
+    dup = False        
+    if a1 == a2:
+        dup = False
+    elif a1 in singleLib and a2 in singleLib:
+        dup = True
+    elif a1 in multiLib and a2 in multiLib:
+        dup = True
+    return dup
+
+
 def findDupes(my):
     """takes a yum base object prints out a list of package duplicates.
        These typically happen when an update transaction is left half-completed"""
@@ -149,12 +164,10 @@ def findDupes(my):
             if len(archs) == 1:
                 refined[(n)] = pkgdict[(n)]
             else:
-                for a in archs: # All archs with same name
-                    for ca in rpmUtils.arch.getArchList(a): # get the compatible arch  
-                        if ca == a:
-                            continue
-                        if ca in archs: # If another compatible is in the archs, then it is a dupe
-                            refined[(n)] = pkgdict[(n)]
+                a1 = archs[0]
+                for a2 in archs[1:]:
+                    if isDuplicate(a1,a2):
+                        refined[(n)] = pkgdict[(n)]
                             
     
     del pkgdict
