@@ -1,4 +1,3 @@
-
 # IF any of these rpms are updated, the yum-updateonboot init script will
 # reboot immediately after the yum update.  To keep yum-updateonboot from
 # rebooting the system, comment this line out.
@@ -8,3 +7,7 @@
 # yum-updateonboot will call 'yum -y groupupdate'  Since group names tend to
 # have spaces in them, used a semi-colon to separate the group names
 #GROUPLIST="My Group;MyOtherGroup;Some_Group;My Group 4"
+
+# Be quiet when updating by default
+# These options are passed to yum, default value is "-q"
+#OPTIONS="-q"

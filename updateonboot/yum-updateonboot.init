@@ -46,6 +46,8 @@ fi
 
 . /etc/sysconfig/yum-updateonboot
 
+# be quiet by default
+[ -z "$OPTIONS" ] && OPTIONS="-q"
 
 # See how we were called.
 case "$1" in
@@ -57,14 +59,14 @@ case "$1" in
 	    rpm -q $REBOOT_RPMS > $TMP1
 	fi
 	echo -n "Updating RPMS on system: "
-	yum -y update &> /dev/null && success || failure
+	yum -y update $OPTIONS && success || failure
 	echo
 	OLD_IFS=$IFS
 	IFS=";"
 	for group in $GROUPLIST ; do
 	    IFS=$OLD_IFS
 	    echo -n $"Updating RPMS in group $group: "
-	    yum -y groupupdate "$group" &> /dev/null && success || failure
+	    yum -y groupupdate "$group" $OPTIONS && success || failure
 	    echo
 	done
 	IFS=$OLD_IFS
