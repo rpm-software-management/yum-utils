@@ -67,6 +67,7 @@ class YumDownloader(YumUtilBase):
         # make yumdownloader work as non root user.
         if self.conf.uid != 0:
             cachedir = getCacheDir()
+            self.logger.debug('Running as non-root, using %s as cachedir' % cachedir)
             if cachedir is None:
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
@@ -267,7 +268,7 @@ class YumDownloader(YumUtilBase):
         """do a default setup for all the normal/necessary yum components,
            really just a shorthand for testing"""
         try:
-            self._getRepos()
+            self._getRepos(doSetup = True)
             # if '--source' is used the add src to the archlist
             if opts.source:
                 archlist = rpmUtils.arch.getArchList() + ['src']    
