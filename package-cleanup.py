@@ -325,7 +325,12 @@ def removeKernels(my, count, confirmed, keepdevel):
         sys.exit(100)
     kernels = getKernels(my)
     runningkernel = os.uname()[2]
-    (kver,krel) = runningkernel.split('-')
+    # Vanilla kernels dont have a release, only a version
+    if '-' in runningkernel:
+        (kver,krel) = runningkernel.split('-')
+    else:
+        kver = runningkernel
+        krel = ""
     
     remove = kernels[count:]
     toremove = []
