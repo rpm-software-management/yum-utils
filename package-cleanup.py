@@ -157,9 +157,9 @@ def findDupes(my):
     for (n) in pkgdict.keys():
         # is more than one package with this name ?
         if len(pkgdict[(n)]) > 1:
-            archs = set()
+            archs = []
             for (e,v,r,a) in pkgdict[(n)]:
-                archs.add(a)
+                archs.append(a)
             # If all packages with the same name has the same arch, then it is a dupe
             if len(archs) == 1:
                 refined[(n)] = pkgdict[(n)]
