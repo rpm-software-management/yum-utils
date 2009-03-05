@@ -62,54 +62,61 @@ def _requires_this_package(rpmdb, pkg):
 def postresolve_hook(conduit):
     
     global exclude_bin
+    global remove_always
     opts, commands = conduit.getCmdLine()
     if hasattr(opts,'exclude_bin'):
         if exclude_bin or opts.exclude_bin:
             exclude_bin = True
-
-    # get all the items in 
-    tsInfo  = conduit.getTsInfo()
-    rpmdb = conduit.getRpmDB()
-    oldlen = 0
-    while oldlen != len(tsInfo):
-        oldlen = len(tsInfo)
-        for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]):
-            if conduit._base.allowedMultipleInstalls(txmbr.po): 
-                # these make everything dodgy, skip it
-                continue
-            for req in txmbr.po.requires:
-                if req[0].startswith('rpmlib('):
+            
+    if opts.remove_leaves or remove_always:   
+        # get all the items in 
+        tsInfo  = conduit.getTsInfo()
+        rpmdb = conduit.getRpmDB()
+        oldlen = 0
+        while oldlen != len(tsInfo):
+            oldlen = len(tsInfo)
+            for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]):
+                if conduit._base.allowedMultipleInstalls(txmbr.po): 
+                    # these make everything dodgy, skip it
                     continue
-                for pkg in rpmdb.getProvides(req[0], req[1], req[2]):
-                    if pkg.pkgtup in [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]:
-                        continue # skip ones already marked for remove, kinda pointless
-                    if pkg.name in ignore_list: # there are some pkgs which are NEVER going to be leafremovals
+                for req in txmbr.po.requires:
+                    if req[0].startswith('rpmlib('):
                         continue
-                    non_removed_requires = []
-                    for req_pkgtup in _requires_this_package(rpmdb,pkg):
-                        pkgtups = [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]
-                        if req_pkgtup not in pkgtups:
-                            non_removed_requires.append(req_pkgtup)
-                    if exclude_bin: # if this pkg is a binary of some kind, skip it
-                        is_bin=False
-                        for file_name in pkg.filelist:
-                            if file_name.find('bin') != -1:
-                                is_bin = True
-                        if is_bin:
+                    for pkg in rpmdb.getProvides(req[0], req[1], req[2]):
+                        if pkg.pkgtup in [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]:
+                            continue # skip ones already marked for remove, kinda pointless
+                        if pkg.name in ignore_list: # there are some pkgs which are NEVER going to be leafremovals
                             continue
-
-                    if not non_removed_requires:
-                        conduit.info(2, 'removing %s. It is not required by anything else.' % pkg)
-                        conduit._base.remove(pkg)
+                        non_removed_requires = []
+                        for req_pkgtup in _requires_this_package(rpmdb,pkg):
+                            pkgtups = [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]
+                            if req_pkgtup not in pkgtups:
+                                non_removed_requires.append(req_pkgtup)
+                        if exclude_bin: # if this pkg is a binary of some kind, skip it
+                            is_bin=False
+                            for file_name in pkg.filelist:
+                                if file_name.find('bin') != -1:
+                                    is_bin = True
+                            if is_bin:
+                                continue
+    
+                        if not non_removed_requires:
+                            conduit.info(2, 'removing %s. It is not required by anything else.' % pkg)
+                            conduit._base.remove(pkg)
 
 def config_hook(conduit):
     global exclude_bin
+    global remove_always
     exclude_bin  = conduit.confBool('main', 'exclude_bin', default=False)
+    remove_always = conduit.confBool('main', 'remove_always', default=False)
     parser = conduit.getOptParser()
     if parser:
         parser.add_option("", "--leaves-exclude-bin", dest="exclude_bin",
                 action="store_true", default=False, 
                 help="do not remove leaf packages which contain executable binaries")
+        parser.add_option('', '--remove-leaves', dest='remove_leaves', 
+                action='store_true', default=False, 
+                help="remove dependencies no longer needed by any other packages")
 
 
 
