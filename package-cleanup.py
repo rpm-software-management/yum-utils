@@ -126,21 +126,31 @@ def findDupes(my):
        These typically happen when an update transaction is left half-completed"""
        
     # iterate rpmdb.pkglist
-    # put each package into name.arch dicts with lists as the po
+    # put each package into name. dicts with lists as the po
     # look for any keys with a > 1 length list of pos where the name
     # of the package is not kernel and/or does not provide a kernel-module
+    # and the archs is the same or one of the archs is 'noarch'
+
     pkgdict = {}
     refined = {}
-    dupes = []
     
     for (n,a,e,v,r) in my.rpmdb.simplePkgList():
-        if not pkgdict.has_key((n,a)):
-            pkgdict[(n,a)] = []
-        pkgdict[(n,a)].append((e,v,r))
+        if not pkgdict.has_key((n)):
+            pkgdict[(n)] = []
+        pkgdict[(n)].append((e,v,r,a))
     
-    for (n,a) in pkgdict.keys():
-        if len(pkgdict[(n,a)]) > 1:
-            refined[(n,a)] = pkgdict[(n,a)]
+    for (n) in pkgdict.keys():
+        # is more than one package with this name ?
+        if len(pkgdict[(n)]) > 1:
+            archs = set()
+            for (e,v,r,a) in pkgdict[(n)]:
+                archs.add(a)
+            # If all packages with the same name has the same arch, then it is a dupe
+            if len(archs) == 1:
+                refined[(n)] = pkgdict[(n)]
+            # if there is more than one arch, then one must be 'noarch' to be a dupe.
+            elif 'noarch' in archs:
+                refined[(n)] = pkgdict[(n)]
     
     del pkgdict
     
@@ -150,8 +160,8 @@ def printDupes(my):
     """print out the dupe listing"""
     dupedict = findDupes(my)
     dupes = []    
-    for (n,a) in dupedict.keys():
-        for (e,v,r) in dupedict[(n,a)]:
+    for (n) in dupedict.keys():
+        for (e,v,r,a) in dupedict[(n)]:
             po = my.getInstalledPackageObject((n,a,e,v,r))
             if po.name.startswith('kernel'):
                 continue
