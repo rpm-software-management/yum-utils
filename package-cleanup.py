@@ -179,15 +179,15 @@ def cleanOldDupes(my, confirmed):
     """remove all the older duplicates"""
     dupedict = findDupes(my)
     removedupes = []
-    for (n,a) in dupedict.keys():
+    for (n) in dupedict.keys():
         if n.startswith('kernel'):
             continue
         if n.startswith('gpg-pubkey'):
             continue
-        (e,v,r) = dupedict[(n,a)][0]
+        (e,v,r,a) = dupedict[(n)][0]
         lowpo = my.getInstalledPackageObject((n,a,e,v,r))
 
-        for (e,v,r) in dupedict[(n,a)][1:]:
+        for (e,v,r,a) in dupedict[(n)][1:]:
             po = my.getInstalledPackageObject((n,a,e,v,r))
             if po.EVR < lowpo.EVR:
                 lowpo = po
