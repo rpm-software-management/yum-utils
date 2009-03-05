@@ -148,9 +148,14 @@ def findDupes(my):
             # If all packages with the same name has the same arch, then it is a dupe
             if len(archs) == 1:
                 refined[(n)] = pkgdict[(n)]
-            # if there is more than one arch, then one must be 'noarch' to be a dupe.
-            elif 'noarch' in archs:
-                refined[(n)] = pkgdict[(n)]
+            else:
+                for a in archs: # All archs with same name
+                    for ca in rpmUtils.arch.getArchList(a): # get the compatible arch  
+                        if ca == a:
+                            continue
+                        if ca in archs: # If another compatible is in the archs, then it is a dupe
+                            refined[(n)] = pkgdict[(n)]
+                            
     
     del pkgdict
     
