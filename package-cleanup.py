@@ -284,7 +284,7 @@ def listOrphans(my):
 def getKernels(my):
     """return a list of all installed kernels, sorted newest to oldest"""
     kernlist = []
-    for po in my.rpmdb.searchNevra(name='kernel'):
+    for po in my.rpmdb.searchNevra(name='kernel') + my.rpmdb.searchNevra(name='kernel-PAE'):
         kernlist.append(po.pkgtup)
     kernlist.sort(sortPackages)
     kernlist.reverse()
@@ -294,7 +294,7 @@ def getKernels(my):
 # are no longer installed or to kernel version that are in the removelist
 def getOldKernelDevel(my,kernels,removelist):
     devellist = []
-    for po in my.rpmdb.searchNevra(name='kernel-devel'):
+    for po in my.rpmdb.searchNevra(name='kernel-devel') + my.rpmdb.searchNevra(name='kernel-PAE-devel'):
         # For all kernel-devel packages see if there is a matching kernel
         # in kernels but not in removelist
         tup = po.pkgtup
@@ -346,10 +346,11 @@ def removeKernels(my, count, confirmed, keepdevel):
     # Vanilla kernels dont have a release, only a version
     if '-' in runningkernel:
         (kver,krel) = runningkernel.split('-')
+        if krel.split('.')[-1] == os.uname()[-1]:
+           krel = ".".join(krel.split('.')[:-1])
     else:
         kver = runningkernel
         krel = ""
-    
     remove = kernels[count:]
     toremove = []
     
@@ -361,6 +362,10 @@ def removeKernels(my, count, confirmed, keepdevel):
         else:
             toremove.append(kernel)
     
+    if len(kernels) == 0:
+        print "No kernels to remove."
+        sys.exit(0)
+        
     if len(kernels) - len(toremove) < 1:
         print "Error all kernel rpms are set to be removed"
         sys.exit(100)
