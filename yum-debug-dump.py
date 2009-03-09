@@ -39,8 +39,6 @@ class YumDebugDump(yum.YumBase):
         self.parse_args()
 
     def parse_args(self):
-        self.conf #  This makes email.Utils from urilib, from optparser
-                  # somehow, magically work. Here be dragons.
         parser = OptionParser()
         parser.set_usage("yum-debug-dump [options]")
         parser.add_option("--norepos", action="store_true", default=False,
