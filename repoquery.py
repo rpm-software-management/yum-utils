@@ -394,7 +394,7 @@ class YumBaseQuery(yum.YumBase):
         qpkgs = []
         for pkg in pkgs:
             if isinstance(pkg, yum.packages.YumInstalledPackage):
-                qpkg = instPkgQuery(pkg, qf)
+                continue
             else:
                 qpkg = repoPkgQuery(pkg, qf)
             qpkgs.append(qpkg)
