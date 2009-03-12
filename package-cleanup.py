@@ -121,6 +121,10 @@ def buildProviderList(my, pkgs, reportProblems):
             sys.exit(0)
     return provsomething
 
+#
+# TODO: replace this one, with the new rpmUtils.arch.canCoinstall when it yum 3.2.21 get released
+#
+
 singleLib = ['i386','i486','i586','i686','noarch']  # single lib duplicates
 multiLib = ['x86_64','noarch']                      # multi lib duplicates            
 
