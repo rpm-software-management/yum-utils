@@ -70,4 +70,4 @@ def exclude_hook(conduit):
                     found = True
             if not found:
                 conduit.delPackage(pkg)
-                conduit.info(5, 'Excluding package %s due to version lock' % pkg)
+                conduit.info(5, 'Excluding package %s (%s) due to version lock' % (pkg,pkg.repoid))
