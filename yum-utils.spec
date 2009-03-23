@@ -340,12 +340,15 @@ Requires: yum >= 3.2.19
 This plugin reads the rpmdb files into the system cache before accessing the
 rpmdb directly. In some cases this should speed up access to rpmdb information
 
-%package -n yum-plugin-auto-update-debuginfo
+%package -n yum-plugin-auto-update-debug-info
+# Works by searching for *-debuginfo ... so it shouldn't trigger on itself.
 Summary: Yum plugin to enable automatic updates to installed debuginfo packages
 Group: System Environment/Base
+Obsoletes: yum-plugin-auto-update-debuginfo < 1.1.20-2
+Conflicts: yum-plugin-auto-update-debuginfo < 1.1.20-2
 Requires: yum >= 3.2.19
 
-%description -n yum-plugin-auto-update-debuginfo
+%description -n yum-plugin-auto-update-debug-info
 This plugin looks to see if any debuginfo packages are installed, and if there
 are it enables all debuginfo repositories that are "children" of enabled
 repositories.
@@ -584,7 +587,7 @@ fi
 /usr/lib/yum-plugins/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
 
-%files -n yum-plugin-auto-update-debuginfo
+%files -n yum-plugin-auto-update-debug-info
 %defattr(-, root, root)
 /usr/lib/yum-plugins/auto-update-debuginfo.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/auto-update-debuginfo.conf
