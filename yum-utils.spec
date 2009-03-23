@@ -346,6 +346,7 @@ Summary: Yum plugin to enable automatic updates to installed debuginfo packages
 Group: System Environment/Base
 Obsoletes: yum-plugin-auto-update-debuginfo < 1.1.20-2
 Conflicts: yum-plugin-auto-update-debuginfo < 1.1.20-2
+Provides: yum-plugin-auto-update-debuginfo = %{version}-%{release}
 Requires: yum >= 3.2.19
 
 %description -n yum-plugin-auto-update-debug-info
