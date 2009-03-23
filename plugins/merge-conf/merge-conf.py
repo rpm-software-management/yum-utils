@@ -19,7 +19,8 @@
 #       could have been removed during a "z" action).
 
 
-import os, sys, md5
+import os, sys
+from yum.misc import Checksums
 from rpm import RPMFILE_CONFIG, RPMFILE_NOREPLACE
 from yum.plugins import TYPE_INTERACTIVE
 
@@ -74,33 +75,41 @@ def posttrans_hook(conduit):
             filemodes = hdr["filemodes"]
             fileflags = hdr["fileflags"]
             filetuple = zip(files, filemodes, fileflags)
-            for file, mode, flags in filetuple:
+            for fn, mode, flags in filetuple:
                 if flags & RPMFILE_CONFIG:
                     if flags & RPMFILE_NOREPLACE:
-                        mergeConfFiles(tsmem.po.name, file, True, conduit, has_vimdiff)
+                        mergeConfFiles(tsmem.po.name, fn, True, conduit, has_vimdiff)
                     else:
-                        mergeConfFiles(tsmem.po.name, file, False, conduit, has_vimdiff)
+                        mergeConfFiles(tsmem.po.name, fn, False, conduit, has_vimdiff)
 
-def mergeConfFiles(pkg, file, noreplace, conduit, has_vimdiff):
+def mergeConfFiles(pkg, fn, noreplace, conduit, has_vimdiff):
     if noreplace:
-        local_file = file
-        pkg_file = "%s.rpmnew" % file
+        local_file = fn
+        pkg_file = "%s.rpmnew" % fn
         final_file = local_file
         other_file = pkg_file
         if not os.path.exists(pkg_file):
             return
-        if md5.new(open(local_file, "r").read()).hexdigest() == md5.new(open(pkg_file, "r").read()).hexdigest():
+        p_sum = Checksums()
+        p_sum.update(open(pkg_file, 'r').read())
+        l_sum = Checksums()
+        l_sum.update(open(local_file, 'r').read())
+        if l_sum.hexdigest() == p_sum.hexdigest():
             conduit.info(2, "Config files '%s' and '%s' are identical, I'm removing the duplicate one" % (local_file, pkg_file))
             os.remove(pkg_file)
             return
     else:
-        local_file = "%s.rpmsave" % file
-        pkg_file = file
+        local_file = "%s.rpmsave" % fn
+        pkg_file = fn
         final_file = pkg_file
         other_file = local_file
         if not os.path.exists(local_file):
             return
-        if md5.new(open(local_file, "r").read()).hexdigest() == md5.new(open(pkg_file, "r").read()).hexdigest():
+        p_sum = Checksums()
+        p_sum.update(open(pkg_file, 'r').read())
+        l_sum = Checksums()
+        l_sum.update(open(local_file, 'r').read())
+        if l_sum.hexdigest() == p_sum.hexdigest():            
             conduit.info(2, "Config files '%s' and '%s' are identical, I'm removing the duplicate one" % (local_file, pkg_file))
             os.remove(local_file)
             return
