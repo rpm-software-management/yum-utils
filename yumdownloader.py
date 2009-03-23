@@ -21,7 +21,7 @@ sys.path.insert(0,'/usr/share/yum-cli')
 import yum
 from yum.misc import getCacheDir, setup_locale
 from yum.packages import parsePackages
-
+from yum.Errors import RepoError
 from utils import YumUtilBase
 
 from urlparse import urljoin
@@ -240,11 +240,14 @@ class YumDownloader(YumUtilBase):
                 repo.cache = 0
                 download.localpath = local # Hack: to set the localpath we want.
                 try:
-                    path = repo.getPackage(download)
+                    checkfunc = (self.verifyPkg, (download, 1), {})
+                    path = repo.getPackage(download, checkfunc=checkfunc)
                 except IOError, e:
                     self.logger.error("Cannot write to file %s. Error was: %s" % (local, e))
                     continue
-                    
+                except RepoError, e:
+                    self.logger.error("Could not download/verify pkg %s: %s" % (download, e)
+                    continue
     
                 if not os.path.exists(local) or not os.path.samefile(path, local):
                     progress = TextMeter()
