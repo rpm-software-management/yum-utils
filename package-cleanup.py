@@ -190,7 +190,7 @@ def printDupes(my):
                 continue
             dupes.append(po)
 
-    for po in dupes:
+    for po in sorted(dupes):
         print "%s" % po
 
 def cleanOldDupes(my, confirmed):
@@ -214,9 +214,9 @@ def cleanOldDupes(my, confirmed):
     if len(removedupes) == 0:
         print "No dupes to clean"
         sys.exit(0)
-        
+
     print "I will remove the following old duplicate packages:"
-    for po in removedupes:
+    for po in sorted(removedupes):
         print "%s" % po
 
     if not confirmed:
@@ -263,7 +263,7 @@ def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
     # Epoch can be a number, stringify to work with getInstalledPackageObject
     for lst in leaves:
         lst[2] = str(lst[2])
-    leaves = (my.getInstalledPackageObject(x) for x in leaves)
+    leaves = sorted((my.getInstalledPackageObject(x) for x in leaves))
 
     for po in leaves:
         if all_nodes or _shouldShowLeaf(my, po, leaf_regex, exclude_devel,
@@ -380,7 +380,7 @@ def removeKernels(my, count, confirmed, keepdevel):
         print "No kernel related packages to remove"
         return
 
-    toremove = [my.getInstalledPackageObject(x) for x in toremove]
+    toremove = sorted((my.getInstalledPackageObject(x) for x in toremove))
 
     print "I will remove the following %s kernel related packages:" % len(toremove)
     for po in toremove:
