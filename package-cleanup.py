@@ -78,7 +78,7 @@ def getLocalRequires(my):
         pkgs[po] = requires
     return pkgs
 
-def buildProviderList(my, pkgs, reportProblems):
+def buildProviderList(my, pkgs, reportProblems, qf):
     """Resolve all dependencies in pkgs and build a dictionary of packages
      that provide something for a package other than itself"""
 
@@ -101,7 +101,7 @@ def buildProviderList(my, pkgs, reportProblems):
                 if not errors:
                     print "Missing dependencies:"
                 errors = True
-                print "Package %s requires %s" % (po,
+                print "Package %s requires %s" % (po.hdr.sprintf(qf),
                   miscutils.formatRequire(req,ver,rflags))
             else:
                 for rpkg in resolve_sack:
@@ -177,7 +177,7 @@ def findDupes(my):
     
     return refined
     
-def printDupes(my):
+def printDupes(my, qf):
     """print out the dupe listing"""
     dupedict = findDupes(my)
     dupes = []    
@@ -191,9 +191,9 @@ def printDupes(my):
             dupes.append(po)
 
     for po in sorted(dupes):
-        print "%s" % po
+        print po.hdr.sprintf(qf)
 
-def cleanOldDupes(my, confirmed):
+def cleanOldDupes(my, confirmed, qf):
     """remove all the older duplicates"""
     dupedict = findDupes(my)
     removedupes = []
@@ -217,7 +217,7 @@ def cleanOldDupes(my, confirmed):
 
     print "I will remove the following old duplicate packages:"
     for po in sorted(removedupes):
-        print "%s" % po
+        print po.hdr.sprintf(qf)
 
     if not confirmed:
         if not userconfirm():
@@ -253,7 +253,7 @@ def _shouldShowLeaf(my, po, leaf_regex, exclude_devel, exclude_bin):
         return True
     return False
 
-def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
+def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin, qf):
     """Print packages that are not required by any other package
        on the system"""
 
@@ -268,9 +268,9 @@ def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
     for po in leaves:
         if all_nodes or _shouldShowLeaf(my, po, leaf_regex, exclude_devel,
                 exclude_bin):
-            print "%s" % po
+            print po.hdr.sprintf(qf)
 
-def listOrphans(my):
+def listOrphans(my, qf):
     """ This is "yum list extras". """
     avail = my.pkgSack.simplePkgList()
     avail = set(avail)
@@ -279,7 +279,7 @@ def listOrphans(my):
             continue
 
         if po.pkgtup not in avail:
-            print "%s" % po
+            print po.hdr.sprintf(qf)
 
 def getKernels(my):
     """return a list of all installed kernels, sorted newest to oldest"""
@@ -333,7 +333,7 @@ def userconfirm():
     else:            
         return True
     
-def removeKernels(my, count, confirmed, keepdevel):
+def removeKernels(my, count, confirmed, keepdevel, qf):
     """Remove old kernels, keep at most count kernels (and always keep the running
      kernel"""
 
@@ -384,7 +384,7 @@ def removeKernels(my, count, confirmed, keepdevel):
 
     print "I will remove the following %s kernel related packages:" % len(toremove)
     for po in toremove:
-        print "%s" % po
+        print po.hdr.sprintf(qf)
 
     if not confirmed:
         if not userconfirm():
@@ -442,6 +442,9 @@ def parseArgs():
       help="Do not remove kernel-devel packages when removing kernels")
     parser.add_option("-c", dest="conffile", action="store",
                 default='/etc/yum.conf', help="config file location")
+    parser.add_option("--qf", "--queryformat", dest="qf", action="store",
+                      default='%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
+                      help="Query format to use for output.")
 
     (opts, args) = parser.parse_args()
     if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans, opts.dupes, opts.cleandupes)): 
@@ -460,20 +463,21 @@ def main():
         if os.geteuid() != 0:
             print "Error: Cannot remove kernels as a user, must be root"
             sys.exit(1)
-        removeKernels(my, opts.kernelcount, opts.confirmed, opts.keepdevel)
+        removeKernels(my, opts.kernelcount, opts.confirmed, opts.keepdevel,
+                      opts.qf)
         sys.exit(0)
     
     if (opts.leaves):
         listLeaves(my, opts.all_nodes, re.compile(opts.leaf_regex, re.IGNORECASE),
-                opts.exclude_devel, opts.exclude_bin)
+                opts.exclude_devel, opts.exclude_bin, opts.qf)
         sys.exit(0)
 
     if (opts.orphans):
-        listOrphans(my)
+        listOrphans(my, opts.qf)
         sys.exit(0)
 
     if opts.dupes:
-        printDupes(my)
+        printDupes(my, opts.qf)
         sys.exit(0)
 
     if opts.cleandupes:
@@ -481,7 +485,7 @@ def main():
             print "Error: Cannot remove packages as a user, must be root"
             sys.exit(1)
     
-        cleanOldDupes(my, opts.confirmed)
+        cleanOldDupes(my, opts.confirmed, opts.qf)
         sys.exit(0)
             
     if not opts.quiet:
@@ -489,7 +493,7 @@ def main():
     pkgs = getLocalRequires(my)
     if not opts.quiet:
         print "Processing all local requires"
-    provsomething = buildProviderList(my,pkgs,opts.problems)
+    provsomething = buildProviderList(my,pkgs,opts.problems,opts.qf)
     
 if __name__ == '__main__':
     main()
