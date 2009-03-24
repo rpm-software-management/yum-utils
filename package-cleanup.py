@@ -69,14 +69,13 @@ def getLocalRequires(my):
     """Get a list of all requirements in the local rpmdb"""
     pkgs = {}
     for po in my.rpmdb.returnPackages():
-        tup = po.pkgtup
         header = po.hdr
         requires = zip(
             header[rpm.RPMTAG_REQUIRENAME],
             header[rpm.RPMTAG_REQUIREFLAGS],
             header[rpm.RPMTAG_REQUIREVERSION],
         )
-        pkgs[tup] = requires
+        pkgs[po] = requires
     return pkgs
 
 def buildProviderList(my, pkgs, reportProblems):
@@ -87,7 +86,7 @@ def buildProviderList(my, pkgs, reportProblems):
     providers = {} # To speed depsolving, don't recheck deps that have 
                    # already been checked
     provsomething = {}
-    for (pkg,reqs) in pkgs.items():
+    for (po,reqs) in pkgs.items():
         for (req,flags,ver)  in reqs:
             if ver == '':
                 ver = None
@@ -102,13 +101,13 @@ def buildProviderList(my, pkgs, reportProblems):
                 if not errors:
                     print "Missing dependencies:"
                 errors = True
-                print "Package %s requires %s" % (pkg[0],
+                print "Package %s requires %s" % (po,
                   miscutils.formatRequire(req,ver,rflags))
             else:
                 for rpkg in resolve_sack:
                     # Skip packages that provide something for themselves
                     # as these can still be leaves
-                    if rpkg != pkg:
+                    if rpkg != po.pkgtup:
                         provsomething[rpkg] = 1
                 # Store the resolve_sack so that we can re-use it if another
                 # package has the same requirement
@@ -191,11 +190,8 @@ def printDupes(my):
                 continue
             dupes.append(po)
 
-    for pkg in dupes:
-        if pkg.epoch != '0':
-            print '%s:%s-%s-%s.%s' % (pkg.epoch, pkg.name, pkg.ver, pkg.rel, pkg.arch)
-        else:
-            print '%s-%s-%s.%s' % (pkg.name, pkg.ver, pkg.rel, pkg.arch)
+    for po in dupes:
+        print "%s" % po
 
 def cleanOldDupes(my, confirmed):
     """remove all the older duplicates"""
@@ -238,19 +234,14 @@ def cleanOldDupes(my, confirmed):
                  
 
 
-def _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel, exclude_bin):
+def _shouldShowLeaf(my, po, leaf_regex, exclude_devel, exclude_bin):
     """
     Determine if the given pkg should be displayed as a leaf or not.
 
     Return True if the pkg should be shown, False if not.
     """
-    if pkg[0] == 'gpg-pubkey':
+    if po.name == 'gpg-pubkey':
         return False
-    pos = my.rpmdb.searchNevra(name=pkg[0], epoch=str(pkg[2]), ver=pkg[3],
-            rel=pkg[4], arch=pkg[1])
-    # This should give us an exact match
-    assert len(pos) == 1
-    po = pos[0]
     name = po.name
     if exclude_devel and name.endswith('devel'):
         return False
@@ -263,27 +254,32 @@ def _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel, exclude_bin):
     return False
 
 def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin):
-    """return a packagtuple of any installed packages that
-       are not required by any other package on the system"""
+    """Print packages that are not required by any other package
+       on the system"""
+
+    # Could use my.rpmdb.returnLeafNodes() directly but it's slow
     ts = transaction.initReadOnlyTransaction()
-    leaves = ts.returnLeafNodes()
-    for pkg in leaves:
-        name = pkg[0]
-        if all_nodes or _shouldShowLeaf(my, pkg, leaf_regex, exclude_devel,
+    leaves = [list(x) for x in ts.returnLeafNodes()]
+    # Epoch can be a number, stringify to work with getInstalledPackageObject
+    for lst in leaves:
+        lst[2] = str(lst[2])
+    leaves = (my.getInstalledPackageObject(x) for x in leaves)
+
+    for po in leaves:
+        if all_nodes or _shouldShowLeaf(my, po, leaf_regex, exclude_devel,
                 exclude_bin):
-            print "%s-%s-%s.%s" % (pkg[0],pkg[3],pkg[4],pkg[1])
+            print "%s" % po
 
 def listOrphans(my):
     """ This is "yum list extras". """
     avail = my.pkgSack.simplePkgList()
     avail = set(avail)
     for po in sorted(my.rpmdb.returnPackages()):
-        (n,a,e,v,r) = po.pkgtup
-        if n == "gpg-pubkey": # Not needed as of at least 3.2.19, but meh
+        if po.name == "gpg-pubkey": # Not needed as of at least 3.2.19, but meh
             continue
 
         if po.pkgtup not in avail:
-            print "%s-%s-%s.%s" % (n, v, r, a)
+            print "%s" % po
 
 def getKernels(my):
     """return a list of all installed kernels, sorted newest to oldest"""
@@ -384,17 +380,17 @@ def removeKernels(my, count, confirmed, keepdevel):
         print "No kernel related packages to remove"
         return
 
+    toremove = [my.getInstalledPackageObject(x) for x in toremove]
+
     print "I will remove the following %s kernel related packages:" % len(toremove)
-    for kernel in toremove:
-        (n,a,e,v,r) = kernel
-        print "%s-%s-%s" % (n,v,r) 
+    for po in toremove:
+        print "%s" % po
 
     if not confirmed:
         if not userconfirm():
             sys.exit(0)
 
-    for kernel in toremove:
-        po = my.rpmdb.searchPkgTuple(kernel)[0]
+    for po in toremove:
         my.tsInfo.addErase(po)
 
     # Now perform the action transaction
