@@ -410,24 +410,25 @@ class YumBaseQuery(yum.YumBase):
         """
         pkgs = []
         try:
-            exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(), [name], casematch=1)
-            pkgs = exact + match
+            pkgs = self.returnPkgList(patterns=[name])
         except yum.Errors.PackageSackError, err:
             self.logger.error(err)
         return self.queryPkgFactory(pkgs)
 
-    def returnPkgList(self):
+    def returnPkgList(self, **kwargs):
         pkgs = []
         if self.options.pkgnarrow == "repos":
             # self.pkgSack is a yum.packageSack.MetaSack
             if self.conf.showdupesfromrepos:
-                pkgs = self.pkgSack.returnPackages()
+                pkgs = self.pkgSack.returnPackages(**kwargs)
             else:
-                pkgs = self.pkgSack.returnNewestByNameArch()
-
+                try:
+                    pkgs = self.pkgSack.returnNewestByNameArch(**kwargs)
+                except yum.Errors.PackageSackError:
+                    pkgs = []
         else:
             what = self.options.pkgnarrow
-            ygh = self.doPackageLists(what)
+            ygh = self.doPackageLists(what, **kwargs)
 
             if what == "all":
                 pkgs = ygh.available + ygh.installed
@@ -469,14 +470,7 @@ class YumBaseQuery(yum.YumBase):
         return grps
                     
     def matchPkgs(self, items):
-        pkgs = []
-        notfound = {}
-        
-        exact, match, unmatch = yum.packages.parsePackages(self.returnPkgList(),
-                                           items, casematch=1)
-        pkgs = exact + match
-        notfound = unmatch
-
+        pkgs = self.returnPkgList(patterns=items)
         return self.queryPkgFactory(pkgs)
 
     def matchSrcPkgs(self, items):
