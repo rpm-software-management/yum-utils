@@ -1,3 +1,138 @@
+2009-03-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.21
+
+2009-03-24  James Antill <james@and.org>
+
+	* repoquery.py: Pass the "name" query down to returnPackages/etc.
+
+2009-03-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: include a check to make sure the pkg makes
+	sense.
+
+2009-03-23  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/merge-conf/merge-conf.py: - remove md5 use to remove deprecation warnings on python 2.6 -
+	clean up minor pychecker warnings about 'file' shadowing builtin
+
+2009-03-23  James Antill <james@and.org>
+
+	* yum-utils.spec: Add provides for plugin-auto-update-debuginfo, to
+	help users out
+
+2009-03-23  James Antill <james@and.org>
+
+	* yum-utils.spec:  auto-update-debuginfo works by searching for *-debuginfo so it's
+	 pretty useless if it triggers on itself. Doh!
+
+2009-03-22  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/versionlock/versionlock.py: add repoid info to versionlock
+	plugin output (rhbz #491415)
+
+2009-03-12  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: just a TODO note
+
+2009-03-11  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: this is a simple fix to remove all installed pkgs
+	from the returned pkgs of any repoquery
+
+2009-03-09  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Find real bug in core yum code, and remove hack
+	for --help
+
+2009-03-09  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Fix --help in yum-debug-dump, who knows how/why
+
+
+2009-03-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: when we clean up kernels make sure that: 1. we
+	look at kernel-PAE,too 2. the running kernel coming back from
+	os.uname()[2] matches what we expect (it changed in F10) 3. if we
+	don't have any kernels installed, it's not an error, it's probably
+	just Xen
+
+2009-03-05  James Antill <james@and.org>
+
+	* package-cleanup.py: Chagne arches to list, as set([1])[0] fails
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* package-cleanup.py: make package-cleanup handle other kind of arch
+	dupes (Ex. i386 & i586) and make it work this time
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* package-cleanup.py: make package-cleanup handle other kind of arch
+	dupes (Ex. i386 & i586)
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* updateonboot/yum-updateonboot.init,
+	updateonboot/yum-updateonboot.sysconfig: make yum-updateonboot more
+	configurable (rhbz #466428)
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* package-cleanup.py: make package-cleanup --oldkernels work with
+	vanilla kernels (rhbz #469825)
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* plugins/remove-with-leaves/remove-with-leaves.conf,
+	plugins/remove-with-leaves/remove-with-leaves.py: made the
+	remove-with-leaves plugin only active when using --remove-leaves or
+	adding remove_always=1 to plugin conf (rhbz #4654149
+
+2009-03-05  Tim Lauridsen <tim@naboo.local>
+
+	* yumdownloader.py: fix issues when running yumdownloader as
+	non-root (rhbz #432889)
+
+2009-03-05  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: make cleanup work with the changes to
+	findDupes
+
+2009-03-05  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: Make package-cleanup find different arch dupes
+	(Ex. name-1.0-1.i386 & name-2.0-1.noarch) (RHBZ #375411)
+
+2009-03-03  James Antill <james@and.org>
+
+	* repoclosure.py: Fix RepoClosure() API for spam-o-matic, and other
+	users
+
+2009-03-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yumdownloader.py: import os and os.path to make the other changes
+	from 2 weeks ago work
+
+2009-03-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: added versioned provided to renamed plugins and
+	other minor cleaups
+
+2009-03-01  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Don't output anything when
+	depsolving failed
+
+2009-03-01  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: make a separate release-tag makefile target
+
+2009-03-01  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2009-03-01  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.20
