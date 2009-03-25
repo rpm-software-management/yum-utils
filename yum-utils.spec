@@ -596,7 +596,7 @@ fi
 
 %changelog
 * Wed Mar 25 2009 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.21
+- mark as 1.1.21 
 
 * Mon Mar 2 2009 Tim Lauridsen <timlau@fedoraproject.org>
 - set yum require to 3.2.21 (the 3.2.21 in rawhide is patched to yum head, so it matches the need yum 3.2.22 code)
