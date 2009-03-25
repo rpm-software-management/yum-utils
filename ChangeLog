@@ -2,6 +2,14 @@
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.21
 
+2009-03-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2009-03-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.21
+
 2009-03-24  James Antill <james@and.org>
 
 	* repoquery.py: Pass the "name" query down to returnPackages/etc.
