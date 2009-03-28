@@ -246,7 +246,7 @@ class YumDownloader(YumUtilBase):
                     self.logger.error("Cannot write to file %s. Error was: %s" % (local, e))
                     continue
                 except RepoError, e:
-                    self.logger.error("Could not download/verify pkg %s: %s" % (download, e)
+                    self.logger.error("Could not download/verify pkg %s: %s" % (download, e))
                     continue
     
                 if not os.path.exists(local) or not os.path.samefile(path, local):
