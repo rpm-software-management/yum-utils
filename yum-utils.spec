@@ -344,8 +344,8 @@ rpmdb directly. In some cases this should speed up access to rpmdb information
 # Works by searching for *-debuginfo ... so it shouldn't trigger on itself.
 Summary: Yum plugin to enable automatic updates to installed debuginfo packages
 Group: System Environment/Base
-Obsoletes: yum-plugin-auto-update-debuginfo < 1.1.20-2
-Conflicts: yum-plugin-auto-update-debuginfo < 1.1.20-2
+Obsoletes: yum-plugin-auto-update-debuginfo < 1.1.21-0
+Conflicts: yum-plugin-auto-update-debuginfo < 1.1.21-0
 Provides: yum-plugin-auto-update-debuginfo = %{version}-%{release}
 Requires: yum >= 3.2.19
 
