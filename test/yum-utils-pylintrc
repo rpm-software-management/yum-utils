@@ -53,27 +53,28 @@ disable-msg-cat=C,R
 #enable-msg=
 
 # Disable the message(s) with the given id(s).
-# C0324: *Comma not followed by a space* 
-# C0301: *Line too long (%s/%s)*
-# C0111: *Missing docstring* (to bad, but off for now)
 # E1101: *%s %r has no %r member* (The init-hook for do sys.path manipulation don't, so we cant find the utils module)
 # F0401: *Unable to import %r (%s)* (See above)
-# R0201: *Method could be a function* (dont care is self is used inside a function)
 # W0704: *Except doesn't do anything* ( Except xxxxxx,e : pass is ok)
 # W0612: *Unused variable %r* ( dont care if x,y,z = f() and y,z is not used) 
 # W0212: *Access to a protected member %s of a client class*  (if sucks, but we do that a lot)
-# R0801: *Similar lines in %s files* (this is fine, some utils look alike)
 # W0613: *Unused argument %r* 
-# R0912: *Too many branches (%s/%s)*
-# R0915: *Too many statements (%s/%s)*
 # W0602: *Using global for %r but no assigment is done*
 # W0511:  Used when a warning note as FIXME or XXX is detected
-# C0321: *More than one statement on a single line*
 # W0401: *Wildcard import %s*
 # W0614: *Unused import %s from wildcard import*
 # W0232: *Class has no __init__ method*
 # W0201: *Attribute %r defined outside __init__*
-disable-msg=C0324,C0301,C0111,E1101,F0401,R0201,W0704,W0612,W0212,R0801,W0613,R0912,R0915,W0602,W0511,C0321,W0401,W0614,W0232,W0201
+# W0603: *Using the global statement*
+# W0621: *Redefining name %r from outer scope (line %s)*
+# W0142: *Used * or ** magic*
+# W0102: *Dangerous default value %s as argument*
+# W0105: *String statement has no effect*
+# W0702: *No exception type(s) specified*
+# W0231: *__init__ method from base class %r is not called*
+# E0202: *An attribute inherited from %s hide this method*
+# W0622: *Redefining built-in %r*
+disable-msg=E1101,F0401,W0704,W0612,W0212,W0613,W0602,W0511,W0401,W0614,W0232,W0201,W0603,W0621,W0142,W0102,W0105,W0702,W0231,E0202,W0622
 
 
 [REPORTS]

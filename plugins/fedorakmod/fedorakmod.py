@@ -24,7 +24,7 @@ import os
 import rpmUtils
 from yum import packages
 from yum.constants import TS_INSTALL
-from yum.plugins import TYPE_CORE, PluginYumExit
+from yum.plugins import TYPE_CORE
 from rpm import RPMPROB_FILTER_OLDPACKAGE
 
 requires_api_version = '2.4'
@@ -52,13 +52,13 @@ def getRunningKernel():
         return ('kernel-%s' % os.uname()[4], 'EQ', ('0', v, r))
     return None
 
-def _whatProvides(c, list):
+def _whatProvides(c, provides):
     """Return a list of POs of installed kernels."""
 
     bag = []
     
     rpmdb = c.getRpmDB()
-    for i in list:
+    for i in provides:
         tuples = rpmdb.whatProvides(i, None, None)
         for pkgtuple in tuples:
             # XXX: what do we do for duplicate packages?
@@ -115,7 +115,7 @@ def resolveVersions(packageList):
        We return a dict of kernel version -> list of kmod POs
           where the list contains only one PO for each kmod name"""
 
-    dict = {}
+    pdict = {}
     for po in packageList:
         kernel = getKernelReqs(po)
         if len(kernel) == 0:
@@ -140,21 +140,21 @@ def resolveVersions(packageList):
             continue
         po.kmodName = name[0]
 
-        if not dict.has_key(kernel):
-            dict[kernel] = [po]
+        if not pdict.has_key(kernel):
+            pdict[kernel] = [po]
         else:
             sameName = None
-            for tempPo in dict[kernel]:
+            for tempPo in pdict[kernel]:
                 if po.name == tempPo.name:
                     sameName = tempPo
                     break
             if sameName and packages.comparePoEVR(sameName, po) < 0:
-                dict[kernel].remove(sameName)
-                dict[kernel].append(po)
+                pdict[kernel].remove(sameName)
+                pdict[kernel].append(po)
             elif sameName is None:
-                dict[kernel].append(po)
+                pdict[kernel].append(po)
 
-    return dict
+    return pdict
 
 def installKernelModules(c, newModules, installedModules):
     """Figure out what special magic needs to be done to install/upgrade
@@ -227,7 +227,7 @@ def pinKernels(c, newKernels, installedKernels, modules):
             c.getTsInfo().remove(kpo.pkgtup)
 
 def installAllKmods(c, avaModules, modules, kernels):
-    list = []
+    plist = []
     names = []
     interesting = []
 
@@ -259,9 +259,9 @@ def installAllKmods(c, avaModules, modules, kernels):
         for po in table[kernel]:
             if po not in modules:
                 c.getTsInfo().addTrueInstall(po)
-                list.append(po)
+                plist.append(po)
 
-    return list
+    return plist
 
 def tsCheck(te):
     "Make sure this transaction element is sane."

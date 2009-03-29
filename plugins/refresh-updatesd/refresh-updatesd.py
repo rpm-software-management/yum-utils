@@ -26,7 +26,7 @@ def posttrans_hook(conduit):
     Tell yum-updatesd to refresh its state. Run only after an rpm transaction.
     """
     if os.geteuid(): # If we aren't root, we _can't_ have updated anything
-       return
+        return
 
     try:
         bus = dbus.SystemBus()

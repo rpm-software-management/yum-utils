@@ -252,10 +252,10 @@ class repoPkgQuery(pkgQuery):
     def files(self, **kw):
         fdict = {}
         for ftype in self.pkg.returnFileTypes():
-            for file in self.pkg.returnFileEntries(ftype):
+            for fn in self.pkg.returnFileEntries(ftype):
                 # workaround for yum returning double leading slashes on some 
                 # directories - posix allows that but it looks a bit odd
-                fdict[os.path.normpath('//%s' % file)] = None
+                fdict[os.path.normpath('//%s' % fn)] = None
         files = fdict.keys()
         files.sort()
         return files
@@ -355,7 +355,7 @@ class groupQuery:
             elif t == "all":
                 pkgs.extend(self.group.packages)
             else:
-                raise "Unknown group package type %s" % t
+                raise queryError("Unknown group package type %s" % t)
             
         return pkgs
         
@@ -813,9 +813,9 @@ def main(args):
                 repo.disable()
 
     if opts.enablerepos:    
-            for repo_match in opts.enablerepos:
-                for repo in repoq.repos.findRepos(repo_match):
-                    repo.enable()
+        for repo_match in opts.enablerepos:
+            for repo in repoq.repos.findRepos(repo_match):
+                repo.enable()
 
     try:
         repoq.doRepoSetup()

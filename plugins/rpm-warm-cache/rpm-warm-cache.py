@@ -20,7 +20,7 @@
 # in order to improve database reads later on.
 # Don't use this if you're short on memory, anyways.
 
-from yum.plugins import PluginYumExit, TYPE_CORE
+from yum.plugins import TYPE_CORE
 from os import walk, path
 
 requires_api_version = '2.1'
@@ -37,8 +37,8 @@ def postreposetup_hook(conduit):
         cmd.startswith('list') or cmd.startswith('info')):
         try:
             for root, dirs, files in walk('/var/lib/rpm'):
-                for file in files:
-                    f = open(path.join(root, file))
+                for fn in files:
+                    f = open(path.join(root, fn))
                     d = f.read(1024*1024)
                     while(len(d) > 0):
                         d = f.read(1024*1024)

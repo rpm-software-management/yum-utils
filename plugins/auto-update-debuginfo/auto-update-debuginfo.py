@@ -19,7 +19,7 @@
 # This plugin enables the debuginfo repos. if you have a debuginfo rpm
 # installed.
 
-from yum.plugins import PluginYumExit, TYPE_CORE
+from yum.plugins import TYPE_CORE
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)

@@ -8,6 +8,8 @@ SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }' ${PKGNAME
 SRPM_FILE = ${PKGNAME}-${VERSION}-${SRPM_RELEASE}.src.rpm
 WEBHOST = yum.baseurl.org
 WEBPATH = /srv/projects/yum/web/download/yum-utils/
+PY_FILES =  $(wildcard *.py) $(wildcard plugins/*/*.py)
+
 
 NMPROG=yum-NetworkManager-dispatcher
 NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
@@ -85,12 +87,6 @@ ChangeLog: FORCE
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 
 pylint:
-	@pylint --rcfile=test/yum-utils-pylintrc \
-		yumdownloader.py yum-complete-transaction.py yum-debug-dump.py yum-builddep.py \
-                debuginfo-install.py package-cleanup.py yum-groups-manager.py verifytree.py \
-		repotrack.py reposync.py \
-		plugins/remove-with-leaves/remove-with-leaves.py \
-		plugins/upgrade-helper/upgrade-helper.py \
-		plugins/security/security.py \
+	@pylint --rcfile=test/yum-utils-pylintrc $(PY_FILES)
 	
 FORCE:	

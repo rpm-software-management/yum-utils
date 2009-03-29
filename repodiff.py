@@ -15,9 +15,8 @@
 # (c) 2007 Red Hat. Written by skvidal@fedoraproject.org
 
 import yum
-import rpmUtils
 import sys
-import time, datetime
+import datetime
 import os
 import locale
 from yum.misc import to_unicode
@@ -136,7 +135,7 @@ def parseArgs(args):
     archlist = ['src']
     for a in opts.archlist:
         for arch in a.split(','):
-             archlist.append(arch)
+            archlist.append(arch)
 
     opts.archlist = archlist             
     
@@ -205,9 +204,9 @@ def main(args):
                 oldtime = oldlogs[0][0]
                 clogdelta = []
                 for (t, author, content) in  pkg.changelog:
-                      if t > oldtime:
-                          msg += "* %s %s\n%s\n\n" % (datetime.date.fromtimestamp(int(t)).strftime("%a %b %d %Y"),
-                            to_unicode(author), to_unicode(content))
+                    if t > oldtime:
+                        msg += "* %s %s\n%s\n\n" % (datetime.date.fromtimestamp(int(t)).strftime("%a %b %d %Y"),
+                               to_unicode(author), to_unicode(content))
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 total_sizechange += sizechange
@@ -226,7 +225,6 @@ def main(args):
     
       
 if __name__ == "__main__":
-    import locale
     # This test needs to be before locale.getpreferredencoding() as that
     # does setlocale(LC_CTYPE, "")
     try:

@@ -17,9 +17,7 @@
 #
 # by Panu Matilainen <pmatilai@laiskiainen.org>
 
-from yum.plugins import PluginYumExit
 from yum.misc import unique
-from yum.packages import YumInstalledPackage
 from yum.plugins import TYPE_CORE
 
 requires_api_version = '2.1'

@@ -32,9 +32,9 @@ def config_hook(conduit):
 def postreposetup_hook(conduit):
     opts, commands = conduit.getCmdLine()
     if opts.dldir:
-        repos = conduit.getRepos();
-        list = repos.listEnabled();
-        for repo in list:
+        repos = conduit.getRepos()
+        rlist = repos.listEnabled()
+        for repo in rlist:
             repo.setAttribute('pkgdir',opts.dldir)
            
 

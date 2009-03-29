@@ -77,11 +77,11 @@ class RepoClosure(yum.YumBase):
             self.repos.sqlite = False
             self.repos._selectSackType()
     
-    def evrTupletoVer(self,tuple):
+    def evrTupletoVer(self,tup):
         """convert and evr tuple to a version string, return None if nothing
         to convert"""
     
-        e, v,r = tuple
+        e, v,r = tup
 
         if v is None:
             return None

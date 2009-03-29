@@ -25,10 +25,8 @@ import sys
 import rpm
 import fnmatch
 import string
-import getopt
 import rpmUtils
 from yum import misc
-from exceptions import Exception
 
 from optparse import OptionParser
 
@@ -59,8 +57,8 @@ def getFileList(path, ext, filelist):
             filelist = getFileList(path + '/' + d, ext, filelist)
         else:
             if string.lower(d[-extlen:]) == '%s' % (ext):
-               newpath = os.path.normpath(path + '/' + d)
-               filelist.append(newpath)
+                newpath = os.path.normpath(path + '/' + d)
+                filelist.append(newpath)
                     
     return filelist
 
@@ -68,15 +66,15 @@ def getFileList(path, ext, filelist):
 def trimRpms(rpms, excludeGlobs):
     # print 'Pre-Trim Len: %d' % len(rpms)
     badrpms = []
-    for file in rpms:
+    for fn in rpms:
         for glob in excludeGlobs:
-            if fnmatch.fnmatch(file, glob):
-                # print 'excluded: %s' % file
-                if file not in badrpms:
-                    badrpms.append(file)
-    for file in badrpms:
-        if file in rpms:
-            rpms.remove(file)            
+            if fnmatch.fnmatch(fn, glob):
+                # print 'excluded: %s' % fn
+                if fn not in badrpms:
+                    badrpms.append(fn)
+    for fn in badrpms:
+        if fn in rpms:
+            rpms.remove(fn)            
     # print 'Post-Trim Len: %d' % len(rpms)
     return rpms
 

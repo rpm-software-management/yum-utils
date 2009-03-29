@@ -19,7 +19,6 @@
 # $ ./repo-graph.py --repoid=base > foo.dot
 # $ neato -v -Gmaxiter=2000 -x -Gcenter=false -Goverlap=scale -Tps2 -o foo.ps foo.dot
 
-import sys
 import yum
 from yum.misc import getCacheDir
 from optparse import OptionParser

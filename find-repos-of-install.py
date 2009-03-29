@@ -92,9 +92,9 @@ if True:
                 repo.disable()
 
     if opts.enablerepos:    
-            for repo_match in opts.enablerepos:
-                for repo in my.repos.findRepos(repo_match):
-                    repo.enable()
+        for repo_match in opts.enablerepos:
+            for repo in my.repos.findRepos(repo_match):
+                repo.enable()
 
 
 

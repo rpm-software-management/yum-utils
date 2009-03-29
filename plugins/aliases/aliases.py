@@ -140,9 +140,7 @@ class AliasCommand(AliasedCommand):
 
 
 def config_hook(conduit):
-    global aliases
-    global conffile
-    global recursive
+    global aliases, conffile, recursive
     
     conffile  = conduit.confString('main', 'conffile',
                                   default='/etc/yum/aliases.conf')

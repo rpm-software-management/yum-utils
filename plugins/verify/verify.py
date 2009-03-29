@@ -26,8 +26,6 @@
 #  yum verify extras
 
 
-import yum
-import types
 from yum.plugins import TYPE_INTERACTIVE
 import logging # for commands
 from yum import logginglevels
@@ -137,6 +135,7 @@ _verify_missing  = ['missing', 'permissions-missing','genchecksum']+_verify_none
 _verify_low      = ['mtime', 'genchecksum', 'permissions-missing'] +_verify_none
 _verify_onohi    = ['mtime', 'checksum']
 _verify_nnohi    = ['mtime', 'checksum']
+_verify_configs  = False
 
 class VerifyCommand:
 

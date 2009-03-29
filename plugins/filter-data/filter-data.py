@@ -26,7 +26,8 @@
 #  yum --filter-groups='App*/Sys*' list updates
 
 from yum.plugins import TYPE_INTERACTIVE
-from yum.misc import to_unicode, to_utf8, to_str
+from yum.misc import to_utf8, to_str
+from optparse import OptionValueError
 
 import fnmatch
 
@@ -443,7 +444,7 @@ def config_hook(conduit):
                 rang = val.split("-")
                 if len(rang) > 2:
                     msg = "%s was passed an invalid range: %s" % (attrs, val)
-                    raise OptionValueError, msg
+                    raise OptionValueError(msg)
                 if len(rang) < 2:
                     rang = (rang[0], rang[0])
                 else:

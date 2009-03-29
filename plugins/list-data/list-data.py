@@ -25,7 +25,6 @@
 #  yum list-groups updates
 
 
-import yum
 import types
 from yum.plugins import TYPE_INTERACTIVE
 import logging # for commands

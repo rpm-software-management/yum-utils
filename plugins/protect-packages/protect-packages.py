@@ -35,7 +35,6 @@ use the --override-protection command-line option.
 
 
 from yum.plugins import TYPE_CORE, TYPE_INTERACTIVE, PluginYumExit
-import sys
 import os
 import string
 import glob

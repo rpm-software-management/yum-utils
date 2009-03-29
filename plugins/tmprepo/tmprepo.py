@@ -21,13 +21,9 @@
 #
 # yum --tmprepo=http://example.com/foo/bar.repo ...
 
-import yum
-import types
 from yum.plugins import TYPE_INTERACTIVE
 import logging # for commands
-from yum import logginglevels
 
-import logging
 import urlgrabber.grabber
 import tempfile
 import os
@@ -160,6 +156,8 @@ rpgpgcheck = True # Remote
 rrgpgcheck = True # Remote 
 lpgpgcheck = True
 lrgpgcheck = False
+def_tmp_repos_cleanup = False
+
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
