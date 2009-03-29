@@ -38,6 +38,8 @@ _requires_cache = {}
 ignore_list = ['glibc', 'bash', 'libgcc']
 
 exclude_bin = False
+remove_always = False
+
 
 def _requires_this_package(rpmdb, pkg):
     if _requires_cache.has_key(pkg):
@@ -61,8 +63,7 @@ def _requires_this_package(rpmdb, pkg):
 
 def postresolve_hook(conduit):
     
-    global exclude_bin
-    global remove_always
+    global exclude_bin, remove_always
     opts, commands = conduit.getCmdLine()
     if hasattr(opts,'exclude_bin'):
         if exclude_bin or opts.exclude_bin:
@@ -105,8 +106,7 @@ def postresolve_hook(conduit):
                             conduit._base.remove(pkg)
 
 def config_hook(conduit):
-    global exclude_bin
-    global remove_always
+    global exclude_bin, remove_always
     exclude_bin  = conduit.confBool('main', 'exclude_bin', default=False)
     remove_always = conduit.confBool('main', 'remove_always', default=False)
     parser = conduit.getOptParser()
