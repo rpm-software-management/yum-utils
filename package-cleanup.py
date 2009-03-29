@@ -29,7 +29,6 @@ import re
 
 from rpmUtils import miscutils, transaction
 from optparse import OptionParser
-from yum import Errors
 from yum.misc import getCacheDir
 
 
@@ -347,7 +346,7 @@ def removeKernels(my, count, confirmed, keepdevel, qf):
     if '-' in runningkernel:
         (kver,krel) = runningkernel.split('-')
         if krel.split('.')[-1] == os.uname()[-1]:
-           krel = ".".join(krel.split('.')[:-1])
+            krel = ".".join(krel.split('.')[:-1])
     else:
         kver = runningkernel
         krel = ""
