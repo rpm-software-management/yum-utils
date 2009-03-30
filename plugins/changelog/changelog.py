@@ -29,6 +29,8 @@ import logging
 
 from yum.i18n import to_unicode
 
+from yum.update_md import UpdateMetadata
+
 try:
     import dateutil.parser as dateutil_parser
 except ImportError:
@@ -38,6 +40,9 @@ plugin_type = (TYPE_INTERACTIVE,)
 
 origpkgs = {}
 changelog = False
+orignots = set()
+also_updateinfo = False
+updateinfo = False
 
 def changelog_delta(pkg, olddate):
     out = []
@@ -49,6 +54,27 @@ def changelog_delta(pkg, olddate):
 def srpmname(pkg):
     n,v,r,e,a = splitFilename(pkg.returnSimple('sourcerpm'))
     return n
+
+def _show_changes_changelog(conduit, srpms):
+    for name in sorted(srpms.keys()):
+        rpms = []
+        if origpkgs.has_key(name):
+            for rpm in srpms[name]:
+                rpms.append("%s" % rpm)
+            done = False
+            kvf = conduit._base.fmtKeyValFill
+            rpm_names = ", ".join(sorted(rpms))
+            for line in changelog_delta(srpms[name][0], origpkgs[name]):
+                if not done:
+                    conduit.info(2,kvf("ChangeLog for: ", rpm_names))
+                done = True
+                conduit.info(2, "%s\n" % to_unicode(line))
+            if not done:
+                conduit.info(2, "%s\n" % kvf("** No ChangeLog for: ",rpm_names))
+
+def _show_changes_updateinfo(conduit):
+    for note in sorted(orignots):
+        conduit.info(2, note)
 
 def show_changes(conduit, msg):
     # Group by src.rpm name, not binary to avoid showing duplicate changelogs
@@ -65,21 +91,10 @@ def show_changes(conduit, msg):
             srpms[name] = [tsmem.po]
 
     conduit.info(2, "\n%s\n" % msg)
-    for name in sorted(srpms.keys()):
-        rpms = []
-        if origpkgs.has_key(name):
-            for rpm in srpms[name]:
-                rpms.append("%s" % rpm)
-            done = False
-            kvf = conduit._base.fmtKeyValFill
-            rpm_names = ", ".join(sorted(rpms))
-            for line in changelog_delta(srpms[name][0], origpkgs[name]):
-                if not done:
-                    conduit.info(2,kvf("ChangeLog for: ", rpm_names))
-                done = True
-                conduit.info(2, "%s\n" % to_unicode(line))
-            if not done:
-                conduit.info(2, "%s\n" % kvf("** No ChangeLog for: ",rpm_names))
+    if changelog:
+        _show_changes_changelog(conduit, srpms)
+    if updateinfo:
+        _show_changes_updateinfo(conduit)
 
 class ChangeLogCommand:
 
@@ -222,25 +237,44 @@ def config_hook(conduit):
         if conduit.confBool('main', 'always', default=False):
             global changelog
             changelog = True
+        if conduit.confBool('main', 'updateinfo', default=True):
+            global also_updateinfo
+            also_updateinfo = True
+        if (also_updateinfo and
+            conduit.confBool('main', 'updateinfo_always', default=changelog)):
+            global updateinfo
+            updateinfo = True
+        if changelog and (not also_updateinfo or updateinfo):
             return
         parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
 
 def _setup_changelog_from_cmdline(conduit):
     global changelog
+    global updateinfo
     opts, args = conduit.getCmdLine()
-    if not changelog and opts:
-        changelog = opts.changelog
+    if opts:
+        if not changelog:
+            changelog = opts.changelog
+        if not updateinfo:
+            updateinfo = opts.changelog
 
 def postresolve_hook(conduit):
     _setup_changelog_from_cmdline(conduit)
 
-    if not changelog or conduit.resultcode == 1:
+    if not (changelog or updateinfo) or conduit.resultcode == 1:
         return
 
     # Find currently installed versions of packages we're about to update
     ts = conduit.getTsInfo()
     rpmdb = conduit.getRpmDB()
+    if updateinfo:
+        repos = set()
+        for tsmem in ts.getMembers():
+            if tsmem.po.repoid == 'installed':
+                continue
+            repos.add(tsmem.po.repo)
+        mdi = UpdateMetadata(repos=list(repos))
     for tsmem in ts.getMembers():
         for po in rpmdb.searchNevra(name=tsmem.po.name, arch=tsmem.po.arch):
             hdr = po.hdr
@@ -251,12 +285,15 @@ def postresolve_hook(conduit):
                 origpkgs[n] = 0 
             else:
                 origpkgs[n] = times[0]
+            if updateinfo:
+                for (pkgtup, notice) in mdi.get_applicable_notices(po.pkgtup):
+                    orignots.add(notice)
 
     if conduit.confString('main', 'when', default='post') == 'pre':
         show_changes(conduit, 'Changes in packages about to be updated:')
 
 def posttrans_hook(conduit):
-    if not changelog: 
+    if not (changelog or updateinfo): 
         return
 
     if conduit.confString('main', 'when', default='post') == "post":

@@ -40,9 +40,27 @@ the yum updates.
 This option reflects specifies if the changelog should always be shown.
 .SH VALUE
 .IP true
-The changelog is always displayed
+The changelog is always displayed.
 .IP false
 A command line option is required for the changelog to be displayed.
+.SH OPTION
+.IP updateinfo
+This option specifies that the "changelog" from the repo. updateinfo should be
+shown.
+.SH VALUE
+.IP true
+The updateinfo is displayed.
+.IP false
+The updateinfo is never displayed.
+.SH OPTION
+.IP updateinfo_always
+This option reflects specifies if the "changelog" from the repo. should always
+be shown (note that if updateinfo is false then this option has no meaning).
+.SH VALUE
+.IP true
+The updateinfo is always displayed.
+.IP false
+A command line option is required for the updateinfo to be displayed.
 .SH AUTHOR
 .RS
 Chitlesh Goorah <chitlesh@fedoraproject.org>
