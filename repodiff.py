@@ -19,7 +19,7 @@ import sys
 import datetime
 import os
 import locale
-from yum.misc import to_unicode
+from yum.i18n import to_unicode
 
 from optparse import OptionParser
 

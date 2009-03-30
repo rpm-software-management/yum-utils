@@ -8,7 +8,7 @@ import optparse
 import gzip
 
 import yum
-from yum.misc import to_unicode
+from yum.i18n import to_unicode
 import yum.comps
 
 sys.path.insert(0, '/usr/share/yum-cli')

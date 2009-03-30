@@ -26,7 +26,7 @@
 #  yum --filter-groups='App*/Sys*' list updates
 
 from yum.plugins import TYPE_INTERACTIVE
-from yum.misc import to_utf8, to_str
+from yum.i18n import to_utf8, to_str
 from optparse import OptionValueError
 
 import fnmatch
