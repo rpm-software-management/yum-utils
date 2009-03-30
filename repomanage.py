@@ -150,7 +150,8 @@ def main(args):
         try:
             hdr = rpmUtils.miscutils.hdrFromPackage(ts, pkg)
         except rpmUtils.RpmUtilsError, e:
-            errorprint(e.message)
+            msg = "Error opening pkg %s: %s" % (pkg, e.message)
+            errorprint(msg)
             continue
         
         pkgtuple = rpmUtils.miscutils.pkgTupleFromHeader(hdr)
