@@ -89,4 +89,7 @@ ChangeLog: FORCE
 pylint:
 	@pylint --rcfile=test/yum-utils-pylintrc $(PY_FILES)
 	
+pylint-short:
+	@pylint -r n --rcfile=test/yum-utils-pylintrc $(PY_FILES)
+
 FORCE:	
