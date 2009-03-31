@@ -42,9 +42,11 @@ if True:
                       help="run from cache only")
     parser.add_option("--tempcache", action="store_true",
                       help="use private cache (default when used as non-root)")
+    parser.add_option("--sync2yumdb", action="store_true",
+                      help="sync anything that is found to the yumdb, if available")
 
 
-    (opts, regexs) = parser.parse_args()
+    (opts, args) = parser.parse_args()
 
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = yum.misc.getCacheDir()
@@ -98,17 +100,23 @@ if True:
 
 
 
-if len(sys.argv) > 1:
+if len(args) >= 1:
     pkgs = my.rpmdb.returnPackages(patterns=sys.argv[1:], ignore_case=True)
 else:
     pkgs = my.rpmdb
 
 for ipkg in sorted(pkgs):
+    if 'repoid' in ipkg.yumdb_info:
+        print '%s from repo %s' % (ipkg, ipkg.yumdb_info.repoid)
+        continue
+
     apkgs = my.pkgSack.searchPkgTuple(ipkg.pkgtup)
     if len(apkgs) < 1:
         print "Error: %s not found in any repository" % ipkg
     else:
         apkg = apkgs[0]
+        if opts.sync2yumdb: # and hasattr(ipkg, 'yumdb_info'): for compat. ?
+            ipkg.yumdb_info.repoid = apkg.repoid
         print '%s from repo %s' % (ipkg, apkg.repoid)
         
     
