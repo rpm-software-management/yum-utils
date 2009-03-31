@@ -107,18 +107,6 @@ Requires: yum >= 3.0
 This plugin adds a --downloadonly flag to yum so that yum will only download
 the packages and not install/update them.
 
-%package -n yum-plugin-allowdowngrade
-Summary: Yum plugin to enable manual downgrading of packages
-Group: System Environment/Base
-Provides: yum-allowdowngrade = %{version}-%{release}
-Obsoletes: yum-allowdowngrade < 1.1.20-0
-Conflicts: yum-allowdowngrade < 1.1.20-0
-Requires: yum >= 3.0
-
-%description -n yum-plugin-allowdowngrade
-This plugin adds a --allow-downgrade flag to yum to make it possible to
-manually downgrade packages to specific versions.
-
 %package -n yum-plugin-priorities
 Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
@@ -371,7 +359,6 @@ plugins="\
  versionlock \
  tsflags \
  downloadonly \
- allowdowngrade \
  priorities \
  refresh-updatesd \
  merge-conf \
@@ -491,11 +478,6 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
 /usr/lib/yum-plugins/downloadonly.*
-
-%files -n yum-plugin-allowdowngrade
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/allowdowngrade.conf
-/usr/lib/yum-plugins/allowdowngrade.*
 
 %files -n yum-plugin-priorities
 %defattr(-, root, root)
