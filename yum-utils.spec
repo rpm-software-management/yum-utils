@@ -8,8 +8,7 @@ Source: http://yum.baseurl.org/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-# changelog requires new update_md.UpdateMetadata() API in 3.2.23
-Requires: python >= 2.4 , yum >= 3.2.23
+Requires: python >= 2.4 , yum >= 3.2.22
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -37,7 +36,8 @@ Group: System Environment/Base
 Provides: yum-changelog = %{version}-%{release}
 Obsoletes: yum-changelog < 1.1.20-0
 Conflicts: yum-changelog < 1.1.20-0
-Requires: yum >= 3.2.19
+# changelog requires new update_md.UpdateMetadata() API in 3.2.23
+Requires: yum >= 3.2.23
 Requires: python-dateutil
 
 %description -n yum-plugin-changelog
