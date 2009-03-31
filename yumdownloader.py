@@ -294,15 +294,20 @@ class YumDownloader(YumUtilBase):
                 self.repos.disableRepo(repo.id)
 
     def addCmdOptions(self):
-        self.optparser.add_option("--destdir", default=".", dest="destdir",
+        # this if for compability with old API (utils.py from yum < 3.2.23)
+        if hasattr(self,'getOptionGroup'): # check if the group option API is available
+            group = self.getOptionGroup()
+        else:
+            group = self.optparser 
+        group.add_option("--destdir", default=".", dest="destdir",
           help='destination directory (defaults to current directory)')
-        self.optparser.add_option("--urls", default=False, dest="urls", action="store_true",
+        group.add_option("--urls", default=False, dest="urls", action="store_true",
           help='just list the urls it would download instead of downloading')
-        self.optparser.add_option("--resolve", default=False, dest="resolve", action="store_true",
+        group.add_option("--resolve", default=False, dest="resolve", action="store_true",
           help='resolve dependencies and download required packages')
-        self.optparser.add_option("--source", default=False, dest="source", action="store_true",
+        group.add_option("--source", default=False, dest="source", action="store_true",
           help='operate on source packages')
-        self.optparser.add_option("--archlist",
+        group.add_option("--archlist",
           help="only download packages of certain architecture(s)")        
 
 if __name__ == '__main__':
