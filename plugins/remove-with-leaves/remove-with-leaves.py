@@ -111,6 +111,9 @@ def config_hook(conduit):
     remove_always = conduit.confBool('main', 'remove_always', default=False)
     parser = conduit.getOptParser()
     if parser:
+        if hasattr(parser, 'plugin_option_group'):
+            parser = parser.plugin_option_group
+
         parser.add_option("", "--leaves-exclude-bin", dest="exclude_bin",
                 action="store_true", default=False, 
                 help="do not remove leaf packages which contain executable binaries")

@@ -173,6 +173,9 @@ def config_hook(conduit):
     if not parser:
         return
 
+    if hasattr(parser, 'plugin_option_group'):
+        parser = parser.plugin_option_group
+
     parser.values.tmp_repos = []
     parser.add_option("--tmprepo", action='append',
                       type='string', dest='tmp_repos', default=[],

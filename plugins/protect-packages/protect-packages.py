@@ -44,6 +44,8 @@ plugin_type = (TYPE_CORE, TYPE_INTERACTIVE)
 
 def config_hook(conduit):
     parser = conduit.getOptParser()
+    if hasattr(parser, 'plugin_option_group'):
+        parser = parser.plugin_option_group
     parser.add_option("", "--override-protection", dest='override', 
                       action="append", default=[], metavar='[package]',
                       help="remove package from the list of protected packages")

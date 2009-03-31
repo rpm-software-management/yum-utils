@@ -246,6 +246,8 @@ def config_hook(conduit):
             updateinfo = True
         if changelog and (not also_updateinfo or updateinfo):
             return
+        if hasattr(parser, 'plugin_option_group'):
+            parser = parser.plugin_option_group
         parser.add_option('--changelog', action='store_true', 
                       help='Show changelog delta of updated packages')
 

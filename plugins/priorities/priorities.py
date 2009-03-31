@@ -76,6 +76,8 @@ def config_hook(conduit):
     # Command-line options.
     parser = conduit.getOptParser()
     if parser:
+        if hasattr(parser, 'plugin_option_group'):
+            parser = parser.plugin_option_group
         parser.add_option('', '--samearch-priorities', dest='samearch',
             action='store_true', default = False,
             help="Priority-exclude packages based on name + arch")

@@ -21,6 +21,8 @@ plugin_type = (TYPE_INTERACTIVE,)
 def init_hook(conduit):
     parser = conduit.getOptParser()
     if parser:
+        if hasattr(parser, 'plugin_option_group'):
+            parser = parser.plugin_option_group
         parser.add_option('--nofsync', dest='nofsync',
                default=False, action='store_true',
                help='Disable database syncing during transaction (DANGEROUS)')

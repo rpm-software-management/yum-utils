@@ -23,6 +23,9 @@ plugin_type = (TYPE_INTERACTIVE,)
 
 def config_hook(conduit):
     parser = conduit.getOptParser()
+    if hasattr(parser, 'plugin_option_group'):
+        parser = parser.plugin_option_group
+
     parser.add_option('', '--downloadonly', dest='dlonly', action='store_true',
            default=False, help="don't update, just download")
     parser.add_option('', '--downloaddir', dest='dldir',
