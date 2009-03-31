@@ -393,14 +393,12 @@ def config_hook(conduit):
     if not parser:
         return
 
+    if hasattr(parser, 'plugin_option_group'):
+        parser = parser.plugin_option_group
+
     conduit.registerCommand(SecurityListCommand())
     conduit.registerCommand(SecurityInfoCommand())
     conduit.registerCommand(SecurityUpdateCommand())
-    parser.values.advisory = []
-    parser.values.cve      = []
-    parser.values.bz       = []
-    parser.values.security = False
-    parser.values.bugfixes = False
     def osec(opt, key, val, parser):
          # CVE is a subset of --security on RHEL, but not on Fedora
         parser.values.security = True

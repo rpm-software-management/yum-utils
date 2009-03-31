@@ -432,7 +432,8 @@ def config_hook(conduit):
             getattr(parser.values, 'verify_' + attrs).extend(vals)
         return func
 
-    parser.values.verify_files = []
+    if hasattr(parser, 'plugin_option_group'):
+        parser = parser.plugin_option_group
     parser.add_option('--verify-filenames', action="callback",
                       callback=make_nopt('filenames'), default=[],type="string",
                       help='Only verify files matching this')
