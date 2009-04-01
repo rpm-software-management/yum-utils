@@ -424,6 +424,7 @@ fi
 %{_bindir}/yum-groups-manager
 %{_bindir}/yum-debug-restore
 %{_sbindir}/yum-complete-transaction
+%{_sbindir}/yumdb
 %{_mandir}/man1/yum-utils.1.*
 %{_mandir}/man1/debuginfo-install.1.*
 %{_mandir}/man1/package-cleanup.1.*

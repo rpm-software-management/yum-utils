@@ -1,7 +1,7 @@
 SUBDIRS = docs
 PKGNAME = yum-utils
 UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff yum-debug-dump yum-debug-restore verifytree yum-groups-manager find-repos-of-install
-UTILSROOT = yum-complete-transaction 
+UTILSROOT = yum-complete-transaction yumdb
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk -F%: '/Release:/ { print $$2 }' ${PKGNAME}.spec ')
 SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }' ${PKGNAME}.spec )
