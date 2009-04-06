@@ -28,9 +28,9 @@ plugin_type = (TYPE_CORE,)
 
 def postreposetup_hook(conduit):
     opts, commands = conduit.getCmdLine()
-    try:
+    if commands is not None:
         cmd = commands[0]
-    except IndexError:
+    else:
         # No command given, do it as it's cheap enough
         cmd = 'install'
     if (cmd in ('upgrade', 'install', 'remove', 'search') or
