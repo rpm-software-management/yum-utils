@@ -28,7 +28,7 @@ plugin_type = (TYPE_CORE,)
 
 def postreposetup_hook(conduit):
     opts, commands = conduit.getCmdLine()
-    if commands is not None:
+    if commands:
         cmd = commands[0]
     else:
         # No command given, do it as it's cheap enough
