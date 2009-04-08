@@ -110,6 +110,10 @@ class YumCompleteTransaction(YumUtilBase):
         self.logger = logging.getLogger("yum.verbose.cli.yumcompletets")
         # Add util commandline options to the yum-cli ones
         self.optparser = self.getOptionParser()
+        if hasattr(self, 'getOptionGroup'):
+            self.optparser_grp = self.getOptionGroup()
+        else:
+            self.optparser_grp = self.optparser
         self.addCmdOptions()
         self.main()
 
@@ -123,7 +127,7 @@ class YumCompleteTransaction(YumUtilBase):
                 os.unlink(f)
 
     def addCmdOptions(self):
-        self.optparser.add_option("--cleanup-only", default=False,
+        self.optparser_grp.add_option("--cleanup-only", default=False,
             action="store_true", dest="cleanup",
             help='Do not complete the transaction just clean up transaction journals')
 
