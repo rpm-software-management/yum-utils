@@ -30,6 +30,8 @@
 
 
 
+
+
 import os
 import sys
 import shutil
@@ -107,6 +109,8 @@ def parseArgs():
         help="delete local packages no longer present in repository")
     parser.add_option("-p", "--download_path", dest='destdir', 
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
+    parser.add_option("-P", "--norepopath", dest='norepopath', default=False, action="store_true",
+	     help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
         help="Remove packages that fail GPG signature checking after downloading")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
@@ -172,6 +176,11 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
+	
+    # --norepopath can only be sensibly used with a single repository:
+    if len(my.repos.listEnabled()) > 1 and opts.norepopath:
+        print >> sys.stderr, "Error: Can't use --norepopath with multiple repositories"
+        sys.exit(1);
 
     # Use progress bar display when downloading repo metadata
     # and package files
@@ -197,8 +206,12 @@ def main():
             download_list = reposack.returnNewestByNameArch()
         else:
             download_list = list(reposack)
+        
+        if opts.norepopath:
+           local_repo_path = opts.destdir
+        else:
+           local_repo_path = opts.destdir + '/' + repo.id
 
-        local_repo_path = opts.destdir + '/' + repo.id
         if opts.delete and os.path.exists(local_repo_path):
             current_pkgs = localpkgs(local_repo_path)
 
