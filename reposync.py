@@ -109,7 +109,7 @@ def parseArgs():
         help="delete local packages no longer present in repository")
     parser.add_option("-p", "--download_path", dest='destdir', 
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
-    parser.add_option("-P", "--norepopath", dest='norepopath', default=False, action="store_true",
+    parser.add_option("--norepopath", dest='norepopath', default=False, action="store_true",
 	     help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
         help="Remove packages that fail GPG signature checking after downloading")
