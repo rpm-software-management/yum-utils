@@ -65,11 +65,11 @@ def postresolve_hook(conduit):
     
     global exclude_bin, remove_always
     opts, commands = conduit.getCmdLine()
-    if hasattr(opts,'exclude_bin'):
+    if opts and hasattr(opts,'exclude_bin'):
         if exclude_bin or opts.exclude_bin:
             exclude_bin = True
             
-    if opts.remove_leaves or remove_always:   
+    if (opts and opts.remove_leaves) or remove_always:
         # get all the items in 
         tsInfo  = conduit.getTsInfo()
         rpmdb = conduit.getRpmDB()
