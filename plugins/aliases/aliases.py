@@ -82,18 +82,18 @@ def resolve_aliases(args, log, skip=0):
         if num >= len(args): # Only options
             break
         
-        enum = num + 1
-        for cmd in aliases:
-            if cmd == args[num]:
-                log(4, 'ALIAS DONE(%s): %s' % (cmd, str(aliases[cmd])))
-                args[num:enum] = aliases[cmd]
-                # Mostly works like the shell, so \ls does no alias lookup on ls
-                if args[num][0] == '\\':
-                    args[num] = args[num][1:]
-                else:
-                    need_rep = recursive
-                break
+        if args[num] not in aliases:
+            continue
 
+        cmd = args[num]
+        log(4, 'ALIAS DONE(%s): %s' % (cmd, str(aliases[cmd])))
+        enum = num + 1
+        args[num:enum] = aliases[cmd]
+        # Mostly works like the shell, so \ls does no alias lookup on ls
+        if args[num][0] == '\\':
+            args[num] = args[num][1:]
+        else:
+            need_rep = recursive
 
 class AliasCommand(AliasedCommand):
     def __init__(self):
