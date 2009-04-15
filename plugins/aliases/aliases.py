@@ -16,7 +16,7 @@
 #
 # by James Antill
 
-from yum.plugins import TYPE_INTERACTIVE
+from yum.plugins import TYPE_INTERACTIVE, PluginYumExit
 import sys
 import time
 try: # yumex doesn't like import cli, but runs this
@@ -48,7 +48,12 @@ class AliasedCommand:
     def getSummary(self):
         return ''
 
-    # doCheck and doCommand are never called, for aliased commands.
+    def doCheck(self, base, basecmd, extcmds):
+        if recursive: # shouldn't happen
+            raise PluginYumExit('And error has occured for %s, please create a bug report')
+
+        raise PluginYumExit('%s is an alias not a command, however recursive processing is turned off')
+    doCommand = doCheck
 
 
 aliases   = None
