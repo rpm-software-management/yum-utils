@@ -158,6 +158,6 @@ def config_hook(conduit):
         for cmd in aliases:
             conduit.registerCommand(AliasedCommand(cmd))
 
+def args_hook(conduit):
     # Skip the yum cmd itself
-    resolve_aliases(args=sys.argv, skip=1, log=conduit.info)
-
+    resolve_aliases(args=conduit.getArgs(), log=conduit.info)

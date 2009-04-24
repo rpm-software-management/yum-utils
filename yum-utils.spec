@@ -208,7 +208,8 @@ Group: System Environment/Base
 Provides: yum-aliases = %{version}-%{release}
 Obsoletes: yum-aliases < 1.1.20-0
 Conflicts: yum-aliases < 1.1.20-0
-Requires: yum >= 3.0.5
+# Requires args_hook
+Requires: yum >= 3.2.23
 
 %description -n yum-plugin-aliases
 This plugin adds the command alias, and parses the aliases config. file to
