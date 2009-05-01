@@ -106,8 +106,8 @@ else:
     pkgs = my.rpmdb
 
 for ipkg in sorted(pkgs):
-    if 'repoid' in ipkg.yumdb_info:
-        print '%s from repo %s' % (ipkg, ipkg.yumdb_info.repoid)
+    if 'from_repo' in ipkg.yumdb_info:
+        print '%s from repo %s' % (ipkg, ipkg.yumdb_info.from_repo)
         continue
 
     apkgs = my.pkgSack.searchPkgTuple(ipkg.pkgtup)
@@ -116,7 +116,7 @@ for ipkg in sorted(pkgs):
     else:
         apkg = apkgs[0]
         if opts.sync2yumdb: # and hasattr(ipkg, 'yumdb_info'): for compat. ?
-            ipkg.yumdb_info.repoid = apkg.repoid
+            ipkg.yumdb_info.from_repo = apkg.repoid
         print '%s from repo %s' % (ipkg, apkg.repoid)
         
     
