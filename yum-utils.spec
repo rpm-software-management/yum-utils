@@ -344,6 +344,16 @@ This plugin looks to see if any debuginfo packages are installed, and if there
 are it enables all debuginfo repositories that are "children" of enabled
 repositories.
 
+%package -n yum-plugin-show-leaves
+Summary: Yum plugin which shows newly installed leaf packages
+packages that became leaves after a transaction
+Group: System Environment/Base
+Requires: yum >= 3.2.23
+
+%description -n yum-plugin-show-leaves
+Yum plugin which shows newly installed leaf packages
+and packages that became leaves after a transaction
+
 %prep
 %setup -q
 
@@ -377,6 +387,7 @@ plugins="\
  post-transaction-actions \
  rpm-warm-cache \
  auto-update-debuginfo \
+ show-leaves \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -579,8 +590,16 @@ fi
 /usr/lib/yum-plugins/auto-update-debuginfo.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/auto-update-debuginfo.conf
 
+%files -n yum-plugin-show-leaves
+%defattr(-, root, root)
+/usr/lib/yum-plugins/show-leaves.*
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/show-leaves.conf
+
 
 %changelog
+* Mon May 18 2009 Seth Vidal <skvidal at fedoraproject.org>
+- add show-leaves plugin from Ville Skyttä
+
 * Wed Mar 25 2009 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.21 
 
