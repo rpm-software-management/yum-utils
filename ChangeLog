@@ -4,6 +4,14 @@
 
 2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
 
+	* ChangeLog: updated ChangeLog
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.22
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
 	* yum-utils.spec: fix spec syntax error (2 line summary)
 
 2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
