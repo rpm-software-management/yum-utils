@@ -1,3 +1,227 @@
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.22
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: fix spec syntax error (2 line summary)
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: fix git-archive
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: added install-builddeps Makefile target
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/aliases/aliases.py, reposync.py, test/yum-utils-pylintrc,
+	yumdb.py: fixed pylint errors: bad indentation, unused imports and
+	global not known at module level
+
+2009-05-18  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/show-leaves/show-leaves.conf,
+	plugins/show-leaves/show-leaves.py, yum-utils.spec: add show-leaves
+	plugin from Ville Skyttä
+
+2009-05-06  James Antill <james@and.org>
+
+	* repoquery.py:  Be a bit nicer with filtering out installed pkgs.    Still do the
+	 same thing by default.    But if they specify pkgnarrow=installed
+	 (or all) don't filter them.
+
+2009-05-01  James Antill <james@and.org>
+
+	* yumdb.py: Add rename command to yumdb
+
+2009-05-01  James Antill <james@and.org>
+
+	* find-repos-of-install.py: Rename yumdb.repoid to yumdb.from_repo
+
+2009-04-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repo-check.py: added a repo-check util command template, it
+	contains the basic stuff for making an easy extentable yum-util,
+	without the need for 100's of almost identical tools
+
+2009-04-24  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py, yum-utils.spec: Change aliases plugint
+	o use the args_hook
+
+2009-04-15  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Speedup my old dumbass code, walking a
+	dict to do an == test is stupid
+
+2009-04-15  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Exit nicley when people try to run
+	aliased commands
+
+2009-04-14  James Antill <james@and.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: Fix
+	remove-with-leaves for PK usage (no opts)
+
+2009-04-08  James Antill <james@and.org>
+
+	* yum-complete-transaction.py: Add yum-complete-transaction options
+	under it's name
+
+2009-04-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: remove -P as a shortcut for --norepopath b/c it is
+	confusingly dissimilar to -p
+
+2009-04-08  Danny Smith <danny@keyop.co.uk>
+
+	* reposync.py: add --norepopath patch
+
+2009-04-06  James Antill <james@and.org>
+
+	* plugins/rpm-warm-cache/rpm-warm-cache.py: And for the no commands
+	case (possible?)
+
+2009-04-06  James Antill <james@and.org>
+
+	* plugins/rpm-warm-cache/rpm-warm-cache.py: Really fix the exception
+	in rpm-warm-cache
+
+2009-04-01  James Antill <james@and.org>
+
+	* Makefile, yum-utils.spec, yumdb.py: Add yumdb command to look at
+	and alter the yumdb
+
+2009-03-31  James Antill <james@and.org>
+
+	* find-repos-of-install.py: Use repoid in find-repos-of-install,
+	also optionally sync. guessed data
+
+2009-03-31  James Antill <james@and.org>
+
+	* plugins/security/security.py, plugins/verify/verify.py: Fix
+	plugins to use plugin_option_group which use parser.values
+
+2009-03-31  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py,
+	plugins/downloadonly/downloadonly.py, plugins/nofsync/nofsync.py,
+	plugins/priorities/priorities.py,
+	plugins/protect-packages/protect-packages.py,
+	plugins/remove-with-leaves/remove-with-leaves.py,
+	plugins/tmprepo/tmprepo.py: Use plugin_option_group if available, on
+	the easy cases
+
+2009-03-31  James Antill <james@and.org>
+
+	* yum-utils.spec: Remove allow-downgrade, as it's in core now
+
+2009-03-31  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yumdownloader.py: add grouped option support if available in
+	installed version of yum
+
+2009-03-31  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, test/yum-utils-pylintrc: use same pylint profile as yum
+	and added 'pylint-short' Makefile target
+
+2009-03-31  James Antill <james@and.org>
+
+	* Makefile, yum-debug-restore.py, yum-utils.spec: Add a "simple"
+	version of yum-debug-restore
+
+2009-03-30  James Antill <james@and.org>
+
+	* yum-utils.spec: Put the require for changelog in the right place
+
+2009-03-30  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repomanage.py: output filename when reporting errors opening
+	packages
+
+2009-03-30  James Antill <james@and.org>
+
+	* docs/yum-changelog.conf.5, plugins/changelog/changelog.py,
+	yum-utils.spec: Allow changelog data to show updateinfo data too
+
+2009-03-30  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/filter-data/filter-data.py, repodiff.py,
+	yum-groups-manager.py: cleanup after API break
+
+2009-03-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, find-repos-of-install.py, plugins/aliases/aliases.py,
+	plugins/auto-update-debuginfo/auto-update-debuginfo.py,
+	plugins/basearchonly/basearchonly.py,
+	plugins/downloadonly/downloadonly.py,
+	plugins/fedorakmod/fedorakmod.py,
+	plugins/filter-data/filter-data.py,
+	plugins/kernel-module/kernel-module.py,
+	plugins/list-data/list-data.py,
+	plugins/protect-packages/protect-packages.py,
+	plugins/refresh-updatesd/refresh-updatesd.py,
+	plugins/rpm-warm-cache/rpm-warm-cache.py,
+	plugins/skip-broken/skip-broken.conf,
+	plugins/skip-broken/skip-broken.py, plugins/tmprepo/tmprepo.py,
+	plugins/verify/verify.py, repo-graph.py, repoclosure.py,
+	repodiff.py, repomanage.py, repoquery.py, test/yum-utils-pylintrc: *
+	'make pylint' now check all python files. * Make the pylint profile
+	more sane and excluded the most stupid warnings * fix a lot of
+	pylint warning and errors, so 'make pylint' now runs without   any
+	messsages and a 10/10 score. so 'make pylint' can be used to catch
+	syntax   error like in the one fixed in
+	8ec41e7c3ccbc3ecd74cbc87f2550e330b3b5be3
+
+2009-03-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: minor pylint
+	cleanup
+
+2009-03-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: Fix pylint warning: W:350: Bad indentation.
+	Found 11 spaces, expected 12 W: 32: Unused import Errors
+
+2009-03-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* test/yum-utils-pylintrc: make pylint conf more sane, dont show
+	refactoring and convention errors
+
+2009-03-28  James Antill <james@and.org>
+
+	* yumdownloader.py: Fix syntax error
+
+2009-03-28  James Antill <james@and.org>
+
+	* yum-utils.spec: rawhide went upto 20-5, so update the obsoletes
+	for auto-debuginfo
+
+2009-03-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py: Add query formatting.
+
+2009-03-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py: Sort package list output.
+
+2009-03-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py: Operate more on yum package objects rather
+	than tuples.
+
+2009-03-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py: Fix same arch duplicate checking.
+
+2009-03-25  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2009-03-25  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.21
