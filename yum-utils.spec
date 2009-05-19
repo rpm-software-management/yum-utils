@@ -346,7 +346,6 @@ repositories.
 
 %package -n yum-plugin-show-leaves
 Summary: Yum plugin which shows newly installed leaf packages
-packages that became leaves after a transaction
 Group: System Environment/Base
 Requires: yum >= 3.2.23
 
