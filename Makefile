@@ -36,7 +36,7 @@ install:
 
 archive:
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
-	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
+	@git archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
 	
 srpm: archive
@@ -68,7 +68,7 @@ test-release:
 	@git commit -a -m "updated ChangeLog"
     	# Make archive
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
-	@git-archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
+	@git archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
 	# Build RPMS
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
 	@$(MAKE) test-cleanup
