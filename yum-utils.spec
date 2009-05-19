@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.21
+Version: 1.1.22
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -596,6 +596,9 @@ fi
 
 
 %changelog
+* Tue May 19 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.22
+
 * Mon May 18 2009 Seth Vidal <skvidal at fedoraproject.org>
 - add show-leaves plugin from Ville Skyttä
 
