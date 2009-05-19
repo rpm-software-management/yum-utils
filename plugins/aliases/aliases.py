@@ -17,7 +17,6 @@
 # by James Antill
 
 from yum.plugins import TYPE_INTERACTIVE, PluginYumExit
-import sys
 import time
 try: # yumex doesn't like import cli, but runs this
     from cli import CliError

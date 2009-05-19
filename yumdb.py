@@ -1,14 +1,13 @@
 #!/usr/bin/python -tt
 
-import os
 import sys
-import re
-import string
 import optparse
 import fnmatch
 
 import yum
 import shlex
+
+parser = None
 
 def setup_opts():
     version = "0.0.1"

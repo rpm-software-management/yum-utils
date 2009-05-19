@@ -208,9 +208,9 @@ def main():
             download_list = list(reposack)
         
         if opts.norepopath:
-           local_repo_path = opts.destdir
+            local_repo_path = opts.destdir
         else:
-           local_repo_path = opts.destdir + '/' + repo.id
+            local_repo_path = opts.destdir + '/' + repo.id
 
         if opts.delete and os.path.exists(local_repo_path):
             current_pkgs = localpkgs(local_repo_path)
