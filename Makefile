@@ -54,6 +54,9 @@ release:
 release-tag:
 	@git tag -s -f -m "Tagged ${PKGNAME}-$(VERSION)" ${PKGNAME}-$(VERSION)
 	@git push --tags origin
+	
+install-builddeps:
+	su -c "yum install perl-TimeDate "
 
 test-release:
 	@git checkout -b release-test
