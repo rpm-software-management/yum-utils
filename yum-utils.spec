@@ -597,7 +597,7 @@ fi
 
 %changelog
 * Tue May 19 2009 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.22
+- mark as 1.1.22 
 
 * Mon May 18 2009 Seth Vidal <skvidal at fedoraproject.org>
 - add show-leaves plugin from Ville Skyttä
