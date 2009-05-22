@@ -117,7 +117,8 @@ class YumBuildDep(YumUtilBase):
                 try:
                     srpms.append(yum.packages.YumLocalPackage(self.ts, arg))
                 except yum.Errors.MiscError, e:
-                    self.logger.error("Error: Could not open %s" % arg)
+                    self.logger.error("Error: Could not open %s .\nTry" 
+                    " running yum-builddep with the --nogpgcheck option." % arg)
                     raise
             elif arg.endswith('.src'):
                 srcnames.append(arg)
