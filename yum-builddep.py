@@ -24,7 +24,7 @@ from utils import YumUtilBase
 
 import logging
 import rpmUtils
-
+import rpm
 
 class YumBuildDep(YumUtilBase):
     NAME = 'yum-builddep'
@@ -48,6 +48,11 @@ class YumBuildDep(YumUtilBase):
         except yum.Errors.RepoError, e:
             self.logger.error("Cannot handle specific enablerepo/disablerepo options.")
             sys.exit(50)
+
+        # turn of our local gpg checking for opening the srpm if it is turned
+        # off for repos :)
+        if opts.nogpgcheck:
+            self.ts.pushVSFlags((rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
 
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
