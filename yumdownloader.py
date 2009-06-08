@@ -121,9 +121,12 @@ class YumDownloader(YumUtilBase):
                 repo.enable()
                 # Setup the repo, without a cache
                 repo.setup(0)
-                # Setup pkgSack with 'src' in the archlist
-                self._getSacks(archlist=archlist, thisrepo=repo.id)
-        
+                try:
+                    # Setup pkgSack with 'src' in the archlist
+                    self._getSacks(archlist=archlist, thisrepo=repo.id)
+                except yum.Errors.YumBaseError, msg:
+                    self.logger.critical(str(msg))
+                    sys.exit(1)
         
     def downloadPackages(self,opts):
         
