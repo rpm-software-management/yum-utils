@@ -126,7 +126,7 @@ def run_cmd(yb, args, inshell=False):
         args.pop(0)
         for pkg in sorted(yb.rpmdb.returnPackages(patterns=args)):
             print pkg
-            for ykey in pkg.yumdb_info:
+            for ykey in sorted(pkg.yumdb_info):
                 print " " * 4, ykey, '=', getattr(pkg.yumdb_info, ykey)
     elif args[0] == 'shell' and not inshell:
         args.pop(0)
