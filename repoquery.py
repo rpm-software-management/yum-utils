@@ -786,13 +786,9 @@ def main(args):
         freport = ( yumout.failureReport, (), {} )
         repoq.repos.setFailureCallback( freport )       
     
-    if os.geteuid() != 0 or opts.tempcache:
-        cachedir = misc.getCacheDir()
-        if cachedir is None:
-            repoq.logger.error("Error: Could not make cachedir, exiting")
-            sys.exit(50)
-        repoq.repos.setCacheDir(cachedir)
-        repoq.conf.cache = 0 # yum set cache=1, if uid != 0
+    if not repoq.setCacheDir(opts.tempcache):
+        repoq.logger.error("Error: Could not make cachedir, exiting")
+        sys.exit(50)
 
     if opts.cache:
         repoq.conf.cache = True
