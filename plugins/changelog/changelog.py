@@ -279,9 +279,11 @@ def postresolve_hook(conduit):
         mdi = UpdateMetadata(repos=list(repos))
     for tsmem in ts.getMembers():
         for po in rpmdb.searchNevra(name=tsmem.po.name, arch=tsmem.po.arch):
-            hdr = po.hdr
-            times = hdr['changelogtime']
-            n,v,r,e,a = splitFilename(hdr['sourcerpm'])
+            times = po.hdr['changelogtime']
+            try:
+                n,v,r,e,a = splitFilename(po.sourcerpm)
+            except TypeError:
+                n = po.name
             if len(times) == 0:
                 # deal with packages without changelog
                 origpkgs[n] = 0 
