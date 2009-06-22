@@ -29,7 +29,6 @@ import re
 
 from rpmUtils import miscutils, transaction
 from optparse import OptionParser
-from yum.misc import getCacheDir
 
 
 def initYum(opts):
@@ -45,15 +44,9 @@ def initYum(opts):
                      debuglevel=debuglevel,errorlevel=errorlevel)
 
     if opts.orphans:
-        # make it work as non root user.
-        if my.conf.uid != 0:
-            cachedir = getCacheDir()
-            if cachedir is None:
-                my.logger.error("Error: Could not make cachedir, exiting")
-                sys.exit(50)
-            my.repos.setCacheDir(cachedir)
-            # Turn of cache
-            my.conf.cache = 0
+        if not my.setCacheDir():
+            my.logger.error("Error: Could not make cachedir, exiting")
+            sys.exit(50)
         my.doRepoSetup()
     elif opts.dupes or opts.cleandupes:
         need_repos = False
