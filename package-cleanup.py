@@ -38,9 +38,12 @@ def initYum(opts):
     if opts.quiet:
         debuglevel=0
         errorlevel=0
+    need_repos = True
     my = yum.YumBase()
+    # This should be preconf
     my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins,
                      debuglevel=debuglevel,errorlevel=errorlevel)
+
     if opts.orphans:
         # make it work as non root user.
         if my.conf.uid != 0:
@@ -52,13 +55,17 @@ def initYum(opts):
             # Turn of cache
             my.conf.cache = 0
         my.doRepoSetup()
+    elif opts.dupes or opts.cleandupes:
+        need_repos = False
     else:
         # Disable all enabled repositories
         for repo in my.repos.listEnabled():
             my.repos.disableRepo(repo.id)
 
-    my.doTsSetup()
-    my.doSackSetup()
+    # FIXME: Is any of this needed anymore?
+    if need_repos:
+        my.doTsSetup()
+        my.doSackSetup()
     my.doRpmDBSetup()
     my.localPackages = []
     return my
@@ -195,6 +202,7 @@ def printDupes(my, qf):
 def cleanOldDupes(my, confirmed, qf):
     """remove all the older duplicates"""
     dupedict = findDupes(my)
+    my._getTs(True) # Remove only transaction, no repos/pkgSacks.
     removedupes = []
     for (n) in dupedict.keys():
         if n.startswith('kernel'):
