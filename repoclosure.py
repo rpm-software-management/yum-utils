@@ -69,10 +69,11 @@ class RepoClosure(yum.YumBase):
     def __init__(self, arch=[], config="/etc/yum.conf", builddeps=False, pkgonly=None):
         yum.YumBase.__init__(self)
         self.logger = logging.getLogger("yum.verbose.repoclosure")
-        self.arch = arch
         self.builddeps = builddeps
         self.pkgonly = pkgonly
         self.doConfigSetup(fn = config,init_plugins=False)
+        self._rc_arches = arch
+
         if hasattr(self.repos, 'sqlite'):
             self.repos.sqlite = False
             self.repos._selectSackType()
@@ -98,11 +99,12 @@ class RepoClosure(yum.YumBase):
     def readMetadata(self):
         self.doRepoSetup()
         archs = []
-        if not self.arch:
-            archs.extend(rpmUtils.arch.getArchList())
+        if not self._rc_arches:
+            archs.extend(self.arch.archlist)
         else:
-            for arch in self.arch:
-                archs.extend(rpmUtils.arch.getArchList(arch))
+            for arch in self._rc_arches:
+                archs.extend(self.arch.get_arch_list(arch))
+
         if self.builddeps and 'src' not in archs:
             archs.append('src')
         self.doSackSetup(archs)
