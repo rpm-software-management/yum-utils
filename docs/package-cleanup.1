@@ -28,7 +28,8 @@ repositories.
 .IP "\fB\-\-oldkernels\fP"
 Remove old kernel and kernel-devel packages.
 .IP "\fB\-\-problems\fP"
-List dependency problems in the local RPM database.
+List dependency problems in the local RPM database. If any problems are 
+found it will exit with an exit code of 1.
 .IP "\fB\-\-dupes\fP"
 Scan for duplicates in the local RPM database.
 .IP "\fB\-\-cleandupes\fP"
