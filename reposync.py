@@ -230,30 +230,36 @@ def main():
                 os.unlink(current_pkgs[pkg]['path'])
 
         if opts.downloadcomps or opts.downloadmd:
+
+            if not os.path.exists(local_repo_path):
+                try:
+                    os.makedirs(local_repo_path)
+                except IOError, e:
+                    my.logger.error("Could not make repo subdir: %s" % e)
+                    my.closeRpmDB()
+                    sys.exit(1)
             try: # download random other metadata
-                if not os.path.exists(local_repo_path):
-                    try:
-                        os.makedirs(local_repo_path)
-                    except IOError, e:
-                        my.logger.error("Could not make repo subdir: %s" % e)
-                        my.closeRpmDB()
-                        sys.exit(1)
                 if opts.downloadcomps:
                     compsfile = repo.getGroups()
                     shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
-                if opts.downloadmd:
-                    for ftype in repo.repoXML.fileTypes():
-                        if ftype in ['primary', 'primary_db', 'filelists',
-                                     'filelists_db', 'other', 'other_db']:
-                            continue
-                        if opts.downloadcomps and ftype == 'group':
-                            continue
-                        resultfile = repo.retrieveMD(ftype)
-                        basename  = os.path.basename(resultfile)
-                        shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
             except yum.Errors.RepoMDError,e :
                 if not opts.quiet:
                     my.logger.error("Unable to fetch metadata: %s" % e)
+
+            if opts.downloadmd:
+                for ftype in repo.repoXML.fileTypes():
+                    if ftype in ['primary', 'primary_db', 'filelists',
+                                 'filelists_db', 'other', 'other_db']:
+                        continue
+                    if opts.downloadcomps and ftype == 'group':
+                        continue
+                    try:
+                        resultfile = repo.retrieveMD(ftype)
+                        basename  = os.path.basename(resultfile)
+                        shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
+                    except yum.Errors.RepoMDError,e :
+                        if not opts.quiet:
+                            my.logger.error("Unable to fetch metadata: %s" % e)
 
         remote_size = 0
         local_size  = 0
