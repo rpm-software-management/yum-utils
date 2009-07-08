@@ -18,6 +18,7 @@
 #   maxhostfileage=10
 #   maxthreads=15
 #   #exclude=.gov, facebook
+#   #prefer=your.favourite.mirror
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -60,6 +61,7 @@ maxhostfileage = 10
 loadcache = False
 maxthreads = 15
 exclude = None
+prefer = None
 downgrade_ftp = True
 done_sock_timeout = False
 done_repos = set()
@@ -88,7 +90,7 @@ def init_hook(conduit):
 
     """
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
-    global maxthreads, exclude, downgrade_ftp
+    global maxthreads, exclude, prefer, downgrade_ftp
     verbose = conduit.confBool('main', 'verbose', default=False)
     always_print_best_host = conduit.confBool('main', 'always_print_best_host',
                                               default=True)
@@ -98,6 +100,7 @@ def init_hook(conduit):
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
+    prefer = conduit.confString('main', 'prefer', default='no.prefer.mirror')
     downgrade_ftp = conduit.confBool('main', 'downgrade_ftp', default=True)
     # If the file hostfilepath exists and is newer than the maxhostfileage,
     # then load the cache.
@@ -154,7 +157,7 @@ def postreposetup_hook(conduit):
     @param loadcache : Fastest Mirrors to be loaded from plugin's cache file or not.
     @type loadcache : Boolean
     """
-    global loadcache, exclude
+    global loadcache, exclude, prefer
 
     opts, commands = conduit.getCmdLine()
     if conduit._base.conf.cache or not _can_write_results(hostfilepath):
@@ -377,7 +380,7 @@ class FastestMirror:
                 if verbose:
                     print "%s already timed: %s" % (mhost, result)
                 self._add_result(mirror, mhost, result)
-            elif mhost in ("127.0.0.1", "::1", "localhost"):
+            elif mhost in ("127.0.0.1", "::1", "localhost", prefer):
                 self._add_result(mirror, mhost, 0)
             else:
                 # No cached info. so spawn a thread and find the info. out
@@ -468,7 +471,7 @@ class PollThread(threading.Thread):
                 if verbose:
                     print "%s already timed: %s" % (self.host, result)
             else:
-                if self.host in ("127.0.0.1", "::1", "localhost"):
+                if self.host in ("127.0.0.1", "::1", "localhost", prefer):
                     result = 0
                 else:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
