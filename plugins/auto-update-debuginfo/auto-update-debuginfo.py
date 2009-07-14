@@ -25,6 +25,9 @@ requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 def enable_debuginfo_repos(yb):
+    # We need to make sure the normal repos. are setup, before we add some...
+    yb.pkgSack.returnPackages
+
     repos = set()
     for repo in yb.repos.listEnabled():
         repos.add(repo.id)
