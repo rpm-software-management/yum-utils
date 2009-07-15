@@ -26,7 +26,7 @@ plugin_type = (TYPE_CORE,)
 
 def enable_debuginfo_repos(yb):
     # We need to make sure the normal repos. are setup, before we add some...
-    yb.pkgSack.returnPackages
+    yb.pkgSack
 
     repos = set()
     for repo in yb.repos.listEnabled():
