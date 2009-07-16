@@ -95,6 +95,8 @@ def resolve_aliases(args, log, skip=0):
             need_rep = recursive
 
 class AliasCommand(AliasedCommand):
+    created = 1198172281
+
     def __init__(self):
         AliasedCommand.__init__(self, "alias")
 
