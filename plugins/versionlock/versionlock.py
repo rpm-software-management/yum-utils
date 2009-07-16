@@ -178,7 +178,8 @@ def exclude_hook(conduit):
         return
 
     ape = conduit._base.pkgSack.addPackageExcluder
-    ape(None, 'wash.marked')
-    ape(None, 'mark.name.in', _version_lock_excluder_n)
-    ape(None, 'wash.nevr.in', _version_lock_excluder_nevr)
-    ape(None, 'exclude.marked')
+    exid = 'yum-utils.versionlock.'
+    ape(None, exid + str(1), 'wash.marked')
+    ape(None, exid + str(2), 'mark.name.in', _version_lock_excluder_n)
+    ape(None, exid + str(3), 'wash.nevr.in', _version_lock_excluder_nevr)
+    ape(None, exid + str(4), 'exclude.marked')
