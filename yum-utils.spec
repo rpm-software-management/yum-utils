@@ -75,7 +75,7 @@ Group: System Environment/Base
 Provides: yum-versionlock = %{version}-%{release}
 Obsoletes: yum-versionlock < 1.1.20-0
 Conflicts: yum-versionlock < 1.1.20-0
-Requires: yum >= 3.0
+Requires: yum >= 3.2.24
 
 %description -n yum-plugin-versionlock
 This plugin takes a set of name/versions for packages and excludes all other
