@@ -161,6 +161,10 @@ def exclude_hook(conduit):
     pkgs = {}
     for ent in _read_locklist():
         (n, v, r, e, a) = splitFilename(ent)
+        n = n.lower()
+        v = v.lower()
+        r = r.lower()
+        e = e.lower()
         if e == '': 
             e = '0'
         _version_lock_excluder_n.add(n)
@@ -172,7 +176,7 @@ def exclude_hook(conduit):
         for (pkgtup, instTup) in conduit._base.up.getObsoletesTuples():
             if instTup[0] not in _version_lock_excluder_n:
                 continue
-            _version_lock_excluder_n.add(pkgtup[0])
+            _version_lock_excluder_n.add(pkgtup[0].lower())
 
     if not _version_lock_excluder_n:
         return
