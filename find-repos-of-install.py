@@ -48,19 +48,13 @@ if True:
 
     (opts, args) = parser.parse_args()
 
-    if os.geteuid() != 0 or opts.tempcache:
-        cachedir = yum.misc.getCacheDir()
-        if cachedir is None:
-            my.logger.error("Error: Could not make cachedir, exiting")
-            sys.exit(50)
-        my.repos.setCacheDir(cachedir)
-        my.conf.cache = 0 # yum set cache=1, if uid != 0
-
+    if not my.setCacheDir(opts.tempcache):
+        repoq.logger.error("Error: Could not make cachedir, exiting")
+        sys.exit(50)
 
     if opts.cache:
         my.conf.cache = True
-        if not opts.quiet:
-            my.logger.info('Running from cache, results might be incomplete.')
+        my.logger.info('Running from cache, results might be incomplete.')
 
     if opts.repofrompath:
         # setup the fake repos
