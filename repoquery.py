@@ -775,7 +775,8 @@ def main(args):
             newrepo.timestamp_check = False
             repoq.repos.add(newrepo)
             repoq.repos.enableRepo(newrepo.id)
-            repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
+            if not opts.quiet:
+                repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
         
     # Show what is going on, if --quiet is not set.
