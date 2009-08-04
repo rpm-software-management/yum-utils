@@ -179,8 +179,6 @@ def ysp_chk_used_map(used_map, msg):
             msg('CVE \"%s\" not found applicable for this system' % i)
 
 class SecurityListCommand:
-    created = 1177064734
-
     def getNames(self):
         return ['list-security', 'list-sec']
 
@@ -329,8 +327,6 @@ def _get_name2oldpkgtup(base):
     return name2tup
 
 class SecurityUpdateCommand:
-    created = 1217002090
-
     def getNames(self):
         return ['update-minimal']
 
