@@ -87,7 +87,7 @@ class RepoClosure(yum.YumBase):
         if v is None:
             return None
     
-        val = ''
+        val = v
         if e is not None:
             val = '%s:%s' % (e, v)
     
