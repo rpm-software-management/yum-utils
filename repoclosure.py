@@ -29,6 +29,7 @@ import yum.Errors
 from yum.misc import getCacheDir
 from optparse import OptionParser
 import rpmUtils.arch
+import rpmUtils.updates
 from yum.constants import *
 from yum.packageSack import ListPackageSack
 
@@ -114,13 +115,26 @@ class RepoClosure(yum.YumBase):
     def getBrokenDeps(self, newest=False):
         unresolved = {}
         resolved = {}
+        pkgs = self.pkgSack
         if newest:
             pkgs = self.pkgSack.returnNewestByNameArch()
-        else:
-            pkgs = self.pkgSack
+            mypkgSack = ListPackageSack(pkgs)
+            pkgtuplist = mypkgSack.simplePkgList()
+            
+            # toss out any of the obsoleted pkgs so we can't depsolve with them
+            self.up = rpmUtils.updates.Updates([], pkgtuplist)
+            self.up.rawobsoletes = mypkgSack.returnObsoletes()
+            for pkg in pkgs:
+                fo = self.up.checkForObsolete([pkg.pkgtup])
+                if fo:
+                    print "ignoring obsolete pkg %s" % pkg
+                    for i in fo[pkg.pkgtup]:
+                        print i
+                    self.pkgSack.delPackage(pkg)
 
-        mypkgSack = ListPackageSack(pkgs)
-        pkgtuplist = mypkgSack.simplePkgList()
+            # we've deleted items so remake the pkgs
+            pkgs = self.pkgSack.returnNewestByNameArch()
+            pkgtuplist = mypkgSack.simplePkgList()
         
         if self.builddeps:
             pkgs = filter(lambda x: x.arch == 'src', pkgs)
