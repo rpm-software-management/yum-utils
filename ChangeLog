@@ -1,3 +1,161 @@
+2009-09-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.23
+
+2009-08-31  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   If epoch is
+	none we still want to use version in repoclosure.
+
+2009-08-31  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: make sure we make the list of pkgs to look at
+	based on the latest pkgsack - complete with pkg deletions of the
+	obsoletes
+
+2009-08-12  Michael Schwendt <mschwendt@fedoraproject.org>
+
+	* repoclosure.py: If epoch is none we still want to use version in
+	repoclosure.
+
+2009-08-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/security/security.py: remove timestamp in created
+	attribute
+
+2009-08-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make sure -q silences the repofrom path stuff
+	closes rh bug #512563
+
+2009-07-28  James Antill <james@and.org>
+
+	* find-repos-of-install.py: Cleanup tempcache, and fix -C option
+
+2009-07-23  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py:  pkgExcluder is all lower(), as excludepkgs/includepkgs are    So we
+	 lowercase the versionlock data.      It's possible, in theory,
+	 we'll have a false match, but no one      should be insane enough
+	 to name things the same apart from case.
+
+2009-07-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/repoquery.1: add note to repoquery man page that you must
+	have srpms in your enabled repos for the archlist=src option to
+	really do anything
+
+2009-07-17  James Antill <james@and.org>
+
+	* yum-utils.spec: Bump require version for new versionlock
+
+2009-07-16  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Add excluderids, so we don't
+	get N versions
+
+2009-07-16  James Antill <james@and.org>
+
+	* plugins/versionlock/versionlock.py: Move versionlock to use
+	pkgExcluder, add versionlock command
+
+2009-07-16  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add created timestamps to the
+	security plugin commands
+
+2009-07-16  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Add a created timestamp to the alias
+	command
+
+2009-07-14  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Remove
+	redundant (and confusing) member access on pkgSack, in auto fix
+
+2009-07-14  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Setup
+	normal repos before we setup new debuginfo. ones, fixes trac/135
+
+2009-07-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:
+	[fastestmirror] Add a patch from Joel Michael to support a
+	'preferred' mirror (#509479)
+
+2009-07-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: fix for bug:
+	https://bugzilla.redhat.com/show_bug.cgi?id=503587  - make sure we
+	don't fail to grab other metadata just b/c groups is not present
+
+2009-07-08  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.py: [fastestmirror] Add a
+	patch from Joel Michael to support a 'preferred' mirror (#509479)
+
+2009-07-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: make repoclosure work with new archstorage class
+	in yumbase
+
+2009-07-07  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/package-cleanup.1: document exit value if problems are found
+	in package-cleanup --problems
+
+2009-06-22  James Antill <james@and.org>
+
+	* package-cleanup.py: Use base.setCacheDir() in package-cleanup
+
+2009-06-22  James Antill <james@and.org>
+
+	* package-cleanup.py: Don't setup repos. when doing dupes processing
+
+
+2009-06-22  James Antill <james@and.org>
+
+	* plugins/changelog/changelog.py: Don't assume pkgs have sourcerpm,
+	in changelog plugin
+
+2009-06-08  James Antill <james@and.org>
+
+	* yumdownloader.py: Output a nice message for failed source repos.
+	in yumdownloader
+
+2009-06-08  James Antill <james@and.org>
+
+	* yumdb.py: Sort keys in yumdb info
+
+2009-06-08  James Antill <james@and.org>
+
+	* repoquery.py: Use setCacheDir in repoquery
+
+2009-05-28  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: when --nogpgcheck is passed - make sure we turn
+	off gpg checking on our read ts not just from repos
+
+2009-05-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: output a nicer error message when the srpm has an
+	unknown gpg key
+
+2009-05-19  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Fix tmprepo, when we have option group
+
+
+2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2009-05-19  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.22
