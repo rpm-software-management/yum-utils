@@ -127,9 +127,10 @@ class RepoClosure(yum.YumBase):
             for pkg in pkgs:
                 fo = self.up.checkForObsolete([pkg.pkgtup])
                 if fo:
-                    print "ignoring obsolete pkg %s" % pkg
-                    for i in fo[pkg.pkgtup]:
-                        print i
+                    # useful debug to make sure the obsoletes is sane
+                    #print "ignoring obsolete pkg %s" % pkg
+                    #for i in fo[pkg.pkgtup]:
+                    #    print i
                     self.pkgSack.delPackage(pkg)
 
             # we've deleted items so remake the pkgs
