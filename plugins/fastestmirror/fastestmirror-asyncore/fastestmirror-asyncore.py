@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # This is a threadless prototype version of fastestmirror
 #
 # Version: 0.3.2
