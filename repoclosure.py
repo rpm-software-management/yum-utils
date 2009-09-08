@@ -47,6 +47,8 @@ def parseArgs():
     parser.add_option("-a", "--arch", default=[], action='append',
         help='check packages of the given archs, can be specified multiple ' +
              'times (default: current arch)')
+    parser.add_option("--basearch", default=None, 
+                      help="set the basearch for yum to run as")
     parser.add_option("-b", "--builddeps", default=False, action="store_true",
         help='check build dependencies only (needs source repos enabled)')
     parser.add_option("-r", "--repoid", default=[], action='append',
@@ -67,8 +69,11 @@ def parseArgs():
 #  Note that this is a "real" API, used by spam-o-matic etc.
 # so we have to do at least some API guarantee stuff.
 class RepoClosure(yum.YumBase):
-    def __init__(self, arch=[], config="/etc/yum.conf", builddeps=False, pkgonly=None):
+    def __init__(self, arch=[], config="/etc/yum.conf", builddeps=False, pkgonly=None,
+                 basearch=None):
         yum.YumBase.__init__(self)
+        if basearch:
+            self.preconf.arch = basearch
         self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.builddeps = builddeps
         self.pkgonly = pkgonly
@@ -180,7 +185,11 @@ class RepoClosure(yum.YumBase):
 
 def main():
     (opts, cruft) = parseArgs()
-    my = RepoClosure(arch = opts.arch, config = opts.config, builddeps = opts.builddeps, pkgonly = opts.pkg)
+    my = RepoClosure(arch=opts.arch, 
+                     config=opts.config, 
+                     builddeps=opts.builddeps,
+                     pkgonly=opts.pkg,
+                     basearch=opts.basearch)
 
     if opts.repofrompath:
         # setup the fake repos
