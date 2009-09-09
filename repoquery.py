@@ -497,13 +497,17 @@ class YumBaseQuery(yum.YumBase):
         for pkg in pkgs:
             for oper in self.pkgops:
                 try:
-                    print to_unicode(pkg.doQuery(oper))
+                    out = pkg.doQuery(oper)
+                    if out:
+                        print to_unicode(out)
                 except queryError, e:
                     self.logger.error( e.msg)
         for prco in items:
             for oper in self.sackops:
                 try:
-                    for p in self.doQuery(oper, prco): print p
+                    for p in self.doQuery(oper, prco): 
+                        if p:
+                            print p
                 except queryError, e:
                     self.logger.error( e.msg)
 
