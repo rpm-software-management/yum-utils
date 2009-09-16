@@ -81,8 +81,8 @@ class DebugInfoInstall(YumUtilBase):
             self.doUnlock()
             sys.exit()
             
-        self.doTransaction()
-        self.doUnlock()    
+        sys.exit(self.doUtilTransaction())
+
     def di_try_install(self, po):
         if po.name.endswith('-debuginfo'): # Wildcard matches produce this
             return

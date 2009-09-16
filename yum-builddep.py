@@ -79,7 +79,7 @@ class YumBuildDep(YumUtilBase):
             print 'No uninstalled build requires'
             sys.exit()
             
-        self.doTransaction()
+        sys.exit(self.doUtilTransaction())
         
     def setupSourceRepos(self):
         # enable the -source repos for enabled primary repos
