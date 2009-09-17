@@ -274,6 +274,10 @@ Verify packages and display data on bad verifications"""
             if problem.type == 'size':
                 cv = "%*s" % (5, base.format_number(cv))
                 ov = "%*s" % (5, base.format_number(ov))
+                if cv == ov: # ignore human units, so we can see the diff.
+                    cv = "%*s B" % (12, str(problem.disk_value))
+                    ov = "%*s B" % (12, str(problem.database_value))
+
             (hib, hie) = self._mode_except(base, 'new', problem, _verify_nnohi)
             msg("        Current:  " + hib + cv + hie)
             (hib, hie) = self._mode_except(base, 'old', problem, _verify_onohi)
