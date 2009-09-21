@@ -49,6 +49,7 @@ import rpmUtils.miscutils
 
 requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
+__package_name__ = "yum-plugin-security"
 
 # newpackages is weird, in that we'll never display that because we filter to
 # things relevant to installed pkgs...
@@ -496,6 +497,8 @@ def exclude_hook(conduit):
     if not info["list_cmd"]:
         return
     
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName(__package_name__)
     conduit.info(2, 'Limiting package lists to security relevant ones')
     
     md_info = ysp_gen_metadata(conduit.getRepos().listEnabled())
@@ -550,6 +553,8 @@ def preresolve_hook(conduit):
     if info["list_cmd"]:
         return
     
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName(__package_name__)
     conduit.info(2, 'Limiting packages to security relevant ones')
 
     md_info = ysp_gen_metadata(conduit.getRepos().listEnabled())

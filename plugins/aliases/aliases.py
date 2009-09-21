@@ -154,6 +154,8 @@ def config_hook(conduit):
     register  = conduit.confBool('main', 'register', default=False)
 
     conduit.registerCommand(AliasCommand())
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-aliases")
     aliases = parse_aliases(conffile)
     if register:
         for cmd in aliases:

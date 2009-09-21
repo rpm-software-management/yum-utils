@@ -309,6 +309,8 @@ class KeysRemoveCommand(KeysListCommand):
             raise PluginYumExit('You need to be root to perform this command.')
         if not len(extcmds):
             raise PluginYumExit('You need to specify a key to remove.')
+        if hasattr(base, 'run_with_package_names'):
+            base.run_with_package_names.add("yum-plugin-keys")
 
 
 def config_hook(conduit):

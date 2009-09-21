@@ -102,6 +102,8 @@ def postresolve_hook(conduit):
                                 continue
     
                         if not non_removed_requires:
+                            if hasattr(conduit, 'registerPackageName'):
+                                conduit.registerPackageName("yum-plugin-remove-with-leaves")
                             conduit.info(2, 'removing %s. It is not required by anything else.' % pkg)
                             conduit._base.remove(pkg)
 

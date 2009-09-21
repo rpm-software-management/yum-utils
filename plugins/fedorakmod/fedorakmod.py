@@ -271,6 +271,8 @@ def tsCheck(te):
         te.output_state = TS_INSTALL
 
 def init_hook(c):
+    if hasattr(c, 'registerPackageName'):
+        c.registerPackageName("yum-plugin-fedorakmod")
     c.info(3, "Loading Fedora Extras kernel module support.")
 
 def postresolve_hook(c):

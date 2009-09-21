@@ -43,6 +43,8 @@ def find_kmodules(availpkgs, provides, kernels):
     return unique(matches)
 
 def preresolve_hook(conduit):
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-kernel-module")
     ts = conduit.getTsInfo()
     kernels = []
     for tsmem in ts.getMembers():

@@ -50,5 +50,7 @@ def postreposetup_hook(conduit):
     yb = conduit._base
     num = len(yb.rpmdb.returnPackages(patterns=['*-debuginfo']))
     if num:
+        if hasattr(conduit, 'registerPackageName'):
+            conduit.registerPackageName("yum-plugin-auto-update-debug-info")
         print "Found %d installed debuginfo package(s)" % num
         enable_debuginfo_repos(yb)

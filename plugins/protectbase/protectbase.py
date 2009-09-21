@@ -59,6 +59,9 @@ def exclude_hook(conduit):
                         conduit.delPackage(po)
                         cnt += 1
 
+    if cnt:
+        if hasattr(conduit, 'registerPackageName'):
+            conduit.registerPackageName("yum-plugin-protectbase")
     conduit.info(2, '%d packages excluded due to repository protections' % cnt)
 
 def _pkglisttodict(pl):

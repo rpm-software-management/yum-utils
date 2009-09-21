@@ -181,6 +181,8 @@ def exclude_hook(conduit):
     if not _version_lock_excluder_n:
         return
 
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-versionlock")
     ape = conduit._base.pkgSack.addPackageExcluder
     exid = 'yum-utils.versionlock.'
     ape(None, exid + str(1), 'wash.marked')
