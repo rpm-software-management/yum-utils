@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #
 # (C) 2005 Gijs Hollestelle, released under the GPL
+# Copyright 2009 Red Hat
+# Rewritten 2009 - Seth Vidal
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,483 +19,357 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-# Note: For yum 2.2.X with X <= 1 and yum 2.3.X with X <= 2 --problems
-# will report problems with unversioned provides fulfilling versioned
-# requires
 
-import yum
-import os
+
 import sys
-import rpm
+sys.path.insert(0,'/usr/share/yum-cli')
+
+from yum.misc import setup_locale
+from utils import YumUtilBase
+import logging
+import os
 import re
 
-from rpmUtils import miscutils, transaction
-from optparse import OptionParser
+from rpmUtils import miscutils, arch
+from optparse import OptionGroup
 
-
-def initYum(opts):
-    debuglevel=2
-    errorlevel=2
-    if opts.quiet:
-        debuglevel=0
-        errorlevel=0
-    need_repos = True
-    my = yum.YumBase()
-    # This should be preconf
-    my.doConfigSetup(opts.conffile,init_plugins=not opts.noplugins,
-                     debuglevel=debuglevel,errorlevel=errorlevel)
-
-    if opts.orphans:
-        if not my.setCacheDir():
-            my.logger.error("Error: Could not make cachedir, exiting")
-            sys.exit(50)
-        my.doRepoSetup()
-    elif opts.dupes or opts.cleandupes:
-        need_repos = False
-    else:
-        # Disable all enabled repositories
-        for repo in my.repos.listEnabled():
-            my.repos.disableRepo(repo.id)
-
-    # FIXME: Is any of this needed anymore?
-    if need_repos:
-        my.doTsSetup()
-        my.doSackSetup()
-    my.doRpmDBSetup()
-    my.localPackages = []
-    return my
-
-
-def getLocalRequires(my):
-    """Get a list of all requirements in the local rpmdb"""
-    pkgs = {}
-    for po in my.rpmdb.returnPackages():
-        header = po.hdr
-        requires = zip(
-            header[rpm.RPMTAG_REQUIRENAME],
-            header[rpm.RPMTAG_REQUIREFLAGS],
-            header[rpm.RPMTAG_REQUIREVERSION],
-        )
-        pkgs[po] = requires
-    return pkgs
-
-def buildProviderList(my, pkgs, reportProblems, qf):
-    """Resolve all dependencies in pkgs and build a dictionary of packages
-     that provide something for a package other than itself"""
-
-    errors = False
-    providers = {} # To speed depsolving, don't recheck deps that have 
-                   # already been checked
-    provsomething = {}
-    for (po,reqs) in pkgs.items():
-        for (req,flags,ver)  in reqs:
-            if ver == '':
-                ver = None
-            rflags = flags & 15
-            if req.startswith('rpmlib'): continue # ignore rpmlib deps
-            if not providers.has_key((req,rflags,ver)):
-                resolve_sack = my.rpmdb.whatProvides(req,rflags,ver)
-            else:
-                resolve_sack = providers[(req,rflags,ver)]
-                
-            if len(resolve_sack) < 1 and reportProblems:
-                if not errors:
-                    print "Missing dependencies:"
-                errors = True
-                print "Package %s requires %s" % (po.hdr.sprintf(qf),
-                  miscutils.formatRequire(req,ver,rflags))
-            else:
-                for rpkg in resolve_sack:
-                    # Skip packages that provide something for themselves
-                    # as these can still be leaves
-                    if rpkg != po.pkgtup:
-                        provsomething[rpkg] = 1
-                # Store the resolve_sack so that we can re-use it if another
-                # package has the same requirement
-                providers[(req,rflags,ver)] = resolve_sack
-    if reportProblems:
-        if errors:
-            sys.exit(1)
-        else:
-            print "No problems found"
-            sys.exit(0)
-    return provsomething
-
-#
-# TODO: replace this one, with the new rpmUtils.arch.canCoinstall when it yum 3.2.21 get released
-#
-
-singleLib = ['i386','i486','i586','i686','noarch']  # single lib duplicates
-multiLib = ['x86_64','noarch']                      # multi lib duplicates            
-
-def isDuplicate(a1,a2):
-    """ check is a1 is a duplicate arch to a2 """
-    dup = False        
-    if a1 == a2:
-        dup = False
-    elif a1 in singleLib and a2 in singleLib:
-        dup = True
-    elif a1 in multiLib and a2 in multiLib:
-        dup = True
-    return dup
-
-
-def findDupes(my):
-    """takes a yum base object prints out a list of package duplicates.
-       These typically happen when an update transaction is left half-completed"""
-       
-    # iterate rpmdb.pkglist
-    # put each package into name. dicts with lists as the po
-    # look for any keys with a > 1 length list of pos where the name
-    # of the package is not kernel and/or does not provide a kernel-module
-    # and the archs is the same or one of the archs is 'noarch'
-
-    pkgdict = {}
-    refined = {}
-    
-    for (n,a,e,v,r) in my.rpmdb.simplePkgList():
-        if not pkgdict.has_key((n)):
-            pkgdict[(n)] = []
-        pkgdict[(n)].append((e,v,r,a))
-    
-    for (n) in pkgdict.keys():
-        # is more than one package with this name ?
-        if len(pkgdict[(n)]) > 1:
-            archs = set()
-            for (e,v,r,a) in pkgdict[(n)]:
-                archs.add(a)
-            # If all packages with the same name have the same arch, then it is a dupe
-            if len(archs) == 1:
-                refined[(n)] = pkgdict[(n)]
-            else:
-                a1 = archs.pop()
-                for a2 in archs:
-                    if isDuplicate(a1,a2):
-                        refined[(n)] = pkgdict[(n)]
-                            
-    
-    del pkgdict
-    
-    return refined
-    
-def printDupes(my, qf):
-    """print out the dupe listing"""
-    dupedict = findDupes(my)
-    dupes = []    
-    for (n) in dupedict.keys():
-        for (e,v,r,a) in dupedict[(n)]:
-            po = my.getInstalledPackageObject((n,a,e,v,r))
-            if po.name.startswith('kernel'):
-                continue
-            if po.name == 'gpg-pubkey':
-                continue
-            dupes.append(po)
-
-    for po in sorted(dupes):
-        print po.hdr.sprintf(qf)
-
-def cleanOldDupes(my, confirmed, qf):
-    """remove all the older duplicates"""
-    dupedict = findDupes(my)
-    my._getTs(True) # Remove only transaction, no repos/pkgSacks.
-    removedupes = []
-    for (n) in dupedict.keys():
-        if n.startswith('kernel'):
-            continue
-        if n.startswith('gpg-pubkey'):
-            continue
-        (e,v,r,a) = dupedict[(n)][0]
-        lowpo = my.getInstalledPackageObject((n,a,e,v,r))
-
-        for (e,v,r,a) in dupedict[(n)][1:]:
-            po = my.getInstalledPackageObject((n,a,e,v,r))
-            if po.EVR < lowpo.EVR:
-                lowpo = po
-                
-        removedupes.append(lowpo)
-    if len(removedupes) == 0:
-        print "No dupes to clean"
-        sys.exit(0)
-
-    print "I will remove the following old duplicate packages:"
-    for po in sorted(removedupes):
-        print po.hdr.sprintf(qf)
-
-    if not confirmed:
-        if not userconfirm():
-            sys.exit(0)
-
-    for po in removedupes:
-        my.remove(po)
-
-    # Now perform the action transaction
-    my.populateTs()
-    my.ts.check()
-    my.ts.order()
-    my.ts.run(progress,'')
-                 
-
-
-def _shouldShowLeaf(my, po, leaf_regex, exclude_devel, exclude_bin):
-    """
-    Determine if the given pkg should be displayed as a leaf or not.
-
-    Return True if the pkg should be shown, False if not.
-    """
-    if po.name == 'gpg-pubkey':
-        return False
-    name = po.name
-    if exclude_devel and name.endswith('devel'):
-        return False
-    if exclude_bin:
-        for file_name in po.filelist:
-            if file_name.find('bin') != -1:
-                return False
-    if leaf_regex.match(name):
-        return True
-    return False
-
-def listLeaves(my, all_nodes, leaf_regex, exclude_devel, exclude_bin, qf):
-    """Print packages that are not required by any other package
-       on the system"""
-
-    # Could use my.rpmdb.returnLeafNodes() directly but it's slow
-    ts = transaction.initReadOnlyTransaction()
-    leaves = [list(x) for x in ts.returnLeafNodes()]
-    # Epoch can be a number, stringify to work with getInstalledPackageObject
-    for lst in leaves:
-        lst[2] = str(lst[2])
-    leaves = sorted((my.getInstalledPackageObject(x) for x in leaves))
-
-    for po in leaves:
-        if all_nodes or _shouldShowLeaf(my, po, leaf_regex, exclude_devel,
-                exclude_bin):
-            print po.hdr.sprintf(qf)
-
-def listOrphans(my, qf):
-    """ This is "yum list extras". """
-    avail = my.pkgSack.simplePkgList()
-    avail = set(avail)
-    for po in sorted(my.rpmdb.returnPackages()):
-        if po.name == "gpg-pubkey": # Not needed as of at least 3.2.19, but meh
-            continue
-
-        if po.pkgtup not in avail:
-            print po.hdr.sprintf(qf)
-
-def getKernels(my):
-    """return a list of all installed kernels, sorted newest to oldest"""
-    kernlist = []
-    for po in my.rpmdb.searchNevra(name='kernel') + my.rpmdb.searchNevra(name='kernel-PAE'):
-        kernlist.append(po.pkgtup)
-    kernlist.sort(sortPackages)
-    kernlist.reverse()
-    return kernlist
-
-# List all kernel devel packages that either belong to kernel versions that
-# are no longer installed or to kernel version that are in the removelist
-def getOldKernelDevel(my,kernels,removelist):
-    devellist = []
-    for po in my.rpmdb.searchNevra(name='kernel-devel') + my.rpmdb.searchNevra(name='kernel-PAE-devel'):
-        # For all kernel-devel packages see if there is a matching kernel
-        # in kernels but not in removelist
-        tup = po.pkgtup
-        keep = False
-        for kernel in kernels:
-            if kernel in removelist:
-                continue
-            (kname,karch,kepoch,kver,krel) = kernel
-            (dname,darch,depoch,dver,drel) = tup
-            if (karch,kepoch,kver,krel) == (darch,depoch,dver,drel):
-                keep = True
-        if not keep:
-            devellist.append(tup)
-    return devellist
-
-    
-def sortPackages(pkg1,pkg2):
-    """sort pkgtuples by evr"""
-    return miscutils.compareEVR((pkg1[2:]),(pkg2[2:]))
-
-def progress(what, bytes, total, h, user):
-    pass
-    #if what == rpm.RPMCALLBACK_UNINST_STOP:
-    #    print "Removing: %s" % h 
-
-def userconfirm():
-    """gets a yes or no from the user, defaults to No"""
-    while True:            
-        choice = raw_input('Is this ok [y/N]: ')
-        choice = choice.lower()
-        if len(choice) == 0 or choice[0] in ['y', 'n']:
-            break
-
-    if len(choice) == 0 or choice[0] != 'y':
-        return False
-    else:            
-        return True
-    
-def removeKernels(my, count, confirmed, keepdevel, qf):
-    """Remove old kernels, keep at most count kernels (and always keep the running
-     kernel"""
-
-    count = int(count)
-    if count < 1:
-        print "Error should keep at least 1 kernel!"
-        sys.exit(100)
-    kernels = getKernels(my)
-    runningkernel = os.uname()[2]
-    # Vanilla kernels dont have a release, only a version
-    if '-' in runningkernel:
-        (kver,krel) = runningkernel.split('-')
-        if krel.split('.')[-1] == os.uname()[-1]:
-            krel = ".".join(krel.split('.')[:-1])
-    else:
-        kver = runningkernel
-        krel = ""
-    remove = kernels[count:]
-    toremove = []
-    
-    # Remove running kernel from remove list
-    for kernel in remove:
-        (n,a,e,v,r) = kernel
-        if (v == kver and r == krel):
-            print "Not removing kernel %s-%s because it is the running kernel" % (kver,krel)
-        else:
-            toremove.append(kernel)
-    
-    if len(kernels) == 0:
-        print "No kernels to remove."
-        sys.exit(0)
-        
-    if len(kernels) - len(toremove) < 1:
-        print "Error all kernel rpms are set to be removed"
-        sys.exit(100)
-        
-    # Now extend the list with all kernel-devel pacakges that either
-    # have no matching kernel installed or belong to a kernel that is to
-    # be removed
-    if not keepdevel: 
-        toremove.extend(getOldKernelDevel(my,kernels,toremove))
-
-    if len(toremove) < 1:
-        print "No kernel related packages to remove"
-        return
-
-    toremove = sorted((my.getInstalledPackageObject(x) for x in toremove))
-
-    print "I will remove the following %s kernel related packages:" % len(toremove)
-    for po in toremove:
-        print po.hdr.sprintf(qf)
-
-    if not confirmed:
-        if not userconfirm():
-            sys.exit(0)
-
-    for po in toremove:
-        my.tsInfo.addErase(po)
-
-    # Now perform the action transaction
-    my.populateTs()
-    my.ts.check()
-    my.ts.order()
-    my.ts.run(progress,'')
-    
-# Returns True if exactly one value in the list evaluates to True
 def exactlyOne(l):
     return len(filter(None, l)) == 1
+
+
+class PackageCleanup(YumUtilBase):
+    NAME = 'package-cleanup'
+    VERSION = '1.0'
+    USAGE = """
+    package-cleanup: helps find problems in the rpmdb of system and correct them
+
+    usage: package-cleanup --problems or --leaves or --orphans or --oldkernels
+    """
+    def __init__(self):
+        YumUtilBase.__init__(self,
+                             PackageCleanup.NAME,
+                             PackageCleanup.VERSION,
+                             PackageCleanup.USAGE)
+        self.logger = logging.getLogger("yum.verbose.cli.packagecleanup")
+        # Add util commandline options to the yum-cli ones
+        self.optparser = self.getOptionParser()
+        self.optparser_grp = self.getOptionGroup()
+        self.addCmdOptions()
+        self.main()
+
+    def addCmdOptions(self):
+        self.optparser_grp.add_option("--problems", default=False, 
+                    dest="problems", action="store_true",
+                    help='List dependency problems in the local RPM database')
+        self.optparser_grp.add_option("--qf", "--queryformat", dest="qf", 
+                    action="store",
+                    default='%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
+                    help="Query format to use for output.")
+        self.optparser_grp.add_option("--dupes", default=False, 
+                    dest="dupes", action="store_true",
+                    help='Scan for duplicates in your rpmdb')
+        self.optparser_grp.add_option("--cleandupes", default=False, 
+                    dest="cleandupes", action="store_true",
+                    help='Scan for duplicates in your rpmdb and remove older ')
+        self.optparser_grp.add_option("--orphans", default=False, 
+                    dest="orphans",action="store_true",
+                    help='List installed packages which are not available from'\
+                         ' currenly configured repositories')
+
+        leafgrp = OptionGroup(self.optparser, 'Leaf Node Options')
+        leafgrp.add_option("--leaves", default=False, dest="leaves",
+                    action="store_true",
+                    help='List leaf nodes in the local RPM database')
+        leafgrp.add_option("--all", default=False, dest="all_nodes",
+                    action="store_true",
+                    help='list all packages leaf nodes that do not match'\
+                         ' leaf-regex')
+        leafgrp.add_option("--leaf-regex", 
+                    default="(^(compat-)?lib.+|.*libs?[\d-]*$)",
+                    help='A package name that matches this regular expression' \
+                         ' (case insensitively) is a leaf')
+        leafgrp.add_option("--exclude-devel", default=False, 
+                    action="store_true",
+                    help='do not list development packages as leaf nodes')
+        leafgrp.add_option("--exclude-bin", default=False, 
+                    action="store_true",
+                    help='do not list packages with files in a bin dirs as'\
+                         'leaf nodes')
+        self.optparser.add_option_group(leafgrp)        
+        
+        kernelgrp = OptionGroup(self.optparser, 'Old Kernel Options')
+        kernelgrp.add_option("--oldkernels", default=False, 
+                    dest="kernels",action="store_true",
+                    help="Remove old kernel and kernel-devel packages")
+        kernelgrp.add_option("--count",default=2,dest="kernelcount",
+                             action="store",
+                             help='Number of kernel packages to keep on the '\
+                                  'system (default 2)')
+        kernelgrp.add_option("--keepdevel", default=False, dest="keepdevel",
+                             action="store_true",
+                             help='Do not remove kernel-devel packages when '
+                                 'removing kernels')
+        self.optparser.add_option_group(kernelgrp)
     
-# Parse command line options
-def parseArgs():
-    parser = OptionParser()
-    parser.add_option("--problems", default=False, dest="problems", action="store_true",
-      help='List dependency problems in the local RPM database')
+    def _find_missing_deps(self, pkgs):
+        """find any missing dependencies for any installed package in pkgs"""
+        # XXX - move into rpmsack/rpmdb
+        
+        providers = {} # To speed depsolving, don't recheck deps that have 
+                       # already been checked
+        problems = []
+        for po in pkgs:
+            for (req,flags,ver)  in po.requires:
+                    
+                if req.startswith('rpmlib'): continue # ignore rpmlib deps
+                if not providers.has_key((req,flags,ver)):
+                    resolve_sack = self.rpmdb.whatProvides(req,flags,ver)
+                else:
+                    resolve_sack = providers[(req,flags,ver)]
+                    
+                if len(resolve_sack) < 1:
+                    missing = miscutils.formatRequire(req,ver,flags)
+                    problems.append((po, "requires %s" % missing))
+                                    
+                else:
+                    # Store the resolve_sack so that we can re-use it if another
+                    # package has the same requirement
+                    providers[(req,flags,ver)] = resolve_sack
+        
+        return problems
 
-    # Leaf listing options
-    parser.add_option("--leaves", default=False, dest="leaves",action="store_true",
-      help='List leaf nodes in the local RPM database')
-    parser.add_option("--all", default=False, dest="all_nodes",action="store_true",
-      help='When listing leaf nodes also list leaf nodes that do not match leaf-regex')
-    parser.add_option("--leaf-regex", default="(^(compat-)?lib.+|.*libs?[\d-]*$)",
-      help='A package name that matches this regular expression (case insensitively) is a leaf')
+    def _find_installed_duplicates(self, ignore_kernel=True):
+        """find installed duplicate packages returns a dict of 
+           pkgname = [[dupe1, dupe2], [dupe3, dupe4]] """
+           
+        # XXX - this should move to be a method of rpmsack
+        
+        multipkgs = {}
+        singlepkgs = {}
+        results = {}
+        
+        for pkg in self.rpmdb.returnPackages():
+            # just skip kernels and everyone is happier
+            if ignore_kernel:
+                if 'kernel' in pkg.provides_names:
+                    continue
+                if pkg.name.startswith('kernel'):
+                    continue
 
-    parser.add_option("--exclude-devel", default=False, action="store_true",
-      help='When listing leaf nodes do not list development packages')
-    parser.add_option("--exclude-bin", default=False, action="store_true",
-      help='When listing leaf nodes do not list packages with files in bin dirs')
+            name = pkg.name                
+            if name in multipkgs or name in singlepkgs:
+                continue
 
-    parser.add_option("--orphans", default=False, dest="orphans",action="store_true",
-      help='List installed packages which are not available from currenly configured repositories')
-    parser.add_option("--noplugins", default=False, dest="noplugins",action="store_true",
-      help='Turn plugin support off')
-    parser.add_option("-q", "--quiet", default=False, dest="quiet",action="store_true",
-      help='Print out nothing unecessary')
-    parser.add_option("-y", default=False, dest="confirmed",action="store_true",
-      help='Agree to anything asked')
-    parser.add_option("-d", "--dupes", default=False, dest="dupes", action="store_true",
-      help='Scan for duplicates in your rpmdb')
-    parser.add_option("--cleandupes", default=False, dest="cleandupes", action="store_true",
-      help='Scan for duplicates in your rpmdb and cleans out the older versions')    
-    parser.add_option("--oldkernels", default=False, dest="kernels",action="store_true",
-      help="Remove old kernel and kernel-devel packages")
-    parser.add_option("--count",default=2,dest="kernelcount",action="store",
-      help="Number of kernel packages to keep on the system (default 2)")
-    parser.add_option("--keepdevel",default=False,dest="keepdevel",action="store_true",
-      help="Do not remove kernel-devel packages when removing kernels")
-    parser.add_option("-c", dest="conffile", action="store",
-                default='/etc/yum.conf', help="config file location")
-    parser.add_option("--qf", "--queryformat", dest="qf", action="store",
-                      default='%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
-                      help="Query format to use for output.")
-
-    (opts, args) = parser.parse_args()
-    if not exactlyOne((opts.problems,opts.leaves,opts.kernels,opts.orphans, opts.dupes, opts.cleandupes)): 
-        parser.print_help()
-        print "Please specify either --problems, --leaves, --orphans or --oldkernels"
-        sys.exit(0)
-    return (opts, args)
-    
-def main():
-    (opts, args) = parseArgs()
-    if not opts.quiet:
-        print "Setting up yum"
-    my = initYum(opts)
-    
-    if (opts.kernels):
-        if os.geteuid() != 0:
-            print "Error: Cannot remove kernels as a user, must be root"
-            sys.exit(1)
-        removeKernels(my, opts.kernelcount, opts.confirmed, opts.keepdevel,
-                      opts.qf)
-        sys.exit(0)
-    
-    if (opts.leaves):
-        listLeaves(my, opts.all_nodes, re.compile(opts.leaf_regex, re.IGNORECASE),
-                opts.exclude_devel, opts.exclude_bin, opts.qf)
-        sys.exit(0)
-
-    if (opts.orphans):
-        listOrphans(my, opts.qf)
-        sys.exit(0)
-
-    if opts.dupes:
-        printDupes(my, opts.qf)
-        sys.exit(0)
-
-    if opts.cleandupes:
-        if os.geteuid() != 0:
-            print "Error: Cannot remove packages as a user, must be root"
-            sys.exit(1)
-    
-        cleanOldDupes(my, opts.confirmed, opts.qf)
-        sys.exit(0)
+            pkgs = self.rpmdb.searchNevra(name=name)
+            if len(pkgs)  <= 1:
+                continue
             
-    if not opts.quiet:
-        print "Reading local RPM database"
-    pkgs = getLocalRequires(my)
-    if not opts.quiet:
-        print "Processing all local requires"
-    provsomething = buildProviderList(my,pkgs,opts.problems,opts.qf)
+            for po in pkgs:
+                if name not in multipkgs:
+                    multipkgs[name] = []
+                if name not in singlepkgs:
+                    singlepkgs[name] = []
+                    
+                if arch.isMultiLibArch(arch=po.arch):
+                    multipkgs[name].append(po)
+                elif po.arch == 'noarch':
+                    multipkgs[name].append(po)
+                    singlepkgs[name].append(po)
+                elif not arch.isMultiLibArch(arch=po.arch):
+                    singlepkgs[name].append(po)
+                else:
+                    print "Warning: neither single nor multi lib arch: %s " % po
+            
+        for (name, pkglist) in multipkgs.items() + singlepkgs.items():
+            if len(pkglist) <= 1:
+                continue
+                
+            if name not in results:
+                results[name] = []
+            results[name].append(pkglist)
+            
+            
+        return results
+
+    def _remove_old_dupes(self):
+        """add older duplicate pkgs to be removed in the transaction"""
+        dupedict = self._find_installed_duplicates()
+
+        removedupes = []
+        for (name,dupelists) in dupedict.items():
+            for dupelist in dupelists:
+                dupelist.sort()
+                for lowpo in dupelist[0:-1]:
+                    removedupes.append(lowpo)
+
+        for po in removedupes:
+            self.remove(po)
+
+
+    def _should_show_leaf(self, po, leaf_regex, exclude_devel, exclude_bin):
+        """
+        Determine if the given pkg should be displayed as a leaf or not.
+
+        Return True if the pkg should be shown, False if not.
+        """
+        if po.name == 'gpg-pubkey':
+            return False
+        name = po.name
+        if exclude_devel and name.endswith('devel'):
+            return False
+        if exclude_bin:
+            for file_name in po.filelist:
+                if file_name.find('bin') != -1:
+                    return False
+        if leaf_regex.match(name):
+            return True
+        return False
+
+    def _get_kernels(self):
+        """return a list of all installed kernels, sorted newest to oldest"""
+
+        kernlist =  self.rpmdb.searchProvides(name='kernel')
+        kernlist.sort()
+        kernlist.reverse()
+        return kernlist
+
+    def _get_old_kernel_devel(self, kernels, removelist):
+    # List all kernel devel packages that either belong to kernel versions that
+    # are no longer installed or to kernel version that are in the removelist
+        
+        devellist = []
+        for po in self.rpmdb.searchProvides(name='kernel-devel'):
+            # For all kernel-devel packages see if there is a matching kernel
+            # in kernels but not in removelist
+            keep = False
+            for kernel in kernels:
+                if kernel in removelist:
+                    continue
+                (kname,karch,kepoch,kver,krel) = kernel.pkgtup
+                (dname,darch,depoch,dver,drel) = po.pkgtup
+                if (karch,kepoch,kver,krel) == (darch,depoch,dver,drel):
+                    keep = True
+            if not keep:
+                devellist.append(po)
+        return devellist
+        
+    def _remove_old_kernels(self, count, keepdevel):
+        """Remove old kernels, keep at most count kernels (and always keep the running
+         kernel"""
+
+        count = int(count)
+        kernels = self._get_kernels()
+        runningkernel = os.uname()[2]
+        # Vanilla kernels dont have a release, only a version
+        if '-' in runningkernel:
+            (kver,krel) = runningkernel.split('-')
+            if krel.split('.')[-1] == os.uname()[-1]:
+                krel = ".".join(krel.split('.')[:-1])
+        else:
+            kver = runningkernel
+            krel = ""
+        remove = kernels[count:]
+        
+        toremove = []
+        # Remove running kernel from remove list
+        for kernel in remove:
+            if kernel.version == kver and krel.startswith(kernel.release):
+                print "Not removing kernel %s-%s because it is the running kernel" % (kver,krel)
+            else:
+                toremove.append(kernel)
+        
+            
+        # Now extend the list with all kernel-devel pacakges that either
+        # have no matching kernel installed or belong to a kernel that is to
+        # be removed
+        if not keepdevel: 
+            toremove.extend(self._get_old_kernel_devel(kernels, toremove))
+
+        for po in toremove:
+            self.remove(po)
+
+
+    def main(self):
+        opts = self.doUtilConfigSetup()
+        if not exactlyOne([opts.problems, opts.dupes, opts.leaves, opts.kernels,
+                           opts.orphans, opts.cleandupes]):
+            self.optparser.print_help()
+            sys.exit(1)
+
+        if self.conf.uid != 0:
+            self.setCacheDir()
+        
+        if opts.problems:
+            issues = self._find_missing_deps(self.rpmdb.returnPackages())
+            for (pkg, prob) in issues:
+                print 'Package %s %s' % (pkg.hdr.sprintf(opts.qf), prob)
+
+            if issues:
+                sys.exit(1)
+            else:
+                print 'No Problems Found'
+                sys.exit(0)
+
+        if opts.dupes:
+            dupes = self._find_installed_duplicates()
+            for name, pkglists in dupes.items():
+                for pkglist in pkglists:
+                    for pkg in pkglist:
+                        print '%s' % pkg.hdr.sprintf(opts.qf)
+            sys.exit(0)
+        
+        if opts.kernels:
+            if self.conf.uid != 0:
+                print "Error: Cannot remove kernels as a user, must be root"
+                sys.exit(1)
+            if int(opts.kernelcount) < 1:
+                print "Error should keep at least 1 kernel!"
+                sys.exit(100)
+                
+            self._remove_old_kernels(opts.kernelcount, opts.keepdevel)
+            self.buildTransaction()
+            if len(self.tsInfo) < 1:
+                print 'No old kernels to remove'
+                sys.exit(0)
+            
+            sys.exit(self.doUtilTransaction())
+            
+        
+        if opts.leaves:
+            leaves = self.rpmdb.returnLeafNodes()
+            leaf_reg = re.compile(opts.leaf_regex, re.IGNORECASE)
+            for po in sorted(leaves):
+                if opts.all_nodes or \
+                   self._should_show_leaf(po, leaf_reg, opts.exclude_devel,
+                        opts.exclude_bin):
+                    print po.hdr.sprintf(opts.qf)
+            
+            sys.exit(0)
+
+        if opts.orphans:
+            if not self.setCacheDir():
+                self.logger.error("Error: Could not make cachedir, exiting")
+                sys.exit(50)
+            
+            for po in sorted(self.doPackageLists(pkgnarrow='extras').extras):
+                print po.hdr.sprintf(opts.qf)
+            sys.exit(0)
+
+
+        if opts.cleandupes:
+            if os.geteuid() != 0:
+                print "Error: Cannot remove packages as a user, must be root"
+                sys.exit(1)
+        
+            self._remove_old_dupes()
+            self.buildTransaction()
+            if len(self.tsInfo) < 1:
+                print 'No duplicates to remove'
+                sys.exit(0)
+                
+            sys.exit(self.doUtilTransaction())
+
     
 if __name__ == '__main__':
-    main()
+    setup_locale()
+    util = PackageCleanup()
