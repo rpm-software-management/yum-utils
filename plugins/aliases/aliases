@@ -21,12 +21,20 @@ ALL DEV UPT ALLSRC ALLDBG
 
 SEC --security
 FORCE --skip-broken --disableexcludes=all
+DUPS --showduplicates
 
 up   upgrade
 inst install
+in   install
+rm   remove
+down downgrade
+rein reinstall
+
+chk check-update
 
 ls  list
 lsi ls installed
+lsa ls available
 lsu ls updates
 lsec list-security
 lssu SEC lsu
@@ -36,6 +44,13 @@ force-inst    FORCE inst
 force-upgrade FORCE upgrade
 force-up      FORCE up
 force-update  FORCE update
+
+v  version
+
+h  history
+hi history info
+hl history list
+hs history summary
 
 dbg-install DBG install
 dbg-inst    DBG inst
@@ -61,5 +76,5 @@ dbg-inst    DBG inst
 # upT UPT up
 # upD DEV up
 # 
-# instT UPT inst
-# instD DEV inst
+# inT UPT inst
+# inD DEV inst
