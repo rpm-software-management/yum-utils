@@ -94,10 +94,13 @@ def run_cmd(yb, args, inshell=False):
     elif args[0] == 'search' and len(args) > 2:
         args.pop(0)
         ykey = args.pop(0)
+        done = False
         # Maybe need some API so we don't have to load everything?
         for pkg in sorted(yb.rpmdb.returnPackages()):
             if ykey not in pkg.yumdb_info:
                 continue
+            if done: print ''
+            done = True
             found = False
             yval = getattr(pkg.yumdb_info, ykey)
             for arg in args:
@@ -124,7 +127,10 @@ def run_cmd(yb, args, inshell=False):
             print pkg
     elif args[0] == 'info':
         args.pop(0)
+        done = False
         for pkg in sorted(yb.rpmdb.returnPackages(patterns=args)):
+            if done: print ''
+            done = True
             print pkg
             for ykey in sorted(pkg.yumdb_info):
                 print " " * 4, ykey, '=', getattr(pkg.yumdb_info, ykey)
