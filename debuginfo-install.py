@@ -22,6 +22,7 @@ import yum
 import yum.Errors
 
 from utils import YumUtilBase
+from yum import _
 
 import logging
 import rpmUtils
@@ -69,7 +70,8 @@ class DebugInfoInstall(YumUtilBase):
         for repo in self.repos.listEnabled():
             di = '%s-debuginfo' % repo.id
             for r in self.repos.findRepos(di):
-                print 'enabling %s' % r.id
+                self.logger.log(yum.logginglevels.INFO_2, 
+                                _('enabling %s') % r.id)
                 r.enable()
                 self.doRepoSetup(thisrepo=r.id)
                 #r.setup(self.conf.cache, self.mediagrabber)
