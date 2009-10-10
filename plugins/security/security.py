@@ -456,9 +456,9 @@ def ysp_check_func_enter(conduit):
     
     ret = None
     if len(args) >= 2:
-        if ((args[0] == "list") and (args[1] == "updates")):
+        if ((args[0] == "list") and (args[1] in ("obsoletes", "updates"))):
             ret = {"skip": ndata, "list_cmd": True}
-        if ((args[0] == "info") and (args[1] == "updates")):
+        if ((args[0] == "info") and (args[1] in ("obsoletes", "updates"))):
             ret = {"skip": ndata, "list_cmd": True}
     if len(args):
 
@@ -520,6 +520,9 @@ def exclude_hook(conduit):
     # for the list of update packages, which is all we care about.    
     upds = conduit._base.doPackageLists(pkgnarrow='updates')
     pkgs = upds.updates
+    # In theory we don't need to do this in some cases, but meh.
+    upds = conduit._base.doPackageLists(pkgnarrow='obsoletes')
+    pkgs += upds.obsoletes
 
     name2tup = _get_name2oldpkgtup(conduit._base)
     
