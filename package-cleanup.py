@@ -65,17 +65,23 @@ class PackageCleanup(YumUtilBase):
                     action="store",
                     default='%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}',
                     help="Query format to use for output.")
-        self.optparser_grp.add_option("--dupes", default=False, 
-                    dest="dupes", action="store_true",
-                    help='Scan for duplicates in your rpmdb')
-        self.optparser_grp.add_option("--cleandupes", default=False, 
-                    dest="cleandupes", action="store_true",
-                    help='Scan for duplicates in your rpmdb and remove older ')
         self.optparser_grp.add_option("--orphans", default=False, 
                     dest="orphans",action="store_true",
                     help='List installed packages which are not available from'\
                          ' currenly configured repositories')
 
+        dupegrp = OptionGroup(self.optparser, 'Duplicate Package Options')
+        dupegrp.add_option("--dupes", default=False, 
+                    dest="dupes", action="store_true",
+                    help='Scan for duplicates in your rpmdb')
+        dupegrp.add_option("--cleandupes", default=False, 
+                    dest="cleandupes", action="store_true",
+                    help='Scan for duplicates in your rpmdb and remove older ')
+        dupegrp.add_option("--noscripts", default=False,
+                    dest="noscripts", action="store_true",
+                    help="disable rpm scriptlets from running when cleaning duplicates")
+        self.optparser.add_option_group(dupegrp)
+        
         leafgrp = OptionGroup(self.optparser, 'Leaf Node Options')
         leafgrp.add_option("--leaves", default=False, dest="leaves",
                     action="store_true",
@@ -360,7 +366,8 @@ class PackageCleanup(YumUtilBase):
             if os.geteuid() != 0:
                 print "Error: Cannot remove packages as a user, must be root"
                 sys.exit(1)
-        
+            if opts.noscripts:
+                self.conf.tsflags.append('noscripts')
             self._remove_old_dupes()
             self.buildTransaction()
             if len(self.tsInfo) < 1:
