@@ -9,6 +9,7 @@ URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 Requires: python >= 2.4 , yum >= 3.2.24
+BuildRequires: python >= 2.4
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
@@ -396,6 +397,7 @@ cd plugins
 for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
+    %{__python} -c "import compileall; compileall.compile_dir('$(RPM_BUILD_ROOT)/usr/lib/yum-plugins', 1")
 done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
@@ -596,6 +598,10 @@ fi
 
 
 %changelog
+* Mon Oct 12 2009 Seth Vidal <skvidal at fedoraproject.org>
+- add python compileall to all plugins so we get .pyc/.pyo files in them
+- fixes https://bugzilla.redhat.com/show_bug.cgi?id=493174
+
 * Wed Sep 2 2009 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.23
 
