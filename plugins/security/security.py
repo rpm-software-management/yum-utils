@@ -539,10 +539,10 @@ def exclude_hook(conduit):
 
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     if cnt:
-        conduit.info(2, 'Needed %d of %d packages, for security' % (cnt, tot))
+        conduit.info(2, '%d package(s) needed for security, out of %d available' $ (cnt, tot))
     else:
-        conduit.info(2, 'No packages needed, for security, %d available' % tot)
-            
+        conduit.info(2, 'No packages needed for security; %d packages available' % tot)
+
 def preresolve_hook(conduit):
     '''
     Yum Plugin PreResolve Hook:
@@ -627,9 +627,9 @@ def preresolve_hook(conduit):
     ysp_chk_used_map(used_map, lambda x: conduit.error(2, x))
     
     if cnt:
-        conduit.info(2, 'Needed %d (+%d related) of %d packages (so far), for security' % (scnt, cnt - scnt, tot))
+        conduit.info(2, '%d package(s) needed (+%d related) for security, out of %d available' $ (scnt, cnd - scnt, tot))
     else:
-        conduit.info(2, 'No packages needed, for security, of %d packages (so far)' % tot)
+        conduit.info(2, 'No packages needed for security; %d packages available' % tot)
 
 if __name__ == '__main__':
     print "This is a plugin that is supposed to run from inside YUM"
