@@ -419,6 +419,7 @@ fi
 %doc README yum-util-cli-template
 %doc COPYING
 %doc plugins/README
+%{_sysconfdir}/bash_completion.d
 %{_bindir}/debuginfo-install
 %{_bindir}/find-repos-of-install
 %{_bindir}/package-cleanup

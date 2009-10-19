@@ -10,9 +10,11 @@ WEBHOST = yum.baseurl.org
 WEBPATH = /srv/projects/yum/web/download/yum-utils/
 PY_FILES =  $(wildcard *.py) $(wildcard plugins/*/*.py)
 
-
 NMPROG=yum-NetworkManager-dispatcher
 NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
+
+BASHCOMP=yum-utils.bash
+BASHCOMPPATH=$(DESTDIR)/etc/bash_completion.d
 
 clean:
 	rm -f *.pyc *.pyo *~
@@ -33,6 +35,8 @@ install:
 	for d in $(SUBDIRS); do make DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
 	mkdir -p $(NMPATH)
 	install -m 755 $(NMPROG) $(NMPATH)
+	mkdir -p $(BASHCOMPPATH)
+	install -m 644 $(BASHCOMP) $(BASHCOMPPATH)
 
 archive:
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
