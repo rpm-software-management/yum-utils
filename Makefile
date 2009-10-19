@@ -38,7 +38,7 @@ archive:
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
 	@git archive --format=tar --prefix=$(PKGNAME)-$(VERSION)/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).tar.gz
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
-	
+
 srpm: archive
 	rm -f ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm
 	rpmbuild -ts  ${PKGNAME}-${VERSION}.tar.gz
@@ -54,7 +54,7 @@ release:
 release-tag:
 	@git tag -s -f -m "Tagged ${PKGNAME}-$(VERSION)" ${PKGNAME}-$(VERSION)
 	@git push --tags origin
-	
+
 install-builddeps:
 	su -c "yum install perl-TimeDate "
 
@@ -66,33 +66,33 @@ test-release:
 	# Make Changelog
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	@git commit -a -m "updated ChangeLog"
-    	# Make archive
+	# Make archive
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@git archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
 	# Build RPMS
 	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
 	@$(MAKE) test-cleanup
-    
 
-test-cleanup:	
+
+test-cleanup:
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
 	@echo "Cleanup the git release-test local branch"
 	@git checkout -f
 	@git checkout master
 	@git branch -D release-test
-    
+
 upload: archive srpm
 	@scp ${PKGNAME}-${VERSION}.tar.gz $(WEBHOST):$(WEBPATH)/
 	@scp ~/rpmbuild/SRPMS/${PKGNAME}-${VERSION}-*.src.rpm $(WEBHOST):$(WEBPATH)/${SRPM_FILE}
 	@rm -rf ${PKGNAME}-${VERSION}.tar.gz
-	
+
 ChangeLog: FORCE
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 
 pylint:
 	@pylint --rcfile=test/yum-utils-pylintrc $(PY_FILES)
-	
+
 pylint-short:
 	@pylint -r n --rcfile=test/yum-utils-pylintrc $(PY_FILES)
 
-FORCE:	
+FORCE:
