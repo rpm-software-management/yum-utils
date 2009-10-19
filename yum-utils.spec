@@ -397,7 +397,7 @@ cd plugins
 for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
-    %{__python} -c "import compileall; compileall.compile_dir('$(RPM_BUILD_ROOT)/usr/lib/yum-plugins', 1")
+    %{__python} -c "import compileall; compileall.compile_dir('$(RPM_BUILD_ROOT)/usr/lib/yum-plugins', 1)"
 done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
