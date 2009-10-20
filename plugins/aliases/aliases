@@ -36,7 +36,7 @@ ls  list
 lsi ls installed
 lsa ls available
 lsu ls updates
-lsec list-security
+lupi list-updateinfo
 lssu SEC lsu
 
 force-install FORCE install
@@ -70,8 +70,8 @@ dbg-inst    DBG inst
 # lssuT SEC lsT updates 
 # lssuD SEC lsD updates
 # 
-# lsecT UPT lsec
-# lsecD DEV lsec
+# lupiT UPT lupi
+# lupiD DEV lupi
 # 
 # upT UPT up
 # upD DEV up
