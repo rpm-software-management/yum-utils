@@ -16,9 +16,9 @@ This works like the update command, but if you have the the package foo-1
 installed and have foo-2 and foo-3 available with updateinfo.xml then
 update-minimal will update you to foo-3.
 .br 
-.I \fR * info-security
+.I \fR * info-updateinfo
 .br 
-.I \fR * list-security
+.I \fR * list-updateinfo
 .PP 
 both of the last two take these \fIsub-commands\fPs:
 .br 
@@ -30,14 +30,17 @@ both of the last two take these \fIsub-commands\fPs:
 .br 
 .I \fR * * security
 .br 
+.I \fR * * new-packages
+.br 
 .br 
 .PP
 .IP "\fB<advisory> [advisory...]\fP"
 Is used to display information about one or more advisories.
 .PP 
-.IP "\fBlist-security\fP" "\fBinfo-security\fP"
+.IP "\fBlist-updateinfo\fP" "\fBinfo-updateinfo\fP"
 Is used to list all of the relevant errata notice information, from the
 updateinfo.xml data in yum. This includes bugzillas, CVEs and security updates.
+You can also list "new" packages, by passing new as the first argument.
 .IP 
 .IP "\fBbugzillas / bzs\fP"
 Is the subset of the security information, pertaining to the bugzillas.
@@ -89,11 +92,11 @@ yum --security update-minimal
 .PP
 To get a list of all BZs that are fixed for packages you have installed use:
 .IP
-yum list-security bugzillas
+yum list-updateinfo bugzillas
 .PP
 To get the information on advisory FEDORA-2707-4567 use:
 .IP
-yum info-security FEDORA-2707-4567
+yum info-updateinfo FEDORA-2707-4567
 .PP
 To update packages to the latest version which contain fixes for Bugzillas 123, 456 and 789; and all security updates use:
 .IP

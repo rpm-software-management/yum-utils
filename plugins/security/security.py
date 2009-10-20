@@ -29,10 +29,11 @@
 # yum --bz  235374 --bz 234688 <cmd>
 # yum --advisory FEDORA-2007-420 --advisory FEDORA-2007-346 <cmd>
 #
-# yum list-security
-# yum list-security bugzillas / bzs
-# yum list-security cves
-# yum list-security security / sec
+# yum list-updateinfo
+# yum list-updateinfo bugzillas / bzs
+# yum list-updateinfo cves
+# yum list-updateinfo security / sec
+# yum list-updateinfo new
 #
 # yum update-minimal --security
 
@@ -144,7 +145,7 @@ def ysp_has_info_md(rname, md):
         return md
 
 def ysp_should_show_pkgtup(opts, pkgtup, md_info, used_map, rname=None):
-    """ Do we want to show this package in list-security. """
+    """ Do we want to show this package in list-updateinfo. """
     
     name = pkgtup[0]
     for (pkgtup, notice) in reversed(md_info.get_applicable_notices(pkgtup)):
@@ -181,10 +182,10 @@ def ysp_chk_used_map(used_map, msg):
 
 class SecurityListCommand:
     def getNames(self):
-        return ['list-security', 'list-sec']
+        return ['list-updateinfo', 'list-security', 'list-sec']
 
     def getUsage(self):
-        return "[security|bugzilla|cve] [PACKAGE-wildcard]"
+        return "[security|bugzilla|cve|new-packages] [PACKAGE-wildcard]"
 
     def getSummary(self):
         return "Returns security data for the packages listed, that affects your system"
@@ -192,7 +193,7 @@ class SecurityListCommand:
     def doCheck(self, base, basecmd, extcmds):
         pass
 
-    def show_pkg(self, msg, pkg, notice, disp=None):
+    def show_pkg(self, base, msg, pkg, notice, disp=None):
         # Make the list view much smaller
         # ysp_show_pkg_md_info(pkg, md, msg)
         if disp and ysp_has_info_md(disp, notice):
@@ -200,12 +201,24 @@ class SecurityListCommand:
                 if ref['type'] != disp:
                     continue
                 msg(" %s %-8s %s" % (str(ref['id']), notice['type'], pkg))
+        elif notice['type'] == 'newpackage':
+            print base.fmtKeyValFill("%s: " % pkg.name, base._enc(pkg.summary))
         else:
             msg("%s %-8s %s" % (notice['update_id'], notice['type'], pkg))
 
     def show_pkg_exit(self):
         pass
-            
+
+    def _get_new_pkgs(self, md_info):
+        for notice in md_info.notices:
+            if notice['type'] != "newpackage":
+                continue
+            for upkg in notice['pkglist']:
+                for pkg in upkg['packages']:
+                    pkgtup = (pkg['name'], pkg['arch'], pkg['epoch'] or '0',
+                              pkg['version'], pkg['release'])
+                    yield (notice, pkgtup)
+
     def doCommand(self, base, basecmd, extcmds):
         self.repos = base.repos
         md_info = ysp_gen_metadata(self.repos.listEnabled())
@@ -240,13 +253,35 @@ class SecurityListCommand:
                 filt_type = "cve"
             elif filt_type == "cve":
                 pass
+            elif filt_type == "newpackages":
+                filt_type = "newpackage"
+            elif filt_type == "new-packages":
+                filt_type = "newpackage"
+            elif filt_type == "new":
+                filt_type = "newpackage"
             else:
                 extcmds = [filt_type] + extcmds
                 filt_type = None
             show_type = filt_type
             if filt_type and filt_type in __update_info_types__:
                 show_type = None
-            
+
+        if filt_type == "newpackage":
+            # No filtering here, as we want what isn't installed...
+            done_pkgs = set()
+            for (notice, pkgtup) in sorted(self._get_new_pkgs(md_info),
+                                           key=lambda x: x[1][0]):
+                if extcmds and not _match_sec_cmd(extcmds, pkgtup[0], notice):
+                    continue
+                if pkgtup[0] in done_pkgs:
+                    continue
+                pkgs = base.pkgSack.searchPkgTuple(pkgtup)
+                if not pkgs:
+                    continue
+                done_pkgs.add(pkgs[0].name)
+                self.show_pkg(base, msg, pkgs[0], notice, None)
+            return 0, [basecmd + ' new done']
+
         opts.sec_cmds = extcmds
         used_map = ysp_gen_used_map(opts)
         name2tup = _get_name2oldpkgtup(base)
@@ -261,7 +296,7 @@ class SecurityListCommand:
                     d['epoch'] = ''
                 else:
                     d['epoch'] = "%s:" % d['e']
-                self.show_pkg(msg, "%(n)s-%(epoch)s%(v)s-%(r)s.%(a)s" % d,
+                self.show_pkg(base, msg, "%(n)s-%(epoch)s%(v)s-%(r)s.%(a)s" % d,
                               notice, show_type)
         ysp_chk_used_map(used_map, msg)
 
@@ -271,9 +306,9 @@ class SecurityListCommand:
 class SecurityInfoCommand(SecurityListCommand):
     show_pkg_info_done = {}
     def getNames(self):
-        return ['info-security', 'info-sec']
+        return ['info-updateinfo', 'info-security', 'info-sec']
 
-    def show_pkg(self, msg, pkg, notice, disp=None):
+    def show_pkg(self, base, msg, pkg, notice, disp=None):
         if notice['update_id'] in self.show_pkg_info_done:
             return
         self.show_pkg_info_done[notice['update_id']] = True
@@ -386,8 +421,8 @@ def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
     Setup the option parser with the '--advisory', '--bz', '--cve', and
-    '--security' command line options. And the 'list-security',
-    'info-security', and 'update-minimal' commands.
+    '--security' command line options. And the 'list-updateinfo',
+    'info-updateinfo', and 'update-minimal' commands.
     '''
 
     parser = conduit.getOptParser()
@@ -470,9 +505,9 @@ def ysp_check_func_enter(conduit):
             ret = {"skip": ndata, "list_cmd": True}
         if (args[0] in ["update", "upgrade"]):
             ret = {"skip": ndata, "list_cmd": False}
-        if (args[0] == "list-sec") or (args[0] == "list-security"):
+        if (args[0] in ("list-sec", "list-security", 'list-updateinfo')):
             return (opts, {"skip": True, "list_cmd": True})
-        if (args[0] == "info-sec") or (args[0] == "info-security"):
+        if (args[0] in ("info-sec", "info-security", 'info-updateinfo')):
             return (opts, {"skip": True, "list_cmd": True})
 
     if ret:
