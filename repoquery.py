@@ -394,7 +394,7 @@ class YumBaseQuery(yum.YumBase):
         qpkgs = []
         for pkg in pkgs:
             if isinstance(pkg, yum.packages.YumInstalledPackage):
-                if self.options.pkgnarrow not in ('all', 'installed'):
+                if self.options.pkgnarrow not in ('all', 'installed', 'extras'):
                     continue
                 qpkg = instPkgQuery(pkg, qf)
             else:
