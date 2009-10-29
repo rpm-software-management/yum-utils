@@ -73,7 +73,13 @@ class DebugInfoInstall(YumUtilBase):
                 self.logger.log(yum.logginglevels.INFO_2, 
                                 _('enabling %s') % r.id)
                 r.enable()
-                self.doRepoSetup(thisrepo=r.id)
+                try:
+                    self.doRepoSetup(thisrepo=r.id)
+                except RepoError, e:
+                    self.logger.critical("Could not access repo %s error was: %s" %
+                                        (r.id, to_unicode(str(e))))
+                    sys.exit(1)
+                         
                 #r.setup(self.conf.cache, self.mediagrabber)
         
         self.debugInfo_main()
