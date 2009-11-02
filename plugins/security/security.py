@@ -578,6 +578,31 @@ def exclude_hook(conduit):
     else:
         conduit.info(2, 'No packages needed for security; %d packages available' % tot)
 
+    if not hasattr(yum.misc, 'get_running_kernel_pkgtup'):
+        return # Back compat.
+
+    kern_pkgtup = yum.misc.get_running_kernel_pkgtup(self.ts)
+    if kern_pkgtup[0] is None:
+        return
+
+    found_sec = False
+    for (pkgtup, notice) in md_info.get_applicable_notices(kern_pkgtup):
+        if found_sec or notice['type'] != 'security':
+            continue
+        found_sec = True
+        ipkg = conduit._base.rpmdb.searchPkgTuple(pkgtup)
+        if not ipkg:
+            continue # Not installed
+        ipkg = ipkg[0]
+        rpkg = '%s-%s:%s-%s.%s' % (kern_pkgtup[0], kern_pkgtup[2],
+                                   kern_pkgtup[3], kern_pkgtup[4],
+                                   kern_pkgtup[1])
+
+        conduit.info(2, 'Security: %s is an installed security update' % ipkg)
+        conduit.info(2, 'Security: %s is the currently running version' % rpkg)
+        break
+
+
 def preresolve_hook(conduit):
     '''
     Yum Plugin PreResolve Hook:
