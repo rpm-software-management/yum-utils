@@ -229,6 +229,15 @@ class pkgQuery:
     def fmt_envra(self, **kw):
         return "%(envr)s.%(arch)s" % self
 
+    def fmt_location(self, **kw):
+        loc = ''
+        repo = self.pkg.repo
+        if self['basepath']:
+            loc = "%(basepath)s/%(relativepath)s" % self
+        else:
+            loc = "%s/%s" % (repo.urls[0], self['relativepath'])
+        return os.path.normpath(loc)
+
 class repoPkgQuery(pkgQuery):
     """
     I wrap a query of a non-installed package available in the repository.
@@ -742,7 +751,7 @@ def main(args):
     if opts.file:
         sackops.append("whatprovides")
     if opts.location:
-        sackops.append("location")
+        pkgops.append("location")
     if opts.groupmember:
         sackops.append("groupmember")
         needgroup = 1
