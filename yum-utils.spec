@@ -422,6 +422,7 @@ fi
 %{_sysconfdir}/bash_completion.d
 %{_bindir}/debuginfo-install
 %{_bindir}/find-repos-of-install
+%{_bindir}/needs-restarting
 %{_bindir}/package-cleanup
 %{_bindir}/repoclosure
 %{_bindir}/repodiff
@@ -599,6 +600,9 @@ fi
 
 
 %changelog
+* Wed Nov  4 2009 Seth Vidal <skvidal at fedoraproject.org>
+- add needs-restarting
+
 * Mon Oct 12 2009 Seth Vidal <skvidal at fedoraproject.org>
 - add python compileall to all plugins so we get .pyc/.pyo files in them
 - fixes https://bugzilla.redhat.com/show_bug.cgi?id=493174
