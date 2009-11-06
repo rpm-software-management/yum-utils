@@ -359,7 +359,7 @@ class SecuritySummaryCommand(SecurityListCommand):
         for T in ('newpackage', 'security', 'bugfix', 'enhancement'):
             if T not in counts:
                 continue
-            print "    %*u %s update(s)" % (maxsize, counts[T], outT[T])
+            print "    %*u %s notice(s)" % (maxsize, counts[T], outT[T])
         _check_running_kernel(base, md_info, _msg)
         self.show_pkg_info_done = {}
 
