@@ -35,6 +35,8 @@
 # yum list-updateinfo security / sec
 # yum list-updateinfo new
 #
+# yum summary-updateinfo
+#
 # yum update-minimal --security
 
 import yum
@@ -55,7 +57,7 @@ __package_name__ = "yum-plugin-security"
 # newpackages is weird, in that we'll never display that because we filter to
 # things relevant to installed pkgs...
 __update_info_types__ = ("security", "bugfix", "enhancement",
-                         "recommended", "newpackages")
+                         "recommended", "newpackage")
 
 def _rpm_tup_vercmp(tup1, tup2):
     """ Compare two "std." tuples, (n, a, e, v, r). """
@@ -206,7 +208,7 @@ class SecurityListCommand:
         else:
             msg("%s %-8s %s" % (notice['update_id'], notice['type'], pkg))
 
-    def show_pkg_exit(self):
+    def show_pkg_exit(self, base, md_info):
         pass
 
     def _get_new_pkgs(self, md_info):
@@ -280,6 +282,7 @@ class SecurityListCommand:
                     continue
                 done_pkgs.add(pkgs[0].name)
                 self.show_pkg(base, msg, pkgs[0], notice, None)
+            self.show_pkg_exit(base, md_info)
             return 0, [basecmd + ' new done']
 
         opts.sec_cmds = extcmds
@@ -300,9 +303,10 @@ class SecurityListCommand:
                               notice, show_type)
         ysp_chk_used_map(used_map, msg)
 
-        self.show_pkg_exit()
+        self.show_pkg_exit(base, md_info)
         return 0, [basecmd + ' done']
             
+
 class SecurityInfoCommand(SecurityListCommand):
     show_pkg_info_done = {}
     def getNames(self):
@@ -315,9 +319,50 @@ class SecurityInfoCommand(SecurityListCommand):
         # Python-2.4.* doesn't understand str(x) returning unicode *sigh*
         obj = notice.__str__()
         msg(obj)
-    
-    def show_pkg_exit(self):
+
+    def show_pkg_exit(self, base, md_info):
         self.show_pkg_info_done = {}
+
+
+class SecuritySummaryCommand(SecurityListCommand):
+    show_pkg_info_done = {}
+    def getNames(self):
+        return ['summary-updateinfo']
+
+    def show_pkg(self, base, msg, pkg, notice, disp=None):
+        if notice['update_id'] in self.show_pkg_info_done:
+            return
+        self.show_pkg_info_done[notice['update_id']] = notice
+
+    def show_pkg_exit(self, base, md_info):
+        def _msg(x):
+            print x
+        counts = {}
+        for notice in self.show_pkg_info_done.values():
+            counts[notice['type']] = counts.get(notice['type'], 0) + 1
+        maxsize = 0
+        for T in ('newpackage', 'security', 'bugfix', 'enhancement'):
+            if T not in counts:
+                continue
+            size = len(str(counts[T]))
+            if maxsize < size:
+                maxsize = size
+        if not maxsize:
+            _check_running_kernel(base, md_info, _msg)
+            return
+
+        outT = {'newpackage' : 'New Package',
+                'security' : 'Security',
+                'bugfix' : 'Bugfix',
+                'enhancement' : 'Enhancement'}
+        print "Updates Info Summary:"
+        for T in ('newpackage', 'security', 'bugfix', 'enhancement'):
+            if T not in counts:
+                continue
+            print "    %*u %s update(s)" % (maxsize, counts[T], outT[T])
+        _check_running_kernel(base, md_info, _msg)
+        self.show_pkg_info_done = {}
+
 
 # "Borrowed" from yumcommands.py
 def yumcommands_checkRootUID(base):
@@ -434,6 +479,7 @@ def config_hook(conduit):
 
     conduit.registerCommand(SecurityListCommand())
     conduit.registerCommand(SecurityInfoCommand())
+    conduit.registerCommand(SecuritySummaryCommand())
     conduit.registerCommand(SecurityUpdateCommand())
     def osec(opt, key, val, parser):
          # CVE is a subset of --security on RHEL, but not on Fedora
