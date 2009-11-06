@@ -578,10 +578,13 @@ def exclude_hook(conduit):
     else:
         conduit.info(2, 'No packages needed for security; %d packages available' % tot)
 
+    _check_running_kernel(conduit._base, md_info, lambda x: conduit.info(2, x))
+
+def _check_running_kernel(yb, md_info, msg):
     if not hasattr(yum.misc, 'get_running_kernel_pkgtup'):
         return # Back compat.
 
-    kern_pkgtup = yum.misc.get_running_kernel_pkgtup(self.ts)
+    kern_pkgtup = yum.misc.get_running_kernel_pkgtup(yb.ts)
     if kern_pkgtup[0] is None:
         return
 
@@ -590,7 +593,7 @@ def exclude_hook(conduit):
         if found_sec or notice['type'] != 'security':
             continue
         found_sec = True
-        ipkg = conduit._base.rpmdb.searchPkgTuple(pkgtup)
+        ipkg = yb.rpmdb.searchPkgTuple(pkgtup)
         if not ipkg:
             continue # Not installed
         ipkg = ipkg[0]
@@ -598,8 +601,8 @@ def exclude_hook(conduit):
                                    kern_pkgtup[3], kern_pkgtup[4],
                                    kern_pkgtup[1])
 
-        conduit.info(2, 'Security: %s is an installed security update' % ipkg)
-        conduit.info(2, 'Security: %s is the currently running version' % rpkg)
+        msg('Security: %s is an installed security update' % ipkg)
+        msg('Security: %s is the currently running version' % rpkg)
         break
 
 
