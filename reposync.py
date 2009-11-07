@@ -180,7 +180,7 @@ def main():
     # --norepopath can only be sensibly used with a single repository:
     if len(my.repos.listEnabled()) > 1 and opts.norepopath:
         print >> sys.stderr, "Error: Can't use --norepopath with multiple repositories"
-        sys.exit(1);
+        sys.exit(1)
 
     # Use progress bar display when downloading repo metadata
     # and package files
