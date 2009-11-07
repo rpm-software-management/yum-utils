@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.23
+Version: 1.1.24
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -600,6 +600,9 @@ fi
 
 
 %changelog
+* Sat Nov 7 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.24
+
 * Wed Nov  4 2009 Seth Vidal <skvidal at fedoraproject.org>
 - add needs-restarting
 
