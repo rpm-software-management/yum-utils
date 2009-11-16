@@ -117,15 +117,22 @@ class YumCompleteTransaction(YumUtilBase):
         self.addCmdOptions()
         self.main()
 
-    def clean_up_ts_files(self, timestamp, path):
+    def clean_up_ts_files(self, timestamp, path, disable=False):
 
         # clean up the transactions
         tsdone = '%s/transaction-done.%s' % (path, timestamp)
         tsall = '%s/transaction-all.%s' % (path, timestamp)
+        results = []
         for f in [tsall, tsdone]:
             if os.path.exists(f):
-                os.unlink(f)
-
+                if disable:
+                    disable_f = f + '.disabled'
+                    os.rename(f, disable_f)
+                    results.append(disable_f)
+                else:
+                    os.unlink(f)
+        return results
+        
     def addCmdOptions(self):
         self.optparser_grp.add_option("--cleanup-only", default=False,
             action="store_true", dest="cleanup",
@@ -153,7 +160,14 @@ class YumCompleteTransaction(YumUtilBase):
         # take the most recent one
         # populate the ts
         # run it
-        times = find_unfinished_transactions(self.conf.persistdir)
+
+        times = []
+        for thistime in find_unfinished_transactions(self.conf.persistdir):
+            if thistime.endswith('disabled'):
+                continue
+            # XXX maybe a check  here for transactions that are just too old to try and complete?
+            times.append(thistime)
+        
         if not times:
             print "No unfinished transactions left."
             sys.exit()
@@ -166,9 +180,10 @@ class YumCompleteTransaction(YumUtilBase):
                 self.clean_up_ts_files(timestamp, self.conf.persistdir)
             sys.exit()
 
-        print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)
 
         timestamp = times[-1]
+        print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)
+        
         remaining = find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
         print "The remaining transaction had %d elements left to run" % len(remaining)
         for (action, pkgspec) in remaining:
@@ -184,8 +199,20 @@ class YumCompleteTransaction(YumUtilBase):
                     self.remove(po=pkg)
 
 
-
+        current_count = len(self.tsInfo)
         self.buildTransaction(unfinished_transactions_check=False)
+        if current_count != len(self.tsInfo):
+            print '\n\nTransaction size changed - this means we are not doing the\n' \
+                  'same transaction as we were before. Aborting and disabling\n' \
+                  'this transaction.'
+                  
+            print '\nYou could try running: package-cleanup --problems\n' \
+                  '                       package-cleanup --dupes\n' \
+                  '                       rpm -Va --nofiles --nodigest'
+            filelist = self.clean_up_ts_files(timestamp, self.conf.persistdir, disable=True)
+            print '\nTransaction files renamed to:\n  %s' % '\n  '.join(filelist)
+            sys.exit()
+            
         if len(self.tsInfo) < 1:
             print 'Nothing in the unfinished transaction to cleanup.'
             print "Cleaning up completed transaction file"
