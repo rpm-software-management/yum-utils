@@ -17,7 +17,7 @@
 
 import yum
 import yum.Errors
-from yum.misc import getCacheDir
+from yum.misc import getCacheDir, to_unicode
 from yum.comps import Comps, CompsException
 from yum.Errors import RepoMDError
 import sys
@@ -146,7 +146,7 @@ class RepoRSS:
         description = '<p><strong>%s</strong> - %s</p>\n\n' % (escape(pkg.name), 
                                             escape(pkg.returnSimple('summary')))
         description += '<p>%s</p>\n\n<p><strong>Change Log:</strong></p>\n\n' % escape(pkg.returnSimple('description').encode('utf-8').replace("\n", "<br />\n"))
-        description += escape('<pre>%s</pre>' % escape(changelog.encode('utf-8')))
+        description += escape('<pre>%s</pre>' % escape(to_unicode(changelog).encode('utf-8')))
         item.newChild(None, 'description', description)
         
         return item

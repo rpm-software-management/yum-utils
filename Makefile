@@ -94,9 +94,9 @@ ChangeLog: FORCE
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 
 pylint:
-	@pylint --rcfile=test/yum-utils-pylintrc $(PY_FILES)
+	@pylint --rcfile=test/yum-utils-pylintrc $(PY_FILES) 2>/dev/null
 
 pylint-short:
-	@pylint -r n --rcfile=test/yum-utils-pylintrc $(PY_FILES)
+	@pylint -r n --rcfile=test/yum-utils-pylintrc $(PY_FILES) 2>/dev/null
 
 FORCE:

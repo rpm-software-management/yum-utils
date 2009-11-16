@@ -23,6 +23,7 @@ import yum.Errors
 
 from utils import YumUtilBase
 from yum import _
+from yum.i18n import to_unicode
 
 import logging
 import rpmUtils
@@ -75,7 +76,7 @@ class DebugInfoInstall(YumUtilBase):
                 r.enable()
                 try:
                     self.doRepoSetup(thisrepo=r.id)
-                except RepoError, e:
+                except yum.Errors.RepoError, e:
                     self.logger.critical("Could not access repo %s error was: %s" %
                                         (r.id, to_unicode(str(e))))
                     sys.exit(1)

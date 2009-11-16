@@ -49,7 +49,7 @@ if True:
     (opts, args) = parser.parse_args()
 
     if not my.setCacheDir(opts.tempcache):
-        repoq.logger.error("Error: Could not make cachedir, exiting")
+        my.logger.error("Error: Could not make cachedir, exiting")
         sys.exit(50)
 
     if opts.cache:

@@ -18,7 +18,7 @@
 
 from yum.plugins import PluginYumExit
 from yum.plugins import TYPE_CORE
-from rpmUtils.miscutils import splitFilename, compareEVR
+from rpmUtils.miscutils import splitFilename
 import urlgrabber
 import urlgrabber.grabber
 

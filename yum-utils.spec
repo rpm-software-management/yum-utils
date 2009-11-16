@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.23
+Version: 1.1.24
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -176,20 +176,6 @@ By default, yum is the only package protected, but by extension this
 automatically protects everything on which yum depends (rpm, python, glibc,
 and so on).Therefore, the plugin functions well even without
 compiling careful lists of all important packages.
-
-%package -n yum-plugin-basearchonly
-Summary: Yum plugin to let Yum install only basearch packages.
-Group: System Environment/Base
-Provides: yum-basearchonly = %{version}-%{release}
-Obsoletes: yum-basearchonly < 1.1.20-0
-Conflicts: yum-basearchonly < 1.1.20-0
-Requires: yum >= 3.0
-
-%description -n yum-plugin-basearchonly
-this plugin makes Yum only install basearch packages on multiarch systems.
-If you type 'yum install foo' on a x68_64 system, only 'foo-x.y.x86_46.rpm' is installed.
-If you want to install the foo-x.y.i386.rpm, you have to type 'yum install foo.i386'.
-The plugin only works with 'yum install'.
 
 %package -n yum-plugin-upgrade-helper
 Summary: Yum plugin to help upgrades to the next distribution version
@@ -375,7 +361,6 @@ plugins="\
  merge-conf \
  security \
  protect-packages \
- basearchonly \
  upgrade-helper \
  aliases \
  list-data \
@@ -521,11 +506,6 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protect-packages.conf
 /usr/lib/yum-plugins/protect-packages.*
 
-%files -n yum-plugin-basearchonly
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/basearchonly.conf
-/usr/lib/yum-plugins/basearchonly.*
-
 %files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
@@ -600,6 +580,13 @@ fi
 
 
 %changelog
+* Sun Nov 8 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- remove basearchonly since all versions of yum for quite some time obsolete it
+- truncate changelog to last 2 years
+
+* Sat Nov 7 2009 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.24
+
 * Wed Nov  4 2009 Seth Vidal <skvidal at fedoraproject.org>
 - add needs-restarting
 
@@ -703,150 +690,3 @@ fi
 * Thu Jan 3 2008 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.10
 
-* Thu Dec 12 2007 James Antill <james@fedoraproject.org>
-- Add yum-aliases plugin
-
-* Fri Dec 7 2007 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.9
-* Fri Oct 26 2007 Seth Vidal <skvidal at fedoraproject.org>
-- add upgrade-helper plugin
-* Wed Oct 17 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.8
-* Sun Sep 30 2007 James Bowes <jbowes@redhat.com>
-- Update the yum-refresh-updatesd description
-
-* Mon Sep 14 2007 Tim Lauridsen <tla@rasmil.dk>
-- do not use wildcards for manpages in yum-utils files section to avoid duplicates
-* Mon Sep 10 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.7
-* Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added basearchonly plugin by Adel Gadllah
-* Tue Jul 24 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.6
-* Tue Jul 17 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added Requires: yum-updatesd to yum-refresh-updatesd
-* Tue Jul 03 2007 Panu Matilainen <pmatilai@laiskiainen.org>
-- Add versionlock list format documentation
-
-* Mon Jun 18 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added protect-packages plugin by Svetlana Anissimova and Matthew Miller
-
-* Mon Jun 18 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.5
-
-* Tue May 1 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.4
-
-* Tue May 1 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.3
-
-* Tue May  1 2007 Seth Vidal <skvidal at linux.duke.edu>
-- added debuginfo-install
-
-* Fri Apr 20 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added security plugin written by James Antill <james@and.org>
-
-* Thu Apr 12 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark as 1.1.2
-- Added merge-conf plugin written by Aurelien Bompard <abompard@fedoraproject.org>
-
-* Mon Feb 19 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark it as 1.1.1
-
-* Mon Feb 19 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark it as 1.1.0 (again)
-
-* Thu Feb 15 2007 Tim Lauridsen <tla@rasmil.dk>
-- removed versionlock.list installation.
-
-* Wed Feb 14 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added versionlock.list installation.
-- fixed skip-broken description (--ignore-broken -> --skip-broken)
-
-* Tue Feb 13 2007 James Bowes <jbowes@redhat.com>
-- Add yum-refresh-updatesd plugin
-
-* Thu Feb 8 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added man dirs to yum-changelog files section
-
-* Wed Feb 7 2007 Tim Lauridsen <tla@rasmil.dk>
-- mark it as 1.1.0
-- Requires: yum >= 3.1.1 for yum-utils.
-
-* Tue Feb 6 2007 Tim Lauridsen <tla@rasmil.dk>
-- Added %%{?dist} tag
-
-* Sun Dec 31 2006 Tim Lauridsen <tla@rasmil.dk>
-- mark it as 1.0.2
-
-* Tue Oct 31 2006 Tim Lauridsen <tla@rasmil.dk>
-- mark it as 1.0.1
-
-* Fri Oct 27 2006 Tim Lauridsen <tla@rasmil.dk>
-- Added priorities plugin written by Daniel de Kok <danieldk at pobox.com>
-
-* Wed Oct  4 2006 Seth Vidal <skvidal at linux.duke.edu>
-- mark it as 1.0
-- change requires for the packages to yum 3.0
-
-* Wed Sep 27 2006 Tim Lauridsen <tla@rasmil.dk>
-- added skip-broken plugin
-
-* Tue Sep 05 2006 Panu Matilainen <pmatilai@laiskianen.org>
-- added allowdowngrade plugin
-
-* Sun Aug 13 2006 Seth Vidal <skvidal at linux.duke.edu>
-- fix the plugins/ doc issue
-
-* Sat May  6 2006 Seth Vidal <skvidal at linux.duke.edu>
-- bump version number
-- added yum-downloadonly plugin
-- fix minor item in tsflags description
-
-* Sat Apr 29 2006 Seth Vidal <skvidal at linux.duke.edu>
-- add reposync
-
-* Fri Apr 28 2006 Tim Lauridsen <tla@rasmil.dk>
-- added yum-fedorakmod plugin subpackage
-- added yum-protectbase plugin subpackage.
-- added yum-versionlock plugin subpackage.
-- added yum-tsflags plugin subpackage.
-- added yum-kernel-module plugin subpackage
-- changed .py to .* in files sections for plugin subpackages to build rpms without error.
-
-* Thu Feb 23 2006 Seth Vidal <skvidal at linux.duke.edu>
--  changed some of the yum version dependencies
-
-* Fri Feb 10 2006 Seth Vidal <skvidal@linux.duke.edu>
-- added repotrack to utils
-- bumped version for 2.5.X-compatible release
-
-* Tue Jan 10 2006 Brian Long <brilong@cisco.com>
-- bump version to 0.4
-- add yum-fastestmirror subpackage
-
-* Mon Oct 17 2005 Panu Matilainen <pmatilai@laiskiainen.org>
-- add repoquery man page
-
-* Sat Sep 17 2005 Panu Matilainen <pmatilai@laiskiainen.org>
-- version 0.3.1
-- various enhancements and fixes to repoquery
-- avoid tracebacks in yumex and pup when changelog plugin is enabled
-
-* Mon Jul 25 2005 Panu Matilainen <pmatilai@laiskiainen.org>
-- bump version to 0.3
-- add yum-changelog subpackage
-- add plugins as documentation to the main package
-- require yum >= 2.3.4 (for getCacheDir)
-
-* Tue Jun  21 2005 Gijs Hollestelle <gijs@gewis.nl>
-- Added missing GPL COPYING file
-
-* Wed Jun  1 2005 Seth Vidal <skvidal@phy.duke.edu>
-- 0.2
-
-* Mon May 23 2005 Panu Matilainen <pmatilai@laiskiainen.org>
-- add yum-updateboot subpackage
-
-* Mon May 16 2005 Gijs Hollestelle <gijs@gewis.nl>
-- first version based on the mock spec file

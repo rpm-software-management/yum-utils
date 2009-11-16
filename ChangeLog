@@ -1,3 +1,244 @@
+2009-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.24
+
+2009-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* debuginfo-install.py, find-repos-of-install.py,
+	plugins/versionlock/versionlock.py, reposync.py: Fix pylint errors:
+	************* Module debuginfo-install E0602:
+	78:DebugInfoInstall.main: Undefined variable 'RepoError' E0602:
+	80:DebugInfoInstall.main: Undefined variable 'to_unicode'
+	************* Module find-repos-of-install E0602: 52: Undefined
+	variable 'repoq' ************* Module reposync W0301:183:
+	Unnecessary semicolon ************* Module versionlock W0611: 21:
+	Unused import compareEVR
+
+2009-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: silence pylint runtime error noise
+
+2009-11-05  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repo-rss.py: Fix UnicodeDecodeError with UTF-8 changelog names.
+
+2009-11-06  James Antill <james@and.org>
+
+	* plugins/security/security.py: Change update => notice, as that's
+	what we are counting
+
+2009-11-06  James Antill <james@and.org>
+
+	* docs/yum-security.8, plugins/security/security.py: Add
+	summary-updateinfo command
+
+2009-11-06  James Antill <james@and.org>
+
+	* plugins/security/security.py: Move running kernel check to it's
+	own function
+
+2009-11-05  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add bash completion for repo-graph, repo-rss,
+	repoclosure and repoquery.
+
+2009-11-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: - add fmt_location  to pkgquery objects - make --location a pkg
+	operation not a sack operation closes rh bug 533024
+
+2009-11-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Compare the
+	currently running kernel for security problems   Add aliases for
+	list-updateinfo instead of list-security
+
+2009-11-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* Makefile, needs-restarting.py, yum-utils.spec: add
+	needs-restarting as a yum-util
+
+2009-11-02  James Antill <james@and.org>
+
+	* plugins/security/security.py: Compare the currently running kernel
+	for security problems
+
+2009-10-20  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Add aliases for list-updateinfo instead
+	of list-security
+
+2009-10-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: catch the repo setup failure when we're
+	adding the -debuginfo repos and report it  fixes rh bug:
+	https://bugzilla.redhat.com/show_bug.cgi?id=531743
+
+2009-10-23  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: Make repoquery --pkgnarrow=extras actually output
+	its findings.
+
+2009-10-20  James Antill <james@and.org>
+
+	* docs/yum-security.8, plugins/security/security.py:  Add option to list-updateinfo command to see new packages in repos.
+	 Change list-security => list-updateinfo, as it's now grossly wrong.
+
+
+2009-10-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* Makefile, yum-utils.bash, yum-utils.spec: Add bash completion for
+	repomanage, package-cleanup and verifytree.  Should work with bash
+	>= 3 and doesn't require any particular version of bash-completion.
+	Actually doesn't require bash-completion at all, but without it one
+	needs to source the file through other means besides b-c's
+	autoloading.
+
+2009-10-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.spec: Fix compileall syntax.
+
+2009-10-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* Makefile: Tabify so Emacs doesn't complain about "suspicious
+	lines".
+
+2009-10-14  James Antill <james@and.org>
+
+	* plugins/security/security.py: Fix typos in previous security
+	message commit
+
+2009-10-14  Douglas Silas <dhensley@redhat.com>
+
+	* plugins/security/security.py: Change the security summary
+	messages, hopefully be less ambiguous.
+
+2009-10-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: add --noscripts option to package-cleanup
+	since so much of our cleanup is related to dainbramaged scriptlets
+
+2009-10-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Do obsoletes
+	as well as updates in security list excluding
+
+2009-10-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: - add compileall command to yum-utils.spec for plugins - fixes rh
+	bug https://bugzilla.redhat.com/show_bug.cgi?id=493174
+
+2009-10-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Do obsoletes as well as updates in
+	security list excluding
+
+2009-10-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: make sure we're calling the logging output
+	instead of print so -q does something
+
+2009-10-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/debuginfo-install.1: add warning messages section in
+	debuginfo-install man page for: rh bug 480385
+
+2009-10-06  James Antill <james@and.org>
+
+	* yumdb.py: When doing double loops, info/search, print a blank line
+	after each package
+
+2009-10-06  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Add some more default aliases
+
+2009-10-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: rewrite package-cleanup to use YumUtilBase
+	interface and to have more correct logic for kernel removals and
+	duplicate installs
+
+2009-09-21  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py,
+	plugins/auto-update-debuginfo/auto-update-debuginfo.py,
+	plugins/fastestmirror/fastestmirror.py,
+	plugins/fedorakmod/fedorakmod.py,
+	plugins/kernel-module/kernel-module.py, plugins/keys/keys.py,
+	plugins/protectbase/protectbase.py,
+	plugins/remove-with-leaves/remove-with-leaves.py,
+	plugins/security/security.py, plugins/versionlock/versionlock.py: 
+	Use new API (if available) for adding packages using, mainly for
+	history
+
+2009-09-17  James Antill <james@and.org>
+
+	* plugins/verify/verify.py: Show size in bytes, if human units ==
+	(BZ 520067)
+
+2009-09-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, yum-builddep.py,
+	yum-complete-transaction.py: modify debuginfo-install, yum-builddep,
+	and yum-complete-transaction to use new doUtilTransaction() method
+
+2009-09-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: when outputting results for prcos (or anything,
+	really) if there is nothing returned from doQuery() then don't print
+	it. It just means that repoquery --conflicts -a outputs at least one
+	line per pkg which is annoying
+
+2009-09-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: add --basearch option  to repoclosure  set
+	basearch yum should run as.
+
+2009-09-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Bump require
+	>= 3.2.23 to 3.2.24.
+
+2009-09-08  Seth Vidal <skvidal@fedoraproject.org>
+
+	*
+	plugins/fastestmirror/fastestmirror-asyncore/fastestmirror-asyncore
+	.py, plugins/fastestmirror/fastestmirror.py,
+	plugins/priorities/priorities.py: change /usr/bin/env python ->
+	/usr/bin/python for fedora and rhel pkg compliance
+	https://bugzilla.redhat.com/show_bug.cgi?id=521469  and it matches
+	everything else we have to not use /usr/bin/env python
+
+2009-09-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: Bump require >= 3.2.23 to 3.2.24.  repoquery needs
+	22ca5115d59d795bac23eb608700f36be96bc99b (yum) added after
+	yum-3.2.23 was released.
+
+	http://yum.baseurl.org/gitweb?p=yum-utils.git;a=commitdiff;h=71308f5d13b697a78d81935a086071367a2b0920
+
+2009-09-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   updated
+	ChangeLog   bumped yum-utils version to 1.1.23
+
+2009-09-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: clean up some garbage output I left in there about
+	obsoletes
+
+2009-09-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2009-09-02  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.23
