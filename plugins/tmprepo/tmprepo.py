@@ -119,6 +119,28 @@ cost=500
     AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
     return tmp_fname
 
+def add_repomd_repo(base, repomd):
+    # Let people do it via. poitning at the repomd.xml file ... smeg it
+    trepo_data = repomd[:-len("repodata/repomd.xml")]
+    trepo_name = os.path.basename(os.path.dirname(os.path.dirname(repomd)))
+    tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
+    repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    open(tmp_fname, "wb").write("""\
+[%(repoid)s]
+name=Tmp. repo. for %(path)s
+baseurl=%(dname)s
+enabled=1
+gpgcheck=true
+repo_gpgcheck=false
+metadata_expire=0
+""" % {'basename' : trepo_name,
+       'path'     : repomd,
+       'repoid'   : repoid,
+       'dname'    : trepo_data})
+    print "Creating tmp. repo for:", repomd
+    AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
+    return tmp_fname
+
 def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
@@ -135,6 +157,8 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
                 log.warn("Failed to find directory " + trepo[len("file:"):])
                 continue
             fname = add_dir_repo(base, trepo, cleanup_dir_temp)
+        elif trepo.endswith("repodata/repomd.xml"):
+            fname = add_repomd_repo(base, trepo)
         else:
             grab = urlgrabber.grabber.URLGrabber()
             # Need to keep alive until fname is used
