@@ -116,6 +116,9 @@ class KeysListCommand:
         print base.fmtColumns(columns)
 
     def doCommand(self, base, basecmd, extcmds):
+        if hasattr(base, 'run_with_package_names'):
+            base.run_with_package_names.add("yum-plugin-keys")
+
         self.exit_code = 0
 
         keys = []
@@ -293,7 +296,13 @@ class KeysRemoveCommand(KeysListCommand):
     def show_key(self, base, key):
         if key.repoid == "installed":
             release = "%x" % key.createts
-            base.remove(name='gpg-pubkey', version=key.keyid, release=release)
+            if hasattr(base.rpmdb, 'returnGPGPubkeyPackages'): # New style
+                for pkg in base.rpmdb.returnGPGPubkeyPackages():
+                    if pkg.version == key.keyid and pkg.release == release:
+                        base.remove(po=pkg)
+            else:
+                base.remove(name='gpg-pubkey',
+                            version=key.keyid, release=release)
             self.exit_code = 2
         else:
             print "Delete key %s-%x from %s?" % (key.keyid, key.createts,
