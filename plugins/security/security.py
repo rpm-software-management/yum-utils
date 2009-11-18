@@ -422,6 +422,8 @@ class SecurityUpdateCommand:
         yumcommands_checkGPGKey(base)
 
     def doCommand(self, base, basecmd, extcmds):
+        if hasattr(base, 'run_with_package_names'):
+            base.run_with_package_names.add(__package_name__)
         md_info       = ysp_gen_metadata(base.repos.listEnabled())
         opts          = base.plugins.cmdline[0]
         opts.sec_cmds = []
