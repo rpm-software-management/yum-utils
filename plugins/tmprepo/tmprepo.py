@@ -208,6 +208,9 @@ def prereposetup_hook(conduit):
     if not opts.tmp_repos:
         return
 
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-tmprepo")
+
     log = logging.getLogger("yum.verbose.main")
     add_repos(conduit._base, log, opts.tmp_repos,
               make_validate(log, rpgpgcheck, rrgpgcheck),
