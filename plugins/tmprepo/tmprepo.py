@@ -103,8 +103,7 @@ metadata_expire=0
 #  Make cost smaller, as we know it's "local" ... if this isn't good just create
 # your own .repo file. ... then you won't need to createrepo each run either.
 cost=500
-""" % {'basename' : trepo_name,
-       'path'     : trepo_path,
+""" % {'path'     : trepo_path,
        'repoid'   : repoid,
        'dname'    : trepo_data})
     if cleanup:
@@ -121,7 +120,8 @@ cost=500
 
 def add_repomd_repo(base, repomd):
     # Let people do it via. poitning at the repomd.xml file ... smeg it
-    trepo_data = repomd[:-len("repodata/repomd.xml")]
+    trepo_data = tempfile.mkdtemp()
+    AutoCleanupDir(trepo_data)
     trepo_name = os.path.basename(os.path.dirname(os.path.dirname(repomd)))
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
     repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
@@ -131,13 +131,33 @@ name=Tmp. repo. for %(path)s
 baseurl=%(dname)s
 enabled=1
 gpgcheck=true
-repo_gpgcheck=false
 metadata_expire=0
-""" % {'basename' : trepo_name,
-       'path'     : repomd,
+""" % {'path'     : repomd,
        'repoid'   : repoid,
-       'dname'    : trepo_data})
+       'dname'    : repomd[:-len("repodata/repomd.xml")]})
     print "Creating tmp. repo for:", repomd
+    AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
+    return tmp_fname
+
+# Note that mirrorlist also includes metalink, due to the anaconda hack.
+def add_mirrorlist_repo(base, mirrorlist):
+    # Let people do it via. poitning at the repomd.xml file ... smeg it
+    trepo_data = tempfile.mkdtemp()
+    AutoCleanupDir(trepo_data)
+    trepo_name = os.path.basename(mirrorlist)
+    tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
+    repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    open(tmp_fname, "wb").write("""\
+[%(repoid)s]
+name=Tmp. repo. for %(path)s
+mirrorlist=%(dname)s
+enabled=1
+gpgcheck=true
+metadata_expire=0
+""" % {'path'     : mirrorlist,
+       'repoid'   : repoid,
+       'dname'    : mirrorlist})
+    print "Creating tmp. repo for:", mirrorlist
     AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
     return tmp_fname
 
@@ -159,7 +179,7 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
             fname = add_dir_repo(base, trepo, cleanup_dir_temp)
         elif trepo.endswith("repodata/repomd.xml"):
             fname = add_repomd_repo(base, trepo)
-        else:
+        elif trepo.endswith(".repo"):
             grab = urlgrabber.grabber.URLGrabber()
             # Need to keep alive until fname is used
             gc_keep = tempfile.NamedTemporaryFile()
@@ -169,6 +189,8 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
             except urlgrabber.grabber.URLGrabError, e:
                 log.warn("Failed to retrieve " + trepo)
                 continue
+        else:
+            fname = add_mirrorlist_repo(base, trepo)
 
         base.getReposFromConfigFile(fname, validate=validate)
         added = True
@@ -176,8 +198,8 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
     # Just do it all again...
     base.setupProgressCallbacks()
 
-rpgpgcheck = True # Remote 
-rrgpgcheck = True # Remote 
+rpgpgcheck = True  # Remote 
+rrgpgcheck = False # Remote 
 lpgpgcheck = True
 lrgpgcheck = False
 def_tmp_repos_cleanup = False
@@ -207,10 +229,10 @@ def config_hook(conduit):
     parser.add_option("--tmprepo-keep-created", action='store_true',
                       dest='tmp_repos_cleanup', default=False,
                       help="keep created direcotry based tmp. repos.")
-    #  We default to repository for actual repo files, because that's the most
-    # secure, but packages for local dirs./files
+    #  We don't default to repository checks for repo files, because no one does
+    # that signing.
     rpgpgcheck = conduit.confBool('main', 'pkgs_gpgcheck', default=True)
-    rrgpgcheck = conduit.confBool('main', 'repo_gpgcheck', default=True)
+    rrgpgcheck = conduit.confBool('main', 'repo_gpgcheck', default=False)
     lpgpgcheck = conduit.confBool('main', 'pkgs_local_gpgcheck',
                                   default=rpgpgcheck)
     lrgpgcheck = conduit.confBool('main', 'repo_local_gpgcheck',
