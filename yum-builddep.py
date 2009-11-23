@@ -146,6 +146,8 @@ class YumBuildDep(YumUtilBase):
             for dep in srpm.requiresList():
                 if dep.startswith("rpmlib("): 
                     continue
+                if self.returnInstalledPackagesByDep(dep):
+                    continue
                 try:
                     pkg = self.returnPackageByDep(dep)
                     print pkg
