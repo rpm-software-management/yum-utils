@@ -69,13 +69,22 @@ def postdownload_hook(conduit):
     cache_dir = conduit.confString('createrepo', 'cachedir', default=None)
     checksum  = conduit.confString('createrepo', 'checksum', default=None)
 
+    quiet     = conduit.confBool('createrepo', 'quiet',     default=True)
+    verbose   = conduit.confBool('createrepo', 'verbose',   default=False)
     skip_stat = conduit.confBool('createrepo', 'skip_stat', default=False)
     unique_md = conduit.confBool('createrepo', 'unique_md_filenames',
                                  default=False)
     update = conduit.confBool('createrepo', 'update', default=True)
     databases = conduit.confBool('createrepo', 'databases', default=True)
 
+    if conduit._base.verbose_logger.isEnabledFor(yum.logginglevels.DEBUG_3):
+        quiet = False
+
     args = ["createrepo"]
+    if quiet:
+        args.append("--quiet")
+    if verbose:
+        args.append("--verbose")
     if databases:
         args.append("--database")
     if update:
@@ -91,9 +100,12 @@ def postdownload_hook(conduit):
         args.append("--cachedir")
         args.append(cache_dir)
     args.append(local_repo_dir)
-    conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" % done)
+    if not quiet:
+        conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" %
+                     done)
     os.spawnvp(os.P_WAIT, "createrepo", args)
-    conduit.info(2, "== Done rebuild of _local repo. ==")
+    if not quiet:
+        conduit.info(2, "== Done rebuild of _local repo. ==")
 
     lrepo = [repo for repo in conduit._base.repos.listEnabled()
              if repo.id == "_local"]
