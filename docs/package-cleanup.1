@@ -24,7 +24,8 @@ List leaf nodes in the local RPM database.  Leaf nodes are RPMs that
 are not relied upon by any other RPM.
 .IP "\fB\-\-orphans\fP"
 List installed packages which are not available from currenly configured
-repositories.
+repositories. This is identical to "yum list extras", which may provide better
+output.
 .IP "\fB\-\-oldkernels\fP"
 Remove old kernel and kernel-devel packages.
 .IP "\fB\-\-problems\fP"
