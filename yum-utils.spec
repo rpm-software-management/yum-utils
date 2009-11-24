@@ -340,6 +340,19 @@ Requires: yum >= 3.2.23
 Yum plugin which shows newly installed leaf packages
 and packages that became leaves after a transaction
 
+%package -n yum-plugin-local
+Summary: Yum plugin to automatically manage a local repo. of downloaded packages
+Group: System Environment/Base
+# Who the hell knows what version :)
+Requires: yum >= 3.2.22
+Requires: createrepo
+
+%description -n yum-plugin-local
+When this plugin is installed it will automatically copy all downloaded packages
+to a repository on the local filesystem, and (re)build that repository. This
+means that anything you've downloaded will always exist, even if the original
+repo. removes it (and can thus. be reinstalled/downgraded/etc.).
+
 %prep
 %setup -q
 
@@ -373,6 +386,7 @@ plugins="\
  rpm-warm-cache \
  auto-update-debuginfo \
  show-leaves \
+ local \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -577,6 +591,12 @@ fi
 %defattr(-, root, root)
 /usr/lib/yum-plugins/show-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/show-leaves.conf
+
+%files -n yum-plugin-local
+%defattr(-, root, root)
+%ghost %{_sysconfdir}/yum.repos.d/_local.repo
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/local.conf
+/usr/lib/yum-plugins/local.*
 
 
 %changelog
