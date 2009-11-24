@@ -39,23 +39,27 @@ Is used to display information about one or more advisories.
 .PP 
 .IP "\fBlist-updateinfo\fP" "\fBinfo-updateinfo\fP" "\fBsummary-updateinfo\fP"
 Is used to list all of the relevant errata notice information, from the
-updateinfo.xml data in yum. This includes bugzillas, CVEs and security updates.
-You can also list "new" packages, by passing new as the first argument.
+updateinfo.xml data in yum. This includes bugzillas, CVEs, security updates and
+new.
 .IP 
 .IP "\fBbugzillas / bzs\fP"
-Is the subset of the security information, pertaining to the bugzillas.
+Is the subset of the updateinfo information, pertaining to the bugzillas.
 .IP 
 .IP "\fBcves\fP"
-Is the subset of the security information, pertaining to the CVEs.
+Is the subset of the updateinfo information, pertaining to the CVEs.
 .IP 
 .IP "\fBsecurity / sec\fP"
-Is the subset of the security information, pertaining to security.
+Is the subset of the updateinfo information, pertaining to security.
 .IP "\fBbugfix\fP"
-Is the subset of the security information, pertaining to bugfixes.
+Is the subset of the updateinfo information, pertaining to bugfixes.
 .IP "\fBenhancement\fP"
-Is the subset of the security information, pertaining to enhancements.
+Is the subset of the updateinfo information, pertaining to enhancements.
 .IP "\fBrecommended\fP"
-Is the subset of the security information, pertaining to recommended updates.
+Is the subset of the updateinfo information, pertaining to recommended updates.
+.IP "\fBnew-packages\fP"
+Is the subset of the updateinfo information, pertaining to new packages. These
+are packages which weren't available at the initial release of your
+distribution.
 .IP
 .PP
 .SH "GENERAL OPTIONS"
@@ -109,6 +113,10 @@ yum --bz 123 --bz 456 --bz 789 --security update-minimal
 To get an info list of the latest packages which contain fixes for Bugzilla 123; CVEs CVE-2207-0123 and CVE-2207-3210; and Fedora advisories FEDORA-2707-4567 and FEDORA-2707-7654 use:
 .IP
 yum --bz 123 --cve CVE-2207-0123 --cve CVE-2207-3210 --advisory FEDORA-2707-4567 --advisory FEDORA-2707-7654 info updates
+.PP
+To get a list of packages which are "new".
+.IP
+yum list-updateinfo new
 
 
 .SH "SEE ALSO"
