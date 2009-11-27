@@ -99,8 +99,6 @@ def run_cmd(yb, args, inshell=False):
         for pkg in sorted(yb.rpmdb.returnPackages()):
             if ykey not in pkg.yumdb_info:
                 continue
-            if done: print ''
-            done = True
             found = False
             yval = getattr(pkg.yumdb_info, ykey)
             for arg in args:
@@ -109,6 +107,8 @@ def run_cmd(yb, args, inshell=False):
                     break
             if not found:
                 continue
+            if done: print ''
+            done = True
             print pkg
             print " " * 4, ykey, '=', yval
     elif args[0] in ['exist?', 'exist', 'exists'] and len(args) > 1:
