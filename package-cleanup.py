@@ -29,6 +29,7 @@ from utils import YumUtilBase
 import logging
 import os
 import re
+import yum.depsolve # For flags
 
 from rpmUtils import miscutils, arch
 from optparse import OptionGroup
@@ -134,6 +135,7 @@ class PackageCleanup(YumUtilBase):
                     resolve_sack = providers[(req,flags,ver)]
                     
                 if len(resolve_sack) < 1:
+                    flags = yum.depsolve.flags.get(flags, flags)
                     missing = miscutils.formatRequire(req,ver,flags)
                     problems.append((po, "requires %s" % missing))
                                     
