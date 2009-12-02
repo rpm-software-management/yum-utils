@@ -26,6 +26,7 @@ import time
 import os
 import os.path
 import exceptions
+import urlparse
 
 from optparse import OptionParser
 
@@ -235,8 +236,11 @@ class pkgQuery:
         if self['basepath']:
             loc = "%(basepath)s/%(relativepath)s" % self
         else:
-            loc = "%s/%s" % (repo.urls[0], self['relativepath'])
-        return os.path.normpath(loc)
+            repourl = repo.urls[0]
+            if repourl[-1] != '/':
+                repourl = repourl + '/'
+            loc = urlparse.urljoin(repourl, self['relativepath'])
+        return loc
 
 class repoPkgQuery(pkgQuery):
     """
