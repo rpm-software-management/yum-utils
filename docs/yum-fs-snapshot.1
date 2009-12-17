@@ -1,0 +1,30 @@
+.\" yum-fs-snapshot
+.TH YUM-FS-SNAPSHOT 1 "14 DECEMBER 2009" "" "User Manuals"
+.SH NAME
+.B yum-fs-snapshot
+.SH SYNOPSIS
+The
+.B yum-fs-snapshot
+package
+.SH DESCRIPTION
+.BR yum-fs-snapshot(1)
+is a Yum plugin for taking snapshots of your filesystems before running a yum
+transaction.  By default it will take a snapshot of any filesystem that can be
+snapshotted, which currently is limited to BTRFS filesystems. 
+.SH FILES
+.B yum-fs-snapshot
+uses a configuration file for its specific actions: 
+.I /etc/yum/pluginconf.d/fs-snapshot.conf
+.RS
+.SH SEE ALSO
+.nf
+.I yum-fs-snapshot.conf (5)
+.fi
+.PP
+.SH AUTHORS
+.nf
+Josef Bacik <josef@toxicpanda.com>
+.fi
+.SH "SEE ALSO"
+.BR yum (1)
+.BR yum-fs-snapshot.conf (5)

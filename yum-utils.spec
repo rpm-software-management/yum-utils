@@ -353,6 +353,15 @@ to a repository on the local filesystem, and (re)build that repository. This
 means that anything you've downloaded will always exist, even if the original
 repo. removes it (and can thus. be reinstalled/downgraded/etc.).
 
+%package -n yum-plugin-fs-snapshot
+Summary: Yum plugin to automatically snapshot your filesystems during updates
+Group: System Environment/Base
+Requires: yum >= 3.2.22
+
+%description -n yum-plugin-fs-snapshot
+When this plugin is installed it will automatically snapshot any
+filesystem that is touched by the packages in a yum update or yum remove.
+
 %prep
 %setup -q
 
@@ -387,6 +396,7 @@ plugins="\
  auto-update-debuginfo \
  show-leaves \
  local \
+ fs-snapshot \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -598,6 +608,12 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/local.conf
 /usr/lib/yum-plugins/local.*
 
+%files -n yum-plugin-fs-snapshot
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fs-snapshot.conf
+/usr/lib/yum-plugins/fs-snapshot.*
+%{_mandir}/man1/yum-fs-snapshot.1.*
+%{_mandir}/man5/yum-fs-snapshot.conf.5.*
 
 %changelog
 * Sun Nov 8 2009 Tim Lauridsen <timlau@fedoraproject.org>
