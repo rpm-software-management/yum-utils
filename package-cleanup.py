@@ -194,8 +194,8 @@ class PackageCleanup(YumUtilBase):
                 
             if name not in results:
                 results[name] = []
-            results[name].append(pkglist)
-            
+            if pkglist not in results[name]:
+                results[name].append(pkglist)
             
         return results
 
