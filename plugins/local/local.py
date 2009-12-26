@@ -35,12 +35,22 @@ plugin_type = (TYPE_CORE,)
 
 def_local_repo_dir = '/var/lib/yum/plugins/local'
 
+def prereposetup_hook(conduit):
+    global local_repo_dir
+    local_repo_dir  = conduit.confString('main', 'repodir',
+                                         default=def_local_repo_dir)
+    try:
+        d_mtime = os.stat(local_repo_dir).st_mtime
+        r_mtime = os.stat("%s/repodata/repomd.xml" % local_repo_dir).st_mtime
+        if d_mtime > r_mtime:
+            _rebuild(conduit)
+    except:
+        pass
+
 def postdownload_hook(conduit):
     if conduit.getErrors() or os.geteuid():
         return
 
-    local_repo_dir  = conduit.confString('main', 'repodir',
-                                         default=def_local_repo_dir)
 
     reg  = False
     done = 0
@@ -65,7 +75,10 @@ def postdownload_hook(conduit):
 
     if not done:
         return
+    _rebuild(conduit)
+    _reposetup(conduit)
 
+def _rebuild(conduit):
     cache_dir = conduit.confString('createrepo', 'cachedir', default=None)
     checksum  = conduit.confString('createrepo', 'checksum', default=None)
 
@@ -104,9 +117,12 @@ def postdownload_hook(conduit):
         conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" %
                      done)
     os.spawnvp(os.P_WAIT, "createrepo", args)
+    # For the prerepo. check
+    os.utime("%s/repodata/repomd.xml" % local_repo_dir, None)
     if not quiet:
         conduit.info(2, "== Done rebuild of _local repo. ==")
 
+def _reposetup(conduit):
     lrepo = [repo for repo in conduit._base.repos.listEnabled()
              if repo.id == "_local"]
     if lrepo:
