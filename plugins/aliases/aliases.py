@@ -74,7 +74,7 @@ def resolve_aliases(args, log, skip=0):
         need_rep = False
         num = skip
         for arg in args[skip:]:
-            if arg[0] != '-':
+            if arg and arg[0] != '-':
                 break
             num += 1
 
