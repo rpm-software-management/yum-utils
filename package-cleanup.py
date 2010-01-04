@@ -69,7 +69,7 @@ class PackageCleanup(YumUtilBase):
         self.optparser_grp.add_option("--orphans", default=False, 
                     dest="orphans",action="store_true",
                     help='List installed packages which are not available from'\
-                         ' currenly configured repositories')
+                         ' currently configured repositories')
 
         dupegrp = OptionGroup(self.optparser, 'Duplicate Package Options')
         dupegrp.add_option("--dupes", default=False, 
