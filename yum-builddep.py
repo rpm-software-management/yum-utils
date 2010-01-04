@@ -128,7 +128,7 @@ class YumBuildDep(YumUtilBase):
             elif arg.endswith('.src'):
                 srcnames.append(arg)
             else:
-                srcnames.append('%s.src' % arg)
+                srcnames.append(arg)
 
         if srcnames:
             self.setupSourceRepos()
@@ -141,16 +141,49 @@ class YumBuildDep(YumUtilBase):
                     self.logger.error("No such package(s): %s" %
                                       ", ".join(unmatch))
                     sys.exit(1)
+                    
+            toActOn = []     
+            for newpkg in srpms:
+                # If there are matches to the package argument given but there
+                # are no source packages, this can be caused because the
+                # source rpm this is built from has a different name
+                # for example: nscd is built from the glibc source rpm
+                # We find this name by parsing the sourcerpm filename
+                # (this is ugly but it appears to work)
+                # And finding a package with arch src and the same
+                # ver and rel as the binary package
+                # That should be the source package
+                # Note we do not use the epoch to search as the epoch for the
+                # source rpm might be different from the binary rpm (see
+                # for example mod_ssl)
+                if newpkg.arch != 'src':
+                    name = newpkg.returnSimple('sourcerpm').rsplit('-',2)[0]
+                    src = self.pkgSack.searchNevra(name=name, arch = 'src',
+                      ver = newpkg.version,
+                      rel = newpkg.release
+                    )
+                    if src == []:
+                        self.logger.error('No source RPM found for %s' % str(newpkg))
+                        
+                    toActOn.extend(src)
+                else:
+                    toActOn.append(newpkg)
+            # Get the best matching srpm        
+            toActOn = self.bestPackagesFromList(toActOn, 'src')
 
-        for srpm in srpms:
+        for srpm in toActOn:
+            self.logger.info('Getting requirements for %s' % srpm)
             for dep in srpm.requiresList():
+                self.logger.debug(' REQ:  %s' % dep)                
                 if dep.startswith("rpmlib("): 
                     continue
-                if self.returnInstalledPackagesByDep(dep):
+                instreq = self.returnInstalledPackagesByDep(dep)
+                if instreq:
+                    self.logger.info(' --> Already installed : %s'  % instreq[0])                    
                     continue
                 try:
                     pkg = self.returnPackageByDep(dep)
-                    print pkg
+                    self.logger.info(' --> %s' % pkg)
                     if not self.rpmdb.installed(name=pkg.name):
                         self.tsInfo.addInstall(pkg)
                     
