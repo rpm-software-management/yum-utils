@@ -24,7 +24,7 @@ from yum.plugins import TYPE_CORE
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
-def enable_debuginfo_repos(yb):
+def enable_debuginfo_repos(yb, conduit):
     # We need to make sure the normal repos. are setup, before we add some...
     yb.pkgSack
 
@@ -36,7 +36,7 @@ def enable_debuginfo_repos(yb):
         if di in repos:
             continue
         for r in yb.repos.findRepos(di):
-            print 'Enabling %s: %s' % (r.id, r.name)
+            conduit.info(2, 'Enabling %s: %s' % (r.id, r.name))
             r.enable()
             yb.doRepoSetup(thisrepo=r.id)
 
@@ -52,5 +52,5 @@ def postreposetup_hook(conduit):
     if num:
         if hasattr(conduit, 'registerPackageName'):
             conduit.registerPackageName("yum-plugin-auto-update-debug-info")
-        print "Found %d installed debuginfo package(s)" % num
-        enable_debuginfo_repos(yb)
+        conduit.info(2, "Found %d installed debuginfo package(s)" % num)
+        enable_debuginfo_repos(yb, conduit)
