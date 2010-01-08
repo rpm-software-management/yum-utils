@@ -31,6 +31,27 @@ import shutil
 import rpmUtils
 import logging
 
+# This is to fix Bug 469
+# To convert from a pkg to a source pkg, we have a problem in that all we have
+# is "sourcerpm", which can be a different nevra ... but just to make it fun
+# the epoch isn't in the name. So we use rpmUtils.miscutils.splitFilename
+# and ignore the arch/epoch ... and hope we get the right thing.
+# Eg. run:
+# for pkg in yb.pkgSack.returnPackages():
+#     if pkg.version not in pkg.sourcerpm:
+#         print pkg, pkg.sourcerpm
+def _best_convert_pkg2srcpkgs(self, opts, pkg):
+    if not opts.source or pkg.arch == 'src':
+        return [pkg]
+
+    (n,v,r,e,a) = rpmUtils.miscutils.splitFilename(pkg.sourcerpm)
+    src = self.pkgSack.searchNevra(name=n, ver=v, rel=r, arch='src')
+    if src == []:
+        self.logger.error('No source RPM found for %s' % str(pkg))
+
+    return src
+
+
 class YumDownloader(YumUtilBase):
     NAME = 'yumdownloader'
     VERSION = '1.0'
@@ -164,31 +185,7 @@ class YumDownloader(YumUtilBase):
                 self.logger.error('No Match for argument %s' % pkg)
                 continue
             for newpkg in installable:
-                # This is to fix Bug 469
-                # If there are matches to the package argument given but there
-                # are no source packages, this can be caused because the
-                # source rpm this is built from has a different name
-                # for example: nscd is built from the glibc source rpm
-                # We find this name by parsing the sourcerpm filename
-                # (this is ugly but it appears to work)
-                # And finding a package with arch src and the same
-                # ver and rel as the binary package
-                # That should be the source package
-                # Note we do not use the epoch to search as the epoch for the
-                # source rpm might be different from the binary rpm (see
-                # for example mod_ssl)
-                if opts.source and newpkg.arch != 'src':
-                    name = newpkg.returnSimple('sourcerpm').rsplit('-',2)[0]
-                    src = self.pkgSack.searchNevra(name=name, arch = 'src',
-                      ver = newpkg.version,
-                      rel = newpkg.release
-                    )
-                    if src == []:
-                        self.logger.error('No source RPM found for %s' % str(newpkg))
-                        
-                    toActOn.extend(src)
-                else:
-                    toActOn.append(newpkg)
+                toActOn.extend(_best_convert_pkg2srcpkgs(self, opts, newpkg))
             if toActOn:
                 pkgGroups = self._groupPackages(toActOn)
                 for group in pkgGroups:
