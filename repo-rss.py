@@ -59,7 +59,7 @@ class YumQuiet(yum.YumBase):
 class RepoRSS:
     def __init__(self, fn='repo-rss.xml'):
         self.description = 'Repository RSS'
-        self.link = 'http://linux.duke.edu/projects/yum'
+        self.link = 'http://yum.baseurl.org'
         self.title = 'Recent Packages'
         self.doFile(fn)
         self.doDoc()
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     parser.add_option("-f", action="store", type="string", dest="filename",
                       default='repo-rss.xml', help="filename to write rss to: %default")
     parser.add_option("-l", action="store", type='string', dest='link',
-                      default='http://linux.duke.edu/projects/yum/',
+                      default='http://yum.baseurl.org',
                       help="url for rss feed link: %default")
     parser.add_option("-t", action='store', type='string', dest='title',
                       default="RSS Repository - Recent Packages",
