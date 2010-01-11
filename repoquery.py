@@ -667,6 +667,8 @@ def main(args):
     # other opts
     parser.add_option("--archlist",
                       help="only query packages of certain architecture(s)")
+    parser.add_option("--releasever", default=None,
+                      help="set value of $releasever in yum config and repo files")
     parser.add_option("--pkgnarrow", default="repos",
                       help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
     parser.add_option("--show-duplicates", action="store_true",
@@ -769,6 +771,7 @@ def main(args):
 
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
+    repoq.releasever = opts.releasever
     if opts.conffile:
         repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
     else:
