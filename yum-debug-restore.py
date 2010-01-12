@@ -58,7 +58,7 @@ def cmd_line():
 
     (opts, args) = parser.parse_args()
     if not args:
-        parser.usage()
+        parser.print_usage()
     return (opts, args)
 
 class OtherRpmDB:
