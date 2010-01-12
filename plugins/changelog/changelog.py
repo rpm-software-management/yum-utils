@@ -27,7 +27,7 @@ from yum.plugins import PluginYumExit
 from yum import logginglevels
 import logging
 
-from yum.i18n import to_unicode
+from yum.i18n import to_unicode, to_str
 
 from yum.update_md import UpdateMetadata
 
@@ -205,8 +205,12 @@ Display changelog data, since a specified time, on a group of packages"""
                 except ValueError:
                     msg = "Argument -- %s -- is not \"all\", a positive number or a date" % since
                     raise PluginYumExit(msg)
-                tt = self._since_dto.timetuple()
-                self._since_tt = time.mktime(tt)
+                try:
+                    tt = self._since_dto.timetuple()
+                    self._since_tt = time.mktime(tt)
+                except ValueError, e:
+                    msg = "Argument -- %s -- is not valid: %s" % (since, to_str(e))
+                    raise PluginYumExit(msg)
 
         ypl = base.returnPkgLists(extcmds)
         self.show_data(msg, ypl.installed, 'Installed Packages')
