@@ -20,6 +20,7 @@
 # $ neato -v -Gmaxiter=2000 -x -Gcenter=false -Goverlap=scale -Tps2 -o foo.ps foo.dot
 
 import yum
+import sys
 from yum.misc import getCacheDir
 from optparse import OptionParser
 
