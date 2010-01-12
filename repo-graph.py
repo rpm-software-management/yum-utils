@@ -113,9 +113,13 @@ if __name__ == '__main__':
                 repo.disable()
             else:
                 repo.enable()
+    try:
+        my.doRepoSetup()
+        my.doTsSetup()
+        my.doSackSetup()
 
-    my.doRepoSetup()
-    my.doTsSetup()
-    my.doSackSetup()
-
-    my.doDot(default_header)
+        my.doDot(default_header)
+    except yum.Errors.YumBaseError, e:
+        print "Encountered an error creating graph: %s" % e
+        sys.exit(1)
+        
