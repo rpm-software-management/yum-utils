@@ -786,15 +786,8 @@ def main(args):
             else:
                 baseurl = repopath
                 
-            repopath = os.path.normpath(repopath)
-            newrepo = yum.yumRepo.YumRepository(repoid)
-            newrepo.name = repopath
-            newrepo.baseurl = baseurl
-            newrepo.basecachedir = repoq.conf.cachedir
-            newrepo.metadata_expire = 0
-            newrepo.timestamp_check = False
-            repoq.repos.add(newrepo)
-            repoq.repos.enableRepo(newrepo.id)
+            repoq.add_enable_repo(repoid, baseurls=[baseurl], 
+                    basecachedir=repoq.conf.cachedir)
             if not opts.quiet:
                 repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
@@ -862,8 +855,8 @@ def main(args):
             repoq.repos.populateSack(mdtype='otherdata')
         if needgroup:
             repoq.doGroupSetup()
-    except yum.Errors.RepoError, e:
-        repoq.logger.error( e)
+    except (yum.Errors.RepoError, yum.Errors.GroupsError), e:
+        repoq.logger.error(e)
         sys.exit(1)
 
     repoq.runQuery(regexs)
