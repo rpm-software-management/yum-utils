@@ -44,11 +44,14 @@ class DebugInfoInstall(YumUtilBase):
                              DebugInfoInstall.VERSION,
                              DebugInfoInstall.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.debuginfoinstall")
-        # Add util commandline options to the yum-cli ones
         self.optparser = self.getOptionParser()
-        self.optparser.add_option("", "--no-debuginfo-plugin",
-                                  action="store_true",
-                                  help="Turn off automatic installation/update of the yum debuginfo plugin")
+        opt = self.optparser
+        # Add util commandline options to the yum-cli ones
+        if hasattr(self, 'getOptionGroup'):
+            opts = self.getOptionGroup()
+        opts.add_option("", "--no-debuginfo-plugin",
+                        action="store_true",
+                        help="Turn off automatic installation/update of the yum debuginfo plugin")
 
         self.main()
 
