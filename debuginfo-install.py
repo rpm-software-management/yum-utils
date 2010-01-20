@@ -28,6 +28,7 @@ from yum.i18n import to_unicode
 import logging
 import rpmUtils
 
+plugin_autodebuginfo_package_name = "yum-plugin-auto-update-debug-info"
 
 class DebugInfoInstall(YumUtilBase):
     NAME = 'debuginfo-install'
@@ -44,8 +45,18 @@ class DebugInfoInstall(YumUtilBase):
                              DebugInfoInstall.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.debuginfoinstall")
         # Add util commandline options to the yum-cli ones
-        self.optparser = self.getOptionParser() 
+        self.optparser = self.getOptionParser()
+        self.optparser.add_option("", "--no-debuginfo-plugin",
+                                  action="store_true",
+                                  help="Turn off automatic installation/update of the yum debuginfo plugin")
+
         self.main()
+
+    def doUtilConfigSetup(self, *args, **kwargs):
+        """ We override this to get our extra option out. """
+        opts = YumUtilBase.doUtilConfigSetup(self, *args, **kwargs)
+        self.no_debuginfo_plugin = opts.no_debuginfo_plugin
+        return opts
 
     def main(self):
         # Parse the commandline option and setup the basics.
@@ -132,7 +143,14 @@ class DebugInfoInstall(YumUtilBase):
                                 self.di_try_install(deppo)
                             except yum.Errors.InstallError, e:
                                 self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
-            
+        #  This is kinda hacky, accessing the option from the plugins code
+        # but I'm not sure of a better way of doing it
+        if not self.no_debuginfo_plugin and self.tsInfo:
+            try:
+                self.install(pattern=plugin_autodebuginfo_package_name)
+            except yum.Errors.InstallError, e:
+                self.logger.critical('Could not find auto debuginfo plugin')
+
         
 if __name__ == '__main__':
     import locale
