@@ -52,6 +52,8 @@ def cmd_line():
 
     parser.add_option("--install-latest", action="store_true",
                       help="install the latest instead of specific versions")
+    parser.add_option("--ignore-arch", action="store_true",
+                      help="ignore arch of packages, so you can dump on .i386 and restore on .x86_64")
 
     parser.add_option("--filter-types", 
                       help="Limit to: install, remove, update, downgrade")
@@ -59,6 +61,7 @@ def cmd_line():
     (opts, args) = parser.parse_args()
     if not args:
         parser.print_usage()
+        sys.exit(1)
     return (opts, args)
 
 class OtherRpmDB:
@@ -91,6 +94,8 @@ class OtherRpmDB:
             self.pkgtups.append(pkgtup)
 
 def naevr2str(n,a,e,v,r):
+    if a is None: # Assume epoch doesn't change without release changing
+        return "%s-%s-%s" % (n,v,r)
     if e in (None, '', '0'):
         return "%s-%s-%s.%s" % (n,v,r,a)
     return "%s-%s:%s-%s.%s" % (n,e,v,r,a)
@@ -98,28 +103,39 @@ def pkgtup2str(pkgtup):
     n,a,e,v,r = pkgtup
     return naevr2str(n,a,e,v,r)
 
-def pkg_data2list(yb, opkgtups, opkgmaps, install_latest):
+def pkg_data2list(yb, opkgtups, opkgmaps, install_latest, ignore_arch):
     ret = []
     npkgtups = set()
     npkgmaps = {}
     for po in sorted(yb.rpmdb.returnPackages()):
+        arch = po.arch
+        if ignore_arch:
+            arch = None
         if False: pass
-        elif (po.name, po.arch) not in opkgmaps:
+        elif (po.name, arch) not in opkgmaps:
             ret.append(("remove", str(po)))
         elif po.pkgtup not in opkgtups:
-            n,a,e,v,r = opkgmaps[(po.name, po.arch)]
+            n,a,e,v,r = opkgmaps[(po.name, arch)]
             pinstEVR = yum.packages.PackageEVR(e, v, r)
-            if po.EVR < pinstEVR:
-                ret.append(("upgrade",   naevr2str(n,a,e,v,r)))
+            if po.EVR == pinstEVR:
+                assert ignore_arch and po.arch != a
+            elif po.EVR < pinstEVR:
+                ret.append(("upgrade",   naevr2str(n,arch,e,v,r)))
             else:
-                ret.append(("downgrade", naevr2str(n,a,e,v,r)))
+                ret.append(("downgrade", naevr2str(n,arch,e,v,r)))
         npkgtups.add(po.pkgtup)
         npkgmaps[(po.name, po.arch)] = po
+        if ignore_arch:
+            npkgmaps[(po.name, None)] = po
 
     for name, arch in sorted(opkgmaps):
+        if ignore_arch and arch is not None:
+            continue
         if (name, arch) in npkgmaps:
             continue
-        if install_latest:
+        if install_latest and ignore_arch:
+            ret.append(("install", name))
+        elif install_latest:
             ret.append(("install", "%s.%s" % (name, arch)))
         else:
             ret.append(("install", pkgtup2str(opkgmaps[(name, arch)])))
@@ -160,6 +176,9 @@ def main():
     opkgmaps = {}
     for pkgtup in orpmdb.pkgtups:
         opkgmaps[(pkgtup[0], pkgtup[1])] = pkgtup
+        if opts.ignore_arch:
+            n,a,e,v,r = pkgtup
+            opkgmaps[(pkgtup[0], None)] = n,None,e,v,r
 
     if opts.output:
         fo = sys.stdout
@@ -178,11 +197,16 @@ def main():
 
     counts = {}
     for T, pkg in pkg_data2list(yb, set(orpmdb.pkgtups), opkgmaps,
-                                opts.install_latest):
+                                opts.install_latest, opts.ignore_arch):
         if fT is not None and T not in fT:
             continue
         counts[T] = counts.get(T, 0) + 1
-        print >>fo, "%-9s %s" % (T, pkg)
+        try:
+            print >>fo, "%-9s %s" % (T, pkg)
+        except IOError:
+            if opts.output: # mainly due to |
+                sys.exit(1)
+            raise
 
     if opts.output:
         sys.exit(0)
