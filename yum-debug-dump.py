@@ -52,6 +52,25 @@ class YumDebugDump(yum.YumBase):
 
         return msg
 
+    def dump_rpmdb_versions(self):
+        msg = "%%%%RPMDB VERSIONS\n"
+        # This should be the same as the default [yum] group in version-groups
+        yumcore = set(['yum', 'rpm', 'yum-metadata-parser'])
+        yumplus = set(['glibc', 'sqlite',
+                       'libcurl', 'nss',
+                       'rpm', 'rpm-libs', 'rpm-python',
+                       'python',
+                       'python-iniparse', 'python-urlgrabber', 'python-pycurl'])
+        yumplus.update(yumcore)
+        groups = {'yum-core' : yumcore,
+                  'yum'      : yumplus}
+        data = self.rpmdb.simpleVersion(False, groups=groups)
+        msg += '  all: %s\n' % (data[0],)
+        for grp in sorted(data[2]):
+            msg += '  %s: %s\n' % (grp, data[2][grp])
+
+        return msg
+
     def dump_repos(self):
         msg = "%%%%REPOS\n"
         for repo in sorted(self.repos.listEnabled()):
@@ -82,6 +101,7 @@ class YumDebugDump(yum.YumBase):
         msg += "  global excludes: %s\n" % ",".join(self.conf.exclude)
         return msg
 
+    # FIXME: This should use rpmdb.check_*()
     def dump_rpm_problems(self):
 
         pkgs = {}
@@ -156,6 +176,7 @@ class YumDebugDump(yum.YumBase):
         fo.write(self.dump_rpmdb())
         if not self.opts.norepos:
             fo.write(self.dump_repos())
+        fo.write(self.dump_rpmdb_versions())
         fo.close()
         return fn
 
