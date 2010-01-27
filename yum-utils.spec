@@ -411,6 +411,7 @@ done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
 # need for for the ghost in files section of yum-plugin-local
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum.repos.d
 touch $RPM_BUILD_ROOT%{_sysconfdir}/yum.repos.d/_local.repo
 
 %clean
