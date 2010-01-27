@@ -34,6 +34,7 @@ requires_api_version = '2.5'
 plugin_type = (TYPE_CORE,)
 
 def_local_repo_dir = '/var/lib/yum/plugins/local'
+local_repo_dir = ''
 
 def prereposetup_hook(conduit):
     global local_repo_dir
@@ -114,8 +115,10 @@ def _rebuild(conduit):
         args.append(cache_dir)
     args.append(local_repo_dir)
     if not quiet:
-        conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" %
-                     done)
+#        FIXME: Something is rotten here, where does done come from
+#        conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" %
+#                     done)
+        conduit.info(2, "== Rebuilding _local repo.  ==")
     os.spawnvp(os.P_WAIT, "createrepo", args)
     # For the prerepo. check
     os.utime("%s/repodata/repomd.xml" % local_repo_dir, None)

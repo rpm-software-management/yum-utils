@@ -90,7 +90,7 @@ class YumBuildDep(YumUtilBase):
         # Do the real action
         # solve for each srpm and put the pkgs into a ts
         try:
-            self.get_build_deps()
+            self.get_build_deps(opts)
         except yum.Errors.MiscError, e:
             msg = "There was a problem getting the build deps, exiting:\n   %s" % e
             self.logger.error(msg)
@@ -136,7 +136,7 @@ class YumBuildDep(YumUtilBase):
     # throw them into a ts
     # run the ts
     
-    def get_build_deps(self):
+    def get_build_deps(self,opts):
         srcnames = []
         srpms = []
         for arg in self.cmds:

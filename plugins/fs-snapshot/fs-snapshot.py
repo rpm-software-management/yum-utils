@@ -29,7 +29,6 @@ rolled-back snapshot.  You have been warned.
 from yum.plugins import TYPE_CORE
 from yum.constants import *
 import os
-import sys
 import time
 from subprocess import Popen,PIPE
 
@@ -44,7 +43,7 @@ def pretrans_hook(conduit):
     """
     if not os.path.exists("/etc/mtab"):
         conduit.info(1, "fs-snapshot: could not open /etc/mtab")
-        pass
+        return
 
     excludeList = conduit.confString('main', 'exclude', default="").split()
 
@@ -72,7 +71,6 @@ def pretrans_hook(conduit):
         mtabfile.close()
     except Exception as (errno, strerror):
         conduit.info(1, "fs-snapshot: error reading /etc/mtab")
-    pass
 
 def _create_snapshot(device, mntpnt, type, conduit):
     """
