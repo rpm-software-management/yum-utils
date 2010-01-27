@@ -1,3 +1,263 @@
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.25
+
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* docs/Makefile: install fs-snapshot docs
+
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: make the /etc/yum.repos.d in buildroot
+
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: Added touch /etc/yum.repos.d/_local.repo to
+	install section this need for for the ghost in files section of
+	yum-plugin-local
+
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/fs-snapshot/fs-snapshot.py, plugins/local/local.py,
+	yum-builddep.py: fix pylint errors.  ************ Module
+	yum-builddep E0602:169:YumBuildDep.get_build_deps: Undefined
+	variable 'opts' ************* Module fs-snapshot W0107:
+	47:pretrans_hook: Unnecessary pass statement W0107:
+	75:pretrans_hook: Unnecessary pass statement W0611: 32: Unused
+	import sys ************* Module local W0601: 39:prereposetup_hook:
+	Global variable 'local_repo_dir' undefined at the module level
+	E0602:118:_rebuild: Undefined variable 'done'
+
+2010-01-21  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Add rpmdb versions to the dump file
+
+2010-01-21  James Antill <james@and.org>
+
+	* yum-debug-restore.py:  A couple of fixes for yum-debug-restore, and can now work across
+	 arch.      Add --ignore-arch option.     Don't traceback when not
+	 given an argument.     Don't traceback when piped. Eg. | head -2
+
+2010-01-20  James Antill <james@and.org>
+
+	* debuginfo-install.py: Put the debuginfo-install options in it's
+	option group
+
+2010-01-20  James Antill <james@and.org>
+
+	* debuginfo-install.py: Auto install the debuginfo plugin, when
+	people install debuginfo packages
+
+2010-01-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repomanage.py: fix up error message from exception
+
+2010-01-18  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make repofrompath use add_enable_repo from yumbase
+	rather than its own thing fixes up using --group* commands from
+	--repofrompath repos and also catches GroupsErrors properly at setup
+	closes rh bug: https://bugzilla.redhat.com/show_bug.cgi?id=556215
+
+2010-01-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/changelog/changelog.py: fix for bug:
+	https://bugzilla.redhat.com/show_bug.cgi?id=546811 - make sure we
+	catch valueerror later, too
+
+2010-01-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-graph.py: whoops - import sys, too
+
+2010-01-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repo-graph.py: catch yumbaseerror exceptions in repograph so it
+	won't traceback if our repos  aren't available for some reason:
+	https://bugzilla.redhat.com/show_bug.cgi?id=548500
+
+2010-01-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Add
+	--releasever to repoquery   Fix source downloads, maybe. We parse
+	all the info. from the sourcerpm
+
+2010-01-12  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-debug-restore.py: fix for rh bug:
+	https://bugzilla.redhat.com/show_bug.cgi?id=551671  just make
+	usage() -> print_usage() for optparser
+
+2010-01-11  James Antill <james@and.org>
+
+	* repoquery.py: Add --releasever to repoquery
+
+2010-01-08  James Antill <james@and.org>
+
+	* yum-builddep.py, yumdownloader.py:  Fix source downloads, maybe. We parse all the info. from the
+	 sourcerpm field when we don't get a source package. Tested with:
+	 yumdownloader --source perl-IO-Compress-Zlib
+
+2010-01-08  Gerhardus Geldenhuis <gerhardus.geldenhuis@gmail.com>
+
+	* docs/debuginfo-install.1, docs/package-cleanup.1,
+	docs/repo-rss.1, docs/repodiff.1, docs/repoquery.1,
+	docs/reposync.1, docs/yum-aliases.1, docs/yum-builddep.1,
+	docs/yum-changelog.1, docs/yum-complete-transaction.8,
+	docs/yum-debug-dump.1, docs/yum-filter-data.1,
+	docs/yum-fs-snapshot.1, docs/yum-fs-snapshot.conf.5,
+	docs/yum-groups-manager.1, docs/yum-list-data.1,
+	docs/yum-security.8, docs/yum-utils.1, docs/yum-verify.1,
+	docs/yum-versionlock.1, docs/yum-versionlock.conf.5,
+	docs/yumdownloader.1, repo-rss.py: commit patch fixing links to yum
+	website and making all the bug reporting information consistent.
+	Additionally, making the date formatting in the man pages consistent
+
+
+2010-01-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: make auto
+	update plugin use conduit.info() instead of print yum bug 384
+
+2010-01-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: simple, obvious, typo
+
+2010-01-04  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-builddep.py: make yum-builddep smarter when a package is build
+	from srpm with another name and make the output a little better
+	(rhbz  #426009)
+
+2009-12-28  Gerhardus Geldenhuis <gerhardus.geldenhuis@gmail.com>
+
+	* docs/yum-versionlock.1:  made the page more apropos friendly   changed synopsis to specify
+	 usage
+
+2009-12-26  James Antill <james@and.org>
+
+	* plugins/local/local.py: Allow people to ove rpms into and out of
+	the local dir. manually
+
+2009-12-26  James Antill <james@and.org>
+
+	* plugins/aliases/aliases.py: Fix yum "" edge case in aliases, BZ
+	550647
+
+2009-12-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Added
+	fs-snapshot plugin by Josef Bacik
+
+2009-12-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	* package-cleanup.py: make sure that noarch pkgs are not listed
+	twice for each duplicate entry
+
+2009-12-17  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* docs/yum-fs-snapshot.1, docs/yum-fs-snapshot.conf.5,
+	plugins/fs-snapshot/fs-snapshot.conf,
+	plugins/fs-snapshot/fs-snapshot.py, yum-utils.spec: Added
+	fs-snapshot plugin by Josef Bacik
+
+2009-12-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: don't os.path.normpath() the loc b/c it clips the
+	double / on http:// :(
+
+2009-12-01  James Antill <james@and.org>
+
+	* package-cleanup.py: Fix passing string flags to formatRequires. BZ
+	541551
+
+2009-11-26  James Antill <james@and.org>
+
+	* yumdb.py: Don't show lots of blank lines in yumdb search
+
+2009-11-24  James Antill <james@and.org>
+
+	* plugins/local/local.conf, plugins/local/local.py: Make local not
+	as verbose, unless requested
+
+2009-11-24  James Antill <james@and.org>
+
+	* plugins/local/local.conf, plugins/local/local.py, yum-utils.spec: 
+	Add local plugin, so Fedora people can download/etc.
+
+2009-11-24  James Antill <james@and.org>
+
+	* docs/yum-security.8: Minor cleanup for new-packages explanation
+
+2009-11-24  James Antill <james@and.org>
+
+	* docs/package-cleanup.1: Add docs. explaining that orphans ==
+	extras
+
+2009-11-23  James Antill <james@and.org>
+
+	* yum-builddep.py: Don't rely on returnPackageByDep() to give you
+	the installed pkg. BZ#539490
+
+2009-11-18  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Let tmprepo create/use tmprepos if
+	given mirrorlist/metalink
+
+2009-11-18  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Let tmprepo create/use tmprepos if
+	given repodata/repomd.xml
+
+2009-11-18  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Add yum-plugin-tmprepo to run_with
+	when using it
+
+2009-11-18  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add yum-plugin-security to run_with
+	when running update-minimal
+
+2009-11-18  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Fix keys-remove to use
+	rpmdb.returnGPGPubkeyPackages
+
+2009-11-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   remove
+	basearch plugin from spec, it is obsoleted by recent version of yum,
+	truncated changelog to last 2 years   updated ChangeLog   bumped
+	yum-utils version to 1.1.24   Fix pylint errors:   silence pylint
+	runtime error noise   Fix UnicodeDecodeError with UTF-8 changelog
+	names.   Change update => notice, as that's what we are counting
+	Add summary-updateinfo command   Move running kernel check to it's
+	own function   Add bash completion for repo-graph, repo-rss,
+	repoclosure and repoquery.
+
+2009-11-16  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: add some checking to
+	yum-complete-transaction - make sure that the transaction we are
+	going to run to complete the unfinished transaction is not different
+	in size than what we were going to run. Helps keep us out of
+	mistakenly removing everything
+
+2009-11-08  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: remove basearch plugin from spec, it is obsoleted
+	by recent version of yum, truncated changelog to last 2 years
+
+2009-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2009-11-07  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.24
