@@ -410,6 +410,8 @@ for plug in $plugins; do
 done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
+# need for for the ghost in files section of yum-plugin-local
+touch $RPM_BUILD_ROOT%{_sysconfdir}/yum.repos.d/_local.repo
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -616,6 +618,10 @@ fi
 %{_mandir}/man5/yum-fs-snapshot.conf.5.*
 
 %changelog
+* Wed Jan 27 2010 Tim Lauridsen <timlau@fedoraproject.org>
+- add touch /etc/yum.repos.d/_local.repo to install section
+- this need for for the ghost in files section of yum-plugin-local
+
 * Sun Nov 8 2009 Tim Lauridsen <timlau@fedoraproject.org>
 - remove basearchonly since all versions of yum for quite some time obsolete it
 - truncate changelog to last 2 years
