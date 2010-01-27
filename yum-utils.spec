@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.24
+Version: 1.1.25
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -620,6 +620,7 @@ fi
 
 %changelog
 * Wed Jan 27 2010 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.25
 - add touch /etc/yum.repos.d/_local.repo to install section
 - this need for for the ghost in files section of yum-plugin-local
 
