@@ -76,10 +76,10 @@ def postdownload_hook(conduit):
 
     if not done:
         return
-    _rebuild(conduit)
+    _rebuild(conduit, done)
     _reposetup(conduit)
 
-def _rebuild(conduit):
+def _rebuild(conduit, done=None):
     cache_dir = conduit.confString('createrepo', 'cachedir', default=None)
     checksum  = conduit.confString('createrepo', 'checksum', default=None)
 
@@ -115,10 +115,11 @@ def _rebuild(conduit):
         args.append(cache_dir)
     args.append(local_repo_dir)
     if not quiet:
-#        FIXME: Something is rotten here, where does done come from
-#        conduit.info(2, "== Rebuilding _local repo. with %u new packages ==" %
-#                     done)
-        conduit.info(2, "== Rebuilding _local repo.  ==")
+        if done is None:
+            conduit.info(2, "== Rebuilding _local repo. ==")
+        else:
+            msg = "== Rebuilding _local repo. with %u new packages ==" % done
+            conduit.info(2, msg)
     os.spawnvp(os.P_WAIT, "createrepo", args)
     # For the prerepo. check
     os.utime("%s/repodata/repomd.xml" % local_repo_dir, None)
