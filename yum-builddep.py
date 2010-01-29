@@ -37,7 +37,7 @@ import rpm
 #     if pkg.version not in pkg.sourcerpm:
 #         print pkg, pkg.sourcerpm
 def _best_convert_pkg2srcpkgs(self, opts, pkg):
-    if not opts.source or pkg.arch == 'src':
+    if pkg.arch == 'src':
         return [pkg]
 
     (n,v,r,e,a) = rpmUtils.miscutils.splitFilename(pkg.sourcerpm)
