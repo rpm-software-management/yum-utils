@@ -301,7 +301,7 @@ class PackageCleanup(YumUtilBase):
         opts = self.doUtilConfigSetup()
         if not exactlyOne([opts.problems, opts.dupes, opts.leaves, opts.kernels,
                            opts.orphans, opts.cleandupes]):
-            self.optparser.print_help()
+            print self.optparser.format_help()
             sys.exit(1)
 
         if self.conf.uid != 0:
