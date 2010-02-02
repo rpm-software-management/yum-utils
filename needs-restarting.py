@@ -95,8 +95,9 @@ def get_open_files(pid):
 
 def main(args):
     (opts, args)  = parseargs(args)
-    
+
     my = yum.YumBase()
+    my.preconf.init_plugins=False
     if hasattr(my, 'setCacheDir'):
         my.setCacheDir()
     my.conf.cache = True
