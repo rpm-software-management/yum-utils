@@ -43,7 +43,7 @@ class MyYumUtil(YumUtilBase):
         opts = self.doUtilConfigSetup()
         # Check if there is anything to do.
         if len(self.cmds) < 1: 
-            parser.print_help()
+            print parser.format_help() # Stupid .print_help() commits unicide
             sys.exit(0)
         # at this point you have the entire YumBaseCli object as 'self'
         # you can do whatever you want
