@@ -107,17 +107,17 @@ def parseargs(args):
     
     if opts.new and opts.old:
         errorprint('\nPass either --old or --new, not both!\n')
-        parser.print_help()
+        print parser.format_help()
         sys.exit(1)
         
     if len(args) > 1:
         errorprint('Error: Only one directory allowed per run.')
-        parser.print_help()
+        print parser.format_help()
         sys.exit(1)
         
     if len(args) < 1:
         errorprint('Error: Must specify a directory to index.')
-        parser.print_help()
+        print parser.format_help()
         sys.exit(1)
         
     return (opts, args)

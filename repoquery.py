@@ -710,7 +710,7 @@ def main(args):
         if opts.all:
             regexs = ['*']
         else:
-            parser.print_help()
+            print parser.format_help()
             sys.exit(1)
 
     pkgops = []
