@@ -1,5 +1,5 @@
 .\" yum-fs-snapshot
-.TH YUM-FS-SNAPSHOT 1 "14 December 2009" "" "User Manuals"
+.TH YUM-FS-SNAPSHOT 1 "3 February 2010" "" "User Manuals"
 .SH NAME
 .B yum-fs-snapshot
 .SH SYNOPSIS
@@ -10,7 +10,11 @@ package
 .BR yum-fs-snapshot(1)
 is a Yum plugin for taking snapshots of your filesystems before running a yum
 transaction.  By default it will take a snapshot of any filesystem that can be
-snapshotted, which currently is limited to BTRFS filesystems. 
+snapshotted, which currently is limited to BTRFS filesystems.  However,
+all filesystems built on LVM logical volumes may be snapshotted at the
+block level using LVM snapshots.  LVM snapshot support is provided for
+the purpose of system rollback.  As such LVM snapshots will only be
+created if the kernel supports the "snapshot-merge" DM target.
 .SH FILES
 .B yum-fs-snapshot
 uses a configuration file for its specific actions: 
@@ -24,6 +28,8 @@ uses a configuration file for its specific actions:
 .SH AUTHORS
 .nf
 Josef Bacik <josef@toxicpanda.com>
+.br
+Mike Snitzer <msnitzer@fedoraproject.org>
 .fi
 .SH "SEE ALSO"
 .BR yum (1)

@@ -1,5 +1,5 @@
 .\" yum-fs-snapshot.conf.5
-.TH YUM-FS-SNAPSHOT.CONF 5 "14 December 2009" "" "File Formats"
+.TH YUM-FS-SNAPSHOT.CONF 5 "3 February 2010" "" "File Formats"
 .SH NAME
 .B yum-fs-snapshot.conf(5)
 
@@ -9,7 +9,7 @@ is the configuration file for
 .B yum-fs-snapshot(1)
 Yum plugin for snapshotting your filesystems before running a yum transaction.
 By default, this plugin will snapshot all filesystems that it is capable of
-snapshotting.
+snapshotting.  This includes block-level snapshots using LVM snapshots.
 .SH FILES
 .I /etc/yum/pluginconf.d/fs-snapshot.conf
 .SH FILE FORMAT
@@ -20,9 +20,20 @@ utilizes configuration options in the form of
 .IP exclude
 This is a space delimited list of the mount points you do not wish to have
 snapshotted by this plugin.
+.SH OPTION - [lvm] section
+.IP enabled
+This is a boolean value used to control whether LVM snapshots will be
+created for filesystems built on LVM logical volumes.
+.SH OPTION - [lvm] section
+.IP lvcreate_size_args
+This is the space delimited lvcreate argument list that is used to
+specify the size of the snapshot LV.  Valid lvcreate size options are -l
+or -L.  If not specified then LVM snapshots will not be created.
 .SH AUTHOR
 .RS
 Josef Bacik <josef@toxicpanda.com>
+.br
+Mike Snitzer <msnitzer@fedoraproject.org>
 .RS
 .SH SEE ALSO
 .BR yum-fs-snapshot(1)
