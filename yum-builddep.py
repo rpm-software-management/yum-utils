@@ -155,11 +155,13 @@ class YumBuildDep(YumUtilBase):
         toActOn = []     
         if srcnames:
             self.setupSourceRepos()
-            exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), srcnames, casematch=1)
+            pkgs = self.pkgSack.returnPackages(patterns=srcnames)
+            exact, match, unmatch = yum.packages.parsePackages(pkgs, srcnames, casematch=1)
             srpms += exact + match
             
             if len(unmatch):
-                exact, match, unmatch = yum.packages.parsePackages(self.rpmdb.returnPackages(), unmatch, casematch=1)
+                pkgs = self.rpmdb.returnPackages(patterns=unmatch)
+                exact, match, unmatch = yum.packages.parsePackages(pkgs, unmatch, casematch=1)
                 if len(unmatch):
                     self.logger.error("No such package(s): %s" %
                                       ", ".join(unmatch))
