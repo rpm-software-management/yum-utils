@@ -152,6 +152,7 @@ class YumBuildDep(YumUtilBase):
             else:
                 srcnames.append(arg)
 
+        toActOn = []     
         if srcnames:
             self.setupSourceRepos()
             exact, match, unmatch = yum.packages.parsePackages(self.pkgSack.returnPackages(), srcnames, casematch=1)
@@ -164,7 +165,7 @@ class YumBuildDep(YumUtilBase):
                                       ", ".join(unmatch))
                     sys.exit(1)
                     
-            toActOn = []     
+
             for newpkg in srpms:
                 toActOn.extend(_best_convert_pkg2srcpkgs(self, opts, newpkg))
             # Get the best matching srpm        
