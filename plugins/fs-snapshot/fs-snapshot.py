@@ -171,7 +171,10 @@ def _create_snapshot(conduit, snapshot_tag, volume):
     """
     Determines if the device is capable of being snapshotted and then calls the
     appropriate snapshotting function.  The idea is you could add something for
-    lvm snapshots, nilfs2 or whatever else here.
+    nilfs2 or whatever else here.
+
+    Returns 0 if no snapshot was created, 1 if an error occurred,
+    and 2 if a snapshot was created.
     """
     if volume["fstype"] == "btrfs":
         return _create_btrfs_snapshot(conduit, snapshot_tag, volume)
@@ -206,7 +209,7 @@ def _create_btrfs_snapshot(conduit, snapshot_tag, volume):
     err = p.wait()
     if err:
         return 1
-    return 0
+    return 2
 
 def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     """
@@ -261,12 +264,7 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     if err:
         conduit.error(1, "fs-snapshot: couldn't add tag to snapshot: %s" %
                       snap_device)
-    return 0
-
-def init_hook(conduit):
-    if hasattr(conduit, 'registerPackageName'):
-        conduit.registerPackageName("yum-plugin-fs-snapshot")
-    conduit.info(3, "Loading File System Snapshot support.")
+    return 2
 
 def pretrans_hook(conduit):
     """
@@ -282,3 +280,6 @@ def pretrans_hook(conduit):
         rc = _create_snapshot(conduit, snapshot_tag, volume)
         if rc == 1:
             conduit.error(1, "fs-snapshot: error snapshotting " + volume["mntpnt"])
+        elif rc == 2 and hasattr(conduit, 'registerPackageName'):
+            # A snapshot was successfully created
+            conduit.registerPackageName("yum-plugin-fs-snapshot")
