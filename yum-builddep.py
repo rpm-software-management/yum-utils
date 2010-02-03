@@ -165,11 +165,11 @@ class YumBuildDep(YumUtilBase):
                                       ", ".join(unmatch))
                     sys.exit(1)
                     
-
-            for newpkg in srpms:
-                toActOn.extend(_best_convert_pkg2srcpkgs(self, opts, newpkg))
-            # Get the best matching srpm        
-            toActOn = self.bestPackagesFromList(toActOn, 'src')
+        toActOn = []
+        for newpkg in srpms:
+            toActOn.extend(_best_convert_pkg2srcpkgs(self, opts, newpkg))
+        # Get the best matching srpm
+        toActOn = self.bestPackagesFromList(toActOn, 'src')
 
         for srpm in toActOn:
             self.logger.info('Getting requirements for %s' % srpm)
