@@ -210,7 +210,7 @@ _yu_repoquery()
     COMPREPLY=( $( compgen -W '--version --help --list --info --file
         --queryformat --groupmember --all --requires --provides --obsoletes
         --conflicts --changelog --location --nevra --envra --nvr --source
-        --srpm --resolve --alldeps --recursive --whatprovides --whatrequires
+        --srpm --resolve --exactdeps --recursive --whatprovides --whatrequires
         --whatobsoletes --whatconflicts --group --grouppkgs --archlist
         --pkgnarrow --show-duplicates --repoid --enablerepo --disablerepo
         --repofrompath --plugins --quiet --verbose --cache --tempcache

@@ -647,8 +647,10 @@ def main(args):
                       help="operate on corresponding source RPM")
     parser.add_option("--resolve", action="store_true",
                       help="resolve capabilities to originating package(s)")
-    parser.add_option("--alldeps", action="store_true",
-                      help="check non-explicit dependencies (files and Provides:) as well")
+    parser.add_option("--alldeps", action="store_true", default=True,
+                      help="check non-explicit dependencies (files and Provides:) as well, defaults to on")
+    parser.add_option("--exactdeps", dest="alldeps", action="store_false",
+                      help="check dependencies exactly as given, opposite of --alldeps")
     parser.add_option("--recursive", action="store_true",
                       help="recursively query for packages (for whatrequires)")
     parser.add_option("--whatprovides", action="store_true",
