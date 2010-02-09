@@ -696,7 +696,8 @@ def main(args):
                       help="use private cache (default when used as non-root)")
     parser.add_option("--querytags", action="store_true",
                       help="list available tags in queryformat queries")
-    parser.add_option("-c", dest="conffile", help="config file location")
+    parser.add_option("-c", "--config", dest="conffile",
+                      help="config file location")
 
     (opts, regexs) = parser.parse_args()
 
