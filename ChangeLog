@@ -2,6 +2,19 @@
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.26
 
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.26
+
+2010-02-09  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/repoquery.1, repoquery.py, yum-utils.bash: Add --config
+	option as the long variant of -c.
+
 2010-02-03  Mike Snitzer <msnitzer@fedoraproject.org>
 
 	* plugins/fs-snapshot/fs-snapshot.py: commit final fs-snapshot patch
