@@ -1,3 +1,92 @@
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.26
+
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.26
+
+2010-02-09  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/repoquery.1, repoquery.py, yum-utils.bash: Add --config
+	option as the long variant of -c.
+
+2010-02-03  Mike Snitzer <msnitzer@fedoraproject.org>
+
+	* plugins/fs-snapshot/fs-snapshot.py: commit final fs-snapshot patch
+	for mike
+
+2010-02-03  Mike Snitzer <msnitzer@fedoraproject.org>
+
+	* docs/yum-fs-snapshot.1, docs/yum-fs-snapshot.conf.5,
+	plugins/fs-snapshot/fs-snapshot.conf,
+	plugins/fs-snapshot/fs-snapshot.py: add lvm support for fs-snapshot
+	plugin
+
+2010-02-03  James Antill <james@and.org>
+
+	* yum-builddep.py: Minor builddep speedup, for srcnames lookup don't
+	load all pkgs
+
+2010-02-03  James Antill <james@and.org>
+
+	* yum-builddep.py: yum-builddep should do something useful for local
+	.src.rpm files, BZ 561341
+
+2010-02-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Fix
+	copy&paste from Makefile => .spec, $(var) => $var
+
+2010-02-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-builddep.py: move toActOn initialization up to avoid rh bug:
+	https://bugzilla.redhat.com/show_bug.cgi?id=561341
+
+2010-02-02  James Antill <james@and.org>
+
+	* yum-utils.spec: Fix copy&paste from Makefile => .spec, $(var) =>
+	$var
+
+2010-02-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* needs-restarting.py: disable plugins on needs-restarting for rh
+	bug: #561023
+
+2010-02-01  James Antill <james@and.org>
+
+	* yum-util-cli-template: Change cli template: print_help => print
+	format_help() al la. BZ 560369
+
+2010-02-01  James Antill <james@and.org>
+
+	* repomanage.py, repoquery.py: Remove the rest of the print_help
+	calls, unicide al la. BZ 560369
+
+2010-02-01  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: fix UnicodeDecode Error in package-cleanup for
+	some locales like de_DE.utf8 (rhbz #560369)
+
+2010-01-29  James Antill <james@and.org>
+
+	* yum-builddep.py: Don't refer to opts.source in yum-builddep
+
+2010-01-28  James Antill <james@and.org>
+
+	* plugins/local/local.py: Fix the done message in the "local" plugin
+
+
+2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2010-01-27  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.25
