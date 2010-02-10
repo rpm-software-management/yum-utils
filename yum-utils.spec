@@ -1,6 +1,6 @@
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.25
+Version: 1.1.26
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -619,6 +619,9 @@ fi
 %{_mandir}/man5/yum-fs-snapshot.conf.5.*
 
 %changelog
+* Wed Feb 10 2010 Tim Lauridsen <timlau@fedoraproject.org>
+- mark as 1.1.26
+
 * Wed Jan 27 2010 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.25
 - add touch /etc/yum.repos.d/_local.repo to install section
