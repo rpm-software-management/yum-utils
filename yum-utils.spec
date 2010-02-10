@@ -620,7 +620,7 @@ fi
 
 %changelog
 * Wed Feb 10 2010 Tim Lauridsen <timlau@fedoraproject.org>
-- mark as 1.1.26
+- mark as 1.1.26  
 
 * Wed Jan 27 2010 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.25
