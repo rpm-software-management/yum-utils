@@ -107,8 +107,12 @@ Query all packages that provide CAPABILITY.
 .IP "\fB\-\-whatrequires CAPABILITY\fP"
 Query all packages that require CAPABILITY.
 .IP "\fB\-\-alldeps\fP"
-When used with --whatrequires, use both automatic and manual dependencies
-for the query.
+When used with --whatrequires, look for non-explicit dependencies in
+addition to explicit ones (e.g. files and Provides in addition to
+package names).  This is the default.
+.IP "\fB\-\-exactdeps\fP"
+When used with --whatrequires, search for dependencies only exactly as given.
+This is effectively the opposite of --alldeps.
 .IP "\fB\-\-recursive\fP"
 When used with --whatrequires, query packages recursively.
 .IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
@@ -147,7 +151,7 @@ Query groups instead of packages.
 .IP "List all packages whose name contains 'perl':"
 \fBrepoquery '*perl*'\fP
 .IP "List all packages depending on openssl:"
-\fBrepoquery --whatrequires --alldeps openssl\fP 
+\fBrepoquery --whatrequires openssl\fP 
 .IP "List all package names and the repository they come from, nicely formatted:"
 \fBrepoquery -a --qf "%-20{repoid} %{name}"\fP
 .IP "List name and summary of all available updates (if any), nicely formatted:"
