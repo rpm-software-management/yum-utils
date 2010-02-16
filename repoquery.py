@@ -554,10 +554,7 @@ class YumBaseQuery(yum.YumBase):
                     provs.extend(pkg.files())
 
             for prov in provs:
-                # Only look at the providing name, not the whole version. This 
-                # might occasionally give some false positives but that's 
-                # better than missing ones which it had previously
-                for pkg in self.pkgSack.searchRequires(prov.split()[0]):
+                for pkg in self.pkgSack.searchRequires(prov):
                     pkgs[pkg.pkgtup] = pkg
                     if self.options.recursive:
                         require_recursive(pkg.name)
