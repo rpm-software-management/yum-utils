@@ -504,23 +504,26 @@ class YumBaseQuery(yum.YumBase):
         else:
             if self.options.srpm:
                 pkgs = self.matchSrcPkgs(items)
+
             else:
                 pkgs = self.matchPkgs(items)
+                for prco in items:
+                    for oper in self.sackops:
+                        try:
+                            for p in self.doQuery(oper, prco): 
+                                if p:
+                                    pkgs.append(p)
+                        except queryError, e:
+                            self.logger.error( e.msg)
 
         for pkg in pkgs:
+            if not self.pkgops:
+                print to_unicode(pkg)
             for oper in self.pkgops:
                 try:
                     out = pkg.doQuery(oper)
                     if out:
                         print to_unicode(out)
-                except queryError, e:
-                    self.logger.error( e.msg)
-        for prco in items:
-            for oper in self.sackops:
-                try:
-                    for p in self.doQuery(oper, prco): 
-                        if p:
-                            print p
                 except queryError, e:
                     self.logger.error( e.msg)
 
