@@ -774,7 +774,7 @@ def main(args):
 
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
-    repoq.releasever = opts.releasever
+    repoq.preconf.releasever = opts.releasever
     if opts.conffile:
         repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
     else:
