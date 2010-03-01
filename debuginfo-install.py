@@ -90,6 +90,11 @@ class DebugInfoInstall(YumUtilBase):
                 r.enable()
                 try:
                     self.doRepoSetup(thisrepo=r.id)
+                    for opt in ['repo_gpgcheck', 'gpgcheck', 'cost', 
+                                'skip_if_unavailable']:
+                        if hasattr(r, opt):
+                            setattr(r, opt, getattr(repo, opt))
+                        
                 except yum.Errors.RepoError, e:
                     self.logger.critical("Could not access repo %s error was: %s" %
                                         (r.id, to_unicode(str(e))))
