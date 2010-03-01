@@ -273,5 +273,10 @@ def main():
             my.logger.info('     %s' % req)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (yum.Errors.YumBaseError, ValueError), e:
+        print >> sys.stderr, str(e)
+        sys.exit(1)
+        
         
