@@ -161,6 +161,7 @@ class YumCompleteTransaction(YumUtilBase):
         # populate the ts
         # run it
 
+        self.run_with_package_names.add('yum-utils')
         times = []
         for thistime in find_unfinished_transactions(self.conf.persistdir):
             if thistime.endswith('disabled'):
