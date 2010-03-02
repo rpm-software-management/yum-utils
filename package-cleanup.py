@@ -335,6 +335,7 @@ class PackageCleanup(YumUtilBase):
                 sys.exit(100)
                 
             self._remove_old_kernels(opts.kernelcount, opts.keepdevel)
+            self.run_with_package_names.add('yum-utils')
             self.buildTransaction()
             if len(self.tsInfo) < 1:
                 print 'No old kernels to remove'
@@ -371,6 +372,7 @@ class PackageCleanup(YumUtilBase):
             if opts.noscripts:
                 self.conf.tsflags.append('noscripts')
             self._remove_old_dupes()
+            self.run_with_package_names.add('yum-utils')
             self.buildTransaction()
             if len(self.tsInfo) < 1:
                 print 'No duplicates to remove'
