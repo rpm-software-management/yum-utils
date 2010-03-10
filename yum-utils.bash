@@ -218,6 +218,33 @@ _yu_repoquery()
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
+# yumdb
+_yu_yumdb()
+{
+    COMPREPLY=()
+
+    case "$3" in
+        -h|--help|-version)
+            return 0
+            ;;
+        -c|--config)
+            COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$2" ) )
+            return 0
+            ;;
+        shell)
+            COMPREPLY=( $( compgen -f -o plusdirs -- "$2" ) )
+            return 0
+            ;;
+    esac
+
+    if [ $COMP_CWORD -le 1 ] ; then
+        COMPREPLY=( $( compgen -W 'get set del rename rename-force search
+            exist unset info shell --version --help --noplugins --config' \
+                -- "$2" ) )
+    fi
+} &&
+complete -F _yu_yumdb -o filenames yumdb yumdb.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
