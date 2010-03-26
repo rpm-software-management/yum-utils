@@ -23,7 +23,7 @@ _yu_repomanage()
 
     COMPREPLY=( $( compgen -d -- "$2" ) )
 } &&
-complete -F _yu_repomanage -o filenames repomanage
+complete -F _yu_repomanage -o filenames repomanage repomanage.py
 
 # package-cleanup
 _yu_package_cleanup()
@@ -49,7 +49,7 @@ _yu_package_cleanup()
         --cleandupes --oldkernels --count --keepdevel -c --queryformat' \
             -- "$2" ) )
 } &&
-complete -F _yu_package_cleanup -o filenames package-cleanup
+complete -F _yu_package_cleanup -o filenames package-cleanup package-cleanup.py
 
 # verifytree
 _yu_verifytree()
@@ -70,7 +70,7 @@ _yu_verifytree()
 
     COMPREPLY=( $( compgen -d -- "$2" ) )
 } &&
-complete -F _yu_verifytree -o filenames verifytree
+complete -F _yu_verifytree -o filenames verifytree verifytree.py
 
 # repo-graph
 _yu_repo_graph()
