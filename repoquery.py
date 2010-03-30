@@ -146,7 +146,7 @@ class pkgQuery:
         if len(tmp) > 1:
             item = tmp[0]
             conv = tmp[1]
-            if convertmap.has_key(conv):
+            if conv in convertmap:
                 convert = convertmap[conv]
             else:
                 raise queryError("Invalid conversion: %s" % conv)
@@ -168,7 +168,7 @@ class pkgQuery:
         return self.fmt_queryformat()
 
     def doQuery(self, method, *args, **kw):
-        if std_qf.has_key(method):
+        if method in std_qf:
             self.qf = std_qf[method]
             return self.fmt_queryformat()
         elif hasattr(self, "fmt_%s" % method):
@@ -295,7 +295,7 @@ class instPkgQuery(pkgQuery):
         self.classname = 'installed pkg'
 
     def __getitem__(self, item):
-        if self.tagmap.has_key(item):
+        if item in self.tagmap:
             return self.pkg.tagByName(self.tagmap[item])
         else:
             return pkgQuery.__getitem__(self, item)

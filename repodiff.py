@@ -184,7 +184,7 @@ def main(args):
     if ygh.remove:
         for pkg in sorted(ygh.remove):
             print 'Removed package %s' % pkg.name
-            if ygh.obsoleted.has_key(pkg):
+            if pkg in ygh.obsoleted:
                 print 'Obsoleted by %s' % ygh.obsoleted[pkg]
             remove_sizechange += (int(pkg.size))
                 

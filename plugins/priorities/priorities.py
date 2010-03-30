@@ -134,11 +134,11 @@ def exclude_hook(conduit):
 
                 if only_samearch:
                     key = "%s.%s" % (po.name,po.arch)
-                    if pkg_priorities.has_key(key) and pkg_priorities[key] < repo.priority:
+                    if key in pkg_priorities and pkg_priorities[key] < repo.priority:
                         delPackage = True
                 else:
                     key = "%s" % po.name
-                    if pkg_priorities_archless.has_key(key) and pkg_priorities_archless[key] < repo.priority:
+                    if key in pkg_priorities_archless and pkg_priorities_archless[key] < repo.priority:
                         delPackage = True
 
                 if delPackage:
@@ -150,11 +150,11 @@ def exclude_hook(conduit):
                 # one of the obsoleted packages is not available through
                 # a repo with a higher priority. If so, remove this package.
                 if check_obsoletes:
-                    if obsoletes.has_key(po.pkgtup):
+                    if po.pkgtup in obsoletes:
                         obsolete_pkgs = obsoletes[po.pkgtup]
                         for obsolete_pkg in obsolete_pkgs:
                             pkg_name = obsolete_pkg[0]
-                            if pkg_priorities_archless.has_key(pkg_name) and pkg_priorities_archless[pkg_name] < repo.priority:
+                            if pkg_name in pkg_priorities_archless and pkg_priorities_archless[pkg_name] < repo.priority:
                                 conduit.delPackage(po)
                                 cnt += 1
                                 conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
@@ -173,5 +173,5 @@ def _pkglist_to_dict(pl, priority, addArch = False):
 
 def _mergeprioritydicts(dict1, dict2):
     for package in dict2.keys():
-        if not dict1.has_key(package) or dict2[package] < dict1[package]:
+        if package not in dict1 or dict2[package] < dict1[package]:
             dict1[package] = dict2[package]

@@ -69,7 +69,7 @@ class yumQuiet(yum.YumBase):
             for r in pkg.returnPrco('requires'):
                 reqname = r[0]
                 if reqname.startswith('rpmlib'): continue
-                if prov.has_key(reqname):
+                if reqname in prov:
                     provider = prov[reqname]
                     cached += 1
                 else:
@@ -83,7 +83,7 @@ class yumQuiet(yum.YumBase):
                     prov[reqname] = provider
                 if provider == pkg.name:
                     xx[provider] = None
-                if xx.has_key(provider) or provider in skip:
+                if provider in xx or provider in skip:
                     continue
                 else:
                     xx[provider] = None

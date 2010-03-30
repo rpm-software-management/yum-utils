@@ -42,7 +42,7 @@ remove_always = False
 
 
 def _requires_this_package(rpmdb, pkg):
-    if _requires_cache.has_key(pkg):
+    if pkg in _requires_cache:
         return _requires_cache[pkg]
         
     requirers = {}

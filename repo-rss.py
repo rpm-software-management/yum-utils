@@ -45,7 +45,7 @@ class YumQuiet(yum.YumBase):
         for po in avail:
             ftime = int(po.returnSimple('filetime'))
             if ftime > recentlimit:
-                if not ftimehash.has_key(ftime):
+                if ftime not in ftimehash:
                     ftimehash[ftime] = [po]
                 else:
                     ftimehash[ftime].append(po)

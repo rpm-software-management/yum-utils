@@ -58,7 +58,7 @@ def srpmname(pkg):
 def _show_changes_changelog(conduit, srpms):
     for name in sorted(srpms.keys()):
         rpms = []
-        if origpkgs.has_key(name):
+        if name in origpkgs:
             for rpm in srpms[name]:
                 rpms.append("%s" % rpm)
             done = False
@@ -85,7 +85,7 @@ def show_changes(conduit, msg):
         if not tsmem.updates:
             continue
         name = srpmname(tsmem.po)
-        if srpms.has_key(name):
+        if name in srpms:
             srpms[name].append(tsmem.po)
         else:
             srpms[name] = [tsmem.po]

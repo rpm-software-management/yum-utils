@@ -62,7 +62,7 @@ def parse_actions(ddir, conduit):
 
 def _get_installed_po(rpmdb, pkgtup):
     (n,a,e,v,r) = pkgtup
-    if _just_installed.has_key(pkgtup):
+    if pkgtup in _just_installed:
         return _just_installed[pkgtup]
     return rpmdb.searchNevra(name=n, arch=a, epoch=e, ver=v, rel=r)[0]
 

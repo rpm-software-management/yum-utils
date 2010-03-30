@@ -68,11 +68,11 @@ def parse_xml(xmlfile):
             child_name = ns_cleanup(child.tag)
             thisarch = myarch
             if child_name == 'removespec':
-                if child.attrib.has_key('on_arch'):
+                if 'on_arch' in child.attrib:
                     thisarch = child.attrib.get('on_arch')
-                if child.attrib.has_key('pkgmatch'):
+                if 'pkgmatch' in child.attrib:
                     thismatch = child.attrib.get('pkgmatch')
-                    if results.has_key(thisarch):
+                    if thisarch in results:
                         if thismatch not in results[thisarch]:
                             results[thisarch].append(thismatch)
                         else:
@@ -89,7 +89,7 @@ def stuff_to_remove(repos):
     #  return them as the toremove list
 
     for repo in repos.listEnabled():
-        if repo.repoXML.repoData.has_key('cleanup'):
+        if 'cleanup' in repo.repoXML.repoData:
             trf = repo.retrieveMD('cleanup')
             tr_dict = parse_xml(trf)
             # prune out things like *, ?, *.*, *.*.*.*.*

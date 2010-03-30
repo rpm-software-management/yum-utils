@@ -140,7 +140,7 @@ def resolveVersions(packageList):
             continue
         po.kmodName = name[0]
 
-        if not pdict.has_key(kernel):
+        if kernel not in pdict:
             pdict[kernel] = [po]
         else:
             sameName = None
@@ -208,7 +208,7 @@ def pinKernels(c, newKernels, installedKernels, modules):
                str(runningKernel))
 
     table = resolveVersions(modules)
-    if not table.has_key(runningKernel):
+    if runningKernel not in table:
         c.info(2, "Trying to mimic %s which has no kernel modules installed" \
                % str(runningKernel))
         return
@@ -217,7 +217,7 @@ def pinKernels(c, newKernels, installedKernels, modules):
     c.info(2, "kmods in %s: %s" % (str(runningKernel), str(names)))
     for kpo in newKernels:
         prov = getKernelProvides(kpo)[0]
-        if table.has_key(prov):
+        if prov in table:
             kmods = [ po.kmodName for po in table[prov] ]
         else:
             kmods = []
@@ -255,7 +255,8 @@ def installAllKmods(c, avaModules, modules, kernels):
     table = resolveVersions(interesting + modules)
     
     for kernel in [ getKernelProvides(k)[0] for k in kernels ]:
-        if not table.has_key(kernel): continue
+        if kernel not in table:
+            continue
         for po in table[kernel]:
             if po not in modules:
                 c.getTsInfo().addTrueInstall(po)

@@ -222,7 +222,7 @@ def main():
                 download_set[rpmname] = 1
 
             for pkg in current_pkgs:
-                if download_set.has_key(pkg):
+                if pkg in download_set:
                     continue
 
                 if not opts.quiet:

@@ -129,7 +129,7 @@ class PackageCleanup(YumUtilBase):
             for (req,flags,ver)  in po.requires:
                     
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
-                if not providers.has_key((req,flags,ver)):
+                if (req,flags,ver) not in providers:
                     resolve_sack = self.rpmdb.whatProvides(req,flags,ver)
                 else:
                     resolve_sack = providers[(req,flags,ver)]

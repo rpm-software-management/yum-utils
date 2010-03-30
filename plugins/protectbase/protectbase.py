@@ -55,7 +55,7 @@ def exclude_hook(conduit):
                     continue
 
                 for po in conduit.getPackages(repo2):
-                    if repo1pkgs.has_key(po.name):
+                    if po.name in repo1pkgs:
                         conduit.delPackage(po)
                         cnt += 1
 

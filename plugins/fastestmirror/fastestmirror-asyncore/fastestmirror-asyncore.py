@@ -135,7 +135,7 @@ def postreposetup_hook(conduit):
     repomirrors = {}
     repos = conduit.getRepos()
     for repo in repos.listEnabled():
-        if not repomirrors.has_key(str(repo)):
+        if str(repo) not in repomirrors:
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
         if exclude:
             for mirror in repomirrors[str(repo)]:

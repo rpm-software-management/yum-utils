@@ -158,11 +158,11 @@ def main(args):
         (n,a,e,v,r) = pkgtuple
         del hdr
         
-        if not pkgdict.has_key((n,a)):
+        if (n,a) not in pkgdict:
             pkgdict[(n,a)] = []
         pkgdict[(n,a)].append((e,v,r))
         
-        if not verfile.has_key(pkgtuple):
+        if pkgtuple not in verfile:
             verfile[pkgtuple] = []
         verfile[pkgtuple].append(pkg)
         

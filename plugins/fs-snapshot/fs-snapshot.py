@@ -178,7 +178,7 @@ def _create_snapshot(conduit, snapshot_tag, volume):
     """
     if volume["fstype"] == "btrfs":
         return _create_btrfs_snapshot(conduit, snapshot_tag, volume)
-    elif volume.has_key(lvm_key):
+    elif lvm_key in volume:
         return _create_lvm_snapshot(conduit, snapshot_tag, volume)
 
     return 0

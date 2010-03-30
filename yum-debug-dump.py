@@ -128,7 +128,7 @@ class YumDebugDump(yum.YumBase):
                 if req.startswith('rpmlib'): 
                     continue # ignore rpmlib deps
 
-                if not providers.has_key((req,rflags,ver)):
+                if (req,rflags,ver) not in providers:
                     resolve_sack = self.rpmdb.whatProvides(req,rflags,ver)
                 else:
                     resolve_sack = providers[(req,rflags,ver)]

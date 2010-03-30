@@ -214,9 +214,8 @@ def main():
                     del this_sack
 
                 for res in pkg_list:
-                    if res is not None:
-                        if not unprocessed_pkgs.has_key(res.pkgtup):
-                            unprocessed_pkgs[res.pkgtup] = res
+                    if res is not None and res.pkgtup not in unprocessed_pkgs:
+                        unprocessed_pkgs[res.pkgtup] = res
     
     
     

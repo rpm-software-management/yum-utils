@@ -153,7 +153,7 @@ class RepoClosure(yum.YumBase):
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
             
                 ver = self.evrTupletoVer((reqe, reqv, reqr))
-                if resolved.has_key((req,flags,ver)):
+                if (req,flags,ver) in resolved:
                     continue
                 try:
                     resolve_sack = self.whatProvides(req, flags, ver)
@@ -161,7 +161,7 @@ class RepoClosure(yum.YumBase):
                     pass
             
                 if len(resolve_sack) < 1:
-                    if not unresolved.has_key(pkg):
+                    if pkg not in unresolved:
                         unresolved[pkg] = []
                     unresolved[pkg].append((req, flags, ver))
                     continue
@@ -176,7 +176,7 @@ class RepoClosure(yum.YumBase):
                     if resolved_by_newest:                    
                         resolved[(req,flags,ver)] = 1
                     else:
-                        if not unresolved.has_key(pkg):
+                        if pkg not in unresolved:
                             unresolved[pkg] = []
                         unresolved[pkg].append((req, flags, ver))                        
                         
