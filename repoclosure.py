@@ -146,7 +146,7 @@ class RepoClosure(yum.YumBase):
             pkgs = filter(lambda x: x.arch == 'src', pkgs)
 
         if self.pkgonly:
-            pkgs = filter(lambda x: x.name == self.pkgonly[0], pkgs)
+            pkgs = filter(lambda x: x.name in self.pkgonly, pkgs)
 
         for pkg in pkgs:
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
