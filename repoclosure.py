@@ -63,6 +63,8 @@ def parseArgs():
                       help="specify repoid & paths of additional repositories - unique repoid and path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
     parser.add_option("-p", "--pkg", action="append",
                       help="check closure for this package only")
+    parser.add_option("-g", "--group", action="append",
+                      help="check closure for packages in this group only")
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -70,13 +72,14 @@ def parseArgs():
 # so we have to do at least some API guarantee stuff.
 class RepoClosure(yum.YumBase):
     def __init__(self, arch=[], config="/etc/yum.conf", builddeps=False, pkgonly=None,
-                 basearch=None):
+                 basearch=None, grouponly=None):
         yum.YumBase.__init__(self)
         if basearch:
             self.preconf.arch = basearch
         self.logger = logging.getLogger("yum.verbose.repoclosure")
         self.builddeps = builddeps
         self.pkgonly = pkgonly
+        self.grouponly = grouponly
         self.doConfigSetup(fn = config,init_plugins=False)
         self._rc_arches = arch
 
@@ -145,8 +148,18 @@ class RepoClosure(yum.YumBase):
         if self.builddeps:
             pkgs = filter(lambda x: x.arch == 'src', pkgs)
 
-        if self.pkgonly:
-            pkgs = filter(lambda x: x.name in self.pkgonly, pkgs)
+        pkglist = self.pkgonly
+        if self.grouponly:
+            if not pkglist:
+                pkglist = []
+            for group in self.grouponly:
+                groupobj = self.comps.return_group(group)
+                if not groupobj:
+                    continue
+                pkglist.extend(groupobj.packages)
+
+        if pkglist:
+            pkgs = filter(lambda x: x.name in pkglist, pkgs)
 
         for pkg in pkgs:
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
@@ -189,6 +202,7 @@ def main():
                      config=opts.config, 
                      builddeps=opts.builddeps,
                      pkgonly=opts.pkg,
+                     grouponly=opts.group,
                      basearch=opts.basearch)
 
     if opts.repofrompath:
