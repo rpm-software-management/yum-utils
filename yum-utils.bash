@@ -142,10 +142,14 @@ _yu_repoclosure()
             type _yum_list &>/dev/null && _yum_list all "$2"
             return 0
             ;;
+        -g|--group)
+            type _yum_grouplist &>/dev/null && _yum_grouplist "" "$2"
+            return 0
+            ;;
     esac
 
     COMPREPLY=( $( compgen -W '--help --config --arch --basearch --builddeps
-        --repoid --tempcache --quiet --newest --repofrompath --pkg' \
+        --repoid --tempcache --quiet --newest --repofrompath --pkg --group' \
             -- "$2" ) )
 } &&
 complete -F _yu_repoclosure -o filenames repoclosure repoclosure.py
