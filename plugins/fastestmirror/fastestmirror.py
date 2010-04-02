@@ -90,7 +90,7 @@ def init_hook(conduit):
 
     """
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
-    global maxthreads, exclude, prefer, downgrade_ftp
+    global maxthreads, exclude, prefer, downgrade_ftp, always_print_best_host
     if hasattr(conduit, 'registerPackageName'):
         conduit.registerPackageName("yum-plugin-fastestmirror")
     verbose = conduit.confBool('main', 'verbose', default=False)
