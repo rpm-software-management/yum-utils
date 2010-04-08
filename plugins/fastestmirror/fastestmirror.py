@@ -14,7 +14,7 @@
 #   enabled=1
 #   verbose=1
 #   socket_timeout=3
-#   hostfilepath=/var/cache/yum/timedhosts
+#   hostfilepath=timedhosts
 #   maxhostfileage=10
 #   maxthreads=15
 #   #exclude=.gov, facebook
@@ -98,7 +98,9 @@ def init_hook(conduit):
                                               default=True)
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
-            default='/var/cache/yum/timedhosts')
+            default='timedhosts')
+    if hostfilepath and hostfilepath[0] != '/':
+        hostfilepath = conduit._base.conf.cachedir + '/' + hostfilepath
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
