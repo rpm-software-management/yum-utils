@@ -1,0 +1,126 @@
+.\" yumdb command
+.TH "yumdb" "8" "8 April 2010" "James Antill" ""
+.SH "NAME"
+yumdb command
+.SH "SYNOPSIS"
+\fByumdb\fP [command] [packages ...]
+.SH "DESCRIPTION"
+.PP 
+This command is used to query and alter the yum database, which is a simple
+key value store used in conjunction with the rpm database. Any installed package
+can have arbitrary data in the yum database, however the main use case is to
+store extra data about packages as they are installed.
+.PP 
+yumdb \fIcommand\fPs are:
+.br 
+.IP "\fByumdb get <key> [pkg-wildcard]...\fP"
+.PP
+This command will get the value for the given key, limiting to any specified
+packages.
+.br 
+.IP "\fByumdb set <key> <value> [pkg-wildcard]..."
+.PP
+This command will set the value for the given key, to the given value, limiting
+to any specified packages.
+.br 
+.IP "\fByumdb del <key> [pkg-wildcard]...
+.PP
+This command will delete the given key, limiting to any specified packages.
+.br 
+.IP "\fByumdb rename <old-key> <new-key> [pkg-wildcard]...
+.PP
+This command will rename the given old-key, to the given new-key, limiting to
+any specified packages. If the old-key does not exist, nothing happens.
+.br 
+.IP "\fByumdb rename-force <old-key> <new-key> [pkg-wildcard]...
+.PP
+This command will rename the given old-key, to the given new-key, limiting to
+any specified packages. If the old-key does not exist, new-key is deleted.
+.br 
+.IP "\fByumdb copy <old-key> <new-key> [pkg-wildcard]...
+.PP
+This command will copy the given old-key, to the given new-key, limiting to
+any specified packages. If the old-key does not exist, nothing happens.
+.br 
+.IP "\fByumdb search <key> <wildcard>...
+.PP
+This command will search all packages for the given key, against any of the
+given wildcard values.
+.br 
+.IP "\fByumdb exist <key> [pkg-wildcard]...
+.PP
+This command will print any packages which have the given key, limiting to any
+specified packages.
+.br 
+.IP "\fByumdb unset <key> [pkg-wildcard]...
+.PP
+This command will print any packages which do not have the given key, limiting
+to any specified packages.
+.br 
+.IP "\fByumdb info [pkg-wildcard]...
+.PP
+This command will all the data stored in the yumdb, limiting to any specified
+packages.
+
+.SH "EXAMPLES"
+.PP
+List all the packages which don't have a from_repo key/value:
+.IP
+yumdb unset from_repo
+.PP
+List all the packages which were installed as dependencies:
+.IP
+yumdb search reason dep
+
+.SH "WELL KNOWN KEYS"
+.PP
+Note that there is no limit to the number of keys that can be created or what
+they may contain (for installed packages only). However this is a list of well
+known keys, and what they store.
+.nf
+.br 
+.IP "\fBchecksum_data
+.IP "\fBchecksum_type
+.PP
+These keys store the createrepo checksum, and it's type, of the available
+package yum installed. Note that these are used by "yum version" to calculate
+the rpmdb version.
+.br 
+.IP "\fBcommand_line
+.PP
+This key stores the entire command line, of the yum command (if it was called).
+.br 
+.IP "\fBfrom_repo
+.IP "\fBfrom_repo_revision
+.IP "\fBfrom_repo_timestamp
+.PP
+These keys take values from the available package yum installed, and store the
+repo id, it's revision and timestamp.
+.br 
+.IP "\fBreason
+.PP
+This key stores either "user" or "dep", currently. To mark if the user requested
+the package to be installed, or if it was brought in automatically as a
+dependency. Note that this is kept over updates.
+.br 
+.IP "\fBreleasever
+.PP
+This key stores the value of releasever, when the package was installed.
+.br 
+.IP "\fBinstallonly
+.PP
+If this attribute has the value "keep" then this package will not be
+removed automatically by the installonly process (and does not count towards
+the installonly_limit).
+
+.SH "SEE ALSO"
+.nf
+.I yum (8)
+.I rpm (8)
+.fi
+
+.SH "AUTHORS"
+.nf
+James Antill <james.antill@redhat.com>.
+.fi
+

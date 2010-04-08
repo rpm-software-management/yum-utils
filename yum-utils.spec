@@ -463,6 +463,7 @@ fi
 %{_mandir}/man1/yum-debug-dump.1.*
 %{_mandir}/man8/yum-complete-transaction.8.*
 %{_mandir}/man1/yum-groups-manager.1.*
+%{_mandir}/man8/yumdb.8.*
 %{_mandir}/man1/yumdownloader.1.*
 
 %files -n yum-updateonboot

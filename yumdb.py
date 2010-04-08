@@ -19,6 +19,7 @@ def setup_opts():
       del           <key> [pkg-wildcard]...
       rename        <key> <key> [pkg-wildcard]...
       rename-force  <key> <key> [pkg-wildcard]...
+      copy          <key> <key> [pkg-wildcard]...
       search        <key> <wildcard>...
       exist?        <key> [pkg-wildcard]...
       unset?        <key> [pkg-wildcard]...
@@ -63,6 +64,19 @@ def run_cmd(yb, args, inshell=False):
             if yokey in pkg.yumdb_info:
                 setattr(pkg.yumdb_info, ynkey, getattr(pkg.yumdb_info, yokey))
                 delattr(pkg.yumdb_info, yokey)
+                print " " * 4, ynkey, '=', getattr(pkg.yumdb_info, ynkey)
+            elif ynkey in pkg.yumdb_info:
+                print " " * 4, ynkey, '=', getattr(pkg.yumdb_info, ynkey)
+            else:
+                print " " * 4, ynkey, '<unset>'
+    elif args[0] == 'copy' and len(args) > 2:
+        args.pop(0)
+        yokey = args.pop(0)
+        ynkey = args.pop(0)
+        for pkg in sorted(yb.rpmdb.returnPackages(patterns=args)):
+            print pkg
+            if yokey in pkg.yumdb_info:
+                setattr(pkg.yumdb_info, ynkey, getattr(pkg.yumdb_info, yokey))
                 print " " * 4, ynkey, '=', getattr(pkg.yumdb_info, ynkey)
             elif ynkey in pkg.yumdb_info:
                 print " " * 4, ynkey, '=', getattr(pkg.yumdb_info, ynkey)
