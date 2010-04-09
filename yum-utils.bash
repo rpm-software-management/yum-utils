@@ -242,7 +242,7 @@ _yu_yumdb()
     esac
 
     if [ $COMP_CWORD -le 1 ] ; then
-        COMPREPLY=( $( compgen -W 'get set del rename rename-force search
+        COMPREPLY=( $( compgen -W 'get set del rename rename-force copy search
             exist unset info shell --version --help --noplugins --config' \
                 -- "$2" ) )
     fi
