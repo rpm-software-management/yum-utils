@@ -110,7 +110,7 @@ def parseArgs():
     parser.add_option("-p", "--download_path", dest='destdir', 
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
     parser.add_option("--norepopath", dest='norepopath', default=False, action="store_true",
-	     help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
+        help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
         help="Remove packages that fail GPG signature checking after downloading")
     parser.add_option("-u", "--urls", default=False, action="store_true", 
@@ -176,7 +176,7 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
-	
+
     # --norepopath can only be sensibly used with a single repository:
     if len(my.repos.listEnabled()) > 1 and opts.norepopath:
         print >> sys.stderr, "Error: Can't use --norepopath with multiple repositories"
@@ -238,29 +238,30 @@ def main():
                     my.logger.error("Could not make repo subdir: %s" % e)
                     my.closeRpmDB()
                     sys.exit(1)
-            try: # download random other metadata
-                if opts.downloadcomps:
-                    compsfile = repo.getGroups()
-                    shutil.copyfile(compsfile,"%s/%s" % (local_repo_path,'comps.xml'))
-            except yum.Errors.RepoMDError,e :
-                if not opts.quiet:
-                    my.logger.error("Unable to fetch metadata: %s" % e)
 
+            if opts.downloadcomps:
+                wanted_types = ['group']
+            
             if opts.downloadmd:
-                for ftype in repo.repoXML.fileTypes():
-                    if ftype in ['primary', 'primary_db', 'filelists',
-                                 'filelists_db', 'other', 'other_db']:
-                        continue
-                    if opts.downloadcomps and ftype == 'group':
-                        continue
-                    try:
-                        resultfile = repo.retrieveMD(ftype)
-                        basename  = os.path.basename(resultfile)
-                        shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
-                    except yum.Errors.RepoMDError,e :
-                        if not opts.quiet:
-                            my.logger.error("Unable to fetch metadata: %s" % e)
+                wanted_types = repo.repoXML.fileTypes.keys()
 
+            for ftype in repo.repoXML.fileTypes():
+                if ftype in ['primary', 'primary_db', 'filelists',
+                             'filelists_db', 'other', 'other_db']:
+                    continue
+                if ftype not in wanted_types:
+                    continue
+
+                try:
+                    resultfile = repo.retrieveMD(ftype)
+                    basename  = os.path.basename(resultfile)
+                    if ftype == 'group' and opts.downloadcomps: # for compat with how --downloadcomps saved the comps file always as comps.xml
+                        basename = 'comps.xml'
+                    shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
+                except yum.Errors.RepoMDError,e :
+                    if not opts.quiet:
+                        my.logger.error("Unable to fetch metadata: %s" % e)
+                
         remote_size = 0
         local_size  = 0
         if not opts.urls:
