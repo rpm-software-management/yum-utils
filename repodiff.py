@@ -20,6 +20,7 @@ import datetime
 import os
 import locale
 from yum.i18n import to_unicode
+import time
 
 from optparse import OptionParser
 
@@ -59,42 +60,59 @@ class DiffYum(yum.YumBase):
         remove = []        
         modified = []
         obsoleted = {} # obsoleted = by
-        newsack = yum.packageSack.ListPackageSack()
-        for repoid in self.dy_repos['new']:
-            newsack.addList(self.pkgSack.returnPackages(repoid=repoid))
 
-        oldsack = yum.packageSack.ListPackageSack()
-        for repoid in self.dy_repos['old']:
-            oldsack.addList(self.pkgSack.returnPackages(repoid=repoid))
+        #  Originally we did this by setting up old and new repos. ... but as
+        # a faster way, we can just go through all the pkgs once getting the
+        # newest pkg with a repoid prefix of "old", dito. "new", and then
+        # compare those directly.
+        def _next_old_new(pkgs):
+            """ Returns latest pair of (oldpkg, newpkg) for each package
+                name. If that name doesn't exist, then it returns None for
+                that package. """
+            lastname = None
+            npkg = opkg = None
+            for pkg in sorted(pkgs):
+                if lastname is None:
+                    lastname = pkg.name
+                if lastname != pkg.name:
+                    yield opkg, npkg
+                    opkg = npkg = None
+                    lastname = pkg.name
 
-        for pkg in newsack.returnNewestByName():
-            tot = self.pkgSack.searchNevra(name=pkg.name)
-            if len(tot) == 1: # it's only in new
-                add.append(pkg)
-            if len(tot) > 1:
-                if oldsack.contains(name=pkg.name):
-                    newest_old = oldsack.returnNewestByName(name=pkg.name)[0]
-                    if newest_old.EVR != pkg.EVR:
-                        modified.append((pkg, newest_old))
+                if pkg.repo.id.startswith('old'):
+                    opkg = pkg
                 else:
-                    add.append(pkg)
+                    assert pkg.repo.id.startswith('new')
+                    npkg = pkg
+            if opkg is not None or npkg is not None: 
+                yield opkg, npkg
 
-        for pkg in oldsack.returnNewestByName():
-            if len(newsack.searchNevra(name=pkg.name)) == 0:
-                remove.append(pkg)
+        for opkg, npkg in _next_old_new(self.pkgSack.returnPackages()):
+            if opkg is None:
+                add.append(npkg)
+            elif npkg is None:
+                remove.append(opkg)
+            elif not npkg.verEQ(opkg):
+                modified.append((npkg, opkg))
 
+        ao = []
+        for pkg in add:
+            if not pkg.obsoletes:
+                continue
+            ao.append(pkg)
 
+        #  Note that this _only_ shows something when you have an additional
+        # package obsoleting a removed package. If the obsoleted package is
+        # still there (somewhat "common") or the obsoleter is an update (dito)
+        # you get get hits here.
         for po in remove:
-            for newpo in add:
-                foundit = 0
-                for obs in newpo.obsoletes:
-                    if po.inPrcoRange('provides', obs):
-                        foundit = 1
-                        obsoleted[po] = newpo
-                        break
-                if foundit:
+            # Remember: Obsoletes are for package names only.
+            poprovtup = (po.name, 'EQ', (po.epoch, po.ver, po.release))
+            for newpo in ao:
+                if po.inPrcoRange('obsoletes', poprovtup):
+                    obsoleted[po] = newpo
                     break
-        
+
         ygh = yum.misc.GenericHolder()
         ygh.add = add
         ygh.remove = remove
