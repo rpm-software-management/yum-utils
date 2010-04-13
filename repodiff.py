@@ -239,6 +239,10 @@ def main(args):
 
             print msg
 
+    if (not ygh.add and not ygh.remove and not ygh.modified and
+        not my.pkgSack.searchNevra(arch='src')):
+        print "** No 'src' pkgs in any repo. maybe see docs. on --archlist?"
+
     print 'Summary:'
     print 'Added Packages: %s' % len(ygh.add)
     print 'Removed Packages: %s' % len(ygh.remove)
