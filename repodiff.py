@@ -198,15 +198,22 @@ def main(args):
             # for any newer clog in pkg
             # print it
             oldlogs = oldpkg.changelog
-            oldlogs.sort()
-            oldlogs.reverse()
             if len(oldlogs):
-                oldtime = oldlogs[0][0]
-                clogdelta = []
+                #  Don't sort as that can screw the order up when time is the
+                # same.
+                oldtime    = oldlogs[-1][0]
+                oldauth    = oldlogs[-1][2]
+                oldcontent = oldlogs[-1][2]
                 for (t, author, content) in  pkg.changelog:
-                    if t > oldtime:
-                        msg += "* %s %s\n%s\n\n" % (datetime.date.fromtimestamp(int(t)).strftime("%a %b %d %Y"),
-                               to_unicode(author), to_unicode(content))
+                    if t < oldtime:
+                        break
+                    if ((t == oldtime) and (author == auth) and
+                        (content == oldcontent)):
+                        break
+                    tm = datetime.date.fromtimestamp(int(t))
+                    tm = tm.strftime("%a %b %d %Y")
+                    msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
+                                                to_unicode(content))
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 total_sizechange += sizechange
