@@ -109,7 +109,7 @@ class DiffYum(yum.YumBase):
             # Remember: Obsoletes are for package names only.
             poprovtup = (po.name, 'EQ', (po.epoch, po.ver, po.release))
             for newpo in ao:
-                if po.inPrcoRange('obsoletes', poprovtup):
+                if newpo.inPrcoRange('obsoletes', poprovtup):
                     obsoleted[po] = newpo
                     break
 
