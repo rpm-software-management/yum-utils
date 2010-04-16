@@ -219,9 +219,9 @@ def main(args):
             if len(oldlogs):
                 #  Don't sort as that can screw the order up when time is the
                 # same.
-                oldtime    = oldlogs[-1][0]
-                oldauth    = oldlogs[-1][2]
-                oldcontent = oldlogs[-1][2]
+                oldtime    = oldlogs[0][0]
+                oldauth    = oldlogs[0][2]
+                oldcontent = oldlogs[0][2]
                 for (t, author, content) in  pkg.changelog:
                     if t < oldtime:
                         break
