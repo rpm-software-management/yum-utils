@@ -220,7 +220,7 @@ def main(args):
                 #  Don't sort as that can screw the order up when time is the
                 # same.
                 oldtime    = oldlogs[0][0]
-                oldauth    = oldlogs[0][2]
+                oldauth    = oldlogs[0][1]
                 oldcontent = oldlogs[0][2]
                 for (t, author, content) in  pkg.changelog:
                     if t < oldtime:
