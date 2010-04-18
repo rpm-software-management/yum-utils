@@ -225,8 +225,8 @@ def main(args):
                 for (t, author, content) in  pkg.changelog:
                     if t < oldtime:
                         break
-                    if ((t == oldtime) and ((author != oldauth) or
-                                            (content != oldcontent)):
+                    if ((t == oldtime) and (author == oldauth) and
+                        (content == oldcontent)):
                         break
                     tm = datetime.date.fromtimestamp(int(t))
                     tm = tm.strftime("%a %b %d %Y")
