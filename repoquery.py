@@ -326,9 +326,9 @@ class instPkgQuery(pkgQuery):
     def fmt_changelog(self, **kw):
         changelog = []
         times = self.pkg.tagByName('changelogtime')
-        names = self.pkg.tagByName('changelogname')
-        texts = self.pkg.tagByName('changelogtext')
         if times is not None:
+            names = self.pkg.tagByName('changelogname')
+            texts = self.pkg.tagByName('changelogtext')
             for date, author, message in zip(times, names, texts):
                 changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
         return "\n".join(changelog)
