@@ -8,7 +8,7 @@ SRPM_RELEASE=$(shell awk '/Release:/ { split($$2,a,"%"); print a[1] }' ${PKGNAME
 SRPM_FILE = ${PKGNAME}-${VERSION}-${SRPM_RELEASE}.src.rpm
 WEBHOST = yum.baseurl.org
 WEBPATH = /srv/projects/yum/web/download/yum-utils/
-PY_FILES =  $(wildcard *.py) $(wildcard plugins/*/*.py)
+PY_FILES =  $(wildcard *.py) $(wildcard plugins/*/*.py) $(wildcard plugins/*/*/*.py)
 
 NMPROG=yum-NetworkManager-dispatcher
 NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
