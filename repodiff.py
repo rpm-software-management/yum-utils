@@ -20,7 +20,6 @@ import datetime
 import os
 import locale
 from yum.i18n import to_unicode
-import time
 
 from optparse import OptionParser
 

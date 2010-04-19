@@ -116,7 +116,6 @@ class RepoRSS:
         
         rfc822_format = "%a, %d %b %Y %X GMT"
         clog_format = "%a, %d %b %Y GMT"
-        xhtml_ns = "http://www.w3.org/1999/xhtml"
         escape = self.xmlescape
         
         item = self.rssnode.newChild(None, 'item', None)

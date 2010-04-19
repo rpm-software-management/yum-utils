@@ -329,8 +329,6 @@ class instPkgQuery(pkgQuery):
         names = self.pkg.tagByName('changelogname')
         texts = self.pkg.tagByName('changelogtext')
         if times is not None:
-            tmplst = zip(times, names, texts)
-
             for date, author, message in zip(times, names, texts):
                 changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
         return "\n".join(changelog)

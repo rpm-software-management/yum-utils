@@ -163,7 +163,6 @@ def main():
 
     if False and opts.show_duplicates:
         yb.conf.showdupesfromrepos = True
-        __show_all_versions__ = True
     if opts.disablerepos:
         for repo_match in opts.disablerepos:
             for repo in yb.repos.findRepos(repo_match):

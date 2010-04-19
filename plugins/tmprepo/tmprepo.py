@@ -193,7 +193,6 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
             fname = add_mirrorlist_repo(base, trepo)
 
         base.getReposFromConfigFile(fname, validate=validate)
-        added = True
 
     # Just do it all again...
     base.setupProgressCallbacks()

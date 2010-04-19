@@ -172,7 +172,6 @@ def main():
     
     unprocessed_pkgs = {}
     final_pkgs = {}
-    user_po_list = []
     pkg_list = []
     
     avail = my.pkgSack.returnPackages()
