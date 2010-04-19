@@ -315,6 +315,8 @@ Verify packages and display data on bad verifications"""
                     done_prob = True
 
     def doCommand(self, base, basecmd, extcmds):
+        global _verify_configs
+
         logger = logging.getLogger("yum.verbose.main")
         def msg(x):
             logger.log(logginglevels.INFO_2, x)
