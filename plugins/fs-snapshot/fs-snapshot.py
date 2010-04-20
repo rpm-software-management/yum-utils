@@ -49,7 +49,7 @@ def kernel_supports_dm_snapshot_merge():
     if dm_snapshot_merge_checked:
         return dm_snapshot_merge_support
     os.system("modprobe dm-snapshot")
-    p = Popen(["dmsetup", "targets"], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/dmsetup", "targets"], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if not err:
         output = p.communicate()[0]
@@ -75,7 +75,8 @@ def inspect_volume_lvm(conduit, volume):
     if device.startswith("/dev/mapper/"):
         # convert /dev/mapper name to /dev/vg/lv for use with LVM2 tools
         # - 'dmsetup splitname' will collapse any escaped characters
-        p = Popen(["dmsetup", "splitname", "--separator", "/", "--noheadings",
+        p = Popen(["/sbin/dmsetup", "splitname", "--separator", "/",
+                   "--noheadings",
                    "-o", "vg_name,lv_name", device], stdout=PIPE, stderr=PIPE)
         err = p.wait()
         if err:
@@ -87,7 +88,7 @@ def inspect_volume_lvm(conduit, volume):
     # Check if device is managed by lvm
     # - FIXME filter out snapshot (and other) LVs; for now just rely
     #   on 'lvcreate' to prevent snapshots of unsupported LV types
-    p = Popen(["lvs", device], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/lvs", device], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if not err:
         # FIXME allow creating snapshot LVs even if kernel doesn't
@@ -201,11 +202,11 @@ def _create_btrfs_snapshot(conduit, snapshot_tag, volume):
 
     snapname = mntpnt + snapshot_tag
     conduit.info(1, "fs-snapshot: snapshotting " + mntpnt + ": " + snapname)
-    p = Popen(["btrfsctl", "-c", mntpnt], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/btrfsctl", "-c", mntpnt], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if err:
         return 1
-    p = Popen(["btrfsctl", "-s", snapname, mntpnt], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/btrfsctl", "-s", snapname, mntpnt], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if err:
         return 1
@@ -246,7 +247,7 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     conduit.info(1, "fs-snapshot: snapshotting %s (%s): %s" %
                  (mntpnt, device, snap_lvname))
     # Create snapshot LV
-    lvcreate_cmd = ["lvcreate", "-s", "-n", snap_lvname]
+    lvcreate_cmd = ["/sbin/lvcreate", "-s", "-n", snap_lvname]
     lvcreate_cmd.extend(lvcreate_size_args.split())
     lvcreate_cmd.append(device)
     p = Popen(lvcreate_cmd, stdout=PIPE, stderr=PIPE)
@@ -258,7 +259,7 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     # Add tag ($snapshot_tag) to snapshot LV
     # - should help facilitate merge of all snapshot LVs created
     #   by a yum transaction, e.g.: lvconvert --merge @snapshot_tag
-    p = Popen(["lvchange", "--addtag", snapshot_tag, snap_device],
+    p = Popen(["/sbin/lvchange", "--addtag", snapshot_tag, snap_device],
               stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if err:
