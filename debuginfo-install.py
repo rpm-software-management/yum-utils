@@ -77,30 +77,25 @@ class DebugInfoInstall(YumUtilBase):
             self.logger.critical("Another application is holding the yum lock, cannot continue")
             sys.exit(1)
         
-        
-        # Setup yum (Ts, RPM db, Repo & Sack)
-        self.doUtilYumSetup()
-        
         # enable the -debuginfo repos for enabled primary repos
+        repos = set()
         for repo in self.repos.listEnabled():
-            di = '%s-debuginfo' % repo.id
+            repos.add(repo.id)
+        for repoid in repos:
+            di = '%s-debuginfo' % repoid
+            if di in repos:
+                 continue
             for r in self.repos.findRepos(di):
                 self.logger.log(yum.logginglevels.INFO_2, 
                                 _('enabling %s') % r.id)
                 r.enable()
-                try:
-                    self.doRepoSetup(thisrepo=r.id)
-                    for opt in ['repo_gpgcheck', 'gpgcheck', 'cost', 
-                                'skip_if_unavailable']:
-                        if hasattr(r, opt):
-                            setattr(r, opt, getattr(repo, opt))
-                        
-                except yum.Errors.RepoError, e:
-                    self.logger.critical("Could not access repo %s error was: %s" %
-                                        (r.id, to_unicode(str(e))))
-                    sys.exit(1)
-                         
-                #r.setup(self.conf.cache, self.mediagrabber)
+                for opt in ['repo_gpgcheck', 'gpgcheck', 'cost',
+                            'skip_if_unavailable']:
+                    if hasattr(r, opt):
+                        setattr(r, opt, getattr(repo, opt))
+
+        # Setup yum (Ts, RPM db, Repo & Sack)
+        self.doUtilYumSetup()
         
         self.debugInfo_main()
         self.buildTransaction()
