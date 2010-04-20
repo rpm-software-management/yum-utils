@@ -45,6 +45,7 @@ class DebugInfoInstall(YumUtilBase):
                              DebugInfoInstall.USAGE)
         self.logger = logging.getLogger("yum.verbose.cli.debuginfoinstall")
         self.optparser = self.getOptionParser()
+        opts = self.optparser
         # Add util commandline options to the yum-cli ones
         if hasattr(self, 'getOptionGroup'):
             opts = self.getOptionGroup()
