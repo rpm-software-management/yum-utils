@@ -25,9 +25,6 @@ requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 def enable_debuginfo_repos(yb, conduit):
-    # We need to make sure the normal repos. are setup, before we add some...
-    yb.pkgSack
-
     repos = set()
     for repo in yb.repos.listEnabled():
         repos.add(repo.id)
@@ -38,15 +35,8 @@ def enable_debuginfo_repos(yb, conduit):
         for r in yb.repos.findRepos(di):
             conduit.info(2, 'Enabling %s: %s' % (r.id, r.name))
             r.enable()
-            yb.doRepoSetup(thisrepo=r.id)
 
-_done_plugin = False
-def postreposetup_hook(conduit):
-    global _done_plugin
-    if _done_plugin:
-        return
-    _done_plugin = True
-
+def prereposetup_hook(conduit):
     yb = conduit._base
     num = len(yb.rpmdb.returnPackages(patterns=['*-debuginfo']))
     if num:
