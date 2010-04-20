@@ -78,13 +78,14 @@ class DebugInfoInstall(YumUtilBase):
             sys.exit(1)
         
         # enable the -debuginfo repos for enabled primary repos
-        repos = set()
+        repos = {}
         for repo in self.repos.listEnabled():
-            repos.add(repo.id)
+            repos[repo.id] = repo
         for repoid in repos:
             di = '%s-debuginfo' % repoid
             if di in repos:
                  continue
+             repo = repos[repoid]
             for r in self.repos.findRepos(di):
                 self.logger.log(yum.logginglevels.INFO_2, 
                                 _('enabling %s') % r.id)
