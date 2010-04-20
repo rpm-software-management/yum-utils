@@ -161,8 +161,6 @@ def main():
         if not opts.quiet:
             yb.logger.info('Running from cache, results might be incomplete.')
 
-    if False and opts.show_duplicates:
-        yb.conf.showdupesfromrepos = True
     if opts.disablerepos:
         for repo_match in opts.disablerepos:
             for repo in yb.repos.findRepos(repo_match):
