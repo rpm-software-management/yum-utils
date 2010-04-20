@@ -84,12 +84,13 @@ class DebugInfoInstall(YumUtilBase):
         for repoid in repos:
             di = '%s-debuginfo' % repoid
             if di in repos:
-                 continue
-             repo = repos[repoid]
+                continue
+            repo = repos[repoid]
             for r in self.repos.findRepos(di):
                 self.logger.log(yum.logginglevels.INFO_2, 
                                 _('enabling %s') % r.id)
                 r.enable()
+                # Note: This is shared with auto-update-debuginfo
                 for opt in ['repo_gpgcheck', 'gpgcheck', 'cost',
                             'skip_if_unavailable']:
                     if hasattr(r, opt):
