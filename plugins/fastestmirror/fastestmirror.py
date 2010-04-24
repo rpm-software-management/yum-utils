@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Version: 0.3.2
+# Version: 0.3.3
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
