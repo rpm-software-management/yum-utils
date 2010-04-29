@@ -270,7 +270,12 @@ class PackageCleanup(YumUtilBase):
         runningkernel = os.uname()[2]
         # Vanilla kernels dont have a release, only a version
         if '-' in runningkernel:
-            (kver,krel) = runningkernel.split('-')
+            splt = runningkernel.split('-')
+            if len(splt) == 2:
+                (kver,krel) = splt
+            else: # Handle cases where a custom build kernel has an extra '-' in the release
+                kver=splt[1]
+                krel="-".join(splt[1:])
             if krel.split('.')[-1] == os.uname()[-1]:
                 krel = ".".join(krel.split('.')[:-1])
         else:
