@@ -364,9 +364,12 @@ class PackageCleanup(YumUtilBase):
             if not self.setCacheDir():
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
-            
-            for po in sorted(self.doPackageLists(pkgnarrow='extras').extras):
-                print po.hdr.sprintf(opts.qf)
+            try:
+                for po in sorted(self.doPackageLists(pkgnarrow='extras').extras):
+                    print po.hdr.sprintf(opts.qf)
+            except YumBaseError,e:
+                self.logger.error("Error: %s" % str(e))
+                sys.exit(1)                
             sys.exit(0)
 
 
