@@ -31,6 +31,7 @@ import os
 import re
 import yum.depsolve # For flags
 
+from yum.Errors import YumBaseError
 from rpmUtils import miscutils, arch
 from optparse import OptionGroup
 
