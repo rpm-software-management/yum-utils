@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Version: 0.3.2
+# Version: 0.3.3
 #
 # A plugin for the Yellowdog Updater Modified which sorts each repo's
 # mirrorlist by connection speed prior to download.
@@ -18,6 +18,7 @@
 #   maxhostfileage=10
 #   maxthreads=15
 #   #exclude=.gov, facebook
+#   #include_only=.nl,.de,.uk,.ie
 #   #prefer=your.favourite.mirror
 #
 # This program is free software; you can redistribute it and/or modify
@@ -46,6 +47,7 @@ import string
 import urlparse
 import datetime
 import threading
+import re
 
 from yum.plugins import TYPE_CORE
 
@@ -61,6 +63,7 @@ maxhostfileage = 10
 loadcache = False
 maxthreads = 15
 exclude = None
+include_only = None
 prefer = None
 downgrade_ftp = True
 done_sock_timeout = False
@@ -90,7 +93,7 @@ def init_hook(conduit):
 
     """
     global verbose, socket_timeout, hostfilepath, maxhostfileage, loadcache
-    global maxthreads, exclude, prefer, downgrade_ftp, always_print_best_host
+    global maxthreads, exclude, include_only, prefer, downgrade_ftp, always_print_best_host
     if hasattr(conduit, 'registerPackageName'):
         conduit.registerPackageName("yum-plugin-fastestmirror")
     verbose = conduit.confBool('main', 'verbose', default=False)
@@ -104,6 +107,7 @@ def init_hook(conduit):
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
+    include_only = conduit.confString('main', 'include_only', default=None)
     prefer = conduit.confString('main', 'prefer', default='no.prefer.mirror')
     downgrade_ftp = conduit.confBool('main', 'downgrade_ftp', default=True)
     # If the file hostfilepath exists and is newer than the maxhostfileage,
@@ -161,7 +165,7 @@ def postreposetup_hook(conduit):
     @param loadcache : Fastest Mirrors to be loaded from plugin's cache file or not.
     @type loadcache : Boolean
     """
-    global loadcache, exclude, prefer
+    global loadcache, exclude, include_only, prefer
 
     opts, commands = conduit.getCmdLine()
     if conduit._base.conf.cache or not _can_write_results(hostfilepath):
@@ -201,14 +205,23 @@ def postreposetup_hook(conduit):
             continue
         if str(repo) not in repomirrors:
             repomirrors[str(repo)] = FastestMirror(repo.urls).get_mirrorlist()
-        if exclude:
-            def excludeCheck(mirror):
-                if filter(lambda exp: exp in host(mirror),
-                          exclude.replace(',', ' ').split()):
-                    conduit.info(2, "Excluding mirror: %s" % host(mirror))
-                    return False
-                return True
-            repomirrors[str(repo)] = filter(excludeCheck,repomirrors[str(repo)])
+        if include_only:
+            def includeCheck(mirror):
+                if filter(lambda exp: re.search(exp, host(mirror)),
+                          include_only.replace(',', ' ').split()):
+                    conduit.info(2, "Including mirror: %s" % host(mirror))
+                    return True
+                return False
+            repomirrors[str(repo)] = filter(includeCheck,repomirrors[str(repo)])
+        else:
+            if exclude:
+                def excludeCheck(mirror):
+                    if filter(lambda exp: re.search(exp, host(mirror)),
+                              exclude.replace(',', ' ').split()):
+                        conduit.info(2, "Excluding mirror: %s" % host(mirror))
+                        return False
+                    return True
+                repomirrors[str(repo)] = filter(excludeCheck,repomirrors[str(repo)])
         repo.urls = repomirrors[str(repo)]
         if len(repo.urls):
             lvl = 3

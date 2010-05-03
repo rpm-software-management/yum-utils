@@ -31,6 +31,7 @@ import os
 import re
 import yum.depsolve # For flags
 
+from yum.Errors import YumBaseError
 from rpmUtils import miscutils, arch
 from optparse import OptionGroup
 
@@ -270,7 +271,12 @@ class PackageCleanup(YumUtilBase):
         runningkernel = os.uname()[2]
         # Vanilla kernels dont have a release, only a version
         if '-' in runningkernel:
-            (kver,krel) = runningkernel.split('-')
+            splt = runningkernel.split('-')
+            if len(splt) == 2:
+                (kver,krel) = splt
+            else: # Handle cases where a custom build kernel has an extra '-' in the release
+                kver=splt[1]
+                krel="-".join(splt[1:])
             if krel.split('.')[-1] == os.uname()[-1]:
                 krel = ".".join(krel.split('.')[:-1])
         else:
@@ -359,9 +365,12 @@ class PackageCleanup(YumUtilBase):
             if not self.setCacheDir():
                 self.logger.error("Error: Could not make cachedir, exiting")
                 sys.exit(50)
-            
-            for po in sorted(self.doPackageLists(pkgnarrow='extras').extras):
-                print po.hdr.sprintf(opts.qf)
+            try:
+                for po in sorted(self.doPackageLists(pkgnarrow='extras').extras):
+                    print po.hdr.sprintf(opts.qf)
+            except YumBaseError,e:
+                self.logger.error("Error: %s" % str(e))
+                sys.exit(1)                
             sys.exit(0)
 
 

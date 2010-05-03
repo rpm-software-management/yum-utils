@@ -162,21 +162,6 @@ to yum and the list-security and info-security commands.
 The options make it possible to limit list/upgrade of packages to specific
 security relevant ones. The commands give you the security information.
 
-%package -n yum-plugin-protect-packages
-Summary: Yum plugin to prevents Yum from removing itself and other protected packages
-Group: System Environment/Base
-Provides: yum-protect-packages = %{version}-%{release}
-Obsoletes: yum-protect-packages < 1.1.20-0
-Conflicts: yum-protect-packages < 1.1.20-0
-Requires: yum >= 3.0
-
-%description -n yum-plugin-protect-packages
-this plugin prevents Yum from removing itself and other protected packages.
-By default, yum is the only package protected, but by extension this
-automatically protects everything on which yum depends (rpm, python, glibc,
-and so on).Therefore, the plugin functions well even without
-compiling careful lists of all important packages.
-
 %package -n yum-plugin-upgrade-helper
 Summary: Yum plugin to help upgrades to the next distribution version
 Group: System Environment/Base
@@ -382,7 +367,6 @@ plugins="\
  refresh-updatesd \
  merge-conf \
  security \
- protect-packages \
  upgrade-helper \
  aliases \
  list-data \
@@ -528,11 +512,6 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
 /usr/lib/yum-plugins/security.*
 %{_mandir}/man8/yum-security.8.*
-
-%files -n yum-plugin-protect-packages
-%defattr(-, root, root)
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protect-packages.conf
-/usr/lib/yum-plugins/protect-packages.*
 
 %files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)
