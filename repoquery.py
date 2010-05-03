@@ -155,11 +155,12 @@ class pkgQuery:
         # populated before calling pkg.returnSimple() ?!
         try:
             res = self.pkg.returnSimple(item)
-        except KeyError:
+        except (KeyError, ValueError):
             if item == "license":
                 res = ", ".join(self.pkg.licenses)
             else:
-                raise queryError("Invalid querytag '%s' for %s" % (item, self.classname))
+                raise queryError("Invalid querytag '%s' for %s: %s" % (item, self.classname, self.pkg))
+
         if convert:
             res = convert(res)
         return res
@@ -200,7 +201,7 @@ class pkgQuery:
 
         qf = qf.replace("\\n", "\n")
         qf = qf.replace("\\t", "\t")
-        pattern = re.compile('%([-\d]*?){([:\w]*?)}')
+        pattern = re.compile('%([-\d]*?){([:\.\w]*?)}')
         fmt = re.sub(pattern, r'%(\2)\1s', qf)
         return fmt % self
 
@@ -297,6 +298,12 @@ class instPkgQuery(pkgQuery):
     def __getitem__(self, item):
         if item in self.tagmap:
             return self.pkg.tagByName(self.tagmap[item])
+        elif item.startswith('yumdb_info.'):
+            yumdb_item = item.split('.')[1]
+            try:
+                return getattr(self.pkg.yumdb_info, yumdb_item)
+            except AttributeError,e:
+                raise queryError("Invalid yumdb querytag '%s' for %s: %s" % (yumdb_item, self.classname, self.pkg))
         else:
             return pkgQuery.__getitem__(self, item)
             
