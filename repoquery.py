@@ -671,6 +671,8 @@ def main(args):
                       help="set value of $releasever in yum config and repo files")
     parser.add_option("--pkgnarrow", default="repos",
                       help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
+    parser.add_option("--installed", action="store_true", default=False,
+                      help="limit query to installed pkgs only")
     parser.add_option("--show-duplicates", action="store_true",
                       dest="show_dupes",
                       help="show all versions of packages")
@@ -764,7 +766,10 @@ def main(args):
         needgroup = 1
     if opts.group:
         needgroup = 1
-
+    if opts.installed:
+        opts.pkgnarrow = 'installed'
+        opts.disablerepos = ['*']
+        
     if opts.nevra or (len(pkgops) == 0 and len(sackops) == 0):
         pkgops.append("queryformat")
 
