@@ -102,24 +102,21 @@ def init_hook(conduit):
     socket_timeout = conduit.confInt('main', 'socket_timeout', default=3)
     hostfilepath = conduit.confString('main', 'hostfilepath',
             default='timedhosts')
-    if hostfilepath and hostfilepath[0] != '/':
-        hostfilepath = conduit._base.conf.cachedir + '/' + hostfilepath
     maxhostfileage = conduit.confInt('main', 'maxhostfileage', default=10)
     maxthreads = conduit.confInt('main', 'maxthreads', default=10)
     exclude = conduit.confString('main', 'exclude', default=None)
     include_only = conduit.confString('main', 'include_only', default=None)
     prefer = conduit.confString('main', 'prefer', default='no.prefer.mirror')
     downgrade_ftp = conduit.confBool('main', 'downgrade_ftp', default=True)
-    # If the file hostfilepath exists and is newer than the maxhostfileage,
-    # then load the cache.
-    if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
-        loadcache = True
 
 def clean_hook(conduit):
     """
     This function cleans the plugin cache file if exists. The function is called
     when C{yum [options] clean [plugins | all ]} is executed.
     """
+    global hostfilepath
+    if hostfilepath and hostfilepath[0] != '/':
+        hostfilepath = conduit._base.conf.cachedir + '/' + hostfilepath
     if os.path.exists(hostfilepath):
         conduit.info(2, "Cleaning up list of fastest mirrors")
         os.unlink(hostfilepath)
@@ -165,7 +162,14 @@ def postreposetup_hook(conduit):
     @param loadcache : Fastest Mirrors to be loaded from plugin's cache file or not.
     @type loadcache : Boolean
     """
-    global loadcache, exclude, include_only, prefer
+    global loadcache, exclude, include_only, prefer, hostfilepath
+
+    if hostfilepath and hostfilepath[0] != '/':
+        hostfilepath = conduit._base.conf.cachedir + '/' + hostfilepath
+    # If the file hostfilepath exists and is newer than the maxhostfileage,
+    # then load the cache.
+    if os.path.exists(hostfilepath) and get_hostfile_age() < maxhostfileage:
+        loadcache = True
 
     opts, commands = conduit.getCmdLine()
     if conduit._base.conf.cache or not _can_write_results(hostfilepath):
