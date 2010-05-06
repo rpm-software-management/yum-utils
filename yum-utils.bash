@@ -218,7 +218,7 @@ _yu_repoquery()
         --whatobsoletes --whatconflicts --group --grouppkgs --archlist
         --pkgnarrow --show-duplicates --repoid --enablerepo --disablerepo
         --repofrompath --plugins --quiet --verbose --cache --tempcache
-        --querytags --config' -- "$2" ) )
+        --querytags --config --installed' -- "$2" ) )
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
