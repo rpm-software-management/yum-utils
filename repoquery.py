@@ -568,7 +568,7 @@ class YumBaseQuery(yum.YumBase):
                         require_recursive(pkg.name)
 
         require_recursive(name)
-        return self.queryPkgFactory(pkgs.values())
+        return self.queryPkgFactory(sorted(pkgs.values()))
 
     def fmt_whatobsoletes(self, name, **kw):
         pkgs = []
