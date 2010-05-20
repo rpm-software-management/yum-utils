@@ -827,11 +827,17 @@ def main(args):
         repoq.conf.showdupesfromrepos = True
             
     if opts.repoid:
+        found_repos = set()
         for repo in repoq.repos.findRepos('*'):
             if repo.id not in opts.repoid:
                 repo.disable()
             else:
+                found_repos.add(repo.id)
                 repo.enable()
+        if not opts.quiet:
+            for not_found in set(opts.repoid).difference(found_repos):
+                repoq.logger.info('Repoid %s was not found.' % not_found)
+
     if opts.disablerepos:
         for repo_match in opts.disablerepos:
             for repo in repoq.repos.findRepos(repo_match):
