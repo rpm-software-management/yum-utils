@@ -1,6 +1,6 @@
 SUBDIRS = docs
 PKGNAME = yum-utils
-UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff yum-debug-dump yum-debug-restore verifytree yum-groups-manager find-repos-of-install needs-restarting yum-show-config
+UTILS = package-cleanup debuginfo-install repoclosure repomanage repoquery repo-graph repo-rss yumdownloader yum-builddep repotrack reposync repodiff yum-debug-dump yum-debug-restore verifytree yum-groups-manager find-repos-of-install needs-restarting yum-config-manager
 UTILSROOT = yum-complete-transaction yumdb
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk -F%: '/Release:/ { print $$2 }' ${PKGNAME}.spec ')
