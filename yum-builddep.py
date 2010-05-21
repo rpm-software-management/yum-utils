@@ -186,8 +186,7 @@ class YumBuildDep(YumUtilBase):
                 try:
                     pkg = self.returnPackageByDep(dep)
                     self.logger.info(' --> %s' % pkg)
-                    if not self.rpmdb.installed(name=pkg.name):
-                        self.tsInfo.addInstall(pkg)
+                    self.install(pkg)
                     
                 except yum.Errors.YumBaseError, e:
                     self.logger.error("Error: %s" % e)
