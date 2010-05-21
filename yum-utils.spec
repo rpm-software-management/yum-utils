@@ -8,16 +8,17 @@ Source: http://yum.baseurl.org/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python >= 2.4 , yum >= 3.2.24
+Requires: python >= 2.4 , yum >= 3.2.27
 BuildRequires: python >= 2.4
 
 %description
 yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and
-more powerful to use. These tools include: debuginfo-install, package-cleanup,
-repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
+more powerful to use. These tools include: debuginfo-install, 
+find-repos-of-install, needs-restarting, package-cleanup, repoclosure, 
+repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, verifytree, yum-builddep, yum-complete-transaction, yumdownloader,
-yum-debug-dump, yum-debug-restore and yum-groups-manager.
+yum-debug-dump, yum-debug-restore, yum-groups-manager and yum-show-config.
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
@@ -434,6 +435,7 @@ fi
 %{_bindir}/yum-debug-dump
 %{_bindir}/yum-groups-manager
 %{_bindir}/yum-debug-restore
+%{_bindir}/yum-show-config
 %{_sbindir}/yum-complete-transaction
 %{_sbindir}/yumdb
 %{_mandir}/man1/yum-utils.1.*
