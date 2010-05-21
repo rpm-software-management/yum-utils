@@ -696,9 +696,9 @@ def main(args):
     parser.add_option("--plugins", action="store_true", default=False,
                       help="enable yum plugin support")
     parser.add_option("--quiet", action="store_true", 
-                      help="quiet (no output to stderr)", default=True)
+                      help="quiet output, only error output to stderr (default enabled)", default=True)
     parser.add_option("--verbose", action="store_false",
-                      help="verbose output", dest="quiet")
+                      help="verbose output (opposite of quiet)", dest="quiet")
     parser.add_option("-C", "--cache", action="store_true",
                       help="run from cache only")
     parser.add_option("--tempcache", action="store_true",
