@@ -793,7 +793,11 @@ def main(args):
     if opts.repofrompath:
         # setup the fake repos
         for repo in opts.repofrompath:
-            repoid,repopath = tuple(repo.split(','))
+            tmp = tuple(repo.split(','))
+            if len(tmp) != 2:
+                repoq.logger.error("Error: Bad repofrompath argument: %s" %repo)
+                continue
+            repoid,repopath = tmp
             if repopath[0] == '/':
                 baseurl = 'file://' + repopath
             else:
@@ -834,9 +838,8 @@ def main(args):
             else:
                 found_repos.add(repo.id)
                 repo.enable()
-        if not opts.quiet:
-            for not_found in set(opts.repoid).difference(found_repos):
-                repoq.logger.info('Repoid %s was not found.' % not_found)
+        for not_found in set(opts.repoid).difference(found_repos):
+            repoq.logger.error('Repoid %s was not found.' % not_found)
 
     if opts.disablerepos:
         for repo_match in opts.disablerepos:
