@@ -63,20 +63,25 @@ if opts.enable and not args:
     logger.error("Error: Trying to enable already enabled repos.")
     opts.enable = False
 
+only = None
+
 if not args or 'main' in args:
     print yb.fmtSection('main')
     print yb.conf.dump()
-    if opts.save:
+    if opts.save and hasattr(yb, 'main_setopts') and yb.main_setopts:
         fn = '/etc/yum/yum.conf'
         if not os.path.exists(fn):
             # Try the old default
             fn = '/etc/yum.conf'
         ybc = yb.conf
         writeRawConfigFile(fn, 'main',
-                           ybc.cfg.options, ybc.iteritems, ybc.optionobj)
+                           ybc.cfg.options, ybc.iteritems, ybc.optionobj,
+                           only)
 
 if opts.enable or opts.disable:
     opts.save = True
+    if not hasattr(yb, 'repo_setopts') or not yb.repo_setopts:
+        only = ['enabled']
 
 if args:
     repos = yb.repos.findRepos(','.join(args))
@@ -85,11 +90,13 @@ else:
 
 for repo in sorted(repos):
     print yb.fmtSection('repo: ' + repo.id)
-    if opts.enable:
+    if opts.enable and not repo.enabled:
         repo.enable()
-    elif opts.disable:
+    elif opts.disable and repo.enabled:
         repo.disable()
     print repo.dump()
-    if opts.save:
+    if (opts.save and
+        (only or (hasattr(yb, 'repo_setopts') and repo.id in yb.repo_setopts))):
         writeRawConfigFile(repo.repofile, repo.id,
-                           repo.cfg.options, repo.iteritems, repo.optionobj)
+                           repo.cfg.options, repo.iteritems, repo.optionobj,
+                           only)
