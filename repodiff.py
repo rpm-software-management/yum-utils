@@ -103,7 +103,7 @@ class DiffYum(yum.YumBase):
         #  Note that this _only_ shows something when you have an additional
         # package obsoleting a removed package. If the obsoleted package is
         # still there (somewhat "common") or the obsoleter is an update (dito)
-        # you get get hits here.
+        # you _don't_ get hits here.
         for po in remove:
             # Remember: Obsoletes are for package names only.
             poprovtup = (po.name, 'EQ', (po.epoch, po.ver, po.release))
