@@ -746,7 +746,7 @@ def main(args):
         if not opts.group:
             needfiles = 1
         pkgops.append("list")
-    if opts.alldeps:
+    if opts.alldeps and not (opts.installed or opts.pkgnarrow == 'installed'):
         needfiles = 1
     if opts.envra:
         pkgops.append("envra")
