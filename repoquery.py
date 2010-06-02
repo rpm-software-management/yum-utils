@@ -856,12 +856,6 @@ def main(args):
             for repo in repoq.repos.findRepos(repo_match):
                 repo.enable()
 
-    try:
-        repoq.doRepoSetup()
-    except yum.Errors.RepoError, e:
-        repoq.logger.error("Could not setup repo: %s" % (e))
-        sys.exit(50)
-    
     for exp in regexs:
         if exp.endswith('.src'):
             needsource = 1
