@@ -811,11 +811,16 @@ def main(args):
         
     # Show what is going on, if --quiet is not set.
     if not opts.quiet and sys.stdout.isatty():
-        repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
-        repoq.repos.callback = output.CacheProgressCallback()
         yumout = output.YumOutput()
         freport = ( yumout.failureReport, (), {} )
-        repoq.repos.setFailureCallback( freport )       
+        if hasattr(repoq, 'prerepoconf'):
+            repoq.prerepoconf.progressbar = TextMeter(fo=sys.stdout)
+            repoq.prerepoconf.callback = output.CacheProgressCallback()
+            repoq.prerepoconf.failure_callback = freport
+        else:
+            repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
+            repoq.repos.callback = output.CacheProgressCallback()
+            repoq.repos.setFailureCallback(freport)
     
     if not repoq.setCacheDir(opts.tempcache):
         repoq.logger.error("Error: Could not make cachedir, exiting")
