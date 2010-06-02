@@ -874,8 +874,11 @@ def main(args):
         archlist.append('src')
 
     try:
-        repoq.doSackSetup(archlist=archlist)
-        repoq.doTsSetup()
+        if not hasattr(repoq, 'arch'):
+            repoq.doSackSetup(archlist=archlist)
+        elif archlist is not None:
+            repoq.arch.archlist = archlist
+
         if needfiles:
             repoq.repos.populateSack(mdtype='filelists')
         if needother:
