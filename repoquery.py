@@ -400,7 +400,7 @@ class YumBaseQuery(yum.YumBase):
         self.pkgops = pkgops
         self.sackops = sackops
 
-    def queryPkgFactory(self, pkgs):
+    def queryPkgFactory(self, pkgs, plain_pkgs=False):
         """
         For each given package, create a query.
 
@@ -414,6 +414,12 @@ class YumBaseQuery(yum.YumBase):
             if isinstance(pkg, yum.packages.YumInstalledPackage):
                 if self.options.pkgnarrow not in ('all', 'installed', 'extras'):
                     continue
+
+            if plain_pkgs:
+                qpkgs.append(pkg)
+                continue
+
+            if isinstance(pkg, yum.packages.YumInstalledPackage):
                 qpkg = instPkgQuery(pkg, qf)
             else:
                 qpkg = repoPkgQuery(pkg, qf)
@@ -489,9 +495,9 @@ class YumBaseQuery(yum.YumBase):
                     grps.append(grp)
         return grps
                     
-    def matchPkgs(self, items):
+    def matchPkgs(self, items, plain_pkgs=False):
         pkgs = self.returnPkgList(patterns=items)
-        return self.queryPkgFactory(pkgs)
+        return self.queryPkgFactory(pkgs, plain_pkgs)
 
     def matchSrcPkgs(self, items):
         srpms = []
@@ -504,6 +510,7 @@ class YumBaseQuery(yum.YumBase):
         return srpms
     
     def runQuery(self, items):
+        plain_pkgs = False
         if self.options.group:
             pkgs = self.matchGroups(items)
         else:
@@ -511,7 +518,9 @@ class YumBaseQuery(yum.YumBase):
                 pkgs = self.matchSrcPkgs(items)
 
             else:
-                pkgs = self.matchPkgs(items)
+                if not self.sackops:
+                    plain_pkgs = True
+                pkgs = self.matchPkgs(items, plain_pkgs=plain_pkgs)
                 for prco in items:
                     for oper in self.sackops:
                         try:
@@ -521,7 +530,24 @@ class YumBaseQuery(yum.YumBase):
                         except queryError, e:
                             self.logger.error( e.msg)
 
+        if plain_pkgs:
+            iq = None
+            rq = None
+            qf = self.options.queryformat or std_qf["nevra"]
         for pkg in pkgs:
+            if plain_pkgs:
+                if isinstance(pkg, yum.packages.YumInstalledPackage):
+                    if iq is None:
+                        iq = instPkgQuery(pkg, qf)
+                    iq.pkg = pkg
+                    iq.name = pkg.name
+                    pkg = iq
+                else:
+                    if rq is None:
+                        rq = instPkgQuery(pkg, qf)
+                    rq.pkg = pkg
+                    rq.name = pkg.name
+                    pkg = rq
             if not self.pkgops:
                 print to_unicode(pkg)
             for oper in self.pkgops:
