@@ -544,6 +544,7 @@ class YumBaseQuery(yum.YumBase):
             iq = None
             rq = None
             qf = self.options.queryformat or std_qf["nevra"]
+            pkgs = sorted(pkgs)
         for pkg in pkgs:
             if plain_pkgs:
                 if isinstance(pkg, yum.packages.YumInstalledPackage):
