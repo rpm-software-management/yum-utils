@@ -134,11 +134,15 @@ class pkgQuery:
         self.qf = qf
         self.name = pkg.name
         self.classname = None
+        self._translated_qf = None
     
     def __getitem__(self, item):
         item = item.lower()
         if hasattr(self, "fmt_%s" % item):
             return getattr(self, "fmt_%s" % item)()
+        if hasattr(self.pkg, item):
+            return getattr(self.pkg, item)
+
         res = None
         convert = None
 
@@ -195,15 +199,17 @@ class pkgQuery:
     def fmt_queryformat(self):
 
         if not self.qf:
-            qf = std_qf["nevra"]
-        else:
+            return self.fmt_nevra()
+
+        if self._translated_qf is None:
             qf = self.qf
 
-        qf = qf.replace("\\n", "\n")
-        qf = qf.replace("\\t", "\t")
-        pattern = re.compile('%([-\d]*?){([:\.\w]*?)}')
-        fmt = re.sub(pattern, r'%(\2)\1s', qf)
-        return fmt % self
+            qf = qf.replace("\\n", "\n")
+            qf = qf.replace("\\t", "\t")
+            pattern = re.compile('%([-\d]*?){([:\.\w]*?)}')
+            fmt = re.sub(pattern, r'%(\2)\1s', qf)
+            self._translated_qf = fmt
+        return self._translated_qf % self
 
     def fmt_requires(self, **kw):
         return "\n".join(self.prco('requires'))
