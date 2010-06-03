@@ -449,6 +449,10 @@ class YumBaseQuery(yum.YumBase):
 
     def returnPkgList(self, **kwargs):
         pkgs = []
+        if 'patterns' in kwargs:
+            if len(kwargs['patterns']) == 1 and kwargs['patterns'][0] == '*':
+                kwargs['patterns'] = None
+
         if self.options.pkgnarrow == "repos":
             # self.pkgSack is a yum.packageSack.MetaSack
             if self.conf.showdupesfromrepos:
