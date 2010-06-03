@@ -86,18 +86,9 @@ class YumDownloader(YumUtilBase):
             sys.exit(0)
 
         # make yumdownloader work as non root user.
-        if self.conf.uid != 0:
-            cachedir = getCacheDir()
-            self.logger.debug('Running as non-root, using %s as cachedir' % cachedir)
-            if cachedir is None:
-                self.logger.error("Error: Could not make cachedir, exiting")
-                sys.exit(50)
-            self.repos.setCacheDir(cachedir)
-
-            # Turn off cache
-            self.conf.cache = 0
-            # make sure the repos know about it, too
-            self.repos.setCache(0)
+        if not self.setCacheDir():
+            self.logger.error("Error: Could not make cachedir, exiting")
+            sys.exit(50)
             
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup(opts)
