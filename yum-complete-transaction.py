@@ -185,7 +185,13 @@ class YumCompleteTransaction(YumUtilBase):
         timestamp = times[-1]
         print "There are %d outstanding transactions to complete. Finishing the most recent one" % len(times)
         
-        remaining = find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
+        try:
+            remaining = find_ts_remaining(timestamp, yumlibpath=self.conf.persistdir)
+        except yum.Errors.MiscError, e:
+            self.logger.error("Error: %s" % e)
+            self.logger.error("Please report this error to: %s" % self.conf.bugtracker_url)
+            sys.exit(1)
+            
         print "The remaining transaction had %d elements left to run" % len(remaining)
         for (action, pkgspec) in remaining:
             if action == 'install':
