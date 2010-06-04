@@ -134,7 +134,7 @@ class pkgQuery:
         self.qf = qf
         self.name = pkg.name
         self.classname = None
-        self._translated_qf = None
+        self._translated_qf = {}
     
     def __getitem__(self, item):
         item = item.lower()
@@ -201,15 +201,16 @@ class pkgQuery:
         if not self.qf:
             return self.fmt_nevra()
 
-        if self._translated_qf is None:
+        # Override .qf for fun and profit...
+        if self.qf not in self._translated_qf:
             qf = self.qf
 
             qf = qf.replace("\\n", "\n")
             qf = qf.replace("\\t", "\t")
             pattern = re.compile('%([-\d]*?){([:\.\w]*?)}')
             fmt = re.sub(pattern, r'%(\2)\1s', qf)
-            self._translated_qf = fmt
-        return self._translated_qf % self
+            self._translated_qf[self.qf] = fmt
+        return self._translated_qf[self.qf] % self
 
     def fmt_requires(self, **kw):
         return "\n".join(self.prco('requires'))
