@@ -195,7 +195,7 @@ def main(args):
     if ygh.add:
         for pkg in sorted(ygh.add):
             print 'New package %s' % pkg.name
-            print '        %s' % pkg.summary
+            print '        %s' % to_unicode(pkg.summary)
             add_sizechange += int(pkg.size)
                 
     if ygh.remove:
