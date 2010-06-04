@@ -814,7 +814,9 @@ def main(args):
         opts.pkgnarrow = 'installed'
         opts.disablerepos = ['*']
         
-    if opts.nevra or (len(pkgops) == 0 and len(sackops) == 0):
+    if opts.nevra:
+        pkgops.append("nevra")
+    elif len(pkgops) == 0 and len(sackops) == 0:
         pkgops.append("queryformat")
 
     repoq = YumBaseQuery(pkgops, sackops, opts)
