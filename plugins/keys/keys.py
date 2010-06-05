@@ -226,7 +226,7 @@ Key owner : %s
 Key email : %s
 Repo      : installed
 Created   : %s
-""" % (key.sum_type, rpmkeyid,
+""" % (rpmkeyid,
        key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
         else:
             gpg_cert = yum.pgpmsg.decode_msg(key.data)

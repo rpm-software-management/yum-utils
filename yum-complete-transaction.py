@@ -235,7 +235,7 @@ class YumCompleteTransaction(YumUtilBase):
                 else:
                     print "Not removing old transaction files"
                     sys.exit()
-            except YumBaseError,e:
+            except yum.Errors.YumBaseError,e:
                 print "Error: %s" % str(e)
                 sys.exit(1)                
 

@@ -91,6 +91,9 @@ class YumDebugDump(yum.YumBase):
         msg += "  python ver: %s\n" % sys.version.replace('\n', '')
         return msg
 
+# remove pylint false positive
+# Instance of 'DummyYumPlugins' has no '_plugins' member (but some types could not be inferred)
+# pylint: disable-msg=E1103
     def dump_yum_config_info(self):
         msg = "%%%%YUM INFO\n"
         msg += "  arch: %s\n" % self.conf.yumvar['arch']
@@ -100,6 +103,7 @@ class YumDebugDump(yum.YumBase):
         msg += "  enabled plugins: %s\n" % ",".join(self.plugins._plugins.keys())
         msg += "  global excludes: %s\n" % ",".join(self.conf.exclude)
         return msg
+# pylint: enable-msg=E1103
 
     # FIXME: This should use rpmdb.check_*()
     def dump_rpm_problems(self):

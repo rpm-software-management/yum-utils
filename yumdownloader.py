@@ -19,7 +19,7 @@ import os.path
 sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
-from yum.misc import getCacheDir, setup_locale
+from yum.misc import setup_locale
 from yum.packages import parsePackages
 from yum.Errors import RepoError
 from utils import YumUtilBase

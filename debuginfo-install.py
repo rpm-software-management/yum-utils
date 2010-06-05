@@ -23,7 +23,6 @@ import yum.Errors
 
 from utils import YumUtilBase
 from yum import _
-from yum.i18n import to_unicode
 
 import logging
 import rpmUtils
