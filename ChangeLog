@@ -1,3 +1,439 @@
+2010-06-06  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.27
+
+2010-06-05  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* debuginfo-install.py, plugins/keys/keys.py,
+	yum-complete-transaction.py, yum-debug-dump.py, yumdownloader.py: 
+	Fix pylint errors  ************* Module debuginfo-install W0611: 26:
+	Unused import to_unicode ************* Module
+	yum-complete-transaction E0602:238:YumCompleteTransaction.main:
+	Undefined variable 'YumBaseError' ************* Module
+	yum-debug-dump E1103:100:YumDebugDump.dump_yum_config_info: Instance
+	of 'DummyYumPlugins' has no '_plugins' member (but some types could
+	not be inferred) ************* Module yumdownloader W0611: 22:
+	Unused import getCacheDir ************* Module keys
+	E9905:229:KeysInfoCommand.show_key: Too many arguments for format
+	string
+
+2010-06-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: to_unicode() summary for repodiff, too  closes
+	https://bugzilla.redhat.com/show_bug.cgi?id=600501
+
+2010-06-04  James Antill <james@and.org>
+
+	* repoquery.py: Overridding .qf happens in doQuery, so we have to
+	cache multiple translations
+
+2010-06-04  James Antill <james@and.org>
+
+	* repoquery.py: Do the right thing for: --nevra --qf "blah"
+
+2010-06-03  James Antill <james@and.org>
+
+	* yumdownloader.py: Have yumdownloader use yb.setCacheDir() so it
+	goes the same location. BZ 599726
+
+2010-06-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-complete-transaction.py: handle corrupt transaction journals
+	- catch the misc exception when the transaction file is corrupt -
+	tell the user to file a bug b/c whatever made their file corrupt is
+	probably not good for their fs - deals with
+	https://bugzilla.redhat.com/show_bug.cgi?id=599574
+
+2010-06-03  James Antill <james@and.org>
+
+	* repoquery.py: Sort the packages, when we have plain pkgs,
+	basically free!
+
+2010-06-03  James Antill <james@and.org>
+
+	* repoquery.py: Don't match '*' against each pkg. for all, just get
+	all of them
+
+2010-06-03  James Antill <james@and.org>
+
+	* repoquery.py: Don't convert the user qf for each package, when we
+	can now do it once.
+
+2010-06-03  James Antill <james@and.org>
+
+	* repoquery.py: Don't create N PkgQuery objects, when we can reuse
+	them.
+
+2010-06-02  James Antill <james@and.org>
+
+	* repoquery.py: Don't explicitly call doRepoSetup()
+
+2010-06-02  James Antill <james@and.org>
+
+	* repoquery.py: Use .arch.archlist if available, also don't call
+	.doTsSetup
+
+2010-06-02  James Antill <james@and.org>
+
+	* repoquery.py: Use prerepoconf, if available
+
+2010-06-02  James Antill <james@and.org>
+
+	* repoquery.py: Don't auto needfiles, when we are just looking at
+	installed
+
+2010-05-25  James Antill <james@and.org>
+
+	* repodiff.py: Fix comment typo
+
+2010-05-24  James Antill <james@and.org>
+
+	* yum-config-manager.py:  Don't save anything we don't have to, mainly enable/disable hack
+	 (should fix config. objects to not change unchanged things).
+
+2010-05-21  James Antill <james@and.org>
+
+	* yum-builddep.py: Have yum-builddep just call .install(), deals
+	with updates and multilib.
+
+2010-05-21  James Antill <james@and.org>
+
+	* Makefile, yum-config-manager.py, yum-show-config.py,
+	yum-utils.spec: Change show-config to config-manager, let people set
+	stuff too.
+
+2010-05-21  James Antill <james@and.org>
+
+	* Makefile, yum-show-config.py, yum-utils.spec: Add yum-show-config
+	command, to let people see the config. as yum sees it.
+
+2010-05-21  James Antill <james@and.org>
+
+	* repoquery.py: Fix the description of quiet (and tell people it's
+	on by default).
+
+2010-05-21  James Antill <james@and.org>
+
+	* repoquery.py: Add errormsg for bad repofrompath argument, make
+	repoid not found an error
+
+2010-05-20  James Antill <james@and.org>
+
+	* repomanage.py: Remove exception from getFileList() and return an
+	empty list, BZ 587288.
+
+2010-05-20  James Antill <james@and.org>
+
+	* repoquery.py: Tell the user about bad --repoid args, but only in
+	non-quiet BZ 593786
+
+2010-05-17  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/debuginfo-install.1, docs/yum-changelog.1,
+	docs/yum-list-data.1, docs/yum-security.8: Man page formatting
+	fixes.
+
+2010-05-12  James Antill <james@and.org>
+
+	* repoquery.py: Sort package lists, in repoquery --whatrequires
+	output.
+
+2010-05-06  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Include --installed in repoquery completions.
+
+2010-05-05  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/fastestmirror/fastestmirror.py: fastestmirror: make it
+	work as non-root user (Don't setup cache dir to early) (rhbz
+	#537829)
+
+2010-05-05  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-complete-transaction.py: yum-complete-transaction : catch
+	YumBaseError in transaction (rhbz #538748)
+
+2010-05-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: - allow querytags like yumdb_info.from_repo - make ValueErrors if
+	you hit a bad rpmtag a lot nicer - stop the traceback - allow '.'s
+	in fmt querys
+
+2010-05-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   add missing
+	import   catch yum exception in --orphans (rhbz #582039)   The
+	protect-packages feature has been merged into core yum, removing it
+	make package-cleanup handle custom kernel with an '-' in the kernel
+	release (rhbz #539651)   [fastestmirror] Bump version and update our
+	changelog   [fastestmirror] Patch from Kris Ven to add a
+	'include_only' option
+
+2010-05-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* docs/repoquery.1, repoquery.py: add --installed option - adds
+	pkgnarrow='installed' and disables all repos
+
+2010-05-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: add missing import
+
+2010-05-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: catch yum exception in --orphans (rhbz
+	#582039)
+
+2010-04-29  James Antill <james@and.org>
+
+	* plugins/protect-packages/protect-packages.conf,
+	plugins/protect-packages/protect-packages.py, yum-utils.spec: The
+	protect-packages feature has been merged into core yum, removing it
+
+
+2010-04-29  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* package-cleanup.py: make package-cleanup handle custom kernel with
+	an '-' in the kernel release (rhbz #539651)
+
+2010-04-24  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/ChangeLog,
+	plugins/fastestmirror/fastestmirror.py: [fastestmirror] Bump version
+	and update our changelog
+
+2010-04-24  Luke Macken <lmacken@redhat.com>
+
+	* plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: [fastestmirror] Patch from
+	Kris Ven to add a 'include_only' option
+
+2010-04-20  Maxim Burgerhout <maxim@wzzrd.com>
+
+	* plugins/fs-snapshot/fs-snapshot.py: Don't require /sbin in the
+	path for fs-snapshot to work
+
+2010-04-20  James Antill <james@and.org>
+
+	* debuginfo-install.py,
+	plugins/auto-update-debuginfo/auto-update-debuginfo.py: Add the repo
+	setopts to auto-update-debuginfo
+
+2010-04-20  Matt McCutchen <matt@mattmccutchen.net>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Stop
+	calling doRepoSetup many times, in auto-update-debuginfo
+
+2010-04-20  James Antill <james@and.org>
+
+	* debuginfo-install.py: Fixup setopt inheritence
+
+2010-04-20  Matt McCutchen <matt@mattmccutchen.net>
+
+	* debuginfo-install.py: Stop calling doRepoSetup many times, in
+	debuginfo-install
+
+2010-04-20  James Antill <james@and.org>
+
+	* debuginfo-install.py: Let debuginfo-install work without
+	getOptionGroup
+
+2010-04-20  James Antill <james@and.org>
+
+	* yum-groups-manager.py: Remove dead code block
+
+2010-04-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* plugins/verify/verify.py: Fix --verify-configuration-files CLI
+	option.
+
+2010-04-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: Don't bother grabbing changelog names and texts if
+	we don't have times.
+
+2010-04-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* debuginfo-install.py,
+	plugins/fastestmirror/fastestmirror-asyncore/fastestmirror-asyncore
+	.py, plugins/tmprepo/tmprepo.py, repo-rss.py, repodiff.py,
+	repoquery.py, repotrack.py, yum-groups-manager.py: Clean up some
+	unused variables and imports.
+
+2010-04-19  Ville Skyttä <ville.skytta@iki.fi>
+
+	* Makefile: Run pylint on plugins/*/*/*.py too.
+
+2010-04-18  James Antill <james@and.org>
+
+	* repodiff.py: Fix the actual bug in repodiff, comparison
+
+2010-04-18  James Antill <james@and.org>
+
+	* repodiff.py:  Yes, looking at code at 2am strikes again ... this was total crack.
+	 Revert "One more fix for the changelog time comparison"  This
+	 reverts commit 3d9cf740ee9c9c2fbf8e408fe0eb2d46c1a88a00.
+
+2010-04-18  James Antill <james@and.org>
+
+	* repodiff.py: One more fix for the changelog time comparison
+
+2010-04-16  James Antill <james@and.org>
+
+	* repodiff.py: Use the newest old changelog entry, not the oldest
+	... *sigh*
+
+2010-04-15  James Antill <james@and.org>
+
+	* repodiff.py: Fix typo on obsoletes check, in repodiff
+
+2010-04-13  James Antill <james@and.org>
+
+	* docs/repodiff.1, repodiff.py: Add message about archlist usage, to
+	stop people being confused.
+
+2010-04-13  James Antill <james@and.org>
+
+	* repodiff.py:  Fix obsoletes processing in repodiff, also giant speedup. Compared
+	 output both before and after and it was identical:  1. Original
+	 with 3.2.27: 8 minutes 27 seconds  2. Original with
+	 returnNewestByName() speedup: 1 minute 50 seconds.  3. New repodiff
+	 with 3.2.27: 11 seconds.  ...tested with Updates/11 vs. Updates/12
+	 on 2010-04-13.
+
+2010-04-13  James Antill <james@and.org>
+
+	* repodiff.py: Stupid typo fix
+
+2010-04-13  Michael Schwendt <mschwendt@gmail.com>
+
+	* repodiff.py: Get the newer "same day" changelog entries in
+	repodiff.  Tided by by James.
+
+2010-04-10  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add copy to yumdb completions.
+
+2010-04-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: fixes
+	https://bugzilla.redhat.com/show_bug.cgi?id=580343  when we are
+	dealing with compressed comps files just fetch the group not
+	group_gz
+
+2010-04-08  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.conf,
+	plugins/fastestmirror/fastestmirror.py: Use the yum configured
+	cachedir value, in fastestmirror
+
+2010-04-08  James Antill <james@and.org>
+
+	* docs/Makefile, docs/yumdb.8, yum-utils.spec, yumdb.py: Add yumdb
+	man page, and yumdb copy command
+
+2010-04-02  Ville Skyttä <ville.skytta@iki.fi>
+
+	* plugins/fastestmirror/fastestmirror.py: Fix always_print_best_host
+	conf setting.
+
+2010-04-01  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add repoclosure --group completion.
+
+2010-03-31  Dennis Gregorovic <dgregor@redhat.com>
+
+	* repoclosure.py: Add a --group flag to filter packages by comps
+	group
+
+2010-03-31  Dennis Gregorovic <dgregor@redhat.com>
+
+	* repoclosure.py: Include all packages listed in the pkgonly arg
+
+2010-03-30  Ville Skyttä <ville.skytta@iki.fi>
+
+	* package-cleanup.py, plugins/changelog/changelog.py,
+	plugins/fastestmirror/fastestmirror-asyncore/fastestmirror-asyncore
+	.py, plugins/fedorakmod/fedorakmod.py,
+	plugins/fs-snapshot/fs-snapshot.py,
+	plugins/post-transaction-actions/post-transaction-actions.py,
+	plugins/priorities/priorities.py,
+	plugins/protectbase/protectbase.py,
+	plugins/remove-with-leaves/remove-with-leaves.py,
+	plugins/upgrade-helper/upgrade-helper.py, repo-graph.py,
+	repo-rss.py, repoclosure.py, repodiff.py, repomanage.py,
+	repoquery.py, reposync.py, repotrack.py, yum-debug-dump.py: Use "in"
+	instead of has_key.
+
+2010-03-26  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Complete on repomanage.py, package-cleanup.py, and
+	verifytree.py.
+
+2010-03-10  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add bash completion for yumdb.
+
+2010-03-02  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repoclosure.py: Make repoclosure work with relative paths, like
+	./myrepo or just .
+
+2010-03-01  James Antill <james@and.org>
+
+	* package-cleanup.py: Add yum-utils to the run_with_packages when
+	running pkg-cleanup
+
+2010-03-01  James Antill <james@and.org>
+
+	* yum-complete-transaction.py: Add yum-utils to the
+	run_with_packages when running y-c-t
+
+2010-03-01  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py: setup some repo features that make sense for
+	the debug repos to inherit from the non-debug repos when we add them
+
+
+2010-03-01  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: catch all yum errors and valueError (which is
+	coming from yum.config.py :() generally this just means we'll get
+	less ABRT errors and more reports from users  (I hope)
+
+2010-02-27  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: Fix --releasever.
+
+2010-02-25  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: move around where we query for pkgs from
+	sackops/prcos and what happens if no special output format is
+	specified in repoquery.  makes: repoquery -qfi /bin/bash output -qi
+	output rather than -q output.
+
+2010-02-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Make
+	--alldeps the default in repoquery.
+
+2010-02-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: make repoquery pass in the whole string not just
+	split for names
+
+2010-02-10  Ville Skyttä <ville.skytta@iki.fi>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils
+
+2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.26
@@ -9,6 +445,13 @@
 2010-02-10  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.26
+
+2010-02-09  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/repoquery.1, repoquery.py, yum-utils.bash: Make --alldeps the
+	default in repoquery.  --alldeps is what people really almost always
+	want, but fail to specify for some reason.  --exactdeps can be used
+	to get the previous default of exact matching.
 
 2010-02-09  Ville Skyttä <ville.skytta@iki.fi>
 
