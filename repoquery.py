@@ -641,7 +641,6 @@ class YumBaseQuery(yum.YumBase):
 
 def main(args):
 
-    needfiles = 0
     needother = 0
     needgroup = 0
     needsource = 0
@@ -781,11 +780,7 @@ def main(args):
         needother = 1
         pkgops.append("changelog")
     if opts.list:
-        if not opts.group:
-            needfiles = 1
         pkgops.append("list")
-    if opts.alldeps and not (opts.installed or opts.pkgnarrow == 'installed'):
-        needfiles = 1
     if opts.envra:
         pkgops.append("envra")
     if opts.nvr:
@@ -913,8 +908,9 @@ def main(args):
         elif archlist is not None:
             repoq.arch.archlist = archlist
 
-        if needfiles:
-            repoq.repos.populateSack(mdtype='filelists')
+        #  Don't do needfiles, because yum will do it automatically and it's
+        # not trivial to get it "right" so we don't download them when not
+        # needed.
         if needother:
             repoq.repos.populateSack(mdtype='otherdata')
         if needgroup:
