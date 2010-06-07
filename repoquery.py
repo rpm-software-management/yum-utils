@@ -556,7 +556,7 @@ class YumBaseQuery(yum.YumBase):
                     pkg = iq
                 else:
                     if rq is None:
-                        rq = instPkgQuery(pkg, qf)
+                        rq = repoPkgQuery(pkg, qf)
                     rq.pkg = pkg
                     rq.name = pkg.name
                     pkg = rq
