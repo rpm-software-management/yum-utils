@@ -251,7 +251,7 @@ class pkgQuery:
         return loc
 
     def fmt_reponame(self, **kw):
-        if hasattr(self.pkg, 'repo'):
+        if hasattr(self.pkg, 'repo') and hasattr(self.pkg.repo, 'name'):
             return self.pkg.repo.name
         return self.pkg.repoid
 
