@@ -140,7 +140,13 @@ class pkgQuery:
         item = item.lower()
         if hasattr(self, "fmt_%s" % item):
             return getattr(self, "fmt_%s" % item)()
-        if hasattr(self.pkg, item):
+        elif item.startswith('repo.'):
+            repo_item = item.split('.')[1]
+            try:
+                return getattr(self.pkg.repo, repo_item)
+            except AttributeError,e:
+                raise queryError("Invalid repo querytag '%s' for %s: %s" % (repo_item, self.classname, self.pkg))
+        elif hasattr(self.pkg, item):
             return getattr(self.pkg, item)
 
         res = None
@@ -250,10 +256,6 @@ class pkgQuery:
             loc = urlparse.urljoin(repourl, self['relativepath'])
         return loc
 
-    def fmt_reponame(self, **kw):
-        if hasattr(self.pkg, 'repo') and hasattr(self.pkg.repo, 'name'):
-            return self.pkg.repo.name
-        return self.pkg.repoid
 
 class repoPkgQuery(pkgQuery):
     """
