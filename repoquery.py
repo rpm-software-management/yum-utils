@@ -250,6 +250,11 @@ class pkgQuery:
             loc = urlparse.urljoin(repourl, self['relativepath'])
         return loc
 
+    def fmt_reponame(self, **kw):
+        if hasattr(self.pkg, 'repo'):
+            return self.pkg.repo.name
+        return self.pkg.repoid
+
 class repoPkgQuery(pkgQuery):
     """
     I wrap a query of a non-installed package available in the repository.
