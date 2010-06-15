@@ -243,7 +243,7 @@ def main():
                 wanted_types = ['group']
             
             if opts.downloadmd:
-                wanted_types = repo.repoXML.fileTypes.keys()
+                wanted_types = repo.repoXML.fileTypes()
 
             for ftype in repo.repoXML.fileTypes():
                 if ftype in ['primary', 'primary_db', 'filelists',
