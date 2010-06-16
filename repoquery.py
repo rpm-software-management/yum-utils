@@ -37,7 +37,7 @@ import yum.config
 import yum.Errors
 import yum.packages
 from yum.i18n import to_unicode
-from rpmUtils.arch import getArchList
+from rpmUtils.arch import getArchList, getBaseArch
 from rpmUtils.miscutils import formatRequire
 import output
 from urlgrabber.progress import TextMeter
@@ -117,6 +117,7 @@ class queryError(exceptions.Exception):
         exceptions.Exception.__init__(self)
         self.msg = msg
 
+
 # abstract class
 class pkgQuery:
     """
@@ -129,7 +130,8 @@ class pkgQuery:
     @type qf:  str
     """
 
-    def __init__(self, pkg, qf):
+    def __init__(self, pkg, qf, yb=None):
+        self.yb = yb
         self.pkg = pkg
         self.qf = qf
         self.name = pkg.name
@@ -256,13 +258,228 @@ class pkgQuery:
             loc = urlparse.urljoin(repourl, self['relativepath'])
         return loc
 
+    def tree_print_req(req, val, level):
+        indent = ''
+        if level:
+            indent = ' |  ' * (level - 1) + ' \_  '
+        print "%s%s [%s]" % (indent, str(req), str(val))
+    def pkg2uniq(pkg):
+        """ Turn a pkg into a "unique" req."""
+        if self.yb and self.yb.conf.showdupesfromrepos:
+            return str(pkg)
+        return "%s.%s" % (pkg.name, getBaseArch(pkg.arch))
+    def pkg2val(reqs, pkg):
+        reqs = sorted(reqs[pkg2req(pkg)])
+        return str(len(reqs)) + ": " + ", ".join(reqs)
+
+    # These are common helpers for the --tree-* options...
+    @staticmethod
+    def _tree_print_req(req, val, level):
+        indent = ''
+        if level:
+            indent = ' |  ' * (level - 1) + ' \_  '
+        print "%s%s [%s]" % (indent, str(req), str(val))
+    def _tree_pkg2uniq(self, pkg):
+        """ Turn a pkg into a "unique" req."""
+        if self.yb and self.yb.conf.showdupesfromrepos:
+            return str(pkg)
+        return "%s.%s" % (pkg.name, getBaseArch(pkg.arch))
+    def _tree_pkg2val(self, reqs, pkg):
+        reqs = sorted(reqs[self._tree_pkg2uniq(pkg)])
+        return str(len(reqs)) + ": " + ", ".join(reqs)
+    def _tree_maybe_add_pkg(self, all_reqs, loc_reqs, pkgs, pkg, val):
+        req = self._tree_pkg2uniq(pkg)
+        if req in loc_reqs:
+            loc_reqs[req].add(val)
+            return
+        if req in all_reqs:
+            pkgs[pkg]     = None
+            loc_reqs[req] = set([val])
+            return
+        pkgs[pkg]     = True
+        loc_reqs[req] = set([val])
+        all_reqs[req] = True
+    def _tree_maybe_add_pkgs(self, all_reqs, tups, tup2pkgs):
+        rpkgs    = {}
+        loc_reqs = {}
+        for rptup in tups:
+            (rpn, rpf, (rp,rpv,rpr)) = rptup
+            if rpn.startswith('rpmlib'):
+                continue
+
+            rname = yum.misc.prco_tuple_to_string(rptup)
+            for npkg in sorted(tup2pkgs(rptup, rname), reverse=True):
+                self._tree_maybe_add_pkg(all_reqs, loc_reqs, rpkgs, npkg, rname)
+        return rpkgs, loc_reqs
+    def _fmt_tree_prov(self, prco_type, **kw):
+        pkg      = kw.get('pkg', self.pkg)
+        req      = kw.get('req', 'cmd line');
+        level    = kw.get('level', 0)
+        all_reqs = kw.get('all_reqs', {})
+        global __req2pkgs
+        __req2pkgs = {}
+        def req2pkgs(ignore, req):
+            req = str(req)
+            if req in __req2pkgs:
+                return __req2pkgs[req]
+
+            if self.yb is None:
+                return []
+            yb = self.yb
+
+            providers = []
+            try:
+                # XXX rhbz#246519, for some reason returnPackagesByDep() fails
+                # to find some root level directories while 
+                # searchPackageProvides() does... use that for now
+                matches = self.yb.searchPackageProvides([req])
+                if self.yb.options.pkgnarrow == 'repos':
+                    # Sucks that we do the work, and throw it away...
+                    for provider in matches:
+                        if provider.repoid != 'installed':
+                            providers.append(provider)
+                elif self.yb.options.pkgnarrow == 'installed':
+                    # Sucks that we do the work, and throw it away...
+                    for provider in matches:
+                        if provider.repoid == 'installed':
+                            providers.append(provider)
+                else:
+                    # Assume "all"
+                    providers = matches.keys()
+
+
+            except yum.Errors.YumBaseError, err:
+                print >>sys.stderr, "No package provides %s" % req
+                return []
+
+            __req2pkgs[req] = providers
+            return providers
+
+        self._tree_print_req(pkg, req, level)
+        tups = getattr(pkg, prco_type)
+        rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, req2pkgs)
+        nlevel = level + 1
+        for rpkg in sorted(rpkgs):
+            if pkg.verEQ(rpkg):
+                continue
+            if rpkgs[rpkg] is None:
+                req = self._tree_pkg2val(loc_reqs, rpkg)
+                self._tree_print_req(rpkg, req, nlevel)
+                continue
+            self._fmt_tree_prov(prco_type,
+                                pkg=rpkg, level=nlevel, all_reqs=all_reqs,
+                                req=self._tree_pkg2val(loc_reqs, rpkg))
+    def fmt_tree_requires(self, **kw):
+        return self._fmt_tree_prov('requires', **kw)
+    def fmt_tree_conflicts(self, **kw):
+        return self._fmt_tree_prov('conflicts', **kw)
+
+    def fmt_tree_obsoletes(self, **kw):
+        pkg      = kw.get('pkg', self.pkg)
+        level    = kw.get('level', 0)
+        all_reqs = kw.get('all_reqs', {})
+        def obs2pkgs():
+            if self.yb is None:
+                return []
+            yb = self.yb
+
+            obss = []
+            if self.yb.options.pkgnarrow in ('all', 'repos'):
+                for obs_n in pkg.obsoletes_names:
+                    for opkg in yb.pkgSack.searchNevra(name=obs_n):
+                        if opkg.obsoletedBy([pkg]):
+                            obss.append(opkg)
+            if self.yb.options.pkgnarrow in ('all', 'installed'):
+                skip = set([pkg.pkgtup for pkg in obbs])
+                for obs_n in pkg.obsoletes_names:
+                    for opkg in yb.rpmdb.searchNevra(name=obs_n):
+                        if opkg.pkgtup in skip:
+                            continue
+                        if opkg.obsoletedBy([pkg]):
+                            obss.append(opkg)
+
+            return obss
+
+        if level:
+            reason = ''
+        else:
+            reason = 'cmd line'
+        self._tree_print_req(pkg, reason, level)
+        all_reqs[pkg] = None
+        nlevel = level + 1
+        for rpkg in sorted(obs2pkgs()):
+            if pkg.verEQ(rpkg):
+                continue
+            if rpkg in all_reqs:
+                self._tree_print_req(rpkg, '', nlevel)
+                continue
+            self.fmt_tree_obsoletes(pkg=rpkg, level=nlevel, all_reqs=all_reqs)
+
+    def fmt_tree_what_requires(self, **kw):
+        pkg      = kw.get('pkg', self.pkg)
+        req      = kw.get('req', 'cmd line');
+        level    = kw.get('level', 0)
+        all_reqs = kw.get('all_reqs', {})
+
+        global __prov2pkgs
+        __prov2pkgs = {}
+        def prov2pkgs(prov, ignore):
+            if str(prov) in __prov2pkgs:
+                return __prov2pkgs[str(prov)]
+
+            if self.yb is None:
+                return []
+            yb = self.yb
+
+            arequirers = []
+            irequirers = []
+            try:
+                skip = {}
+                if yb.options.pkgnarrow in ('all', 'installed'):
+                    irequirers = yb.rpmdb.getRequires(prov[0],prov[1],prov[2])
+                    irequirers = irequirers.keys()
+                if yb.options.pkgnarrow in ('all', 'repos'):
+                    arequirers = yb.pkgSack.getRequires(prov[0],prov[1],prov[2])
+                    if not irequirers:
+                        arequirers = arequirers.keys()
+                    else:
+                        skip = set([pkg.pkgtup for pkg in irequirers])
+                        arequirers = [pkg for pkg in arequirers
+                                      if pkg.pkgtup not in skip]
+
+            except yum.Errors.YumBaseError, err:
+                print >>sys.stderr, "No package provides %s" % str(prov)
+                return []
+
+            __prov2pkgs[str(prov)] = arequirers + irequirers
+            return arequirers + irequirers
+
+        self._tree_print_req(pkg, req, level)
+        filetupes = []
+        for n in pkg.filelist + pkg.dirlist + pkg.ghostlist:
+            filetupes.append((n, None, (None, None, None)))
+
+        tups = pkg.provides + filetupes
+        rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, prov2pkgs)
+        nlevel = level + 1
+        for rpkg in sorted(rpkgs):
+            if pkg.verEQ(rpkg): # Remove deps. on self.
+                continue
+            if rpkgs[rpkg] is None:
+                req = self._tree_pkg2val(loc_reqs, rpkg)
+                self._tree_print_req(rpkg, req, nlevel)
+                continue
+            self.fmt_tree_what_requires(pkg=rpkg,
+                                        level=nlevel, all_reqs=all_reqs,
+                                        req=self._tree_pkg2val(loc_reqs, rpkg))
+
 
 class repoPkgQuery(pkgQuery):
     """
     I wrap a query of a non-installed package available in the repository.
     """
-    def __init__(self, pkg, qf):
-        pkgQuery.__init__(self, pkg, qf)
+    def __init__(self, pkg, qf, yb=None):
+        pkgQuery.__init__(self, pkg, qf, yb)
         self.classname = 'repo pkg'
 
     def prco(self, what, **kw):
@@ -296,6 +513,7 @@ class repoPkgQuery(pkgQuery):
                                                 to_unicode(message)))
         return "\n".join(changelog)
 
+
 class instPkgQuery(pkgQuery):
     """
     I wrap a query of an installed package 
@@ -305,8 +523,8 @@ class instPkgQuery(pkgQuery):
     tagmap = { 'installedsize': 'size',
              }
 
-    def __init__(self, pkg, qf):
-        pkgQuery.__init__(self, pkg, qf)
+    def __init__(self, pkg, qf, yb=None):
+        pkgQuery.__init__(self, pkg, qf, yb)
         self.classname = 'installed pkg'
 
     def __getitem__(self, item):
@@ -397,6 +615,7 @@ class groupQuery:
     def fmt_info(self):
         return ["%s:\n\n%s\n" % (self.name, self.group.description)]
 
+
 class YumBaseQuery(yum.YumBase):
     def __init__(self, pkgops = [], sackops = [], options = None):
         """
@@ -434,9 +653,9 @@ class YumBaseQuery(yum.YumBase):
                 continue
 
             if isinstance(pkg, yum.packages.YumInstalledPackage):
-                qpkg = instPkgQuery(pkg, qf)
+                qpkg = instPkgQuery(pkg, qf, self)
             else:
-                qpkg = repoPkgQuery(pkg, qf)
+                qpkg = repoPkgQuery(pkg, qf, self)
             qpkgs.append(qpkg)
         return qpkgs
 
@@ -557,13 +776,13 @@ class YumBaseQuery(yum.YumBase):
             if plain_pkgs:
                 if isinstance(pkg, yum.packages.YumInstalledPackage):
                     if iq is None:
-                        iq = instPkgQuery(pkg, qf)
+                        iq = instPkgQuery(pkg, qf, self)
                     iq.pkg = pkg
                     iq.name = pkg.name
                     pkg = iq
                 else:
                     if rq is None:
-                        rq = repoPkgQuery(pkg, qf)
+                        rq = repoPkgQuery(pkg, qf, self)
                     rq.pkg = pkg
                     rq.name = pkg.name
                     pkg = rq
@@ -571,7 +790,7 @@ class YumBaseQuery(yum.YumBase):
                 print to_unicode(pkg)
             for oper in self.pkgops:
                 try:
-                    out = pkg.doQuery(oper)
+                    out = pkg.doQuery(oper, yb=self)
                     if out:
                         print to_unicode(out)
                 except queryError, e:
@@ -645,6 +864,7 @@ class YumBaseQuery(yum.YumBase):
             else:
                 loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
+
 
 def main(args):
 
@@ -721,7 +941,7 @@ def main(args):
     parser.add_option("--releasever", default=None,
                       help="set value of $releasever in yum config and repo files")
     parser.add_option("--pkgnarrow", default="repos",
-                      help="limit query to installed / available / recent / updates / extras / available + installed / repository (default) packages")
+                      help="limit query to installed / available / recent / updates / extras / all (available + installed) / repository (default) packages")
     parser.add_option("--installed", action="store_true", default=False,
                       help="limit query to installed pkgs only")
     parser.add_option("--show-duplicates", action="store_true",
@@ -751,6 +971,18 @@ def main(args):
                       help="list available tags in queryformat queries")
     parser.add_option("-c", "--config", dest="conffile",
                       help="config file location")
+    parser.add_option("--tree-requires", action="store_true",
+                      dest="tree_requires",
+                      help="list recursive requirements, in tree form")
+    parser.add_option("--tree-conflicts", action="store_true",
+                      dest="tree_conflicts",
+                      help="list recursive conflicts, in tree form")
+    parser.add_option("--tree-obsoletes", action="store_true",
+                      dest="tree_obsoletes",
+                      help="list recursive obsoletes, in tree form")
+    parser.add_option("--tree-whatrequires", action="store_true",
+                      dest="tree_what_requires",
+                      help="list recursive what reqauires, in tree form")
 
     (opts, regexs) = parser.parse_args()
 
@@ -794,6 +1026,14 @@ def main(args):
         pkgops.append("nvr")
     if opts.source:
         pkgops.append("source")
+    if opts.tree_requires:
+        pkgops.append("tree_requires")
+    if opts.tree_conflicts:
+        pkgops.append("tree_conflicts")
+    if opts.tree_obsoletes:
+        pkgops.append("tree_obsoletes")
+    if opts.tree_what_requires:
+        pkgops.append("tree_what_requires")
     if opts.srpm:
         needsource = 1
     if opts.whatrequires:
