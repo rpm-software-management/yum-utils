@@ -1062,11 +1062,24 @@ def main(args):
     elif len(pkgops) == 0 and len(sackops) == 0:
         pkgops.append("queryformat")
 
+    for exp in regexs:
+        if exp.endswith('.src'):
+            needsource = 1
+            break
+
+    if opts.archlist:
+        archlist = opts.archlist.split(',')
+    elif needsource:
+        archlist = getArchList()
+        archlist.append('src')
+
     repoq = YumBaseQuery(pkgops, sackops, opts)
 
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
     repoq.preconf.releasever = opts.releasever
+    if archlist:
+        repoq.preconf.arch = archlist[0]
     if opts.conffile:
         repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
     else:
@@ -1137,17 +1150,6 @@ def main(args):
         for repo_match in opts.enablerepos:
             for repo in repoq.repos.findRepos(repo_match):
                 repo.enable()
-
-    for exp in regexs:
-        if exp.endswith('.src'):
-            needsource = 1
-            break
-
-    if opts.archlist:
-        archlist = opts.archlist.split(',')
-    elif needsource:
-        archlist = getArchList()
-        archlist.append('src')
 
     try:
         if not hasattr(repoq, 'arch'):

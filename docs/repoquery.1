@@ -126,7 +126,9 @@ When used with --whatrequires, query packages recursively.
 .IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
 Limit the query to packages of given architecture(s). Valid values are all
 architectures known to rpm/yum such as 'i386' and 'src' for
-source RPMS.
+source RPMS. Note that repoquery will now change yum's "arch" to the first
+value in the archlist. So "\-\-archlist=i386,i686" will change yum's canonical
+arch to i386, but allow packages of i386 and i686.
 .IP "\fB\-\-pkgnarrow=WHAT\fP"
 Limit what packages are considered for the query. Valid values for WHAT are:
 installed, available, recent, updates, extras, all and repository (default).
