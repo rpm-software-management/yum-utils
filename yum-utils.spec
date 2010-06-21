@@ -348,6 +348,16 @@ Requires: yum >= 3.2.22
 When this plugin is installed it will automatically snapshot any
 filesystem that is touched by the packages in a yum update or yum remove.
 
+%package -n yum-plugin-ps
+Summary: Yum plugin to look at processes, with respect to packages
+Group: System Environment/Base
+Requires: yum >= 3.2.28
+
+%description -n yum-plugin-ps
+When this plugin is installed it adds the yum command "ps", which allows you
+to see which running processes are accociated with which packages (and if they
+need rebooting, or have updates, etc.)
+
 %prep
 %setup -q
 
@@ -382,6 +392,7 @@ plugins="\
  show-leaves \
  local \
  fs-snapshot \
+ ps \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -599,6 +610,11 @@ fi
 /usr/lib/yum-plugins/fs-snapshot.*
 %{_mandir}/man1/yum-fs-snapshot.1.*
 %{_mandir}/man5/yum-fs-snapshot.conf.5.*
+
+%files -n yum-plugin-ps
+%defattr(-, root, root)
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ps.conf
+/usr/lib/yum-plugins/ps.*
 
 %changelog
 * Sun Jun 6 2010 Tim Lauridsen <timlau@fedoraproject.org>
