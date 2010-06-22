@@ -351,7 +351,7 @@ filesystem that is touched by the packages in a yum update or yum remove.
 %package -n yum-plugin-ps
 Summary: Yum plugin to look at processes, with respect to packages
 Group: System Environment/Base
-Requires: yum >= 3.2.28
+Requires: yum >= 3.2.27
 
 %description -n yum-plugin-ps
 When this plugin is installed it adds the yum command "ps", which allows you
