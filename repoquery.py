@@ -790,7 +790,7 @@ class YumBaseQuery(yum.YumBase):
                 print to_unicode(pkg)
             for oper in self.pkgops:
                 try:
-                    out = pkg.doQuery(oper, yb=self)
+                    out = pkg.doQuery(oper)
                     if out:
                         print to_unicode(out)
                 except queryError, e:
