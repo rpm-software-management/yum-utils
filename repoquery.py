@@ -113,9 +113,15 @@ convertmap = { 'date': sec2date,
              }
 
 class queryError(exceptions.Exception):
-    def __init__(self, msg):
-        exceptions.Exception.__init__(self)
-        self.msg = msg
+    def __init__(self, value=None):
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        return "%s" %(self.value,)
+
+    def __unicode__(self):
+        return '%s' % to_unicode(self.value)
+        
 
 
 # abstract class
@@ -632,6 +638,11 @@ class YumBaseQuery(yum.YumBase):
         self.options = options
         self.pkgops = pkgops
         self.sackops = sackops
+        self._sacks = []
+        if self.options.pkgnarrow in ('all', 'extras', 'installed'):
+            self._sacks.append('rpmdb')
+        if self.options.pkgnarrow not in ('extras', 'installed'):
+            self._sacks.append('pkgSack')
 
     def queryPkgFactory(self, pkgs, plain_pkgs=False):
         """
@@ -765,7 +776,7 @@ class YumBaseQuery(yum.YumBase):
                                 if p:
                                     pkgs.append(p)
                         except queryError, e:
-                            self.logger.error( e.msg)
+                            self.logger.error(e)
 
         if plain_pkgs:
             iq = None
@@ -794,7 +805,7 @@ class YumBaseQuery(yum.YumBase):
                     if out:
                         print to_unicode(out)
                 except queryError, e:
-                    self.logger.error( e.msg)
+                    self.logger.error(e)
 
     def doQuery(self, method, *args, **kw):
         return getattr(self, "fmt_%s" % method)(*args, **kw)
@@ -826,24 +837,31 @@ class YumBaseQuery(yum.YumBase):
                     provs.extend(pkg.files())
 
             for prov in provs:
-                for pkg in self.pkgSack.searchRequires(prov):
-                    pkgs[pkg.pkgtup] = pkg
-                    if self.options.recursive:
-                        require_recursive(pkg.name)
+                for sackstr in self._sacks:
+                    sack = getattr(self, sackstr)
+                    for pkg in sack.searchRequires(prov):
+                        pkgs[pkg.pkgtup] = pkg
+                        if self.options.recursive:
+                            require_recursive(pkg.name)
+                
 
         require_recursive(name)
         return self.queryPkgFactory(sorted(pkgs.values()))
 
     def fmt_whatobsoletes(self, name, **kw):
         pkgs = []
-        for pkg in self.pkgSack.searchObsoletes(name):
-            pkgs.append(pkg)
+        for sackstr in self._sacks:
+            sack = getattr(self, sackstr)
+            for pkg in sack.searchObsoletes(name):
+                pkgs.append(pkg)
         return self.queryPkgFactory(pkgs)
             
     def fmt_whatconflicts(self, name, **kw):
         pkgs = []
-        for pkg in self.pkgSack.searchConflicts(name):
-            pkgs.append(pkg)
+        for sackstr in self._sacks:
+            sack = getattr(self, sackstr)
+            for pkg in sack.searchConflicts(name):
+                pkgs.append(pkg)
         return self.queryPkgFactory(pkgs)
 
     def fmt_requires(self, name, **kw):
@@ -1167,8 +1185,10 @@ def main(args):
     except (yum.Errors.RepoError, yum.Errors.GroupsError), e:
         repoq.logger.error(e)
         sys.exit(1)
-
-    repoq.runQuery(regexs)
+    try:
+        repoq.runQuery(regexs)
+    except queryError, e:
+        repoq.logger.error(e)
 
 if __name__ == "__main__":
     misc.setup_locale()
