@@ -96,7 +96,15 @@ class YumBuildDep(YumUtilBase):
             self.logger.error(msg)
             sys.exit(1)
 
-        self.buildTransaction()
+        if hasattr(self, 'doUtilBuildTransaction'):
+            self.doUtilBuildTransaction()
+        else:
+            try:
+                self.buildTransaction()
+            except yum.Errors.YumBaseError, e:
+                self.logger.critical("Error building transaction: %s" % e)
+                sys.exit(1)
+
         if len(self.tsInfo) < 1:
             print 'No uninstalled build requires'
             sys.exit()

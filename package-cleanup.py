@@ -342,7 +342,15 @@ class PackageCleanup(YumUtilBase):
                 
             self._remove_old_kernels(opts.kernelcount, opts.keepdevel)
             self.run_with_package_names.add('yum-utils')
-            self.buildTransaction()
+            if hasattr(self, 'doUtilBuildTransaction'):
+                self.doUtilBuildTransaction()
+            else:
+                try:
+                    self.buildTransaction()
+                except yum.Errors.YumBaseError, e:
+                    self.logger.critical("Error building transaction: %s" % e)
+                    sys.exit(1)
+
             if len(self.tsInfo) < 1:
                 print 'No old kernels to remove'
                 sys.exit(0)
@@ -382,7 +390,17 @@ class PackageCleanup(YumUtilBase):
                 self.conf.tsflags.append('noscripts')
             self._remove_old_dupes()
             self.run_with_package_names.add('yum-utils')
-            self.buildTransaction()
+
+            if hasattr(self, 'doUtilBuildTransaction'):
+                self.doUtilBuildTransaction()
+            else:
+                try:
+                    self.buildTransaction()
+                except yum.Errors.YumBaseError, e:
+                    self.logger.critical("Error building transaction: %s" % e)
+                    sys.exit(1)
+                                    
+
             if len(self.tsInfo) < 1:
                 print 'No duplicates to remove'
                 sys.exit(0)

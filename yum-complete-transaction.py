@@ -207,7 +207,15 @@ class YumCompleteTransaction(YumUtilBase):
 
 
         current_count = len(self.tsInfo)
-        self.buildTransaction(unfinished_transactions_check=False)
+        if hasattr(self, 'doUtilBuildTransaction'):
+            self.doUtilBuildTransaction(unfinished_transactions_check=False)
+        else:
+            try:
+                self.buildTransaction(unfinished_transactions_check=False)
+            except yum.Errors.YumBaseError, e:
+                self.logger.critical("Error building transaction: %s" % e)
+                sys.exit(1)
+
         if current_count != len(self.tsInfo):
             print '\n\nTransaction size changed - this means we are not doing the\n' \
                   'same transaction as we were before. Aborting and disabling\n' \
