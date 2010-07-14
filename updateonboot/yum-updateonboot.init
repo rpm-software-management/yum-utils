@@ -92,9 +92,12 @@ case "$1" in
 	$0 stop
 	$0 start
 	;;
+  usage)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+	;;
   *)
         echo $"Usage: $0 {start|stop|restart|reload|status}"
-        exit 1
+        exit 2
 esac
 
 exit 0
