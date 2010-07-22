@@ -142,6 +142,8 @@ def parseArgs(args):
                       help="In addition to src.rpms, any arch you want to include")
     parser.add_option("-s", "--size", default=False, action='store_true',
                       help="Output size changes for any new->old packages")
+    parser.add_option("--simple",  default=False, action='store_true',
+                      help="output simple format")
     (opts, argsleft) = parser.parse_args()
 
     if not opts.new or not opts.old:
@@ -189,52 +191,58 @@ def main(args):
     ygh = my.dy_diff()
     
 
+
     total_sizechange = 0
     add_sizechange = 0
     remove_sizechange = 0
     if ygh.add:
         for pkg in sorted(ygh.add):
-            print 'New package %s' % pkg.name
-            print '        %s' % to_unicode(pkg.summary)
+            print 'New package: %s-%s-%s' % (pkg.name, pkg.ver, pkg.rel)
+            print '             %s\n' % to_unicode(pkg.summary)
             add_sizechange += int(pkg.size)
                 
     if ygh.remove:
         for pkg in sorted(ygh.remove):
-            print 'Removed package %s' % pkg.name
+            print 'Removed package:  %s-%s-%s' % (pkg.name, pkg.ver, pkg.rel)
             if pkg in ygh.obsoleted:
-                print 'Obsoleted by %s' % ygh.obsoleted[pkg]
+                print 'Obsoleted by   :  %s' % ygh.obsoleted[pkg]
             remove_sizechange += (int(pkg.size))
                 
     if ygh.modified:
-        print 'Updated Packages:\n'
+        print '\nUpdated Packages:\n'
         for (pkg, oldpkg) in sorted(ygh.modified):
-            msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
-            dashes = "-" * len(msg) 
-            msg += "\n%s\n" % dashes
-            # get newest clog time from the oldpkg
-            # for any newer clog in pkg
-            # print it
-            oldlogs = oldpkg.changelog
-            if len(oldlogs):
-                #  Don't sort as that can screw the order up when time is the
-                # same.
-                oldtime    = oldlogs[0][0]
-                oldauth    = oldlogs[0][1]
-                oldcontent = oldlogs[0][2]
-                for (t, author, content) in  pkg.changelog:
-                    if t < oldtime:
-                        break
-                    if ((t == oldtime) and (author == oldauth) and
-                        (content == oldcontent)):
-                        break
-                    tm = datetime.date.fromtimestamp(int(t))
-                    tm = tm.strftime("%a %b %d %Y")
-                    msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
-                                                to_unicode(content))
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 total_sizechange += sizechange
-                msg += "\nSize Change: %s bytes\n" % sizechange
+            
+            if opts.simple:
+                msg = "%s: %s-%s-%s ->  %s-%s-%s" % (pkg.name, oldpkg.name, 
+                        oldpkg.ver, oldpkg.rel, pkg.name, pkg.ver, pkg.rel)
+            else:
+                msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
+                dashes = "-" * len(msg) 
+                msg += "\n%s\n" % dashes
+                # get newest clog time from the oldpkg
+                # for any newer clog in pkg
+                # print it
+                oldlogs = oldpkg.changelog
+                if len(oldlogs):
+                    #  Don't sort as that can screw the order up when time is the
+                    # same.
+                    oldtime    = oldlogs[0][0]
+                    oldauth    = oldlogs[0][1]
+                    oldcontent = oldlogs[0][2]
+                    for (t, author, content) in  pkg.changelog:
+                        if t < oldtime:
+                            break
+                        if ((t == oldtime) and (author == oldauth) and
+                            (content == oldcontent)):
+                            break
+                        tm = datetime.date.fromtimestamp(int(t))
+                        tm = tm.strftime("%a %b %d %Y")
+                        msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
+                                                    to_unicode(content))
+                    msg += "\nSize Change: %s bytes\n" % sizechange
 
             print msg
 
@@ -242,7 +250,7 @@ def main(args):
         not my.pkgSack.searchNevra(arch='src')):
         print "** No 'src' pkgs in any repo. maybe see docs. on --archlist?"
 
-    print 'Summary:'
+    print '\nSummary:'
     print 'Added Packages: %s' % len(ygh.add)
     print 'Removed Packages: %s' % len(ygh.remove)
     print 'Modified Packages: %s' % len(ygh.modified)
