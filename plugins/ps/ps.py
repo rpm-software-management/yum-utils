@@ -28,7 +28,12 @@ import yum.misc as misc
 from yum.plugins import TYPE_INTERACTIVE
 
 from urlgrabber.progress import format_number
-import utils
+try:
+    import utils
+except ImportError:
+    #  This only happens when we are imported but aren't going to be run
+    # due to being type ITERACTIVE.
+    utils = None
 
 import fnmatch
 import time
