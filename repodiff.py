@@ -242,7 +242,8 @@ def main(args):
                         tm = tm.strftime("%a %b %d %Y")
                         msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
                                                     to_unicode(content))
-                    msg += "\nSize Change: %s bytes\n" % sizechange
+                    if opts.size:
+                        msg += "\nSize Change: %s bytes\n" % sizechange
 
             print msg
 
