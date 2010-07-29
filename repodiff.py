@@ -19,6 +19,7 @@ import sys
 import datetime
 import os
 import locale
+import rpmUtils.arch
 from yum.i18n import to_unicode
 
 from optparse import OptionParser
@@ -52,7 +53,13 @@ class DiffYum(yum.YumBase):
         self.repos.enableRepo(repoid)
         # setup the repo dirs/etc
         self.doRepoSetup(thisrepo=repoid)
-        self._getSacks(archlist=self.dy_archlist, thisrepo=repoid)
+        if '*' in self.dy_archlist:
+            # Include all known arches
+            arches = rpmUtils.arch.arches
+            archlist = list(set(arches.keys()).union(set(arches.values())))
+        else:
+            archlist = self.dy_archlist
+        self._getSacks(archlist=archlist, thisrepo=repoid)
 
     def dy_diff(self):
         add = []
