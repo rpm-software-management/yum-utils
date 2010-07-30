@@ -77,6 +77,8 @@ NAME = 'yum-config-manager'
 VERSION = '1.0'
 USAGE = '"yum-config-manager [options] [section]'
 
+yum.misc.setup_locale()
+
 yb = YumUtilBase(NAME, VERSION, USAGE)
 logger = logging.getLogger("yum.verbose.cli.yum-config-manager")
 yb.preconf.debuglevel = 0
