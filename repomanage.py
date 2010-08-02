@@ -31,12 +31,6 @@ from yum import misc
 from optparse import OptionParser
 
 
-class Error(Exception):
-    def __init__(self, message=None):
-        Exception.__init__(self)
-        self.message = message
-
-
 def errorprint(stuff):
     print >> sys.stderr, stuff
     
