@@ -39,7 +39,7 @@ def parseArgs():
     dependencies in all packages for resolution. Print out the list of
     packages with unresolved dependencies
     
-    %s [-c <config file>] [-a <arch>] [-r <repoid>] [-r <repoid2>]
+    %s [-c <config file>] [-a <arch>] [-l <lookaside>] [-r <repoid>] [-r <repoid2>]
     """ % sys.argv[0]
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
@@ -51,6 +51,8 @@ def parseArgs():
                       help="set the basearch for yum to run as")
     parser.add_option("-b", "--builddeps", default=False, action="store_true",
         help='check build dependencies only (needs source repos enabled)')
+    parser.add_option("-l", "--lookaside", default=[], action='append',
+        help="specify a lookaside repo id to query, can be specified multiple times")
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
@@ -77,6 +79,7 @@ class RepoClosure(yum.YumBase):
         if basearch:
             self.preconf.arch = basearch
         self.logger = logging.getLogger("yum.verbose.repoclosure")
+        self.lookaside = []
         self.builddeps = builddeps
         self.pkgonly = pkgonly
         self.grouponly = grouponly
@@ -162,6 +165,10 @@ class RepoClosure(yum.YumBase):
             pkgs = filter(lambda x: x.name in pkglist, pkgs)
 
         for pkg in pkgs:
+            if pkg.repoid in self.lookaside:
+                # don't attempt to resolve dependancy issues for
+                # packages from lookaside repositories
+                continue
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
             
@@ -191,7 +198,7 @@ class RepoClosure(yum.YumBase):
                     else:
                         if pkg not in unresolved:
                             unresolved[pkg] = []
-                        unresolved[pkg].append((req, flags, ver))                        
+                        unresolved[pkg].append((req, flags, ver))
                         
         return unresolved
     
@@ -227,10 +234,14 @@ def main():
     
     if opts.repoid:
         for repo in my.repos.repos.values():
-            if repo.id not in opts.repoid:
+            if ((repo.id not in opts.repoid) and
+                (repo.id not in opts.lookaside)):
                 repo.disable()
             else:
                 repo.enable()
+
+    if opts.lookaside:
+        my.lookaside = opts.lookaside
 
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
