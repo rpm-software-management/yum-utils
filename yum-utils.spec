@@ -465,30 +465,33 @@ fi
 
 %files -n yum-updateonboot
 %defattr(-, root, root)
-%doc updateonboot/README
+%doc updateonboot/README COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/yum-updateonboot
 %{_initrddir}/yum-updateonboot
 
 %files -n yum-plugin-changelog
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
+%doc COPYING
 /usr/lib/yum-plugins/changelog.*
 %{_mandir}/man1/yum-changelog.1.*
 %{_mandir}/man5/yum-changelog.conf.5.*
 
 %files -n yum-plugin-fastestmirror
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
 /usr/lib/yum-plugins/fastestmirror*.*
 
 %files -n yum-plugin-protectbase
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protectbase.conf
 /usr/lib/yum-plugins/protectbase.*
 
 %files -n yum-plugin-versionlock
 %defattr(-, root, root)
-%doc plugins/versionlock/README
+%doc plugins/versionlock/README COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.list
 /usr/lib/yum-plugins/versionlock.*
@@ -497,42 +500,50 @@ fi
 
 %files -n yum-plugin-tsflags
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
 /usr/lib/yum-plugins/tsflags.*
 
 %files -n yum-plugin-downloadonly
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
 /usr/lib/yum-plugins/downloadonly.*
 
 %files -n yum-plugin-priorities
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
 /usr/lib/yum-plugins/priorities.*
 
 %files -n yum-plugin-refresh-updatesd
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
 /usr/lib/yum-plugins/refresh-updatesd.*
 
 %files -n yum-plugin-merge-conf
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
 /usr/lib/yum-plugins/merge-conf.*
 
 %files -n yum-plugin-security
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
 /usr/lib/yum-plugins/security.*
 %{_mandir}/man8/yum-security.8.*
 
 %files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
 /usr/lib/yum-plugins/upgrade-helper.*
 
 %files -n yum-plugin-aliases
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
 %config(noreplace) %{_sysconfdir}/yum/aliases.conf
 /usr/lib/yum-plugins/aliases.*
@@ -540,43 +551,51 @@ fi
 
 %files -n yum-plugin-list-data
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
 /usr/lib/yum-plugins/list-data.*
 %{_mandir}/man1/yum-list-data.1.*
 
 %files -n yum-plugin-filter-data
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
 /usr/lib/yum-plugins/filter-data.*
 %{_mandir}/man1/yum-filter-data.1.*
 
 %files -n yum-plugin-tmprepo
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
 /usr/lib/yum-plugins/tmprepo.*
 
 %files -n yum-plugin-verify
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/verify.conf
 /usr/lib/yum-plugins/verify.*
 %{_mandir}/man1/yum-verify.1.*
 
 %files -n yum-plugin-keys
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/keys.conf
 /usr/lib/yum-plugins/keys.*
 
 %files -n yum-NetworkManager-dispatcher
 %defattr(-, root, root)
+%doc COPYING
 /etc/NetworkManager/dispatcher.d/*
 
 %files -n yum-plugin-remove-with-leaves
 %defattr(-, root, root)
+%doc COPYING
 /usr/lib/yum-plugins/remove-with-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
 %files -n yum-plugin-post-transaction-actions
 %defattr(-, root, root)
+%doc COPYING
 /usr/lib/yum-plugins/post-transaction-actions.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
 %doc plugins/post-transaction-actions/sample.action
@@ -585,27 +604,32 @@ fi
 
 %files -n yum-plugin-rpm-warm-cache
 %defattr(-, root, root)
+%doc COPYING
 /usr/lib/yum-plugins/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
 
 %files -n yum-plugin-auto-update-debug-info
 %defattr(-, root, root)
+%doc COPYING
 /usr/lib/yum-plugins/auto-update-debuginfo.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/auto-update-debuginfo.conf
 
 %files -n yum-plugin-show-leaves
 %defattr(-, root, root)
+%doc COPYING
 /usr/lib/yum-plugins/show-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/show-leaves.conf
 
 %files -n yum-plugin-local
 %defattr(-, root, root)
+%doc COPYING
 %ghost %{_sysconfdir}/yum.repos.d/_local.repo
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/local.conf
 /usr/lib/yum-plugins/local.*
 
 %files -n yum-plugin-fs-snapshot
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fs-snapshot.conf
 /usr/lib/yum-plugins/fs-snapshot.*
 %{_mandir}/man1/yum-fs-snapshot.1.*
@@ -613,10 +637,14 @@ fi
 
 %files -n yum-plugin-ps
 %defattr(-, root, root)
+%doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ps.conf
 /usr/lib/yum-plugins/ps.*
 
 %changelog
+* Tue Aug  3 2010 Seth Vidal <skvidal at fedoraproject.org>
+- add COPYING docs to all the plugins to make fedora(and Tim) happy. :)
+
 * Tue Aug 3 2010 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.28 
 
