@@ -74,6 +74,8 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'relativepath', 'hdrstart', 'hdrend', 'id',
             ]
 
+
+
 def sec2isodate(timestr):
     return time.strftime("%F %T", time.gmtime(int(timestr)))
 
@@ -280,7 +282,7 @@ class pkgQuery:
 
     # These are common helpers for the --tree-* options...
     @staticmethod
-    def _tree_print_req(self, req, val, level):
+    def _tree_print_req(req, val, level):
         indent = ''
         if level:
             indent = ' |  ' * (level - 1) + ' \_  '
@@ -322,7 +324,6 @@ class pkgQuery:
         req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
-        global __req2pkgs
         __req2pkgs = {}
         def req2pkgs(ignore, req):
             req = str(req)
@@ -396,7 +397,7 @@ class pkgQuery:
                         if opkg.obsoletedBy([pkg]):
                             obss.append(opkg)
             if self.yb.options.pkgnarrow in ('all', 'installed'):
-                skip = set([pkg.pkgtup for pkg in obbs])
+                skip = set([pkg.pkgtup for pkg in obss])
                 for obs_n in pkg.obsoletes_names:
                     for opkg in yb.rpmdb.searchNevra(name=obs_n):
                         if opkg.pkgtup in skip:
@@ -427,7 +428,6 @@ class pkgQuery:
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
 
-        global __prov2pkgs
         __prov2pkgs = {}
         def prov2pkgs(prov, ignore):
             if str(prov) in __prov2pkgs:
