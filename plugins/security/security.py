@@ -44,7 +44,6 @@ import fnmatch
 from yum.plugins import TYPE_INTERACTIVE
 from yum.update_md import UpdateMetadata
 import logging # for commands
-from yum import logginglevels
 
 from yum.constants import *
 

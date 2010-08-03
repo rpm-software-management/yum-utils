@@ -23,7 +23,6 @@
 #  yum ps k\*
 #  yum ps all
 
-import yum
 import yum.misc as misc
 from yum.plugins import TYPE_INTERACTIVE
 
@@ -42,19 +41,19 @@ requires_api_version = '2.5'
 plugin_type = (TYPE_INTERACTIVE,)
 
 def _rpmdb_return_running_packages(self, return_pids=False):
-        """returns a list of yum installed package objects which own a file
-           that are currently running or in use."""
-        pkgs = {}
-        for pid in misc.return_running_pids():
-            for fn in misc.get_open_files(pid):
-                for pkg in self.searchFiles(fn):
-                    if pkg not in pkgs:
-                        pkgs[pkg] = set()
-                    pkgs[pkg].add(pid)
+    """returns a list of yum installed package objects which own a file
+       that are currently running or in use."""
+    pkgs = {}
+    for pid in misc.return_running_pids():
+        for fn in misc.get_open_files(pid):
+            for pkg in self.searchFiles(fn):
+                if pkg not in pkgs:
+                    pkgs[pkg] = set()
+                pkgs[pkg].add(pid)
 
-        if return_pids:
-            return pkgs
-        return sorted(pkgs.keys())
+    if return_pids:
+        return pkgs
+    return sorted(pkgs.keys())
 
 
 class PSCommand:
