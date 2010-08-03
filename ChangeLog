@@ -1,3 +1,219 @@
+2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.28
+
+2010-08-03  James Antill <james@and.org>
+
+	* repoquery.py: Fix pylint warnings (all false positives, I think).
+
+
+2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repoquery.py: fix pylint errors ************* Module repoquery
+	W0211:283:pkgQuery._tree_print_req: Static method with 'self' as
+	first argument W0601:325:pkgQuery._fmt_tree_prov: Global variable
+	'__req2pkgs' undefined at the module level
+	W0601:430:pkgQuery.fmt_tree_what_requires: Global variable
+	'__prov2pkgs' undefined at the module level
+	E0602:399:pkgQuery.fmt_tree_obsoletes.obs2pkgs: Undefined variable
+	'obbs' E1120:364:pkgQuery._fmt_tree_prov: No value passed for
+	parameter 'level' in function call
+	E1120:373:pkgQuery._fmt_tree_prov: No value passed for parameter
+	'level' in function call E1120:463:pkgQuery.fmt_tree_what_requires:
+	No value passed for parameter 'level' in function call
+	E1120:476:pkgQuery.fmt_tree_what_requires: No value passed for
+	parameter 'level' in function call
+	E1120:413:pkgQuery.fmt_tree_obsoletes: No value passed for parameter
+	'level' in function call E1120:420:pkgQuery.fmt_tree_obsoletes: No
+	value passed for parameter 'level' in function call
+
+2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/ps/ps.py, plugins/security/security.py: fix pylint erros
+	************* Module ps W0311: 45: Bad indentation. Found 8 spaces,
+	expected 4 W0311: 47: Bad indentation. Found 8 spaces, expected 4
+	W0311: 48: Bad indentation. Found 8 spaces, expected 4 W0311: 49:
+	Bad indentation. Found 12 spaces, expected 8 W0311: 50: Bad
+	indentation. Found 16 spaces, expected 12 W0311: 51: Bad
+	indentation. Found 20 spaces, expected 16 W0311: 52: Bad
+	indentation. Found 24 spaces, expected 20 W0311: 53: Bad
+	indentation. Found 20 spaces, expected 16 W0311: 55: Bad
+	indentation. Found 8 spaces, expected 4 W0311: 56: Bad indentation.
+	Found 12 spaces, expected 8 W0311: 57: Bad indentation. Found 8
+	spaces, expected 4 W0611: 26: Unused import yum ************* Module
+	security W0611: 47: Unused import logginglevels
+
+2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* repoquery.py: fix pylint errors  ************* Module repoquery
+	W0301:322: Unnecessary semicolon W0301:426: Unnecessary semicolon
+	E0213:267:pkgQuery.tree_print_req: Method should have "self" as
+	first argument E0213:272:pkgQuery.pkg2uniq: Method should have
+	"self" as first argument E0602:274:pkgQuery.pkg2uniq: Undefined
+	variable 'self' E0602:274:pkgQuery.pkg2uniq: Undefined variable
+	'self' E0213:277:pkgQuery.pkg2val: Method should have "self" as
+	first argument
+
+2010-08-03  James Antill <james@and.org>
+
+	* plugins/security/security.py: Use print instead of log for
+	security output so -q "works", trac 307
+
+2010-08-03  James Antill <james@and.org>
+
+	* plugins/security/security.py: Fix bug for when not using "all",
+	bah.
+
+2010-08-03  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add installed mark, when using
+	list/info "all". Fix usage text.
+
+2010-08-02  James Antill <james@and.org>
+
+	* plugins/security/security.py:  Big changes to security plugin command:  . Move list, info, summary
+	 under a single "updateinfo" command.  . Allow each command to see
+	 "available", "installed", "updates" or   "all". So you can easily
+	 see what has been applied as well as what   is to be applied.  .
+	 Should be fully backward compat.  . Cleanup some output.  ...plugin
+	 now approached ridiculously badly named status.
+
+2010-08-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repomanage.py: get rid of exception.message deprecated use
+
+2010-08-02  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repomanage.py: remove completely unused exception definition from
+	repomanage altogether
+
+2010-07-30  James Antill <james@and.org>
+
+	* yum-config-manager.py: Fix unicide in yum-config-manager, BZ
+	619851
+
+2010-07-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Accept "*"
+	to mean all arches.
+
+2010-07-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-config-manager.py: add '--add-repo' option to
+	yum-config-manager to allow adding repos from:
+	http://someserver/foo.repo or http://someplace/this/is/a/repo/  and
+	setting them up, trivially.
+
+2010-07-27  Dennis Gregorovic <dgregor@redhat.com>
+
+	* repodiff.py: Accept "*" to mean all arches.
+
+2010-07-27  James Antill <james@and.org>
+
+	* repodiff.py: Don't traceback when --size isn't given.
+
+2010-07-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Fix some
+	minor problems with return codes in updateonboot initscript   Fix
+	annoying warnings for non-cli yum callers
+
+2010-07-22  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repodiff.py: add --simple option to repodiff to condense its
+	output a lot.
+
+2010-07-14  James Antill <james@and.org>
+
+	* updateonboot/yum-updateonboot.init: Fix some minor problems with
+	return codes in updateonboot initscript
+
+2010-07-07  James Antill <james@and.org>
+
+	* plugins/ps/ps.py: Fix annoying warnings for non-cli yum callers
+
+2010-07-06  Seth Vidal <skvidal@fedoraproject.org>
+
+	* debuginfo-install.py, package-cleanup.py, yum-builddep.py,
+	yum-complete-transaction.py: optionally call
+	doUtilBuildTransaction(), if available for all the utils that need
+	to do that
+
+2010-06-30  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: - make queryErrors be normal for python exceptions - make
+	whatrequres/provides/conflicts/obsoletes work with --installed or
+	pkgnarrow=installed or all
+
+2010-06-25  James Antill <james@and.org>
+
+	* repoquery.py: Fix doQuery() passing yb keyword, leftover snafu
+	from tree-* args. change
+
+2010-06-22  James Antill <james@and.org>
+
+	* plugins/ps/ps.py, yum-utils.spec: Allow "ps" plugin to work on
+	much older yum versions
+
+2010-06-21  James Antill <james@and.org>
+
+	* plugins/ps/ps.conf, plugins/ps/ps.py, yum-utils.spec: Add ps
+	plugin, to show info about running commands.
+
+2010-06-18  James Antill <james@and.org>
+
+	* docs/repoquery.1, repoquery.py: Have repoquery --archlist change
+	preconf.arch too
+
+2010-06-17  James Antill <james@and.org>
+
+	* docs/repoquery.1: Add docs for --tree-*
+
+2010-06-16  James Antill <james@and.org>
+
+	* repoquery.py:  Add --tree-requires, --tree-conflicts, --tree-obsoletes and
+	 --tree-whatrequires options to repoquery.   These replace
+	 pkg-deps-tree-view.py and pkg-provs-tree-view.py, with conflicts
+	 and obsoletes added "for fun". Could do --tree-whatconflicts and
+	 --tree-whatobsoletes for even more fun, but I passed atm.
+
+2010-06-15  Seth Vidal <skvidal@fedoraproject.org>
+
+	* reposync.py: get rid of keys() call to the FileTypes function
+
+2010-06-14  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: add repo. like yumdb_info. for repoquery to keep
+	arbitrary names out of the legacy of repoquery  this makes:
+	repoquery -q --qf "%{name} %{repo.name} %{repo.baseurl}" pkgname
+	work correctly
+
+2010-06-14  James Antill <james@and.org>
+
+	* repoquery.py: Fix reponame for installed
+
+2010-06-14  James Antill <james@and.org>
+
+	* repoquery.py: Add reponame variable, as we can't use repo.name
+
+2010-06-07  James Antill <james@and.org>
+
+	* repoquery.py: Don't pre-download filelists, often got this `wrong'
+	with alldeps
+
+2010-06-06  James Antill <james@and.org>
+
+	* repoquery.py: Fix stupid typo in repoquery, let non-installed
+	packages work again
+
+2010-06-06  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2010-06-06  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.27
