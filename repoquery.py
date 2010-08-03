@@ -264,23 +264,23 @@ class pkgQuery:
             loc = urlparse.urljoin(repourl, self['relativepath'])
         return loc
 
-    def tree_print_req(req, val, level):
+    def tree_print_req(self, req, val, level):
         indent = ''
         if level:
             indent = ' |  ' * (level - 1) + ' \_  '
         print "%s%s [%s]" % (indent, str(req), str(val))
-    def pkg2uniq(pkg):
+    def pkg2uniq(self, pkg):
         """ Turn a pkg into a "unique" req."""
         if self.yb and self.yb.conf.showdupesfromrepos:
             return str(pkg)
         return "%s.%s" % (pkg.name, getBaseArch(pkg.arch))
-    def pkg2val(reqs, pkg):
+    def pkg2val(self, reqs, pkg):
         reqs = sorted(reqs[pkg2req(pkg)])
         return str(len(reqs)) + ": " + ", ".join(reqs)
 
     # These are common helpers for the --tree-* options...
     @staticmethod
-    def _tree_print_req(req, val, level):
+    def _tree_print_req(self, req, val, level):
         indent = ''
         if level:
             indent = ' |  ' * (level - 1) + ' \_  '
@@ -319,7 +319,7 @@ class pkgQuery:
         return rpkgs, loc_reqs
     def _fmt_tree_prov(self, prco_type, **kw):
         pkg      = kw.get('pkg', self.pkg)
-        req      = kw.get('req', 'cmd line');
+        req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
         global __req2pkgs
@@ -423,7 +423,7 @@ class pkgQuery:
 
     def fmt_tree_what_requires(self, **kw):
         pkg      = kw.get('pkg', self.pkg)
-        req      = kw.get('req', 'cmd line');
+        req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
 
