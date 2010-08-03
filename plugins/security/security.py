@@ -384,7 +384,9 @@ class UpdateinfoCommand:
         md_info = ysp_gen_metadata(self.repos.listEnabled())
         logger = logging.getLogger("yum.verbose.main")
         def msg(x):
-            logger.log(logginglevels.INFO_2, x)
+            #  Don't use: logger.log(logginglevels.INFO_2, x)
+            # or -q deletes everything.
+            print x
 
         opts, cmdline = base.plugins.cmdline
         extcmds, show_type, filt_type = self._parse_extcmds(extcmds)
