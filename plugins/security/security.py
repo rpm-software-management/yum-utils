@@ -209,6 +209,7 @@ class UpdateinfoCommand:
                     r_maxsize = max(len(str(ref['id'])), r_maxsize)
 
         for (notice, pkgtup, pkg) in data:
+            mark = ''
             if list_type == 'all':
                 mark = '  '
                 if _rpm_tup_vercmp(iname2tup[pkgtup[0]], pkgtup) >= 0:
