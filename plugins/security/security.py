@@ -186,7 +186,7 @@ class UpdateinfoCommand:
         return ['updateinfo'] + sorted(self.direct_cmds.keys())
 
     def getUsage(self):
-        return "[security|bugzilla|cve|new-packages] [PACKAGE-wildcard]"
+        return "[info|list|...] [security|...] [installed|available|all] [pkgs|id]"
 
     def getSummary(self):
         return "Acts on repository update information"
@@ -194,7 +194,8 @@ class UpdateinfoCommand:
     def doCheck(self, base, basecmd, extcmds):
         pass
 
-    def list_show_pkgs(self, base, md_info, list_type, show_type, data, msg):
+    def list_show_pkgs(self, base, md_info, list_type, show_type,
+                       iname2tup, data, msg):
         n_maxsize = 0
         r_maxsize = 0
         t_maxsize = 0
@@ -208,20 +209,25 @@ class UpdateinfoCommand:
                     r_maxsize = max(len(str(ref['id'])), r_maxsize)
 
         for (notice, pkgtup, pkg) in data:
+            if list_type == 'all':
+                mark = '  '
+                if _rpm_tup_vercmp(iname2tup[pkgtup[0]], pkgtup) >= 0:
+                    mark = 'i '
             if show_type and ysp_has_info_md(show_type, notice):
                 for ref in ysp__safe_refs(notice['references']):
                     if ref['type'] != show_type:
                         continue
-                    msg(" %-*s %-*s %s" % (r_maxsize, str(ref['id']),
-                                           t_maxsize, notice['type'], pkg))
+                    msg("%s %-*s %-*s %s" % (mark, r_maxsize, str(ref['id']),
+                                             t_maxsize, notice['type'], pkg))
             elif hasattr(pkg, 'name'):
                 print base.fmtKeyValFill("%s: " % pkg.name,
                                          base._enc(pkg.summary))
             else:
-                msg("%-*s %-*s %s" % (n_maxsize, notice['update_id'],
-                                      t_maxsize, notice['type'], pkg))
+                msg("%s%-*s %-*s %s" % (mark, n_maxsize, notice['update_id'],
+                                        t_maxsize, notice['type'], pkg))
 
-    def info_show_pkgs(self, base, md_info, list_type, show_type, data, msg):
+    def info_show_pkgs(self, base, md_info, list_type, show_type,
+                       iname2tup, data, msg):
         show_pkg_info_done = {}
         for (notice, pkgtup, pkg) in data:
             if notice['update_id'] in show_pkg_info_done:
@@ -229,9 +235,15 @@ class UpdateinfoCommand:
             show_pkg_info_done[notice['update_id']] = notice
             # Python-2.4.* doesn't understand str(x) returning unicode *sigh*
             obj = notice.__str__()
+            if list_type == 'all':
+                if _rpm_tup_vercmp(iname2tup[pkgtup[0]], pkgtup) >= 0:
+                    obj = obj + "\n  Installed : true"
+                else:
+                    obj = obj + "\n  Installed : false"
             msg(obj)
 
-    def summary_show_pkgs(self, base, md_info, list_type, show_type, data, msg):
+    def summary_show_pkgs(self, base, md_info, list_type, show_type,
+                          iname2tup, data, msg):
         def _msg(x):
             print x
         counts = {}
@@ -322,7 +334,7 @@ class UpdateinfoCommand:
                 continue
             done_pkgs.add(n)
             data.append((notice, pkgtup, pkgs[0]))
-        show_pkgs(base, md_info, list_type, None, data, msg)
+        show_pkgs(base, md_info, list_type, None, {}, data, msg)
 
     @staticmethod
     def _parse_extcmds(extcmds):
@@ -388,16 +400,15 @@ class UpdateinfoCommand:
 
         opts.sec_cmds = extcmds
         used_map = ysp_gen_used_map(opts)
+        iname2tup = {}
         if False: pass
-        elif list_type == 'all':
+        elif list_type in ('installed', 'all'):
             name2tup = _get_name2allpkgtup(base)
+            iname2tup = _get_name2instpkgtup(base)
         elif list_type == 'updates':
             name2tup = _get_name2oldpkgtup(base)
         elif list_type == 'available':
             name2tup = _get_name2instpkgtup(base)
-        elif list_type == 'installed':
-            name2tup  = _get_name2allpkgtup(base)
-            iname2tup = _get_name2instpkgtup(base)
 
         def _show_pkgtup(pkgtup):
             name = pkgtup[0]
@@ -425,7 +436,7 @@ class UpdateinfoCommand:
                     d['epoch'] = "%s:" % d['e']
                 data.append((notice, pkgtup,
                             "%(n)s-%(epoch)s%(v)s-%(r)s.%(a)s" % d))
-        show_pkgs(base, md_info, list_type, show_type, data, msg)
+        show_pkgs(base, md_info, list_type, show_type, iname2tup, data, msg)
 
         ysp_chk_used_map(used_map, msg)
 
