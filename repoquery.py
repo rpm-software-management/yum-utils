@@ -271,14 +271,6 @@ class pkgQuery:
         if level:
             indent = ' |  ' * (level - 1) + ' \_  '
         print "%s%s [%s]" % (indent, str(req), str(val))
-    def pkg2uniq(self, pkg):
-        """ Turn a pkg into a "unique" req."""
-        if self.yb and self.yb.conf.showdupesfromrepos:
-            return str(pkg)
-        return "%s.%s" % (pkg.name, getBaseArch(pkg.arch))
-    def pkg2val(self, reqs, pkg):
-        reqs = sorted(reqs[pkg2req(pkg)])
-        return str(len(reqs)) + ": " + ", ".join(reqs)
 
     # These are common helpers for the --tree-* options...
     @staticmethod
@@ -397,7 +389,7 @@ class pkgQuery:
                         if opkg.obsoletedBy([pkg]):
                             obss.append(opkg)
             if self.yb.options.pkgnarrow in ('all', 'installed'):
-                skip = set([pkg.pkgtup for pkg in obss])
+                skip = set([opkg.pkgtup for opkg in obss])
                 for obs_n in pkg.obsoletes_names:
                     for opkg in yb.rpmdb.searchNevra(name=obs_n):
                         if opkg.pkgtup in skip:
@@ -445,12 +437,12 @@ class pkgQuery:
                     irequirers = yb.rpmdb.getRequires(prov[0],prov[1],prov[2])
                     irequirers = irequirers.keys()
                 if yb.options.pkgnarrow in ('all', 'repos'):
-                    arequirers = yb.pkgSack.getRequires(prov[0],prov[1],prov[2])
+                    areqs = yb.pkgSack.getRequires(prov[0],prov[1],prov[2])
                     if not irequirers:
-                        arequirers = arequirers.keys()
+                        arequirers = areqs.keys()
                     else:
                         skip = set([pkg.pkgtup for pkg in irequirers])
-                        arequirers = [pkg for pkg in arequirers
+                        arequirers = [pkg for pkg in areqs
                                       if pkg.pkgtup not in skip]
 
             except yum.Errors.YumBaseError, err:
