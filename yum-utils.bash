@@ -249,6 +249,22 @@ _yu_yumdb()
 } &&
 complete -F _yu_yumdb -o filenames yumdb yumdb.py
 
+# repodiff
+_yu_repodiff()
+{
+    COMPREPLY=()
+
+    case "$3" in
+        -h|--help|--version|-n|--new|-o|--old|-a|--archlist)
+            return 0
+            ;;
+    esac
+
+    COMPREPLY=( $( compgen -W '--version --help --new --old --quiet --archlist
+        --size --simple' -- "$2" ) )
+} &&
+complete -F _yu_repodiff repodiff repodiff.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
