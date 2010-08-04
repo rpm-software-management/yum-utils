@@ -134,7 +134,7 @@ _yu_repoclosure()
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$2" ) )
             return 0
             ;;
-        -r|--repoid)
+        -l|--lookaside|-r|--repoid)
             type _yum_repolist &>/dev/null && _yum_repolist all "$2"
             return 0
             ;;
@@ -149,8 +149,8 @@ _yu_repoclosure()
     esac
 
     COMPREPLY=( $( compgen -W '--help --config --arch --basearch --builddeps
-        --repoid --tempcache --quiet --newest --repofrompath --pkg --group' \
-            -- "$2" ) )
+        --lookaside --repoid --tempcache --quiet --newest --repofrompath --pkg
+        --group' -- "$2" ) )
 } &&
 complete -F _yu_repoclosure -o filenames repoclosure repoclosure.py
 
