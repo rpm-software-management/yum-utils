@@ -992,7 +992,7 @@ def main(args):
                       help="list recursive obsoletes, in tree form")
     parser.add_option("--tree-whatrequires", action="store_true",
                       dest="tree_what_requires",
-                      help="list recursive what reqauires, in tree form")
+                      help="list recursive what requires, in tree form")
 
     (opts, regexs) = parser.parse_args()
 
