@@ -216,9 +216,10 @@ _yu_repoquery()
         --conflicts --changelog --location --nevra --envra --nvr --source
         --srpm --resolve --exactdeps --recursive --whatprovides --whatrequires
         --whatobsoletes --whatconflicts --group --grouppkgs --archlist
-        --pkgnarrow --show-duplicates --repoid --enablerepo --disablerepo
-        --repofrompath --plugins --quiet --verbose --cache --tempcache
-        --querytags --config --installed' -- "$2" ) )
+        --pkgnarrow --installed --show-duplicates --repoid --enablerepo
+        --disablerepo --repofrompath --plugins --quiet --verbose --cache
+        --tempcache --querytags --config --tree-requires --tree-conflicts
+        --tree-obsoletes --tree-whatrequires' -- "$2" ) )
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
