@@ -760,7 +760,10 @@ class YumBaseQuery(yum.YumBase):
             else:
                 if not self.sackops:
                     plain_pkgs = True
-                pkgs = self.matchPkgs(items, plain_pkgs=plain_pkgs)
+                try:
+                    pkgs = self.matchPkgs(items, plain_pkgs=plain_pkgs)
+                except yum.Errors.RepoError, e:
+                    raise queryError("Could not match packages: %s" % to_unicode(e))
                 for prco in items:
                     for oper in self.sackops:
                         try:
