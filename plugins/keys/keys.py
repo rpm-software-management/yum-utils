@@ -229,8 +229,12 @@ Created   : %s
 """ % (rpmkeyid,
        key.sum_auth_name, key.sum_auth_email, time.ctime(key.createts))
         else:
-            gpg_cert = yum.pgpmsg.decode_msg(key.data)
-            print """\
+            if yum.__version_info__ > (3, 2, 28):
+                gpg_certs = yum.pgpmsg.decode_msg(key.data, multi=True)
+            else:
+                gpg_certs = [yum.pgpmsg.decode_msg(key.data)]
+            for gpg_cert in gpg_certs:
+                print """\
 Type       : %s
 Rpm Key ID : %s
 Key owner  : %s
