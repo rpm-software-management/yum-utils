@@ -216,11 +216,11 @@ def main():
         # setup the fake repos
         for repo in opts.repofrompath:
             repoid,repopath = tuple(repo.split(','))
-            repopath = os.path.abspath(repopath)
-            if repopath[0] == '/':
-                baseurl = 'file://' + repopath
-            else:
+            if repopath.startswith('http') or repopath.startswith('ftp') or repopath.startswith('file:'):
                 baseurl = repopath
+            else:
+                repopath = os.path.abspath(repopath)                
+                baseurl = 'file://' + repopath
                 
             newrepo = yum.yumRepo.YumRepository(repoid)
             newrepo.name = repopath
