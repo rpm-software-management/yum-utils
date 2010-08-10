@@ -727,9 +727,13 @@ def _check_running_kernel(yb, md_info, msg):
         if not ipkg:
             continue # Not installed
         ipkg = ipkg[0]
-        rpkg = '%s-%s:%s-%s.%s' % (kern_pkgtup[0], kern_pkgtup[2],
-                                   kern_pkgtup[3], kern_pkgtup[4],
-                                   kern_pkgtup[1])
+
+        e = ''
+        if kern_pkgtup[2] != '0':
+            e = '%s:' % kern_pkgtup[2]
+        rpkg = '%s-%s%s-%s.%s' % (kern_pkgtup[0], e,
+                                  kern_pkgtup[3], kern_pkgtup[4],
+                                  kern_pkgtup[1])
 
         msg('Security: %s is an installed security update' % ipkg)
         msg('Security: %s is the currently running version' % rpkg)
