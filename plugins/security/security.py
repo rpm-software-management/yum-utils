@@ -287,12 +287,34 @@ class UpdateinfoCommand:
                               pkg['version'], pkg['release'])
                     yield (notice, pkgtup)
 
+    _cmd2filt = {"bugzillas" : "bugzilla",
+                 "bugzilla" : "bugzilla",
+                 "bzs" : "bugzilla",
+                 "bz" : "bugzilla",
+
+                 "sec" : "security",
+
+                 "cves" : "cve",
+                 "cve" : "cve",
+
+                 "newpackages" : "newpackage",
+                 "new-packages" : "newpackage",
+                 "newpackage" : "newpackage",
+                 "new-package" : "newpackage",
+                 "new" : "newpackage"}
+    for filt_type in __update_info_types__:
+        _cmd2filt[filt_type] = filt_type
+
     def doCommand(self, base, basecmd, extcmds):
         if basecmd in self.direct_cmds:
             subcommand = self.direct_cmds[basecmd]
         elif extcmds and extcmds[0] in ('list', 'info', 'summary'):
             subcommand = extcmds[0]
             extcmds = extcmds[1:]
+        elif extcmds and extcmds[0] in self._cmd2filt:
+            subcommand = 'list'
+        elif extcmds:
+            subcommand = 'info'
         else:
             subcommand = 'summary'
 
@@ -336,43 +358,14 @@ class UpdateinfoCommand:
             data.append((notice, pkgtup, pkgs[0]))
         show_pkgs(base, md_info, list_type, None, {}, data, msg)
 
-    @staticmethod
-    def _parse_extcmds(extcmds):
+    def _parse_extcmds(self, extcmds):
         filt_type = None
         show_type = None
         if len(extcmds) >= 1:
-            filt_type = extcmds.pop(0)
+            filt_type = None
             
-            if False:
-                pass
-
-            elif filt_type == "bugzillas":
-                filt_type = "bugzilla"
-            elif filt_type == "bzs":
-                filt_type = "bugzilla"
-            elif filt_type == "bz":
-                filt_type = "bugzilla"
-            elif filt_type == "bugzilla":
-                pass
-            
-            elif filt_type == "sec":
-                filt_type = "security"
-            elif filt_type in __update_info_types__:
-                pass
-            
-            elif filt_type == "cves":
-                filt_type = "cve"
-            elif filt_type == "cve":
-                pass
-            elif filt_type == "newpackages":
-                filt_type = "newpackage"
-            elif filt_type == "new-packages":
-                filt_type = "newpackage"
-            elif filt_type == "new":
-                filt_type = "newpackage"
-            else:
-                extcmds = [filt_type] + extcmds
-                filt_type = None
+            if extcmds[0] in self._cmd2filt:
+                filt_type = self._cmd2filt[extcmds.pop(0)]
             show_type = filt_type
             if filt_type and filt_type in __update_info_types__:
                 show_type = None
@@ -734,9 +727,13 @@ def _check_running_kernel(yb, md_info, msg):
         if not ipkg:
             continue # Not installed
         ipkg = ipkg[0]
-        rpkg = '%s-%s:%s-%s.%s' % (kern_pkgtup[0], kern_pkgtup[2],
-                                   kern_pkgtup[3], kern_pkgtup[4],
-                                   kern_pkgtup[1])
+
+        e = ''
+        if kern_pkgtup[2] != '0':
+            e = '%s:' % kern_pkgtup[2]
+        rpkg = '%s-%s%s-%s.%s' % (kern_pkgtup[0], e,
+                                  kern_pkgtup[3], kern_pkgtup[4],
+                                  kern_pkgtup[1])
 
         msg('Security: %s is an installed security update' % ipkg)
         msg('Security: %s is the currently running version' % rpkg)
