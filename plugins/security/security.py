@@ -181,6 +181,10 @@ class UpdateinfoCommand:
                    'info-sec'           : 'info',
                    'summary-updateinfo' : 'summary'}
 
+    #  Note that this code (instead of using inheritance and multiple
+    # cmd classes) means that "yum help" only displays the updateinfo command.
+    # Which is what we want, because the other commands are just backwards
+    # compatible gunk we don't want the user using).
     def getNames(self):
         return ['updateinfo'] + sorted(self.direct_cmds.keys())
 
@@ -233,8 +237,18 @@ class UpdateinfoCommand:
             if notice['update_id'] in show_pkg_info_done:
                 continue
             show_pkg_info_done[notice['update_id']] = notice
-            # Python-2.4.* doesn't understand str(x) returning unicode *sigh*
-            obj = notice.__str__()
+
+            if hasattr(notice, 'text'):
+                debug_log_lvl = yum.logginglevels.DEBUG_3
+                vlog = logging.getLogger("yum.verbose.main")
+                if vlog.isEnabledFor(debug_log_lvl):
+                    obj = notice.text(skip_data=[])
+                else:
+                    obj = notice.text()
+            else:
+                # Python-2.4.* doesn't understand str(x) returning unicode
+                obj = notice.__str__()
+
             if list_type == 'all':
                 if _rpm_tup_vercmp(iname2tup[pkgtup[0]], pkgtup) >= 0:
                     obj = obj + "\n  Installed : true"
