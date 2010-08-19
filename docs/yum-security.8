@@ -10,34 +10,77 @@ This plugin extends \fByum\fP to allow lists and updates to be limited using sec
 .PP 
 added yum \fIcommand\fPs are:
 .br 
-.I \fR * update-minimal
+.I \fR yum update-minimal
 .PP 
 This works like the update command, but if you have the the package foo-1
 installed and have foo-2 and foo-3 available with updateinfo.xml then
 update-minimal will update you to foo-3.
 .br 
-.I \fR * info-updateinfo
+.I \fR yum updateinfo info
 .br 
-.I \fR * list-updateinfo
+.I \fR yum updateinfo list
+.br 
+.I \fR yum updateinfo summary
 .PP 
-both of the last two take these \fIsub-command\fPs:
+all of the last three take these \fIsub-command\fPs:
 .br 
-.I \fR * * <advisory> [advisory...]
+.I \fR yum updateinfo * all
 .br 
-.I \fR * * bugzillas
+.I \fR yum updateinfo * available
 .br 
-.I \fR * * cves
+.I \fR yum updateinfo * installed
 .br 
-.I \fR * * security
+.I \fR yum updateinfo * updates
+.PP 
+and then:
 .br 
-.I \fR * * new-packages
+.I \fR * <advisory> [advisory...]
+.br 
+.I \fR * <package>
+.br 
+.I \fR * bugzillas
+.br 
+.I \fR * cves
+.br 
+.I \fR * enhancement
+.br 
+.I \fR * security
+.br 
+.I \fR * new-packages
 .br 
 .br 
+.PP
+.IP "\fBall\fP"
+Is used to display information about both install and available advisories.
+.PP
+.IP "\fBavailable\fP"
+Is used to display information about just available advisories. This is the
+default.
+.PP
+.IP "\fBinstalled\fP"
+Is used to display information about just install advisories.
+.PP
+.IP "\fBupdates\fP"
+This is mostly the same as "available" but it only shows advisory information
+for packages that can be updated to.
 .PP
 .IP "\fB<advisory> [advisory...]\fP"
 Is used to display information about one or more advisories.
 .PP 
-.IP "\fBlist-updateinfo\fP, \fBinfo-updateinfo\fP, \fBsummary-updateinfo\fP"
+.IP "\fB<package> [package...]\fP"
+Is used to display information about one or more packages.
+.PP 
+.IP "\fBlist\fP"
+Is used to list all of the relevant errata notice information, from the
+updateinfo.xml data in yum. This includes bugzillas, CVEs, security updates and
+new.
+.PP 
+.IP "\fBinfo\fP"
+Is used to show all the errata notice information, from the
+updateinfo.xml data in yum. This includes bugzillas, CVEs, security updates and
+new.
+.PP 
+.IP "\fBlist\fP"
 Is used to list all of the relevant errata notice information, from the
 updateinfo.xml data in yum. This includes bugzillas, CVEs, security updates and
 new.
@@ -96,11 +139,16 @@ yum --security update-minimal
 .PP
 To get a list of all BZs that are fixed for packages you have installed use:
 .IP
-yum list-updateinfo bugzillas
+yum updateinfo list bugzillas
+.PP
+To get a list of all security advisoryies, including the ones you have already
+installed use:
+.IP
+yum updateinfo list all security
 .PP
 To get the information on advisory FEDORA-2707-4567 use:
 .IP
-yum info-updateinfo FEDORA-2707-4567
+yum updateinfo info FEDORA-2707-4567
 .PP
 To update packages to the latest version which contain fixes for Bugzillas 123, 456 and 789; and all security updates use:
 .IP
@@ -116,7 +164,11 @@ yum --bz 123 --cve CVE-2207-0123 --cve CVE-2207-3210 --advisory FEDORA-2707-4567
 .PP
 To get a list of packages which are "new".
 .IP
-yum list-updateinfo new
+yum updateinfo list new
+.PP
+To get a summary of advisories you haven't installed yet use:
+.IP
+yum updateinfo summary
 
 
 .SH "SEE ALSO"
