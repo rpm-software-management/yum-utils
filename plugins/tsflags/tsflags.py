@@ -28,4 +28,8 @@ def postreposetup_hook(conduit):
     conf = conduit.getConf()
     if opts.tsflags:
         flags = opts.tsflags.split(',')
-        conf.setConfigOption('tsflags', flags)
+        for flag in flags:
+            if flag not in conf.tsflags:
+                conf.tsflags.append(flag)
+
+        
