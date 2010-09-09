@@ -753,6 +753,13 @@ class YumBaseQuery(yum.YumBase):
         plain_pkgs = False
         if self.options.group:
             pkgs = self.matchGroups(items)
+        elif self.options.groupmember:
+            pkglist = self.matchPkgs(items, plain_pkgs=True)
+            for pkg in pkglist:
+                print to_unicode(pkg)
+                for group in self.find_groupmember(pkg.name):
+                    print to_unicode('  @%s' % group)
+            pkgs = []
         else:
             if self.options.srpm:
                 pkgs = self.matchSrcPkgs(items)
@@ -805,7 +812,7 @@ class YumBaseQuery(yum.YumBase):
     def doQuery(self, method, *args, **kw):
         return getattr(self, "fmt_%s" % method)(*args, **kw)
 
-    def fmt_groupmember(self, name, **kw):
+    def find_groupmember(self, name, **kw):
         grps = []
         for group in self.comps.get_groups():
             if name in group.packages:
@@ -1062,7 +1069,6 @@ def main(args):
     if opts.location:
         pkgops.append("location")
     if opts.groupmember:
-        sackops.append("groupmember")
         needgroup = 1
     if opts.group:
         needgroup = 1
