@@ -755,9 +755,9 @@ class YumBaseQuery(yum.YumBase):
             pkgs = self.matchGroups(items)
         elif self.options.groupmember:
             pkglist = self.matchPkgs(items, plain_pkgs=True)
-            for pkg in pkglist:
+            for pkg in sorted(pkglist):
                 print to_unicode(pkg)
-                for group in self.find_groupmember(pkg.name):
+                for group in sorted(self.find_groupmember(pkg.name)):
                     print to_unicode('  @%s' % group)
             pkgs = []
         else:
