@@ -88,6 +88,11 @@ def postresolve_hook(conduit):
                             continue # skip ones already marked for remove, kinda pointless
                         if pkg.name in ignore_list: # there are some pkgs which are NEVER going to be leafremovals
                             continue
+
+                        # Skip manually installed packages.
+                        if pkg.yumdb_info.get('reason') == 'user':
+                            continue
+
                         non_removed_requires = []
                         for req_pkgtup in _requires_this_package(rpmdb,pkg):
                             pkgtups = [ txmbr.po.pkgtup for txmbr in tsInfo.getMembersWithState(output_states=[TS_ERASE]) ]
