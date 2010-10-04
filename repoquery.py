@@ -567,6 +567,8 @@ class instPkgQuery(pkgQuery):
             names = self.pkg.tagByName('changelogname')
             texts = self.pkg.tagByName('changelogtext')
             for date, author, message in zip(times, names, texts):
+                author = to_unicode(author)
+                message = to_unicode(message)
                 changelog.append("* %s %s\n%s\n" % (sec2day(date), author, message))
         return "\n".join(changelog)
 
