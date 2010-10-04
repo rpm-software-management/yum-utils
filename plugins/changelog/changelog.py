@@ -163,7 +163,7 @@ Display changelog data, since a specified time, on a group of packages"""
                     self._done_spkgs[pkg.sourcerpm] = True
                     msg('%-40.40s %s' % (pkg, pkg.repoid))
                 self._changelogs += 1
-                msg(line)
+                msg(to_unicode(line))
                 msg('')
 
     def doCommand(self, base, basecmd, extcmds):
