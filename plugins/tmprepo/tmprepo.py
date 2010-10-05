@@ -92,20 +92,29 @@ def add_dir_repo(base, trepo, cleanup):
     trepo_name = os.path.basename(os.path.dirname(trepo_path))
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
     repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    tpc = 'true'
+    if not lpgpgcheck:
+        tpc = 'false'
+    trc = 'true'
+    if not lrgpgcheck:
+        trc = 'false'
     open(tmp_fname, "wb").write("""\
 [%(repoid)s]
 name=Tmp. repo. for %(path)s
 baseurl=file:%(dname)s
 enabled=1
-gpgcheck=true
-repo_gpgcheck=false
+gpgcheck=%(pkgs_gpgcheck)s
+repo_gpgcheck=%(repo_gpgcheck)s
 metadata_expire=0
 #  Make cost smaller, as we know it's "local" ... if this isn't good just create
 # your own .repo file. ... then you won't need to createrepo each run either.
 cost=500
 """ % {'path'     : trepo_path,
        'repoid'   : repoid,
-       'dname'    : trepo_data})
+       'dname'    : trepo_data,
+       'pkgs_gpgcheck' : tpc,
+       'repo_gpgcheck' : trc,
+       })
     if cleanup:
         print "Creating tmp. repodata for:", trepo_path
     else:
@@ -125,16 +134,29 @@ def add_repomd_repo(base, repomd):
     trepo_name = os.path.basename(os.path.dirname(os.path.dirname(repomd)))
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
     repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    pgpgcheck, rgpgcheck = rpgpgcheck, rrgpgcheck
+    if repomd.startswith("file:"):
+        pgpgcheck, rgpgcheck = lpgpgcheck, lrgpgcheck
+    tpc = 'true'
+    if not pgpgcheck:
+        tpc = 'false'
+    trc = 'true'
+    if not rgpgcheck:
+        trc = 'false'
     open(tmp_fname, "wb").write("""\
 [%(repoid)s]
 name=Tmp. repo. for %(path)s
 baseurl=%(dname)s
 enabled=1
-gpgcheck=true
+gpgcheck=%(pkgs_gpgcheck)s
+repo_gpgcheck=%(repo_gpgcheck)s
 metadata_expire=0
 """ % {'path'     : repomd,
        'repoid'   : repoid,
-       'dname'    : repomd[:-len("repodata/repomd.xml")]})
+       'dname'    : repomd[:-len("repodata/repomd.xml")],
+       'pkgs_gpgcheck' : tpc,
+       'repo_gpgcheck' : trc,
+       })
     print "Creating tmp. repo for:", repomd
     AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
     return tmp_fname
@@ -147,6 +169,12 @@ def add_mirrorlist_repo(base, mirrorlist):
     trepo_name = os.path.basename(mirrorlist)
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
     repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    tpc = 'true'
+    if not rpgpgcheck:
+        tpc = 'false'
+    trc = 'true'
+    if not rrgpgcheck:
+        trc = 'false'
     open(tmp_fname, "wb").write("""\
 [%(repoid)s]
 name=Tmp. repo. for %(path)s
@@ -156,12 +184,16 @@ gpgcheck=true
 metadata_expire=0
 """ % {'path'     : mirrorlist,
        'repoid'   : repoid,
-       'dname'    : mirrorlist})
+       'dname'    : mirrorlist,
+       'pkgs_gpgcheck' : tpc,
+       'repo_gpgcheck' : trc,
+       })
     print "Creating tmp. repo for:", mirrorlist
     AutoCleanupDir("%s/%s" % (base.conf.cachedir, repoid))
     return tmp_fname
 
-def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
+def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp,
+              nogpgcheck):
     """ Add temporary repos to yum. """
     # Don't use self._splitArg()? ... or require URLs without commas?
     for trepo in tmp_repos:
@@ -194,6 +226,10 @@ def add_repos(base, log, tmp_repos, tvalidate, tlocvalidate, cleanup_dir_temp):
 
         base.getReposFromConfigFile(fname, validate=validate)
 
+    if nogpgcheck:
+        for repo in base.repos.listEnabled():
+            repo.gpgcheck      = False
+            repo.repo_gpgcheck = False
     # Just do it all again...
     base.setupProgressCallbacks()
 
@@ -260,4 +296,5 @@ def prereposetup_hook(conduit):
     add_repos(conduit._base, log, opts.tmp_repos,
               make_validate(log, rpgpgcheck, rrgpgcheck),
               make_validate(log, lpgpgcheck, lrgpgcheck),
-              not (opts.tmp_repos_cleanup or def_tmp_repos_cleanup))
+              not (opts.tmp_repos_cleanup or def_tmp_repos_cleanup),
+              opts.nogpgcheck)
