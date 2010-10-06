@@ -1,0 +1,52 @@
+.\" show-installed
+.TH "show-installed" "1" "21 October 2010" "Florian Festi" ""
+.SH "NAME"
+show\-installed
+.SH "SYNOPSIS"
+\fBshow\-installed\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fBshow\-installed\fP gives a compact description of the packages installed (or given) making use of the comps groups found in the repositories.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+show this help message and exit
+.TP
+.B \-f FORMAT, \-\-format=FORMAT
+yum, kickstart or human; yum gives the result as a yum command line; kickstart the content of a %packages section; "human" readable is default.
+.TP
+.B \-i INPUT, \-\-input=INPUT
+File to read the package list from instead of using the rpmdb. \- for stdin. The file must contain package names only separated by white space (including newlines). rpm \-qa \-\-qf='%{name}
+' produces proper output.
+.TP
+.B \-o OUTPUT, \-\-output=OUTPUT
+File to write the result to. Stdout is used if option is omited.
+.TP
+.B \-q, \-\-quiet
+Do not show warnings.
+.TP
+.B \-e, \-\-no\-excludes
+Only show groups that are installed completely. Do not use exclude lines.
+.TP
+.B \-\-global\-excludes
+Print exclude lines at the end and not after the groups requiring them.
+.TP
+.B \-\-global\-addons
+Print package names at the end and not after the groups offering them as addon.
+.TP
+.B \-\-addons\-by\-group
+Also show groups not selected to sort packages contained by them. Those groups are commented out with a "# " at the begin of the line.
+.TP
+.B \-m, \-\-allow\-mandatories
+Check if just installing the mandatory packages gives better results. Uses "." to mark those groups.
+.TP
+.B \-a, \-\-allow\-all
+Check if installing all packages in the groups gives better results. Uses "*" to mark those groups.
+.TP
+.B \-\-ignore\-missing
+Ignore packages missing in the repos.
+.TP
+.B \-\-ignore\-missing\-excludes
+Do not produce exclude lines for packages not in the repository.
+
+.fi

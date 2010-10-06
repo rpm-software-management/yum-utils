@@ -91,10 +91,10 @@ class RepoClosure(yum.YumBase):
             self.repos._selectSackType()
     
     def evrTupletoVer(self,tup):
-        """convert and evr tuple to a version string, return None if nothing
+        """convert an evr tuple to a version string, return None if nothing
         to convert"""
     
-        e, v,r = tup
+        e, v, r = tup
 
         if v is None:
             return None
