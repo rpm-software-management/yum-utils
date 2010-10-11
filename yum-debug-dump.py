@@ -201,12 +201,10 @@ def main():
         my.repos.setCache(0)
 
     filename = None
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
+    if my.args:
+        filename = my.args[0]
     fn = my.create_debug_file(fn=filename)
     print "Output written to: %s" % fn
 
 if __name__ == "__main__":
     main()
-
-
