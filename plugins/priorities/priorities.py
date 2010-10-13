@@ -161,7 +161,8 @@ def exclude_hook(conduit):
                                 cnt += 1
                                 conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
                                 break
-    conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
+    if cnt:
+        conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
 
 def _pkglist_to_dict(pl, priority, addArch = False):
     out = dict()
