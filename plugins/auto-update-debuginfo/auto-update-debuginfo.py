@@ -25,22 +25,22 @@ requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 def enable_debuginfo_repos(yb, conduit):
-    repos = {}
+    baserepos = {}
     for repo in yb.repos.listEnabled():
-        repos[repo.id] = repo
-    for repoid in repos:
+        baserepos[repo.id] = repo
+    for repoid in baserepos:
         di = '%s-debuginfo' % repoid
-        if di in repos:
+        if di in baserepos:
             continue
-        repo = repos[repoid]
+        baserepo = baserepos[repoid]
         for r in yb.repos.findRepos(di):
             conduit.info(2, 'Enabling %s: %s' % (r.id, r.name))
             r.enable()
+            r.skip_if_unavailable = True
             # Note: This is shared with debuginfo-install
-            for opt in ['repo_gpgcheck', 'gpgcheck', 'cost',
-                        'skip_if_unavailable']:
+            for opt in ['repo_gpgcheck', 'gpgcheck', 'cost']:
                 if hasattr(r, opt):
-                    setattr(r, opt, getattr(repo, opt))
+                    setattr(r, opt, getattr(baserepo, opt))
 
 def prereposetup_hook(conduit):
     yb = conduit._base
