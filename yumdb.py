@@ -24,6 +24,7 @@ def setup_opts():
       exist?        <key> [pkg-wildcard]...
       unset?        <key> [pkg-wildcard]...
       info          [pkg-wildcard]...
+      sync          [pkg-wildcard]...
       shell         [filename]...
 """
     parser =  optparse.OptionParser(usage = usage_txt, version = vers_txt)
@@ -147,6 +148,47 @@ def run_cmd(yb, args, inshell=False):
             done = True
             print pkg
             for ykey in sorted(pkg.yumdb_info):
+                print " " * 4, ykey, '=', getattr(pkg.yumdb_info, ykey)
+    elif args[0] in ('sync', 'synchronize', 'sync-f', 'synchronize-f',
+                     'sync-force', 'synchronize-force'):
+        force = args[0] in ('sync-f', 'synchronize-f',
+                            'sync-force', 'synchronize-force')
+        args.pop(0)
+        done = False
+        for pkg in sorted(yb.rpmdb.returnPackages(patterns=args)):
+            apkg = yb.pkgSack.searchPkgTuple(pkg.pkgtup)
+            if not apkg:
+                continue
+            apkg = sorted(apkg)[0]
+
+            if done: print ''
+            done = True
+            print pkg
+            ndata = {}
+            ndata['releasever'] = yb.conf.yumvar['releasever']
+            ndata['from_repo']  = apkg.repoid
+            csum = apkg.returnIdSum()
+            if csum is not None:
+                ndata['checksum_type'] = str(csum[0])
+                ndata['checksum_data'] = str(csum[1])
+            if hasattr(apkg.repo, 'repoXML'):
+                md = apkg.repo.repoXML
+                if md and md.revision is not None:
+                    ndata['from_repo_revision']  = str(md.revision)
+                if md:
+                    ndata['from_repo_timestamp'] = str(md.timestamp)
+
+            loginuid = yum.misc.getloginuid()
+            if loginuid is not None:
+                ndata['changed_by'] = str(loginuid)
+
+            for ykey in ndata:
+                if not force and hasattr(pkg.yumdb_info, ykey):
+                    continue
+                setattr(pkg.yumdb_info, ykey, ndata[ykey])
+            for ykey in sorted(pkg.yumdb_info):
+                if ykey not in ndata:
+                    continue
                 print " " * 4, ykey, '=', getattr(pkg.yumdb_info, ykey)
     elif args[0] == 'shell' and not inshell:
         args.pop(0)

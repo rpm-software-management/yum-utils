@@ -59,8 +59,21 @@ to any specified packages.
 .br 
 .IP "\fByumdb info [pkg-wildcard]...
 .PP
-This command will all the data stored in the yumdb, limiting to any specified
-packages.
+This command will display all the data stored in the yumdb, limiting to any
+specified packages.
+.br 
+.IP "\fByumdb sync [pkg-wildcard]...
+.PP
+This command will add any missing data to the yumdb from the repositories,
+limiting to any specified packages. This is useful to run if you have had any
+aborted transactions (and thus. missing yumdb data).
+Note that "yumdb sync" cannot know all the information that would have been put
+into the yumdb at the time.
+.br 
+.IP "\fByumdb sync-force [pkg-wildcard]...
+.PP
+This command will replace any data in the yumdb from the repositories,
+limiting to any specified packages.
 
 .SH "EXAMPLES"
 .PP
