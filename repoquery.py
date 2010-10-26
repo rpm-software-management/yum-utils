@@ -751,6 +751,27 @@ class YumBaseQuery(yum.YumBase):
                 srpms.extend(self.returnByName(src))
         return srpms
     
+    def yum_search(self, terms):
+        """use yum's search generator to search arbitrary fields"""
+        
+        pkgs = []
+        fields = self.options.searchfields
+        if not fields:
+            fields = ['name', 'summary', 'description', 'url']
+        
+        matching = self.searchGenerator(fields, terms, keys=True)
+        
+        for (po, keys, matched_value) in matching:
+            if isinstance(po, yum.packages.YumInstalledPackage):
+                if self.options.pkgnarrow not in ('all', 'installed', 'extras'):
+                    continue
+            if isinstance(po, yum.sqlitesack.YumAvailablePackageSqlite):
+                if self.options.pkgnarrow not in ('all', 'available', 'repos'):
+                    continue
+            pkgs.append(po)
+        
+        return self.queryPkgFactory(pkgs)
+        
     def runQuery(self, items):
         plain_pkgs = False
         if self.options.group:
@@ -762,6 +783,9 @@ class YumBaseQuery(yum.YumBase):
                 for group in sorted(self.find_groupmember(pkg.name)):
                     print to_unicode('  @%s' % group)
             pkgs = []
+        elif self.options.search:
+            pkgs = self.yum_search(items)
+
         else:
             if self.options.srpm:
                 pkgs = self.matchSrcPkgs(items)
@@ -1005,6 +1029,13 @@ def main(args):
     parser.add_option("--tree-whatrequires", action="store_true",
                       dest="tree_what_requires",
                       help="list recursive what requires, in tree form")
+    parser.add_option("--search", action="store_true",
+                      dest="search",
+                      help="Use yum's search to return pkgs")
+    parser.add_option("--search-fields", action="append", dest="searchfields",
+                      default=[],
+                      help="search fields to search using --search")
+                      
 
     (opts, regexs) = parser.parse_args()
 
@@ -1077,7 +1108,7 @@ def main(args):
     if opts.installed:
         opts.pkgnarrow = 'installed'
         opts.disablerepos = ['*']
-        
+
     if opts.nevra:
         pkgops.append("nevra")
     elif len(pkgops) == 0 and len(sackops) == 0:
