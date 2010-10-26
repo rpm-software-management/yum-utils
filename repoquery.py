@@ -757,18 +757,21 @@ class YumBaseQuery(yum.YumBase):
         pkgs = []
         fields = self.options.searchfields
         if not fields:
-            fields = ['name', 'summary', 'description', 'url']
+            fields = ['name', 'summary']
+        try:
+            matching = self.searchGenerator(fields, terms, searchtags=False)
         
-        matching = self.searchGenerator(fields, terms, keys=True)
-        
-        for (po, keys, matched_value) in matching:
-            if isinstance(po, yum.packages.YumInstalledPackage):
-                if self.options.pkgnarrow not in ('all', 'installed', 'extras'):
-                    continue
-            if isinstance(po, yum.sqlitesack.YumAvailablePackageSqlite):
-                if self.options.pkgnarrow not in ('all', 'available', 'repos'):
-                    continue
-            pkgs.append(po)
+            for (po, matched_value) in matching:
+                if isinstance(po, yum.packages.YumInstalledPackage):
+                    if self.options.pkgnarrow not in ('all', 'installed', 'extras'):
+                        continue
+                if isinstance(po, yum.sqlitesack.YumAvailablePackageSqlite):
+                    if self.options.pkgnarrow not in ('all', 'available', 'repos'):
+                        continue
+                pkgs.append(po)
+
+        except (yum.Errors.RepoError,ValueError), e:
+            raise queryError("Could not run search: %s" % e)
         
         return self.queryPkgFactory(pkgs)
         
@@ -784,8 +787,12 @@ class YumBaseQuery(yum.YumBase):
                     print to_unicode('  @%s' % group)
             pkgs = []
         elif self.options.search:
-            pkgs = self.yum_search(items)
-
+            plain_pkgs = False
+            pkgs = []
+            try:
+                pkgs = self.yum_search(items)
+            except queryError, e:
+                self.logger.error(e)
         else:
             if self.options.srpm:
                 pkgs = self.matchSrcPkgs(items)
@@ -1030,7 +1037,7 @@ def main(args):
                       dest="tree_what_requires",
                       help="list recursive what requires, in tree form")
     parser.add_option("--search", action="store_true",
-                      dest="search",
+                      dest="search", default=False,
                       help="Use yum's search to return pkgs")
     parser.add_option("--search-fields", action="append", dest="searchfields",
                       default=[],
@@ -1125,6 +1132,9 @@ def main(args):
         archlist = getArchList()
         archlist.append('src')
 
+    if opts.searchfields:
+        opts.search = True
+        
     repoq = YumBaseQuery(pkgops, sackops, opts)
 
     # silence initialisation junk from modules etc unless verbose mode
