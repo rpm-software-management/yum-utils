@@ -176,6 +176,7 @@ def main(args):
         my.conf.debuglevel=0
         my.doLoggingSetup(my.conf.debuglevel, my.conf.errorlevel)
     
+    my.conf.disable_excludes = ['all']
     my.dy_shutdown_all_other_repos()
     my.dy_archlist = opts.archlist
     if not opts.quiet: print 'setting up repos'
