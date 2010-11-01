@@ -905,7 +905,7 @@ class YumBaseQuery(yum.YumBase):
         for pkg in self.returnByName(name):
             for req in pkg.prco("requires"):
                 for res in self.fmt_whatprovides(req):
-                    pkgs[res.name] = res
+                    pkgs[(res.name, res.pkg.arch)] = res
         return pkgs.values()
 
     def fmt_location(self, name):
