@@ -20,6 +20,7 @@ ALLDBG DBG DEVDBG UPTDBG
 ALL DEV UPT ALLSRC ALLDBG
 
 SEC --security
+CRIT --sec-severity=critical
 FORCE --skip-broken --disableexcludes=all
 DUPS --showduplicates
 
@@ -31,6 +32,10 @@ down downgrade
 rein reinstall
 
 chk check-update
+
+upi updateinfo
+lp  upi list
+lps upi list security
 
 ls  list
 lsi ls installed
@@ -51,6 +56,12 @@ h  history
 hi history info
 hl history list
 hs history summary
+hp history package-list
+
+rl repolist
+
+gi groupinfo
+gl grouplist
 
 dbg-install DBG install
 dbg-inst    DBG inst
@@ -60,6 +71,8 @@ dbg-inst    DBG inst
 
 # lsT UPT ls
 # lsD DEV ls
+# chkT UPT chk
+# chkD UPT chk
 # 
 # lsuT lsT updates
 # lsuD lsD updates
