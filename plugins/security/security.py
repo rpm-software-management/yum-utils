@@ -122,17 +122,23 @@ def ysp_should_filter_pkg(opts, pkgname, notice, used_map):
     elif opts.advisory and notice['update_id'] in opts.advisory:
         used_map['id'][notice['update_id']] = True
         return True
+    elif (opts.severity and notice['type'] == 'security' and
+          notice['severity'] in opts.severity):
+        used_map['sev'][notice['severity']] = True
+        return True
     elif opts.cve and _has_id(used_map, notice['references'], "cve", opts.cve):
         return True
     elif opts.bz and _has_id(used_map, notice['references'],"bugzilla",opts.bz):
         return True
     # FIXME: Add opts for enhancement/etc.? -- __update_info_types__
-    elif opts.security and notice['type'] == 'security':
+    elif (opts.security and notice['type'] == 'security' and
+          (not opts.severity or 'severity' not in notice or
+           not notice['severity'])):
         return True
     elif opts.bugfixes and notice['type'] == 'bugfix':
         return True
     elif not (opts.advisory or opts.cve or opts.bz or
-              opts.security or opts.bugfixes or opts.sec_cmds):
+              opts.security or opts.bugfixes or opts.sec_cmds or opts.severity):
         return True # This is only possible from should_show_pkg
     return False
 
@@ -146,7 +152,7 @@ def ysp_has_info_md(rname, md):
         return md
 
 def ysp_gen_used_map(opts):
-    used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}, 'cmd' : {}}
+    used_map = {'bugzilla' : {}, 'cve' : {}, 'id' : {}, 'cmd' : {}, 'sev' : {}}
     for i in opts.sec_cmds:
         used_map['cmd'][i] = False
     for i in opts.advisory:
@@ -155,6 +161,8 @@ def ysp_gen_used_map(opts):
         used_map['bugzilla'][i] = False
     for i in opts.cve:
         used_map['cve'][i] = False
+    for i in opts.severity:
+        used_map['sev'][i] = False
     return used_map
 
 def ysp_chk_used_map(used_map, msg):
@@ -170,6 +178,9 @@ def ysp_chk_used_map(used_map, msg):
     for i in used_map['cve']:
         if not used_map['cve'][i]:
             msg('CVE \"%s\" not found applicable for this system' % i)
+    for i in used_map['sev']:
+        if not used_map['sev'][i]:
+            msg('Severity \"%s\" not found applicable for this system' % i)
 
 class UpdateinfoCommand:
     # Old command names...
@@ -204,7 +215,10 @@ class UpdateinfoCommand:
         t_maxsize = 0
         for (notice, pkgtup, pkg) in data:
             n_maxsize = max(len(notice['update_id']), n_maxsize)
-            t_maxsize = max(len(notice['type']),      t_maxsize)
+            tn = notice['type']
+            if tn == 'security' and notice['severity']:
+                tn = notice['severity'] + '/Sec.'
+            t_maxsize = max(len(tn),                  t_maxsize)
             if show_type:
                 for ref in ysp__safe_refs(notice['references']):
                     if ref['type'] != show_type:
@@ -217,18 +231,22 @@ class UpdateinfoCommand:
                 mark = '  '
                 if _rpm_tup_vercmp(iname2tup[pkgtup[0]], pkgtup) >= 0:
                     mark = 'i '
+            tn = notice['type']
+            if tn == 'security' and notice['severity']:
+                tn = notice['severity'] + '/Sec.'
+
             if show_type and ysp_has_info_md(show_type, notice):
                 for ref in ysp__safe_refs(notice['references']):
                     if ref['type'] != show_type:
                         continue
                     msg("%s %-*s %-*s %s" % (mark, r_maxsize, str(ref['id']),
-                                             t_maxsize, notice['type'], pkg))
+                                             t_maxsize, tn, pkg))
             elif hasattr(pkg, 'name'):
                 print base.fmtKeyValFill("%s: " % pkg.name,
                                          base._enc(pkg.summary))
             else:
                 msg("%s%-*s %-*s %s" % (mark, n_maxsize, notice['update_id'],
-                                        t_maxsize, notice['type'], pkg))
+                                        t_maxsize, tn, pkg))
 
     def info_show_pkgs(self, base, md_info, list_type, show_type,
                        iname2tup, data, msg):
@@ -261,12 +279,18 @@ class UpdateinfoCommand:
         def _msg(x):
             print x
         counts = {}
+        sev_counts = {}
         show_pkg_info_done = {}
         for (notice, pkgtup, pkg) in data:
             if notice['update_id'] in show_pkg_info_done:
                 continue
             show_pkg_info_done[notice['update_id']] = notice
             counts[notice['type']] = counts.get(notice['type'], 0) + 1
+            if notice['type'] == 'security':
+                sev = notice['severity']
+                if sev is None:
+                    sev = ''
+                sev_counts[sev] = sev_counts.get(sev, 0) + 1
 
         maxsize = 0
         for T in ('newpackage', 'security', 'bugfix', 'enhancement'):
@@ -287,7 +311,16 @@ class UpdateinfoCommand:
         for T in ('newpackage', 'security', 'bugfix', 'enhancement'):
             if T not in counts:
                 continue
-            print "    %*u %s notice(s)" % (maxsize, counts[T], outT[T])
+            n = outT[T]
+            if T == 'security' and len(sev_counts) == 1:
+                sn = sev_counts.keys()[0]
+                if sn != '':
+                    n = sn + " " + n
+            print "    %*u %s notice(s)" % (maxsize, counts[T], n)
+            if T == 'security' and len(sev_counts) != 1:
+                for sn in sorted(sev_counts):
+                    args = (maxsize, sev_counts[sn],sn or '?', outT['security'])
+                    print "        %*u %s %s notice(s)" % args
         _check_running_kernel(base, md_info, _msg)
         self.show_pkg_info_done = {}
 
@@ -530,7 +563,7 @@ class SecurityUpdateCommand:
         used_map      = ysp_gen_used_map(opts)
 
         ndata = not (opts.security or opts.bugfixes or
-                     opts.advisory or opts.bz or opts.cve)
+                     opts.advisory or opts.bz or opts.cve or opts.severity)
 
         # NOTE: Not doing obsoletes processing atm. ... maybe we should? --
         # Also worth pointing out we don't go backwards for obsoletes in the:
@@ -567,9 +600,9 @@ class SecurityUpdateCommand:
 def config_hook(conduit):
     '''
     Yum Plugin Config Hook: 
-    Setup the option parser with the '--advisory', '--bz', '--cve', and
-    '--security' command line options. And the 'list-updateinfo',
-    'info-updateinfo', and 'update-minimal' commands.
+    Setup the option parser with the '--advisory', '--bz', '--cve',
+    '--security' and '--severity' command line options. Also the 'updateinfo'
+    and 'update-minimal' commands.
     '''
 
     parser = conduit.getOptParser()
@@ -587,11 +620,13 @@ def config_hook(conduit):
     def obug(opt, key, val, parser):
         parser.values.bugfixes = True
     def ocve(opt, key, val, parser):
-        parser.values.cve.append(val)
+        parser.values.cve.extend(val.split(','))
     def obz(opt, key, val, parser):
         parser.values.bz.append(str(val))
     def oadv(opt, key, val, parser):
-        parser.values.advisory.append(val)
+        parser.values.advisory.extend(val.split(','))
+    def osev(opt, key, val, parser):
+        parser.values.severity.extend(val.split(','))
             
     parser.add_option('--security', action="callback",
                       callback=osec, dest='security', default=False,
@@ -605,6 +640,9 @@ def config_hook(conduit):
     parser.add_option('--bz', action="callback",
                       callback=obz, dest='bz', default=[], type="int",
                       help='Include packages needed to fix the given BZ')
+    parser.add_option('--sec-severity', action="callback",
+                      callback=osev, dest='severity', default=[], type="string",
+                      help='Include security relevant packages, of this severity')
     parser.add_option('--advisory', action="callback",
                       callback=oadv, dest='advisory', default=[], type="string",
                       help='Include packages needed to fix the given advisory')
