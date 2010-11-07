@@ -1,3 +1,213 @@
+2010-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.29
+
+2010-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile: Make a better test-release Makefile target
+
+2010-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* test/yum-utils-pylintrc: fix config file format changes for pylint
+	in F14
+
+2010-11-04  James Antill <james@and.org>
+
+	* plugins/security/security.py: Add --sec-severity, and deal with
+	severity data in updateinfo.
+
+2010-11-04  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Some more aliases.
+
+2010-11-01  James Antill <james@and.org>
+
+	* repoquery.py: Use arch as well as name in fmt_requires.
+
+2010-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add 3.2.29 requirement for repoquery --search
+
+2010-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: - fix repoquery for the bizarre empty results and the traceback on
+	bad input - also needs a fix for yum 3.2.29 in the searchGenerator
+	:(
+
+2010-10-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: add --search and --searchfields to repoquery
+
+2010-10-06  Florian Festi <ffesti@redhat.com>
+
+	* Makefile, docs/show-installed.1, docs/yum-utils.1,
+	repoclosure.py, show-installed.py, yum-utils.spec: show-installed, a
+	new tool to give a compat description of the packages installed on
+	the system making use of dependencies and comps groups
+
+2010-10-26  James Antill <james@and.org>
+
+	* docs/yumdb.8, yumdb.py: Add yumdb copy-force, for symmetry with
+	rename-force.
+
+2010-10-26  James Antill <james@and.org>
+
+	* yumdb.py: Cleanup yumdb rename/rename-force, and make the
+	difference more obvious.
+
+2010-10-26  James Antill <james@and.org>
+
+	* docs/yumdb.8, yumdb.py: Add a yumdb sync command, for failed
+	transactions.
+
+2010-10-26  James Antill <james@and.org>
+
+	* repodiff.py: Disable any excludes in repodiff.
+
+2010-10-13  James Antill <james@and.org>
+
+	* plugins/priorities/priorities.py: Only display priorities message,
+	if we did something.
+
+2010-10-13  James Antill <james@and.org>
+
+	* plugins/priorities/priorities.py: Speedup priorities: Reuse
+	rawobsoletes.
+
+2010-10-13  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: make all
+	debuginfo repos enabled by auto-update-debuginfo be set to
+	skip_if_unavailable=True  Also change some variable names so I don't
+	go blind when reading this code trying to figure out if 'repos' is
+	the repos object or something else.
+
+2010-10-11  James Antill <james@and.org>
+
+	* yum-debug-dump.py: Fix the filename argument handling in
+	yum-debug-dump, BZ 641837
+
+2010-10-05  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.py: Obey --nogpgcheck in --tmprepo repos.
+	Use pkgs_gpgcheck/etc. for defaults.
+
+2010-10-04  James Antill <james@and.org>
+
+	* repoquery.py: Fix unicide in repoquery --installed -a --changelog.
+
+
+2010-10-04  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/changelog/changelog.py: to_unicode() on the changelog
+	output as per ticket 610 - thanks to Richard Fearn for the
+	suggestion
+
+2010-10-04  James Antill <james@and.org>
+
+	* plugins/tmprepo/tmprepo.conf: Fix the text in the config. file for
+	the tmprepo plugin.
+
+2010-09-20  Casey Jao <cjao@ugcs.caltech.edu>
+
+	* plugins/remove-with-leaves/remove-with-leaves.py: 
+	Remove-with-leaves plugin: check install reason
+
+2010-09-13  James Antill <james@and.org>
+
+	* docs/debuginfo-install.1, docs/yum-list-data.1: Fix typos in man
+	page, "pacakges" => packages. BZ 632857
+
+2010-09-10  James Antill <james@and.org>
+
+	* repoquery.py: Make --groupmember have sorted output.
+
+2010-09-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: when --groupmember is specified output the groups
+	per pkg not just as one lump intermixed  pkgname   @groupname
+	@groupname2 pkgname2   @groupname   @groupname3  etc
+
+2010-08-26  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/tsflags/tsflags.py: stop using setConfigOption in tsflags
+	plugin
+
+2010-08-19  James Antill <james@and.org>
+
+	* docs/yum-security.8: Update the docs. for "yum-security".
+
+2010-08-19  James Antill <james@and.org>
+
+	* plugins/security/security.py: Use .text() for notices, to drop
+	files output by default.
+
+2010-08-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils:   Don't
+	display 0: for epoch, on installed kernels security warning   Choose
+	the sub-command more intelligently, depending on the args. (or lack)
+	Display multiple certs, on newer yums ... almost certainly not
+	though
+
+2010-08-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: fix the url-based repofrompaths with repoclosure
+	from having the wrong prefix prepended to them closes rh bug 622710
+
+
+2010-08-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Don't display 0: for epoch, on
+	installed kernels security warning
+
+2010-08-09  James Antill <james@and.org>
+
+	* plugins/security/security.py: Choose the sub-command more
+	intelligently, depending on the args. (or lack)
+
+2010-08-09  James Antill <james@and.org>
+
+	* plugins/keys/keys.py: Display multiple certs, on newer yums ...
+	almost certainly not though
+
+2010-08-05  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: catch repoErrors when we go to matchPkgs since
+	that's where they end up getting setup. partial fix for rh bug
+	#621639
+
+2010-08-04  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add repoquery --lookaside bash completion.
+
+2010-08-04  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add repoquery --tree-* bash completions.
+
+2010-08-04  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: --tree-whatrequires help string typo fix.
+
+2010-08-04  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add bash completion for repodiff.
+
+2010-08-03  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: add copying to each plugin for fedora policies
+
+2010-08-03  Dennis Gregorovic <dgregor@redhat.com>
+
+	* repoclosure.py: add --lookaside switch for depsolving against a
+	repo without depsolving the repo itself
+
+2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2010-08-03  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.28
