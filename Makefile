@@ -16,6 +16,13 @@ NMPATH=$(DESTDIR)/etc/NetworkManager/dispatcher.d
 BASHCOMP=yum-utils.bash
 BASHCOMPPATH=$(DESTDIR)/etc/bash_completion.d
 
+GITDATE=git$(shell date +%Y%m%d)
+VER_REGEX=\(^Version:\s*[0-9]*\.[0-9]*\.\)\(.*\)
+BUMPED_MINOR=${shell VN=`cat ${PKGNAME}.spec | grep Version| sed  's/${VER_REGEX}/\2/'`; echo $$(($$VN + 1))}
+NEW_VER=${shell cat ${PKGNAME}.spec | grep Version| sed  's/\(^Version:\s*\)\([0-9]*\.[0-9]*\.\)\(.*\)/\2${BUMPED_MINOR}/'}
+NEW_REL=0.1.${GITDATE}
+
+
 clean:
 	rm -f *.pyc *.pyo *~
 	rm -f test/*~
@@ -61,22 +68,21 @@ release-tag:
 
 install-builddeps:
 	su -c "yum install perl-TimeDate "
-
+	
 test-release:
 	@git checkout -b release-test
-	# Add '.test' to Version in spec file
-	@cat yum-utils.spec | sed  's/^Version:.*/&.test/' > yum-utils-test.spec ; mv yum-utils-test.spec yum-utils.spec
-	@git commit -a -m "bumped yum-utils version to $(VERSION).test"
+	# +1 Minor version and add 0.1-gitYYYYMMDD release
+	@cat ${PKGNAME}.spec | sed  -e 's/${VER_REGEX}/\1${BUMPED_MINOR}/' -e 's/\(^Release:\s*\)\([0-9]*\)\(.*\)./\10.1.${GITDATE}%{?dist}/' > ${PKGNAME}-test.spec ; mv ${PKGNAME}-test.spec ${PKGNAME}.spec
+	@git commit -a -m "bumped ${PKGNAME} version ${NEW_VER}-${NEW_REL}"
 	# Make Changelog
 	@git log --pretty --numstat --summary | ./tools/git2cl > ChangeLog
 	@git commit -a -m "updated ChangeLog"
-	# Make archive
-	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
-	@git archive --format=tar --prefix=$(PKGNAME)-$(VERSION).test/ HEAD | gzip -9v >${PKGNAME}-$(VERSION).test.tar.gz
+    	# Make archive
+	@rm -rf ${PKGNAME}-${NEW_VER}.tar.gz
+	@git archive --format=tar --prefix=$(PKGNAME)-$(NEW_VER)/ HEAD | gzip -9v >${PKGNAME}-$(NEW_VER).tar.gz
 	# Build RPMS
-	@rpmbuild -ta  ${PKGNAME}-${VERSION}.test.tar.gz
-	@$(MAKE) test-cleanup
-
+	@rpmbuild -ta ${PKGNAME}-${NEW_VER}.tar.gz
+	@$(MAKE) test-cleanup	
 
 test-cleanup:
 	@rm -rf ${PKGNAME}-${VERSION}.test.tar.gz
