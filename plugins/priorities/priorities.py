@@ -94,6 +94,7 @@ def _all_repo_priorities_same(allrepos):
 
 def exclude_hook(conduit):
     global only_samearch
+    global check_obsoletes
 
     allrepos = conduit.getRepos().listEnabled()
 
