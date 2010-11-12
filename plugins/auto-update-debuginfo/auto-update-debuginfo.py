@@ -21,6 +21,8 @@
 
 from yum.plugins import TYPE_CORE
 
+import os, os.path
+
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
@@ -42,9 +44,53 @@ def enable_debuginfo_repos(yb, conduit):
                 if hasattr(r, opt):
                     setattr(r, opt, getattr(baserepo, opt))
 
+def _read_cached(cfname):
+    try:
+        fo = open(cfname)
+        crpmdbv = fo.readline()[:-1]
+        cnum    = int(fo.readline())
+        return crpmdbv, cnum
+    except:
+        return None, None
+
+def _write_cached(cfname, rpmdbv, num):
+    cdname = os.path.dirname(cfname)
+    if not os.access(cdname, os.W_OK):
+        if os.path.exists(cdname):
+            return
+
+        try:
+            os.makedirs(cdname)
+        except (IOError, OSError), e:
+            return
+
+    fo = open(cfname + ".tmp", "w")
+    fo.write(str(rpmdbv))
+    fo.write('\n')
+    fo.write(str(num))
+    fo.write('\n')
+    fo.close()
+    os.rename(cfname + ".tmp", cfname)
+
 def prereposetup_hook(conduit):
     yb = conduit._base
-    num = len(yb.rpmdb.returnPackages(patterns=['*-debuginfo']))
+
+    caching = hasattr(yb.rpmdb, 'simpleVersion')
+    num = None
+    if caching:
+        cfname = yb.conf.persistdir + '/plugins/auto-update-debuginfo/num'
+        crpmdbv, num = _read_cached(cfname)
+        if num is not None:
+            rpmdbv = yb.rpmdb.simpleVersion(main_only=True)[0]
+            if rpmdbv != crpmdbv:
+                num = None
+
+    if num is None:
+        num = len(yb.rpmdb.returnPackages(patterns=['*-debuginfo']))
+        if caching:
+            rpmdbv = yb.rpmdb.simpleVersion(main_only=True)[0]
+            _write_cached(cfname, rpmdbv, num)
+
     if num:
         if hasattr(conduit, 'registerPackageName'):
             conduit.registerPackageName("yum-plugin-auto-update-debug-info")
