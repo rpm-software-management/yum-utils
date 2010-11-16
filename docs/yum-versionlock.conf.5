@@ -18,6 +18,8 @@ This is basically the same as doing an exclude for the package name itself (as
 you cannot exclude installed packages), but yum will still see the versions you
 have installed/versionlocked as available so that "yum reinstall" will still
 work, etc.
+It can also work in the opposite way, like a fast exclude, by prefixing a '!'
+character to the version.
 .SH FILES
 .I /etc/yum/pluginconf.d/versionlock.conf
 .SH FILE FORMAT

@@ -19,18 +19,23 @@
 from yum.plugins import PluginYumExit
 from yum.plugins import TYPE_CORE
 from rpmUtils.miscutils import splitFilename
+from yum.packageSack import packagesNewestByName
+
 import urlgrabber
 import urlgrabber.grabber
 
 import os
 import fnmatch
 import tempfile
+import time
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
 _version_lock_excluder_n      = set()
 _version_lock_excluder_nevr   = set()
+
+_version_lock_excluder_B_nevr = set()
 
 #  In theory we could do full nevra/pkgtup ... but having foo-1.i386 and not
 # foo-1.x86_64 would be pretty weird. So just do "archless".
@@ -58,7 +63,7 @@ class VersionLockCommand:
         return ["versionlock"]
 
     def getUsage(self):
-        return '[PACKAGE-wildcard]'
+        return '[add|exclude|list|delete|clear] [PACKAGE-wildcard]'
 
     def getSummary(self):
         return 'Control package version locks.'
@@ -69,10 +74,16 @@ class VersionLockCommand:
     def doCommand(self, base, basecmd, extcmds):
         cmd = 'list'
         if extcmds:
-            if extcmds[0] not in ('add', 'list', 'del', 'delete', 'clear'):
+            if extcmds[0] not in ('add',
+                                  'exclude', 'add-!', 'add!', 'blacklist',
+                                  'list', 'del', 'delete', 'clear'):
                 cmd = 'add'
             else:
-                cmd = {'del' : 'delete'}.get(extcmds[0], extcmds[0])
+                cmd = {'del'       : 'delete',
+                       'add-!'     : 'exclude',
+                       'add!'      : 'exclude',
+                       'blacklist' : 'exclude',
+                       }.get(extcmds[0], extcmds[0])
                 extcmds = extcmds[1:]
 
         filename = fileurl
@@ -101,9 +112,36 @@ class VersionLockCommand:
                 done.add((n, a, e, v, r))
 
                 print "Adding versionlock on: %s:%s-%s-%s" % (e, n, v, r)
+                if not count:
+                    fo.write("\n# Added locks on %s\n" % time.ctime())
                 count += 1
                 (n, a, e, v, r) = pkg.pkgtup
                 fo.write("%s:%s-%s-%s.%s\n" % (e, n, v, r, '*'))
+
+            return 0, ['versionlock added: ' + str(count)]
+
+        if cmd == 'exclude':
+            pkgs = base.pkgSack.returnPackages(patterns=extcmds)
+            pkgs = packagesNewestByName(pkgs)
+
+            fo = open(filename, 'a')
+            count = 0
+            done = set()
+            for pkg in pkgs:
+                #  We ignore arch, so only add one entry for foo-1.i386 and
+                # foo-1.x86_64.
+                (n, a, e, v, r) = pkg.pkgtup
+                a = '*'
+                if (n, a, e, v, r) in done:
+                    continue
+                done.add((n, a, e, v, r))
+
+                print "Adding exclude on: %s:%s-%s-%s" % (e,n,v,r)
+                if not count:
+                    fo.write("\n# Added excludes on %s\n" % time.ctime())
+                count += 1
+                (n, a, e, v, r) = pkg.pkgtup
+                fo.write("!%s:%s-%s-%s.%s\n" % (e, n, v, r, '*'))
 
             return 0, ['versionlock added: ' + str(count)]
 
@@ -152,6 +190,25 @@ def config_hook(conduit):
     if hasattr(conduit._base, 'registerCommand'):
         conduit.registerCommand(VersionLockCommand())
 
+def _add_versionlock_whitelist(conduit):
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-versionlock")
+    ape = conduit._base.pkgSack.addPackageExcluder
+    exid = 'yum-utils.versionlock.W.'
+    ape(None, exid + str(1), 'wash.marked')
+    ape(None, exid + str(2), 'mark.name.in', _version_lock_excluder_n)
+    ape(None, exid + str(3), 'wash.nevr.in', _version_lock_excluder_nevr)
+    ape(None, exid + str(4), 'exclude.marked')
+
+def _add_versionlock_blacklist(conduit):
+    if hasattr(conduit, 'registerPackageName'):
+        conduit.registerPackageName("yum-plugin-versionlock")
+    ape = conduit._base.pkgSack.addPackageExcluder
+    exid = 'yum-utils.versionlock.B.'
+    ape(None, exid + str(1), 'wash.marked')
+    ape(None, exid + str(2), 'mark.nevr.in', _version_lock_excluder_B_nevr)
+    ape(None, exid + str(3), 'exclude.marked')
+
 def exclude_hook(conduit):
     conduit.info(3, 'Reading version lock configuration')
 
@@ -160,6 +217,10 @@ def exclude_hook(conduit):
 
     pkgs = {}
     for ent in _read_locklist():
+        neg = False
+        if ent and ent[0] == '!':
+            ent = ent[1:]
+            neg = True
         (n, v, r, e, a) = splitFilename(ent)
         n = n.lower()
         v = v.lower()
@@ -167,10 +228,14 @@ def exclude_hook(conduit):
         e = e.lower()
         if e == '': 
             e = '0'
+        if neg:
+            _version_lock_excluder_B_nevr.add("%s-%s:%s-%s" % (n, e, v, r))
+            continue
         _version_lock_excluder_n.add(n)
         _version_lock_excluder_nevr.add("%s-%s:%s-%s" % (n, e, v, r))
 
-    if conduit.confBool('main', 'follow_obsoletes', default=False):
+    if (_version_lock_excluder_n and
+        conduit.confBool('main', 'follow_obsoletes', default=False)):
         #  If anything obsoletes something that we have versionlocked ... then
         # remove all traces of that too.
         for (pkgtup, instTup) in conduit._base.up.getObsoletesTuples():
@@ -178,14 +243,7 @@ def exclude_hook(conduit):
                 continue
             _version_lock_excluder_n.add(pkgtup[0].lower())
 
-    if not _version_lock_excluder_n:
-        return
-
-    if hasattr(conduit, 'registerPackageName'):
-        conduit.registerPackageName("yum-plugin-versionlock")
-    ape = conduit._base.pkgSack.addPackageExcluder
-    exid = 'yum-utils.versionlock.'
-    ape(None, exid + str(1), 'wash.marked')
-    ape(None, exid + str(2), 'mark.name.in', _version_lock_excluder_n)
-    ape(None, exid + str(3), 'wash.nevr.in', _version_lock_excluder_nevr)
-    ape(None, exid + str(4), 'exclude.marked')
+    if _version_lock_excluder_n:
+        _add_versionlock_whitelist(conduit)
+    if _version_lock_excluder_B_nevr:
+        _add_versionlock_blacklist(conduit)
