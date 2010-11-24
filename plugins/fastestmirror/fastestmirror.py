@@ -119,7 +119,10 @@ def clean_hook(conduit):
         hostfilepath = conduit._base.conf.cachedir + '/' + hostfilepath
     if os.path.exists(hostfilepath):
         conduit.info(2, "Cleaning up list of fastest mirrors")
-        os.unlink(hostfilepath)
+        try:
+            os.unlink(hostfilepath)
+        except Exception, e:
+            conduit.info(2, "Cleanup failed: %s" % e)
 
 # Get the hostname from a url, stripping away any usernames/passwords
 host = lambda mirror: mirror.split('/')[2].split('@')[-1]
