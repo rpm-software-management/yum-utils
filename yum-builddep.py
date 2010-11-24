@@ -136,6 +136,24 @@ class YumBuildDep(YumUtilBase):
                     print "Could not setup repo %s: %s" % (r.id, e)
                     sys.exit(1)
 
+    def install_deps(self, deplist):
+        for dep in deplist:
+            self.logger.debug(' REQ:  %s' % dep)                
+            if dep.startswith("rpmlib("): 
+                continue
+            instreq = self.returnInstalledPackagesByDep(dep)
+            if instreq:
+                self.logger.info(' --> Already installed : %s'  % instreq[0])                    
+                continue
+            try:
+                pkg = self.returnPackageByDep(dep)
+                self.logger.info(' --> %s' % pkg)
+                self.install(pkg)
+                
+            except yum.Errors.YumBaseError, e:
+                self.logger.error("Error: %s" % e)
+                sys.exit(1)
+
     # go through each of the pkgs, figure out what they are/where they are 
     # if they are not a local package then run
         # Setup source repos
@@ -146,7 +164,14 @@ class YumBuildDep(YumUtilBase):
     
     def get_build_deps(self,opts):
         srcnames = []
+        specnames = []
         srpms = []
+        specworks = False
+
+        # See if we can use spec files for buildrequires
+        if hasattr(rpm, 'spec') and hasattr(rpm.spec, 'sourceHeader'):
+            specworks = True
+
         for arg in self.cmds:
             if arg.endswith('.src.rpm'):
                 try:
@@ -157,6 +182,8 @@ class YumBuildDep(YumUtilBase):
                     raise
             elif arg.endswith('.src'):
                 srcnames.append(arg)
+            elif specworks and arg.endswith('.spec'):
+                specnames.append(arg)
             else:
                 srcnames.append(arg)
 
@@ -183,24 +210,22 @@ class YumBuildDep(YumUtilBase):
 
         for srpm in toActOn:
             self.logger.info('Getting requirements for %s' % srpm)
-            for dep in srpm.requiresList():
-                self.logger.debug(' REQ:  %s' % dep)                
-                if dep.startswith("rpmlib("): 
-                    continue
-                instreq = self.returnInstalledPackagesByDep(dep)
-                if instreq:
-                    self.logger.info(' --> Already installed : %s'  % instreq[0])                    
-                    continue
-                try:
-                    pkg = self.returnPackageByDep(dep)
-                    self.logger.info(' --> %s' % pkg)
-                    self.install(pkg)
-                    
-                except yum.Errors.YumBaseError, e:
-                    self.logger.error("Error: %s" % e)
-                    sys.exit(1)
+            self.install_deps(srpm.requiresList())
     
-    
+        for name in specnames:
+            try:
+                spec = rpm.spec(name)
+            except ValueError:
+                self.logger.error("Bad spec: %s" % name)
+                continue
+
+            buildreqs = []
+            for d in rpm.ds(spec.sourceHeader, 'requires'):
+                buildreqs.append(d.DNEVR()[2:])
+                
+            self.logger.info('Getting requirements for %s' % name)
+            self.install_deps(buildreqs)
+            
 if __name__ == '__main__':
     setup_locale()
     util = YumBuildDep()
