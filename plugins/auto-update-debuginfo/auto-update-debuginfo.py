@@ -22,17 +22,36 @@
 from yum.plugins import TYPE_CORE
 
 import os, os.path
+import re
+import fnmatch
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_CORE,)
 
+def _check_man_disable(mdrs, di):
+    """ Was this repo. manually disabled. """
+    for match in mdrs:
+        if match(di):
+            return True
+    return False
+
 def enable_debuginfo_repos(yb, conduit):
+    mdrs = set()
+    opts, args = conduit.getCmdLine()
+    if opts is not None:
+        for opt, repoexp in opts.repos:
+            if opt == '--disablerepo':
+                mdrs.add(repoexp)
+    mdrs = [re.compile(fnmatch.translate(x)).match for x in mdrs]
+
     baserepos = {}
     for repo in yb.repos.listEnabled():
         baserepos[repo.id] = repo
     for repoid in baserepos:
         di = '%s-debuginfo' % repoid
         if di in baserepos:
+            continue
+        if _check_man_disable(mdrs, di):
             continue
         baserepo = baserepos[repoid]
         for r in yb.repos.findRepos(di):
