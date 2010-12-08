@@ -266,6 +266,23 @@ _yu_repodiff()
 } &&
 complete -F _yu_repodiff repodiff repodiff.py
 
+# yum-builddep
+_yu_builddep()
+{
+    COMPREPLY=()
+
+    # TODO: options handling (should really come from yum completion)
+
+    if [[ $2 == -* ]] ; then
+        return 0
+    fi
+
+    COMPREPLY=( $( compgen -f -o plusdirs -X "!*.spec" -- "$2" ) )
+    [[ $2 != */* && $2 != ~* ]] && type _yum_list &>/dev/null && \
+        _yum_list all "$2"
+} &&
+complete -F _yu_builddep -o filenames yum-builddep yum-builddep.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
