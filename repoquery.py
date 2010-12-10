@@ -1140,7 +1140,7 @@ def main(args):
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
     repoq.preconf.releasever = opts.releasever
-    if archlist:
+    if archlist and not archlist[0] == 'src':
         repoq.preconf.arch = archlist[0]
     if opts.conffile:
         repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
