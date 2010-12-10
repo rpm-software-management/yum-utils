@@ -63,6 +63,7 @@ Group       : %{group}
 URL         : %{url}
 Repository  : %{repoid}
 Summary     : %{summary}
+Source      : %{sourcerpm}
 Description :\n%{description}""",
 }
 
