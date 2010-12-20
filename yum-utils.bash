@@ -30,24 +30,22 @@ _yu_package_cleanup()
 {
     COMPREPLY=()
 
+    _yum_complete_baseopts "$2" "$3" 2>/dev/null && return 0
+
     case "$3" in
-        -h|--help|--leaf-regex|--qf|--queryformat)
+        --leaf-regex|--qf|--queryformat)
             return 0
             ;;
         --count)
             COMPREPLY=( $( compgen -W '1 2 3 4 5 6 7 8 9' -- "$2" ) )
             return 0
             ;;
-        -c)
-            COMPREPLY=( $( compgen -f -o plusdirs -X "!*.conf" -- "$2" ) )
-            return 0
-            ;;
     esac
 
-    COMPREPLY=( $( compgen -W '--help --problems --leaves --all --leaf-regex
-        --exclude-devel --exclude-bin --orphans --noplugins --quiet -y --dupes
-        --cleandupes --oldkernels --count --keepdevel -c --queryformat' \
-            -- "$2" ) )
+    COMPREPLY=( $( compgen -W '$( _yum_baseopts 2>/dev/null ) --problems
+        --queryformat --orphans --dupes --cleandupes --noscripts --leaves --all
+        --leaf-regex --exclude-devel --exclude-bin --oldkernels --count
+        --keepdevel' -- "$2" ) )
 } &&
 complete -F _yu_package_cleanup -o filenames package-cleanup package-cleanup.py
 
@@ -271,9 +269,10 @@ _yu_builddep()
 {
     COMPREPLY=()
 
-    # TODO: options handling (should really come from yum completion)
+    _yum_complete_baseopts "$2" "$3" && return 0
 
     if [[ $2 == -* ]] ; then
+        COMPREPLY=( $( compgen -W '$( _yum_baseopts 2>/dev/null )' -- "$2" ) )
         return 0
     fi
 
