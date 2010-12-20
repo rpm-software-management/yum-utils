@@ -282,6 +282,23 @@ _yu_builddep()
 } &&
 complete -F _yu_builddep -o filenames yum-builddep yum-builddep.py
 
+# debuginfo-install
+_yu_debuginfo_install()
+{
+    COMPREPLY=()
+
+    _yum_complete_baseopts "$2" "$3" && return 0
+
+    if [[ $2 == -* ]] ; then
+        COMPREPLY=( $( compgen -W '$( _yum_baseopts 2>/dev/null )
+            --no-debuginfo-plugin' -- "$2" ) )
+        return 0
+    fi
+
+    _yum_list all "$2"
+} &&
+complete -F _yu_debuginfo_install debuginfo-install debuginfo-install.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
