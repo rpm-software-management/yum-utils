@@ -80,7 +80,7 @@ _yu_repo_graph()
             return 0
             ;;
         --repoid)
-            type _yum_repolist &>/dev/null && _yum_repolist all "$2"
+            _yum_repolist all "$2" 2>/dev/null
             return 0
             ;;
         -c)
@@ -114,8 +114,7 @@ _yu_repo_rss()
 
     COMPREPLY=( $( compgen -W '--help -f -l -t -d -r --tempcache -g -a -c' \
         -- "$2" ) )
-    [[ "$2" == -* ]] && return 0
-    type _yum_repolist &>/dev/null && _yum_repolist all "$2"
+    [[ "$2" == -* ]] || _yum_repolist all "$2" 2>/dev/null || return 0
 } &&
 complete -F _yu_repo_rss -o filenames repo-rss repo-rss.py
 
@@ -133,15 +132,15 @@ _yu_repoclosure()
             return 0
             ;;
         -l|--lookaside|-r|--repoid)
-            type _yum_repolist &>/dev/null && _yum_repolist all "$2"
+            _yum_repolist all "$2" 2>/dev/null
             return 0
             ;;
         -p|--pkg)
-            type _yum_list &>/dev/null && _yum_list all "$2"
+            _yum_list all "$2" 2>/dev/null
             return 0
             ;;
         -g|--group)
-            type _yum_grouplist &>/dev/null && _yum_grouplist "" "$2"
+            _yum_grouplist "" "$2" 2>/dev/null
             return 0
             ;;
     esac
@@ -170,15 +169,15 @@ _yu_repoquery()
             ;;
         -l|--list|-i|--info|-R|--requires)
             if $groupmode ; then
-                type _yum_grouplist &>/dev/null && _yum_grouplist "" "$2"
+                _yum_grouplist "" "$2" 2>/dev/null
             else
-                type _yum_list &>/dev/null && _yum_list all "$2"
+                _yum_list all "$2" 2>/dev/null
             fi
             return 0
             ;;
         --provides|--obsoletes|--conflicts|--groupmember|--changelog|\
         --location|--nevra|--envra|--nvr|-s|--source)
-            type _yum_list &>/dev/null && _yum_list all "$2"
+            _yum_list all "$2" 2>/dev/null
             return 0
             ;;
         --grouppkgs)
@@ -192,15 +191,15 @@ _yu_repoquery()
             return 0
             ;;
         --repoid)
-            type _yum_repolist &>/dev/null && _yum_repolist all "$2"
+            _yum_repolist all "$2" 2>/dev/null
             return 0
             ;;
         --enablerepo)
-            type _yum_repolist &>/dev/null && _yum_repolist disabled "$2"
+            _yum_repolist disabled "$2" 2>/dev/null
             return 0
             ;;
         --disablerepo)
-            type _yum_repolist &>/dev/null && _yum_repolist enabled "$2"
+            _yum_repolist enabled "$2" 2>/dev/null
             return 0
             ;;
         -c)
@@ -277,8 +276,7 @@ _yu_builddep()
     fi
 
     COMPREPLY=( $( compgen -f -o plusdirs -X "!*.spec" -- "$2" ) )
-    [[ $2 != */* && $2 != ~* ]] && type _yum_list &>/dev/null && \
-        _yum_list all "$2"
+    [[ $2 != */* && $2 != ~* ]] && _yum_list all "$2" 2>/dev/null
 } &&
 complete -F _yu_builddep -o filenames yum-builddep yum-builddep.py
 
