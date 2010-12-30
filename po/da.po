@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Tim Lauridsen <timlau@fedoraproject.org>, 2010
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-30 13:46+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tim Lauridsen <timlau@fedoraproject.org>\n"
+"Language-Team: Danish <da@li.org>\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../debuginfo-install.py:90
+#, python-format
+msgid "enabling %s"
+msgstr "aktivere %s"
+
+#: ../plugins/aliases/aliases.py:113
+#, python-format
+msgid "Can't open aliases file: %s"
+msgstr "Kan ikke finde filen med aliaser: %s"
+
+#: ../plugins/aliases/aliases.py:120
+#, python-format
+msgid ""
+"\n"
+"# Alias added on %s\n"
+"%s\n"
+msgstr ""
+"\n"
+"# Alias tilføjet på %s\n"
+"%s\n"
+
+#: ../plugins/aliases/aliases.py:128
+#, python-format
+msgid "%s, no match for %s"
+msgstr "%s, ingen match for %s"
+
+#: ../plugins/aliases/aliases.py:132 ../plugins/aliases/aliases.py:139
+#, python-format
+msgid "Alias %s = %s"
+msgstr "Alias %s = %s"

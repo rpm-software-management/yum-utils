@@ -24,12 +24,11 @@ except:
     class CliError: # Never used by yumex
         pass
 
-#try: # $rand yum using python code don't have i18n
-#    from i18n import _
-#except:
-# i18n is now yum.i18n ... but need a real yum-utils i18n so just rm atm.
-if True:
-    def _(x): return x
+from kitchen.i18n import easy_gettext_setup
+
+# setup the translation wrappers
+
+_, P_  = easy_gettext_setup('yum-utils') 
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)

@@ -8,8 +8,12 @@ Source: http://yum.baseurl.org/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: python >= 2.4 , yum >= 3.2.29
-BuildRequires: python >= 2.4
+Requires: yum >= 3.2.29
+Requires: python-kitchen
+BuildRequires: python-devel >= 2.4
+BuildRequires: gettext
+BuildRequires: intltool
+Provides: yum-utils-translations = %{version}-%{release}
 
 
 %description
@@ -184,6 +188,7 @@ Obsoletes: yum-aliases < 1.1.20-0
 Conflicts: yum-aliases < 1.1.20-0
 # Requires args_hook
 Requires: yum >= 3.2.23
+Requires: yum-utils-translations = %{version}-%{release}
 
 %description -n yum-plugin-aliases
 This plugin adds the command alias, and parses the aliases config. file to
@@ -367,6 +372,8 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C updateonboot DESTDIR=$RPM_BUILD_ROOT install
 
+%find_lang %name
+
 # Plugins to install
 plugins="\
  changelog \
@@ -411,6 +418,7 @@ install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/p
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum.repos.d
 touch $RPM_BUILD_ROOT%{_sysconfdir}/yum.repos.d/_local.repo
 
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -423,7 +431,7 @@ if [ $1 = 0 ]; then
     /sbin/chkconfig --del yum-updateonboot >/dev/null 2>&1 || :;
 fi
 
-%files
+%files -f %{name}.lang
 %defattr(-, root, root)
 %doc README yum-util-cli-template
 %doc COPYING
@@ -644,6 +652,9 @@ fi
 /usr/lib/yum-plugins/ps.*
 
 %changelog
+* Thu Dec 30 2010 Tim Lauridsen <timlau@fedoraproject.org>
+- Added Translation support and need Requires, BuildRequires 
+
 * Sun Nov 7 2010 Tim Lauridsen <timlau@fedoraproject.org>
 - mark as 1.1.29 
 
