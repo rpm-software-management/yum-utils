@@ -1,3 +1,5 @@
+%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+
 Summary: Utilities based around the yum package manager
 Name: yum-utils
 Version: 1.1.29
@@ -459,6 +461,7 @@ fi
 %{_bindir}/show-installed
 %{_sbindir}/yum-complete-transaction
 %{_sbindir}/yumdb
+%{python_sitelib}/yumutils/
 %{_mandir}/man1/yum-utils.1.*
 %{_mandir}/man1/debuginfo-install.1.*
 %{_mandir}/man1/package-cleanup.1.*
@@ -652,6 +655,9 @@ fi
 /usr/lib/yum-plugins/ps.*
 
 %changelog
+* Mon Jan 3 2011 Tim Lauridsen <timlau@fedoraproject.org>
+- Added yumutils python module
+ 
 * Thu Dec 30 2010 Tim Lauridsen <timlau@fedoraproject.org>
 - Added Translation support and need Requires, BuildRequires 
 

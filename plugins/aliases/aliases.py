@@ -24,11 +24,7 @@ except:
     class CliError: # Never used by yumex
         pass
 
-from kitchen.i18n import easy_gettext_setup
-
-# setup the translation wrappers
-
-_, P_  = easy_gettext_setup('yum-utils') 
+from yumutils.i18n import _, P_
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
