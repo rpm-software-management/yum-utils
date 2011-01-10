@@ -89,7 +89,7 @@ def problem_contains(problems, types):
             return problem
     return None
 
-def pkg_multilib_file(data, pkg, pkgs, fname):
+def pkg_multilib_file(data, pkg, pkgs, fname, verify_cb=None):
 
     problems = data[pkg][fname]
     ml_csum = problem_contains(problems, ['checksum'])
@@ -103,7 +103,7 @@ def pkg_multilib_file(data, pkg, pkgs, fname):
             continue
 
         if opkg not in data:
-            data[opkg] = opkg.verify()
+            data[opkg] = opkg.verify(callback=verify_cb)
         if fname not in data[opkg]:
             return True
 
@@ -140,12 +140,13 @@ _verify_configs  = False
 class VerifyCommand:
 
     def __init__(self, names, conf, multilib=True, verify_configs_override=None,
-                 all=False):
+                 all=False, verify_callback=None):
         self.names = names
         self.conf  = conf
         self.all = all
         self.multilib = multilib
         self.verify_configs_override = verify_configs_override
+        self.verify_callback = verify_callback
 
     def getNames(self):
         return self.names
@@ -189,7 +190,7 @@ Verify packages and display data on bad verifications"""
         for fname in results:
             problems = results[fname]
             mpkgs = self._multilib[nevr(pkg)]
-            if not pkg_multilib_file(data, pkg, mpkgs, fname):
+            if not pkg_multilib_file(data, pkg, mpkgs, fname, verify_cb=self.verify_callback):
                 continue
 
             tmp = []
@@ -203,7 +204,8 @@ Verify packages and display data on bad verifications"""
     def filter_data(self, msg, pkgs):
         data = {}
         for pkg in sorted(pkgs):
-            oresults = pkg.verify(patterns=self._filename_globs, all=self.all)
+            oresults = pkg.verify(patterns=self._filename_globs, all=self.all, 
+                                  callback=self.verify_callback)
 
             if not _verify_configs and not self.verify_configs_override:
                 for fn in oresults.keys():
@@ -421,10 +423,13 @@ def config_hook(conduit):
 
     reg = conduit.registerCommand
     reg(VerifyCommand(['verify-all'], conf, multilib=False,
-                      verify_configs_override=True, all=True))
+                      verify_configs_override=True, all=True, 
+                      verify_callback=conduit._base.verify_plugins_cb))
     reg(VerifyCommand(['verify-rpm'], conf, multilib=False,
-                      verify_configs_override=True))
-    reg(VerifyCommand(['verify-multilib','verify'], conf))
+                      verify_configs_override=True,
+                      verify_callback=conduit._base.verify_plugins_cb))
+    reg(VerifyCommand(['verify-multilib','verify'], conf,
+                      verify_callback=conduit._base.verify_plugins_cb))
 
     parser = conduit.getOptParser()
     if not parser:
