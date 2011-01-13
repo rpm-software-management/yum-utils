@@ -1,3 +1,98 @@
+2011-01-13  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.30
+
+2011-01-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/verify/verify.py: when we run verify make sure we call the
+	verify_plugins_callback so we can pick up any verify modification
+	plugins in our output
+
+2011-01-03  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, plugins/aliases/aliases.py, yum-utils.spec,
+	yumutils/Makefile, yumutils/__init__.py, yumutils/i18n.py: Added
+	yumutils python module with i18n handling code
+
+2010-12-30  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* Makefile, plugins/aliases/aliases.py, po/Makefile,
+	po/POTFILES.in, po/da.po, po/yum-utils.pot, yum-utils.spec: Added
+	translation support to yum-utils Added working translation to
+	yum-plugin-aliases
+
+2010-12-20  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Simplify various completions by just invoking
+	yum's functions ignoring stderr.
+
+2010-12-20  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add debuginfo-install completion.
+
+2010-12-20  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Use yum's base option completion in
+	package-cleanup and yum-builddep if available.
+
+2010-12-10  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py: add sourcerpm to default output of repoquery -i rh
+	bug: https://bugzilla.redhat.com/show_bug.cgi?id=661827
+
+2010-12-10  James Antill <james@and.org>
+
+	* repoquery.py: Don't set basearch if it's src, because that's not
+	valid (esp. for MM etc.)
+
+2010-12-08  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add basic yum-builddep completion (no support for
+	options yet).
+
+2010-12-03  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Obey
+	manual --disablerepo in auto-up-di plugin.
+
+2010-11-24  Panu Matilainen <pmatilai@redhat.com>
+
+	* yum-builddep.py: Teach yum-builddep to install buildrequires
+	parsed directly from spec - Split the actual install part out of
+	get_build_deps() to avoid   code duplication - If rpm-python
+	supports it, accept spec files as arguments and   grab buildrequires
+	directly out of the parsed spec
+
+2010-11-24  James Antill <james@and.org>
+
+	* plugins/fastestmirror/fastestmirror.py: Don't crash when we can't
+	unlink the hostfilepath. BZ 650468.
+
+2010-11-16  James Antill <james@and.org>
+
+	* docs/yum-versionlock.1, docs/yum-versionlock.conf.5,
+	plugins/versionlock/versionlock.py: Add excludes functionality to
+	versionlock. Document command.
+
+2010-11-12  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Add rpmdb
+	caching to a-u-di.
+
+2010-11-12  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Be less
+	verbose in a-u-di.
+
+2010-11-09  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/priorities/priorities.py: add global check_obsoletes for
+	exclude hook.  closes rh bug#651598
+
+2010-11-07  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2010-11-07  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.29
