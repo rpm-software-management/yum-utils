@@ -2,7 +2,7 @@
 
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.29
+Version: 1.1.30
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -655,6 +655,9 @@ fi
 /usr/lib/yum-plugins/ps.*
 
 %changelog
+* Thu Jan 13 2011 Tim Lauridsen <timlau@fedoraproject.org> 
+- mark as 1.1.30 
+ 
 * Mon Jan 3 2011 Tim Lauridsen <timlau@fedoraproject.org>
 - Added yumutils python module
  
