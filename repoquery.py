@@ -29,6 +29,7 @@ import exceptions
 import urlparse
 
 from optparse import OptionParser
+from optparse import SUPPRESS_HELP
 
 import logging
 import yum
@@ -74,8 +75,6 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'requires', 'provides', 'conflicts', 'obsoletes',
               'relativepath', 'hdrstart', 'hdrend', 'id',
             ]
-
-
 
 def sec2isodate(timestr):
     return time.strftime("%F %T", time.gmtime(int(timestr)))
@@ -126,6 +125,34 @@ class queryError(exceptions.Exception):
         return '%s' % to_unicode(self.value)
         
 
+class DotPlot(object):
+    def __init__(self):
+
+        print 'digraph packages {',
+        print """
+size="20.69,25.52";
+ratio="fill";
+rankdir="TB";
+orientation=port;
+node[style="filled"];
+outputorder="edgesfirst";
+ranksep="1";
+"""
+    
+    def addPackage(self, pkg, deps):
+        # color calculations lifted from rpmgraph 
+        h=0.5+(0.6/23*len(deps))
+        s=h+0.1
+        b=1.0
+        
+        print '"%s" [color="%s %s %s"];' % (pkg, h, s, b)
+        print '"%s" -> {' % pkg
+        for req in deps:
+            print '"%s"' % req
+        print '} [color="%s %s %s"];\n' % (h, s, b)
+    
+    def __del__(self):
+        print "}"
 
 # abstract class
 class pkgQuery:
@@ -230,16 +257,31 @@ class pkgQuery:
         return self._translated_qf[self.qf] % self
 
     def fmt_requires(self, **kw):
-        return "\n".join(self.prco('requires'))
+        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+            self.fmt_tree_requires(output = self.yb.options.output,
+                                tree_level = self.yb.options.tree_level,
+                                dot = self.yb.options.dot)
+        else:
+            return "\n".join(self.prco('requires'))
 
     def fmt_provides(self, **kw):
         return "\n".join(self.prco('provides'))
 
     def fmt_conflicts(self, **kw):
-        return "\n".join(self.prco('conflicts'))
+        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+            self.fmt_tree_conflicts(output = self.yb.options.output,
+                                tree_level = self.yb.options.tree_level,
+                                dot = self.yb.options.dot)
+        else:
+            return "\n".join(self.prco('conflicts'))
 
     def fmt_obsoletes(self, **kw):
-        return "\n".join(self.prco('obsoletes'))
+        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+            self.fmt_tree_obsoletes(output = self.yb.options.output,
+                                tree_level = self.yb.options.tree_level,
+                                dot = self.yb.options.dot)
+        else:
+            return "\n".join(self.prco('obsoletes'))
 
     def fmt_list(self, **kw):
         return "\n".join(self.files())
@@ -317,6 +359,22 @@ class pkgQuery:
         req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
+        
+        if kw['output'].lower() == 'dot-tree':
+            if 'dot' not in kw.keys() or kw['dot'] is None:
+                kw['dot'] = Dot()
+        elif 'dot' not in kw.keys() or kw['dot'] is None:
+            kw['dot'] = None
+        
+        if str(kw['tree_level']).lower() != 'all':
+            try: 
+                kw['tree_level'] = int(kw['tree_level'])
+            except ValueError, er:
+                kw['tree_level'] = 'all'
+        
+        if not 'output' in kw.keys():
+            kw['output'] = 'ascii-tree'
+
         __req2pkgs = {}
         def req2pkgs(ignore, req):
             req = str(req)
@@ -353,22 +411,37 @@ class pkgQuery:
                 return []
 
             __req2pkgs[req] = providers
-            return providers
-
-        self._tree_print_req(pkg, req, level)
+            return providers 
+        
+        dot = kw['dot']
+        
         tups = getattr(pkg, prco_type)
         rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, req2pkgs)
+        if dot is None:
+            self._tree_print_req(pkg, req, level)
+            lim = level + 1
+        else:
+            dot.addPackage(pkg, rpkgs)
+            lim = level + 2
         nlevel = level + 1
+        if str(kw['tree_level']).lower() != 'all' and \
+            int(kw['tree_level']) < int(lim):
+            return
         for rpkg in sorted(rpkgs):
             if pkg.verEQ(rpkg):
                 continue
             if rpkgs[rpkg] is None:
                 req = self._tree_pkg2val(loc_reqs, rpkg)
-                self._tree_print_req(rpkg, req, nlevel)
+                if dot is None:
+                    self._tree_print_req(rpkg, req, nlevel)
                 continue
             self._fmt_tree_prov(prco_type,
-                                pkg=rpkg, level=nlevel, all_reqs=all_reqs,
-                                req=self._tree_pkg2val(loc_reqs, rpkg))
+                                pkg = rpkg, level = nlevel, all_reqs = all_reqs,
+                                req = self._tree_pkg2val(loc_reqs, rpkg),
+                                tree_level = kw['tree_level'],
+                                output = kw['output'],
+                                dot = dot)
+        
     def fmt_tree_requires(self, **kw):
         return self._fmt_tree_prov('requires', **kw)
     def fmt_tree_conflicts(self, **kw):
@@ -378,6 +451,22 @@ class pkgQuery:
         pkg      = kw.get('pkg', self.pkg)
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
+        
+        if kw['output'].lower() == 'dot-tree':
+            if 'dot' not in kw.keys() or kw['dot'] is None:
+                kw['dot'] = Dot()
+        elif 'dot' not in kw.keys() or kw['dot'] is None:
+            kw['dot'] = None
+        
+        if str(kw['tree_level']).lower() != 'all':
+            try: 
+                kw['tree_level'] = int(kw['tree_level'])
+            except ValueError, er:
+                kw['tree_level'] = 'all'
+        
+        if not 'output' in kw.keys():
+            kw['output'] = 'ascii-tree'
+        
         def obs2pkgs():
             if self.yb is None:
                 return []
@@ -400,26 +489,53 @@ class pkgQuery:
 
             return obss
 
+        dot = kw['dot']
+        
         if level:
             reason = ''
         else:
             reason = 'cmd line'
-        self._tree_print_req(pkg, reason, level)
+        rpkgs = obs2pkgs()
+        if dot is None:
+            self._tree_print_req(pkg, reason, level)
+            lim = level + 1
+        else:
+            dot.addPackage(pkg, rpkgs)
+            lim = level + 2
         all_reqs[pkg] = None
         nlevel = level + 1
-        for rpkg in sorted(obs2pkgs()):
+        if str(kw['tree_level']).lower() != 'all' and \
+            int(kw['tree_level']) < int(lim):
+            return
+        for rpkg in sorted(rpkgs):
             if pkg.verEQ(rpkg):
                 continue
-            if rpkg in all_reqs:
+            if rpkg in all_reqs and dot is None:
                 self._tree_print_req(rpkg, '', nlevel)
                 continue
-            self.fmt_tree_obsoletes(pkg=rpkg, level=nlevel, all_reqs=all_reqs)
+            self.fmt_tree_obsoletes(pkg=rpkg, level=nlevel, all_reqs=all_reqs,
+                                    tree_level = kw['tree_level'],
+                                    output = kw['output'],
+                                    dot = dot)
 
     def fmt_tree_what_requires(self, **kw):
         pkg      = kw.get('pkg', self.pkg)
         req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
+        
+        if kw['output'].lower() == 'dot-tree':
+            if 'dot' not in kw.keys() or kw['dot'] is None:
+                kw['dot'] = Dot()
+
+        if str(kw['tree_level']).lower() != 'all':
+            try: 
+                kw['tree_level'] = int(kw['tree_level'])
+            except ValueError, er:
+                kw['tree_level'] = 'all'
+        
+        if not 'output' in kw.keys():
+            kw['output'] = 'ascii-tree'
 
         __prov2pkgs = {}
         def prov2pkgs(prov, ignore):
@@ -453,24 +569,39 @@ class pkgQuery:
             __prov2pkgs[str(prov)] = arequirers + irequirers
             return arequirers + irequirers
 
-        self._tree_print_req(pkg, req, level)
         filetupes = []
         for n in pkg.filelist + pkg.dirlist + pkg.ghostlist:
             filetupes.append((n, None, (None, None, None)))
-
+        
         tups = pkg.provides + filetupes
         rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, prov2pkgs)
+        dot = kw['dot']
+        
+        if dot is None:
+            self._tree_print_req(pkg, req, level)
+            lim = level + 1
+        else:
+            dot.addPackage(pkg, rpkgs)
+            lim = level + 2
         nlevel = level + 1
+        
+        if str(kw['tree_level']).lower() != 'all' and \
+            int(kw['tree_level']) < int(lim):
+            return
         for rpkg in sorted(rpkgs):
             if pkg.verEQ(rpkg): # Remove deps. on self.
                 continue
             if rpkgs[rpkg] is None:
                 req = self._tree_pkg2val(loc_reqs, rpkg)
-                self._tree_print_req(rpkg, req, nlevel)
+                if dot is None:
+                    self._tree_print_req(rpkg, req, nlevel)
                 continue
             self.fmt_tree_what_requires(pkg=rpkg,
                                         level=nlevel, all_reqs=all_reqs,
-                                        req=self._tree_pkg2val(loc_reqs, rpkg))
+                                        req=self._tree_pkg2val(loc_reqs, rpkg),
+                                        tree_level = kw['tree_level'],
+                                        output = kw['output'],
+                                        dot = dot)
 
 
 class repoPkgQuery(pkgQuery):
@@ -837,7 +968,10 @@ class YumBaseQuery(yum.YumBase):
                 print to_unicode(pkg)
             for oper in self.pkgops:
                 try:
-                    out = pkg.doQuery(oper)
+                    out = pkg.doQuery(oper, 
+                        tree_level = self.options.tree_level,
+                        output = self.options.output,
+                        dot = self.options.dot)
                     if out:
                         print to_unicode(out)
                 except queryError, e:
@@ -881,7 +1015,9 @@ class YumBaseQuery(yum.YumBase):
                             require_recursive(pkg.name)
                 
 
-        require_recursive(name)
+        
+        if self.options.output not in ('ascii-tree','dot-tree'):
+            require_recursive(name)
         return self.queryPkgFactory(sorted(pkgs.values()))
 
     def fmt_whatobsoletes(self, name, **kw):
@@ -902,7 +1038,6 @@ class YumBaseQuery(yum.YumBase):
 
     def fmt_requires(self, name, **kw):
         pkgs = {}
-        
         for pkg in self.returnByName(name):
             for req in pkg.prco("requires"):
                 for res in self.fmt_whatprovides(req):
@@ -1002,7 +1137,7 @@ def main(args):
                       dest="show_dupes",
                       help="show all versions of packages")
     parser.add_option("--show-dupes", action="store_true",
-                      help="show all versions of packages")
+                      help=SUPPRESS_HELP)
     parser.add_option("--repoid", action="append",
                       help="specify repoids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("--enablerepo", action="append", dest="enablerepos",
@@ -1027,16 +1162,20 @@ def main(args):
                       help="config file location")
     parser.add_option("--tree-requires", action="store_true",
                       dest="tree_requires",
-                      help="list recursive requirements, in tree form")
+                      help=SUPPRESS_HELP)
     parser.add_option("--tree-conflicts", action="store_true",
                       dest="tree_conflicts",
-                      help="list recursive conflicts, in tree form")
+                      help=SUPPRESS_HELP)
     parser.add_option("--tree-obsoletes", action="store_true",
                       dest="tree_obsoletes",
-                      help="list recursive obsoletes, in tree form")
+                      help=SUPPRESS_HELP)
     parser.add_option("--tree-whatrequires", action="store_true",
                       dest="tree_what_requires",
-                      help="list recursive what requires, in tree form")
+                      help=SUPPRESS_HELP)
+    parser.add_option("--level", dest="tree_level", default="all",
+                      help="levels to display (can be any number of 'all', default to 'all')")
+    parser.add_option("--output", dest="output", default="text",
+                      help="output format to use (can be text|ascii-tree|dot-tree, default to 'text')")
     parser.add_option("--search", action="store_true",
                       dest="search", default=False,
                       help="Use yum's search to return pkgs")
@@ -1088,17 +1227,27 @@ def main(args):
     if opts.source:
         pkgops.append("source")
     if opts.tree_requires:
+        opts.output = "ascii-tree"
         pkgops.append("tree_requires")
     if opts.tree_conflicts:
+        opts.output = "ascii-tree"
         pkgops.append("tree_conflicts")
     if opts.tree_obsoletes:
+        opts.output = "ascii-tree"
         pkgops.append("tree_obsoletes")
     if opts.tree_what_requires:
+        opts.output = "ascii-tree"
         pkgops.append("tree_what_requires")
+    if opts.output == "dot-tree":
+        opts.dot = DotPlot()
+    else:
+        opts.dot = None
     if opts.srpm:
         needsource = 1
     if opts.whatrequires:
         sackops.append("whatrequires")
+        if opts.output != 'text':
+            pkgops.append("tree_what_requires")
     if opts.whatprovides:
         sackops.append("whatprovides")
     if opts.whatobsoletes:
