@@ -175,6 +175,8 @@ class RepoClosure(yum.YumBase):
                 ver = self.evrTupletoVer((reqe, reqv, reqr))
                 if (req,flags,ver) in resolved:
                     continue
+                
+                resolve_sack = [] # make it empty
                 try:
                     resolve_sack = self.whatProvides(req, flags, ver)
                 except yum.Errors.RepoError, e:
