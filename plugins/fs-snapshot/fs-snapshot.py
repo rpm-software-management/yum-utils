@@ -27,7 +27,7 @@ newer version elsewhere and copy the new versions of the files back to your
 rolled-back snapshot.  You have been warned.
 """
 
-from yum.plugins import TYPE_CORE
+from yum.plugins import TYPE_CORE, YumPluginExit
 from yum.constants import *
 import os
 import time
@@ -41,6 +41,9 @@ lvm_key = "create_lvm_snapshot"
 # avoid multiple snapshot-merge checks via inspect_volume_lvm()
 dm_snapshot_merge_checked = 0
 dm_snapshot_merge_support = 0
+
+def _fail(msg):
+    raise YumPluginExit(msg)
 
 def kernel_supports_dm_snapshot_merge():
     # verify the kernel provides the 'snapshot-merge' DM target
@@ -163,7 +166,7 @@ def get_volumes(conduit):
 
     except Exception, e:
         msg = "fs-snapshot: error processing mounted volumes: %s" % e
-        conduit.error(1, msg)
+        _fail(msg)
 
     return volumes
 
@@ -235,12 +238,19 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
         return 1
 
     mntpnt = volume["mntpnt"]
-    if mntpnt == "/":
-        # FIXME only print a variant of this warning if a kernel
-        # will be installed by the current yum transaction
+    kernel_inst = True # Default to saying it might be.
+    ts = conduit._base.rpmdb.readOnlyTS()
+    kern_pkgtup = yum.misc.get_running_kernel_pkgtup(ts)
+    del ts
+    if kern_pkgtup is not None:
+        kernel_inst = conduit.getTsInfo().matchNaevr(name=kern_pkgtup[0])
+    #  We only warn about this if a kernel is being installed or removed. Note
+    # that this doesn't show anything if you move from "kern-foo" to "kern-bar"
+    # but yum doesn't know any more than "what is running now".
+    if mntpnt == "/" and kern_inst:
         conduit.info(1, "fs-snapshot: WARNING: creating LVM snapshot of root LV.  If a kernel is\n"
-                        "                      being installed /boot may need to be manually restored\n"
-                        "                      in the event that a system rollback proves necessary.")
+                        "                      being altered /boot may need to be manually restored\n"
+                        "                      in the event that a system rollback proves necessary.\n")
 
     snap_device = device + "_" + snapshot_tag
     snap_lvname = snap_device.split('/')[3]
@@ -265,6 +275,7 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     if err:
         conduit.error(1, "fs-snapshot: couldn't add tag to snapshot: %s" %
                       snap_device)
+        return 1
     return 2
 
 def pretrans_hook(conduit):
@@ -280,7 +291,7 @@ def pretrans_hook(conduit):
     for volume in volumes:
         rc = _create_snapshot(conduit, snapshot_tag, volume)
         if rc == 1:
-            conduit.error(1, "fs-snapshot: error snapshotting " + volume["mntpnt"])
+            _fail("fs-snapshot: error snapshotting " + volume["mntpnt"])
         elif rc == 2 and hasattr(conduit, 'registerPackageName'):
             # A snapshot was successfully created
             conduit.registerPackageName("yum-plugin-fs-snapshot")
