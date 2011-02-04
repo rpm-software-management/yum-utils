@@ -20,18 +20,6 @@ The yumutils.i18n pythom module for i18n code used by utils and plugins
 # flag to disable i18n, set it to false to enable dummy wrappers.
 _use_i18n = True
 
-if _use_i18n:
-    try:
-        from kitchen.i18n import easy_gettext_setup
-        # setup the translation wrappers
-        _, P_  = easy_gettext_setup('yum-utils') 
-    except:
-        _ = dummy_wrapper
-        P_ = dummyP_wrapper
-else:
-    _ = dummy_wrapper
-    P_ = dummyP_wrapper
-    
     
 def dummy_wrapper(str):
     '''
@@ -48,4 +36,16 @@ def dummyP_wrapper(str1, str2, n):
         return str1
     else:
         return str2
+
+if _use_i18n:
+    try:
+        from kitchen.i18n import easy_gettext_setup
+        # setup the translation wrappers
+        _, P_  = easy_gettext_setup('yum-utils') 
+    except:
+        _ = dummy_wrapper
+        P_ = dummyP_wrapper
+else:
+    _ = dummy_wrapper
+    P_ = dummyP_wrapper
     
