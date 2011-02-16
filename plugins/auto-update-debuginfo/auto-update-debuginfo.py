@@ -38,7 +38,7 @@ def _check_man_disable(mdrs, di):
 def enable_debuginfo_repos(yb, conduit):
     mdrs = set()
     opts, args = conduit.getCmdLine()
-    if opts is not None:
+    if opts is not None and hasattr(opts.repos) :
         for opt, repoexp in opts.repos:
             if opt == '--disablerepo':
                 mdrs.add(repoexp)
