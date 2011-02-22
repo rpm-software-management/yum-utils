@@ -16,8 +16,7 @@ show this help message and exit
 yum, kickstart or human; yum gives the result as a yum command line; kickstart the content of a %packages section; "human" readable is default.
 .TP
 .B \-i INPUT, \-\-input=INPUT
-File to read the package list from instead of using the rpmdb. \- for stdin. The file must contain package names only separated by white space (including newlines). rpm \-qa \-\-qf='%{name}
-' produces proper output.
+File to read the package list from instead of using the rpmdb. \- for stdin. The file must contain package names only separated by white space (including newlines). rpm \-qa \-\-qf='%{name}\\n' produces proper output.
 .TP
 .B \-o OUTPUT, \-\-output=OUTPUT
 File to write the result to. Stdout is used if option is omited.

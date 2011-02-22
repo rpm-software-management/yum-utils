@@ -359,7 +359,7 @@ def __main__():
     parser.add_option("-f", "--format", dest="format",
                      choices=('kickstart','human','yum'), default="human",
                      help='yum, kickstart or human; yum gives the result as a yum command line; kickstart the content of a %packages section; "human" readable is default.')
-    parser.add_option("-i", "--input", dest="input", action="store", default=None, help="File to read the package list from instead of using the rpmdb. - for stdin. The file must contain package names only separated by white space (including newlines). rpm -qa --qf='%{name}\n' produces proper output.")
+    parser.add_option("-i", "--input", dest="input", action="store", default=None, help="File to read the package list from instead of using the rpmdb. - for stdin. The file must contain package names only separated by white space (including newlines). rpm -qa --qf='%{name}\\n' produces proper output.")
     parser.add_option("-o", "--output", dest="output", action="store", default=None, help="File to write the result to. Stdout is used if option is omited.")
     parser.add_option("-q", "--quiet", dest="quiet", action="store_true", help="Do not show warnings.")
     parser.add_option("-e", "--no-excludes", dest="excludes",
