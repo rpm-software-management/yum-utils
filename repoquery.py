@@ -1173,7 +1173,7 @@ def main(args):
                       dest="tree_what_requires",
                       help=SUPPRESS_HELP)
     parser.add_option("--level", dest="tree_level", default="all",
-                      help="levels to display (can be any number of 'all', default to 'all')")
+                      help="levels to display (can be any number or 'all', default to 'all')")
     parser.add_option("--output", dest="output", default="text",
                       help="output format to use (can be text|ascii-tree|dot-tree, default to 'text')")
     parser.add_option("--search", action="store_true",
