@@ -164,7 +164,7 @@ _yu_repoquery()
     case "$3" in
         -h|--help|--version|-f|--file|--qf|--queryformat|--resolve|--archlist|\
         --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
-        --repofrompath)
+        --repofrompath|--level|--search-fields)
             return 0
             ;;
         -l|--list|-i|--info|-R|--requires)
@@ -202,8 +202,12 @@ _yu_repoquery()
             _yum_repolist enabled "$2" 2>/dev/null
             return 0
             ;;
-        -c)
+        -c|--config)
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$2" ) )
+            return 0
+            ;;
+        --output)
+            COMPREPLY=( $( compgen -W 'text ascii-tree dot-tree' -- "$2" ) )
             return 0
             ;;
     esac
@@ -215,8 +219,8 @@ _yu_repoquery()
         --whatobsoletes --whatconflicts --group --grouppkgs --archlist
         --pkgnarrow --installed --show-duplicates --repoid --enablerepo
         --disablerepo --repofrompath --plugins --quiet --verbose --cache
-        --tempcache --querytags --config --tree-requires --tree-conflicts
-        --tree-obsoletes --tree-whatrequires' -- "$2" ) )
+        --tempcache --querytags --config --level --output --search
+        --search-fields' -- "$2" ) )
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
