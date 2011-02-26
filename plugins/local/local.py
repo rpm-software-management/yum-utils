@@ -80,6 +80,10 @@ def postdownload_hook(conduit):
     _reposetup(conduit)
 
 def _rebuild(conduit, done=None):
+    enabled = conduit.confBool('createrepo', 'enabled', default=True)
+    if not enabled:
+        return
+
     cache_dir = conduit.confString('createrepo', 'cachedir', default=None)
     checksum  = conduit.confString('createrepo', 'checksum', default=None)
 
