@@ -95,8 +95,8 @@ def _rebuild(conduit, done=None):
     update = conduit.confBool('createrepo', 'update', default=True)
     databases = conduit.confBool('createrepo', 'databases', default=True)
 
-    deltas = conduit.confBool('createrepo', 'deltas', default=False)
-    num_deltas = conduit.confInt('createrepo', 'num-deltas', default=None)
+    deltas = conduit.confBool('createrepo', 'enable_deltas', default=False)
+    num_deltas = conduit.confInt('createrepo', 'deltas', default=None)
     old_package_dirs = conduit.confString('createrepo', 'oldpackagedirs', default=local_repo_dir)
 
     if conduit._base.verbose_logger.isEnabledFor(yum.logginglevels.DEBUG_3):
