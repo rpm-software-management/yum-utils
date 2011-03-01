@@ -283,7 +283,7 @@ def postresolve_hook(conduit):
         mdi = UpdateMetadata(repos=list(repos))
     for tsmem in ts.getMembers():
         for po in rpmdb.searchNevra(name=tsmem.po.name, arch=tsmem.po.arch):
-            times = po.hdr['changelogtime']
+            times = po['changelogtime']
             try:
                 n,v,r,e,a = splitFilename(po.sourcerpm)
             except TypeError:
