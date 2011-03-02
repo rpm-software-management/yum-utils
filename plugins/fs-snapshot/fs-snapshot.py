@@ -27,7 +27,7 @@ newer version elsewhere and copy the new versions of the files back to your
 rolled-back snapshot.  You have been warned.
 """
 
-from yum.plugins import TYPE_CORE, YumPluginExit
+from yum.plugins import TYPE_CORE, PluginYumExit
 from yum.constants import *
 import os
 import time
@@ -43,7 +43,7 @@ dm_snapshot_merge_checked = 0
 dm_snapshot_merge_support = 0
 
 def _fail(msg):
-    raise YumPluginExit(msg)
+    raise PluginYumExit(msg)
 
 def kernel_supports_dm_snapshot_merge():
     # verify the kernel provides the 'snapshot-merge' DM target
