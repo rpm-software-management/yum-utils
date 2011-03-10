@@ -90,14 +90,12 @@ Specify custom output format for queries. You can add ":date", ":day" and
 ":isodate" to all the tags that are a time, and you can add ":k", ":m", ":g",
 ":t" and ":h" to sizes. You can also specify field width as in
 sprintf (Eg. %-20{name})
-.IP "\fB\-\-tree\-requires [pkgs]\fP"
-For the given packages print a tree of the packages that they require.
-.IP "\fB\-\-tree\-conflicts [pkgs]\fP"
-For the given packages print a tree of the packages that they conflict.
-.IP "\fB\-\-tree\-obsoletes [pkgs]\fP"
-For the given packages print a tree of the packages that they obsolete.
-.IP "\fB\-\-tree\-whatrequires [pkgs]\fP"
-For the given packages print a tree of the packages that require them.
+.IP "\fB\-\-output [text|ascii-tree|dot-tree]\fP"
+Output format which can be used with --requires/--whatrequires/--obsoletes/--conflicts.
+Default output is 'text'.
+.IP "\fB\-\-level [all|any int]\fP"
+In combination with --output ascii-tree|dot-tree this option specifies the
+number of level to print on the tree. Default level is 'all'.
 .PP 
 
 .SH "PACKAGE SELECTION OPTIONS" 
@@ -134,9 +132,6 @@ Limit what packages are considered for the query. Valid values for WHAT are:
 installed, available, recent, updates, extras, all and repository (default).
 .IP "\fB\-\-installed\fP"
 Restrict query ONLY to installed pkgs - disables all repos and only acts on rpmdb.
-.IP "\fB\-\-show-dupes, \-\-show\-duplicates\fP"
-Query all versions of package. By default only newest packages are
-considered.
 
 .PP
 .SH "GROUP QUERY OPTIONS" 

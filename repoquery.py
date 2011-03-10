@@ -362,7 +362,7 @@ class pkgQuery:
         
         if kw['output'].lower() == 'dot-tree':
             if 'dot' not in kw.keys() or kw['dot'] is None:
-                kw['dot'] = Dot()
+                kw['dot'] = DotPlot()
         elif 'dot' not in kw.keys() or kw['dot'] is None:
             kw['dot'] = None
         
@@ -454,7 +454,7 @@ class pkgQuery:
         
         if kw['output'].lower() == 'dot-tree':
             if 'dot' not in kw.keys() or kw['dot'] is None:
-                kw['dot'] = Dot()
+                kw['dot'] = DotPlot()
         elif 'dot' not in kw.keys() or kw['dot'] is None:
             kw['dot'] = None
         
@@ -526,7 +526,7 @@ class pkgQuery:
         
         if kw['output'].lower() == 'dot-tree':
             if 'dot' not in kw.keys() or kw['dot'] is None:
-                kw['dot'] = Dot()
+                kw['dot'] = DotPlot()
 
         if str(kw['tree_level']).lower() != 'all':
             try: 
