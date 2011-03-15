@@ -24,8 +24,9 @@ manager. It includes utilities by different authors that make yum easier and
 more powerful to use. These tools include: debuginfo-install, 
 find-repos-of-install, needs-restarting, package-cleanup, repoclosure, 
 repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
-repotrack, verifytree, yumdownloader, yum-builddep, yum-complete-transaction, 
-yum-config-manager, yum-debug-dump, yum-debug-restore and yum-groups-manager.
+repotrack, show-installed, show-changed-rco, verifytree, yumdownloader,
+yum-builddep, yum-complete-transaction, yum-config-manager, yum-debug-dump,
+yum-debug-restore and yum-groups-manager.
 
 %package -n yum-updateonboot
 Summary: Run yum update on system boot
@@ -459,6 +460,7 @@ fi
 %{_bindir}/yum-groups-manager
 %{_bindir}/yum-debug-restore
 %{_bindir}/show-installed
+%{_bindir}/show-changed-rco
 %{_sbindir}/yum-complete-transaction
 %{_sbindir}/yumdb
 %{python_sitelib}/yumutils/
