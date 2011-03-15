@@ -29,6 +29,7 @@ rolled-back snapshot.  You have been warned.
 
 from yum.plugins import TYPE_CORE, PluginYumExit
 from yum.constants import *
+import yum.misc
 import os
 import time
 from subprocess import Popen,PIPE
@@ -238,12 +239,12 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
         return 1
 
     mntpnt = volume["mntpnt"]
-    kernel_inst = True # Default to saying it might be.
+    kern_inst = True # Default to saying it might be.
     ts = conduit._base.rpmdb.readOnlyTS()
     kern_pkgtup = yum.misc.get_running_kernel_pkgtup(ts)
     del ts
     if kern_pkgtup is not None:
-        kernel_inst = conduit.getTsInfo().matchNaevr(name=kern_pkgtup[0])
+        kern_inst = conduit.getTsInfo().matchNaevr(name=kern_pkgtup[0])
     #  We only warn about this if a kernel is being installed or removed. Note
     # that this doesn't show anything if you move from "kern-foo" to "kern-bar"
     # but yum doesn't know any more than "what is running now".
