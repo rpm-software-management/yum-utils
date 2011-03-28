@@ -161,6 +161,10 @@ def main():
                       help="specify repoid & paths of additional repositories - unique repoid and complete path required, can be specified multiple times. Example. --repofrompath=myrepo,/path/to/repo")
     parser.add_option("--old-packages", action="append",
                       help="packages to use to compare against, instead of installed")
+    parser.add_option("--ignore-arch", action="store_true",
+                      help="ignore arch when searching for old packages")
+    parser.add_option("--skip-new", action="store_true",
+                      help="skip packages without a matching old package")
     parser.add_option("-C", "--cache", action="store_true",
                       help="run from cache only")
     parser.add_option("-c", "--config", dest="conffile", default=None,
@@ -206,17 +210,26 @@ def main():
     npkgs = _get_npkgs(yb, args)
     opkgs = {}
     for pkg in sorted(_get_opkgs(yb, npkgs, opts.old_packages)):
+        opkgs[(pkg.name, pkg.arch)] = pkg
         opkgs[pkg.name] = pkg
 
     for pkg in sorted(npkgs):
-        print "New-Package:", pkg, pkg.ui_from_repo
-
         opkg = None
         oreqs = {}
         oobss = {}
         ocons = {}
-        if pkg.name in opkgs:
-            opkg = opkgs[pkg.name]
+        if opts.ignore_arch:
+            if pkg.name in opkgs:
+                opkg = opkgs[pkg.name]
+        elif (pkg.name, pkg.arch) in opkgs:
+            opkg = opkgs[(pkg.name, pkg.arch)]
+
+        if opkg is None and opts.skip_new:
+            continue
+
+        print "New-Package:", pkg, pkg.ui_from_repo
+
+        if opkg is not None:
             print "Old-Package:", opkg, opkg.ui_from_repo
 
             oreqs = _get_oreqs(pkg, opkg.requires)
