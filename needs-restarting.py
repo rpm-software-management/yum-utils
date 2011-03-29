@@ -129,6 +129,8 @@ def main(args):
         except OSError, e:
             print "Couldn't access process information for %s: %s" % (pid, str(e))
             continue
+        # proc cmdline is null-delimited so clean that up
+        cmdline = cmdline.replace('\000', ' ')
         print '%s : %s' % (pid, cmdline)
         
     return 0
