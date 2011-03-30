@@ -73,7 +73,7 @@ class YumBuildDep(YumUtilBase):
 
         # turn of our local gpg checking for opening the srpm if it is turned
         # off for repos :)
-        if opts.nogpgcheck:
+        if opts.nogpgcheck or not self.conf.localpkg_gpgcheck:
             self.ts.pushVSFlags((rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
 
         # Check if there is anything to do.
