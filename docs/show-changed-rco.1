@@ -1,0 +1,67 @@
+.\" show-changed-rco
+.TH "show-installed" "1" "30 March 2011" "James Antill" ""
+.SH "NAME"
+show\-changed-\-rco
+.SH "SYNOPSIS"
+\fBshow\-changed-\-rco\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fBshow\-changed-\-rco\fP gives a compact description of the changes to a
+packages Requires, Conflicts and Obsoletes data from the installed (or old) to
+a specified rpm file.
+.SH OPTIONS
+.TP
+.IP \-h, \-\-help
+show this help message and exit
+.IP "\fB\-C, \-\-cache\fP" 
+Tells repoquery to run entirely from YUM cache - does not download any metadata
+or update the cache. Queries in this mode can fail or give partial/incorrect
+results if the cache isn't fully populated beforehand with eg "yum makecache".
+.IP "\fB\-c <config file>, \-\-config=<config file>\fP"
+Use alternative config file (default is /etc/yum.conf).
+
+.IP "\fB\-\-repoid=<repo>\fP"
+Specify which repository to query. Using this option disables all repositories
+not explicitly enabled with --repoid option (can be used multiple times). By
+default repoquery uses whatever repositories are enabled in YUM configuration.
+.IP "\fB\-\-enablerepo=<repo>\fP"
+In addition to the default set, query the given additional repository, even if
+it is disabled in YUM configuration.  Can be used multiple times.
+.IP "\fB\-\-disablerepo=<repo>\fP"
+Do not query the given repository, even if it is enabled in YUM
+configuration.  Can be used multiple times.
+.IP "\fB\-\-repofrompath=<repoid>,<path/url>\fP"
+Specify a path or url to a repository (same path as in a baseurl) to add to
+the repositories for this query. This option can be used multiple times. If
+you want to view only the pkgs from this repository combine this with
+--repoid. The repoid for the repository is specified by <repoid>.
+
+.IP "\fB\-\-old-packages=<pkg>\fP"
+Explicitly list the valid old packages to match the new packages against.
+.IP "\fB\-\-ignore-arch\fP"
+Ignore arch. so you can compare foo-2.i686 to foo-1.x86_64.
+.IP "\fB\-\-skip-new\fP"
+Only give output for packages which we've found an old package for.
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There are of course no bugs, but should you find any, you should first
+consult the FAQ section on http://yum.baseurl.org/wiki/Faq and if unsuccessful
+in finding a resolution contact the mailing list: yum-devel@lists.baseurl.org.
+To file a bug use http://bugzilla.redhat.com for Fedora/RHEL/Centos
+related bugs and http://yum.baseurl.org/report for all other bugs.
+
+.fi
