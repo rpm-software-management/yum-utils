@@ -1292,10 +1292,11 @@ def main(args):
     repoq.preconf.releasever = opts.releasever
     if archlist and not archlist[0] == 'src':
         repoq.preconf.arch = archlist[0]
-    if opts.conffile:
-        repoq.doConfigSetup(fn=opts.conffile, debuglevel=initnoise, init_plugins=opts.plugins)
-    else:
-        repoq.doConfigSetup(debuglevel=initnoise, init_plugins=opts.plugins)
+    if opts.conffile is not None:
+        repoq.preconf.fn = opts.conffile
+    repoq.preconf.debuglevel = initnoise
+    repoq.preconf.init_plugins = opts.plugins
+    repoq.conf
 
     if opts.repofrompath:
         # setup the fake repos

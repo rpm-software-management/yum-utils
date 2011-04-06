@@ -133,12 +133,11 @@ def main():
     # Borrowing large sections from repoquery/pkg-tree etc.
     initnoise = (not opts.quiet) * 2
     yb = yum.YumBase()
-    yb.doConfigSetup(debuglevel=0, errorlevel=1)
-    if opts.conffile:
-        yb.doConfigSetup(fn=opts.conffile, debuglevel=initnoise,
-                         init_plugins=opts.plugins)
-    else:
-        yb.doConfigSetup(debuglevel=initnoise, init_plugins=opts.plugins)
+    if opts.conffile is not None:
+        yb.preconf.fn = opts.conffile
+    yb.preconf.debuglevel = initnoise
+    yb.preconf.init_plugins = opts.plugins
+    yb.conf
 
     # Show what is going on, if --quiet is not set.
     if not opts.quiet and sys.stdout.isatty():
