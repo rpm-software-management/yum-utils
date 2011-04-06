@@ -93,7 +93,7 @@ class PackageCleanup(YumUtilBase):
                     help='list all packages leaf nodes that do not match'\
                          ' leaf-regex')
         leafgrp.add_option("--leaf-regex", 
-                    default="(^(compat-)?lib.+|.*libs?[\d-]*$)",
+                    default="(^(compat-)?lib(?!reoffice).+|.*libs?[\d-]*|.*-data$)",
                     help='A package name that matches this regular expression' \
                          ' (case insensitively) is a leaf')
         leafgrp.add_option("--exclude-devel", default=False, 
