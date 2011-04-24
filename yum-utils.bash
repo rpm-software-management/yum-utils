@@ -341,6 +341,26 @@ _yu_debuginfo_install()
 } &&
 complete -F _yu_debuginfo_install debuginfo-install debuginfo-install.py
 
+# yum-debug-dump
+_yu_debug_dump()
+{
+    COMPREPLY=()
+
+    case $3 in
+        -h|--help)
+            return 0
+            ;;
+    esac
+
+    if [[ $2 == -* ]] ; then
+        COMPREPLY=( $( compgen -W '--help --norepos' -- "$2" ) )
+        return 0
+    fi
+
+    COMPREPLY=( $( compgen -f -o plusdirs -- "$cur" ) )
+} &&
+complete -F _yu_debug_dump -o filenames yum-debug-dump yum-debug-dump.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
