@@ -40,7 +40,7 @@ class YumDebugDump(yum.YumBase):
 
     def parse_args(self):
         parser = OptionParser()
-        parser.set_usage("yum-debug-dump [options]")
+        parser.set_usage("yum-debug-dump [options] [filename]")
         parser.add_option("--norepos", action="store_true", default=False,
            help="do not attempt to dump the repository contents")
         self.opts, self.args = parser.parse_args()
