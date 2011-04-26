@@ -96,7 +96,7 @@ class YumDownloader(YumUtilBase):
         if opts.source:
             self.setupSourceRepos()
         # Do the real action
-        self.downloadPackages(opts)
+        self.exit_code = self.downloadPackages(opts)
         
     def setupSourceRepos(self):
         # enable the -source repos for enabled primary repos
@@ -208,7 +208,8 @@ class YumDownloader(YumUtilBase):
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
             sys.exit(1)
-            
+
+        exit_code = 0
         for pkg in toDownload:
             n,a,e,v,r = pkg.pkgtup
             packages =  self.pkgSack.searchNevra(n,e,v,r,a)
@@ -235,9 +236,11 @@ class YumDownloader(YumUtilBase):
                     path = repo.getPackage(download, checkfunc=checkfunc)
                 except IOError, e:
                     self.logger.error("Cannot write to file %s. Error was: %s" % (local, e))
+                    exit_code = 2
                     continue
                 except RepoError, e:
                     self.logger.error("Could not download/verify pkg %s: %s" % (download, e))
+                    exit_code = 2
                     continue
     
                 if not os.path.exists(local) or not os.path.samefile(path, local):
@@ -245,7 +248,8 @@ class YumDownloader(YumUtilBase):
                     progress.start(basename=os.path.basename(local),
                                    size=os.stat(path).st_size)
                     shutil.copy2(path, local)
-                    progress.end(progress.size) 
+                    progress.end(progress.size)
+        return exit_code
                     
     def _groupPackages(self,pkglist):
         pkgGroups = {}
@@ -304,5 +308,4 @@ class YumDownloader(YumUtilBase):
 if __name__ == '__main__':
     setup_locale()
     util = YumDownloader()
-        
-        
+    sys.exit(util.exit_code)
