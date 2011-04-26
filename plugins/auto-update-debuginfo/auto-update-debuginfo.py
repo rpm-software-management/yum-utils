@@ -83,7 +83,11 @@ def _write_cached(cfname, rpmdbv, num):
         except (IOError, OSError), e:
             return
 
-    fo = open(cfname + ".tmp", "w")
+    try:
+        fo = open(cfname + ".tmp", "w")
+    except (IOError, OSError), e:
+        return
+
     fo.write(str(rpmdbv))
     fo.write('\n')
     fo.write(str(num))
