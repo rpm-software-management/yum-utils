@@ -172,6 +172,14 @@ class YumDownloader(YumUtilBase):
             pos = self.pkgSack.returnPackages(patterns=pkgnames)
             exactmatch, matched, unmatched = parsePackages(pos, pkgnames)
             installable = yum.misc.unique(exactmatch + matched)
+            if not installable:
+                try:
+                    installable = self.returnPackagesByDep(pkg)
+                    installable = yum.misc.unique(installable)
+                except yum.Errors.YumBaseError, msg:
+                    self.logger.error(str(msg))
+                    continue
+
             if not installable: # doing one at a time, apart from groups
                 self.logger.error('No Match for argument %s' % pkg)
                 continue
