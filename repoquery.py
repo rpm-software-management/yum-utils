@@ -240,7 +240,7 @@ class pkgQuery:
         # for subclasses to implement
         raise NotImplementedError
 
-    def fmt_queryformat(self):
+    def fmt_queryformat(self, **kw):
 
         if not self.qf:
             return self.fmt_nevra()
@@ -930,12 +930,13 @@ class YumBaseQuery(yum.YumBase):
                 pkgs = self.matchSrcPkgs(items)
 
             else:
+                pkgs = []
                 if not self.sackops:
                     plain_pkgs = True
-                try:
-                    pkgs = self.matchPkgs(items, plain_pkgs=plain_pkgs)
-                except yum.Errors.RepoError, e:
-                    raise queryError("Could not match packages: %s" % to_unicode(e))
+                    try:
+                        pkgs = self.matchPkgs(items, plain_pkgs=plain_pkgs)
+                    except yum.Errors.RepoError, e:
+                        raise queryError("Could not match packages: %s" % to_unicode(e))
                 for prco in items:
                     for oper in self.sackops:
                         try:
