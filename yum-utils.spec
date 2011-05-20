@@ -367,6 +367,17 @@ When this plugin is installed it adds the yum command "ps", which allows you
 to see which running processes are accociated with which packages (and if they
 need rebooting, or have updates, etc.)
 
+%package -n yum-plugin-puppetverify
+Summary: Yum plugin to add puppet checksums to verify data
+Group: System Environment/Base
+Provides: yum-puppetverify = %{version}-%{release}
+Requires: yum >= 3.2.12
+Requires: PyYaml >= 3.09
+Requires: puppet
+
+%description -n yum-plugin-puppetverify
+Supplies checksums for files in packages from puppet's state file. 
+
 %prep
 %setup -q
 
@@ -404,6 +415,7 @@ plugins="\
  local \
  fs-snapshot \
  ps \
+ puppetverify \
 "
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
@@ -657,6 +669,12 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ps.conf
 /usr/lib/yum-plugins/ps.*
+
+%files -n yum-plugin-puppetverify
+%defattr(-, root, root)
+%doc COPYING
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/puppetverify.conf
+/usr/lib/yum-plugins/puppetverify.*
 
 %changelog
 * Thu Jan 13 2011 Tim Lauridsen <timlau@fedoraproject.org> 
