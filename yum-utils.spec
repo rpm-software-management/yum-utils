@@ -372,7 +372,7 @@ Summary: Yum plugin to add puppet checksums to verify data
 Group: System Environment/Base
 Provides: yum-puppetverify = %{version}-%{release}
 Requires: yum >= 3.2.12
-Requires: PyYaml >= 3.09
+Requires: PyYAML >= 3.09
 Requires: puppet
 
 %description -n yum-plugin-puppetverify
