@@ -50,6 +50,16 @@ Create and use a private cache instead of the main YUM cache. This is used
 by default when run as non-root user.
 .IP "\fB\-c <config file>, \-\-config=<config file>\fP"
 Use alternative config file (default is /etc/yum.conf).
+.IP "\fB\-\-releasever=version\fP"
+Pretend the current release version is the given string. This is very useful
+when combined with \-\-installroot. You can also use \-\-releasever=/ to take
+the releasever information from outside the installroot.
+Note that with the default upstream cachedir, of /var/cache/yum, using this
+option will corrupt your cache (and you can use $releasever in your cachedir
+configuration to stop this).
+.IP "\fB\-\-setopt=option=value\fP"
+Set any config option in yum config or repo files. For options in the global 
+config just use: \-\-setopt=option=value for repo options use: \-\-setopt=repoid.option=value
 
 .PP 
 .SH "PACKAGE QUERY OPTIONS" 
