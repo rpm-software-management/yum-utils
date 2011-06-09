@@ -158,10 +158,12 @@ def parseArgs(args):
         sys.exit(1)
 
     # sort out the comma-separated crap we somehow inherited.    
-    archlist = ['src']
+    archlist = []
     for a in opts.archlist:
         for arch in a.split(','):
             archlist.append(arch)
+    if not archlist :
+        archlist = ['src']
 
     opts.archlist = archlist             
     
@@ -172,6 +174,11 @@ def main(args):
 
             
     my = DiffYum()
+    archlist_changed = False
+    if opts.archlist and not opts.archlist[0] == 'src':
+        my.preconf.arch = opts.archlist[0]
+        archlist_changed = True
+
     if opts.quiet:
         my.conf.debuglevel=0
         my.doLoggingSetup(my.conf.debuglevel, my.conf.errorlevel)
@@ -179,6 +186,9 @@ def main(args):
     my.conf.disable_excludes = ['all']
     my.dy_shutdown_all_other_repos()
     my.dy_archlist = opts.archlist
+    if archlist_changed:
+        my.dy_archlist += my.arch.archlist
+
     if not opts.quiet: print 'setting up repos'
     for r in opts.old:
         if not opts.quiet: print "setting up old repo %s" % r
