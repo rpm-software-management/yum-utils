@@ -171,7 +171,7 @@ class YumDownloader(YumUtilBase):
 
             pos = self.pkgSack.returnPackages(patterns=pkgnames)
             exactmatch, matched, unmatched = parsePackages(pos, pkgnames)
-            installable = yum.misc.unique(exactmatch + matched)
+            installable = (exactmatch + matched)
             if not installable:
                 try:
                     installable = self.returnPackagesByDep(pkg)
@@ -221,7 +221,12 @@ class YumDownloader(YumUtilBase):
         for pkg in toDownload:
             n,a,e,v,r = pkg.pkgtup
             packages =  self.pkgSack.searchNevra(n,e,v,r,a)
+            packages.sort()
+            last = None
             for download in packages:
+                if download.pkgtup == last :
+                    continue
+                last = download.pkgtup
                 repo = self.repos.getRepo(download.repoid)
                 remote = download.returnSimple('relativepath')
                 if opts.urls:
