@@ -106,11 +106,12 @@ class DiffYum(yum.YumBase):
             elif not npkg.verEQ(opkg):
                 modified.append((npkg, opkg))
 
-        ao = []
+        ao = {}
         for pkg in add:
-            if not pkg.obsoletes:
-                continue
-            ao.append(pkg)
+            for obs_name in set(pkg.obsoletes_names):
+                if obs_name not in ao:
+                    ao[obs_name] = []
+                ao[obs_name].append(pkg)
 
         #  Note that this _only_ shows something when you have an additional
         # package obsoleting a removed package. If the obsoleted package is
@@ -119,7 +120,7 @@ class DiffYum(yum.YumBase):
         for po in remove:
             # Remember: Obsoletes are for package names only.
             poprovtup = (po.name, 'EQ', (po.epoch, po.ver, po.release))
-            for newpo in ao:
+            for newpo in ao.get(po.name, []):
                 if newpo.inPrcoRange('obsoletes', poprovtup):
                     obsoleted[po] = newpo
                     break
