@@ -17,14 +17,21 @@ Add a repo. as an new repo.
 .IP "\fB\-\-archlist, -a\fP"
 Add architectures to change the default from just comparing source packages.
 Note that if you want the same as a native
-"x86_64" architecture machine you need: x86_64,athlon,i686,i586,i486,i386,noarch
+"x86_64" architecture machine you just need to pass "x86_64" (this is different
+from earlier versions where you needed to specify
+"x86_64,athlon,i686,i586,i486,i386,noarch" and you still got "src").
 .IP "\fB\-\-size, -s\fP"
 Ouput additional data about the size of the changes.
+.IP "\fB\-\-compare-arch\fP"
+Normally packages are just compared based on their name, this flag makes the
+comparison also use the arch. So foo.i386 and foo.x86_64 are different.
 .SH "EXAMPLES"
 .IP "Compare source pkgs in two local repos:"
 \fBrepodiff --old=/tmp/repo-old --new=/tmp/repo-new\fP
-.IP "Compare x86_64 binary pkgs in two remote repos, and two local one:"
-\fBrepodiff -a x86_64,i386,noarch,src --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
+.IP "Compare x86_64 compat. binary pkgs in two remote repos, and two local one:"
+\fBrepodiff -a x86_64 --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
+.IP "Compare x86_64 compat. binary pkgs, but also compare arch:"
+\fBrepodiff -a x86_64 --compare-arch --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
 .PP 
 
 .SH "SEE ALSO"
