@@ -50,10 +50,13 @@ def posttrans_hook(conduit):
     if conf.assumeyes:
         return    
         
-    has_vimdiff = False
+    has_prog = {"meld": False, "vimdiff": False}
     for d in os.getenv("PATH", "").split(":"):
-        if os.path.exists(os.path.join(d, "vimdiff")):
-            has_vimdiff = True
+        for prog in has_prog.keys():
+            if os.path.exists(os.path.join(d, prog)):
+                has_prog[prog] = True
+        # short circuit the search if all binaries are found
+        if not False in has_prog.values():
             break
     ts = conduit.getTsInfo()
     for tsmem in ts.getMembers():
@@ -78,11 +81,11 @@ def posttrans_hook(conduit):
             for fn, mode, flags in filetuple:
                 if flags & RPMFILE_CONFIG:
                     if flags & RPMFILE_NOREPLACE:
-                        mergeConfFiles(tsmem.po.name, fn, True, conduit, has_vimdiff)
+                        mergeConfFiles(tsmem.po.name, fn, True, conduit, has_prog)
                     else:
-                        mergeConfFiles(tsmem.po.name, fn, False, conduit, has_vimdiff)
+                        mergeConfFiles(tsmem.po.name, fn, False, conduit, has_prog)
 
-def mergeConfFiles(pkg, fn, noreplace, conduit, has_vimdiff):
+def mergeConfFiles(pkg, fn, noreplace, conduit, has_prog):
     if noreplace:
         local_file = fn
         pkg_file = "%s.rpmnew" % fn
@@ -127,7 +130,9 @@ def mergeConfFiles(pkg, fn, noreplace, conduit, has_vimdiff):
             print " - install the package's version (i)"
         else:
             print " - keep your version (n)"
-        if has_vimdiff:
+        if has_prog["meld"]:
+            print " - merge interactively with meld (m)"
+        if has_prog["vimdiff"]:
             print " - merge interactively with vim (v)"
         print " - background this process and examine manually (z)"
         sys.stdout.write("Your answer ? ")
@@ -154,7 +159,10 @@ def mergeConfFiles(pkg, fn, noreplace, conduit, has_vimdiff):
             os.system(os.getenv("SHELL", "bash"))
         elif answer == "q":
             print "Choosing RPM's default action."
-        elif answer == "v" and has_vimdiff:
+        elif answer == "m" and has_prog["meld"]:
+            os.system("""meld '%s' '%s'""" % (other_file, final_file))
+            break
+        elif answer == "v" and has_prog["vimdiff"]:
             os.system("""vimdiff '%s' '%s'""" % (final_file, other_file))
             break
         else:
