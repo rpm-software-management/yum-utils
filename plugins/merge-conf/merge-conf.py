@@ -85,6 +85,21 @@ def posttrans_hook(conduit):
                     else:
                         mergeConfFiles(tsmem.po.name, fn, False, conduit, has_prog)
 
+def mergeComplete(noreplace, other_file):
+    while True:
+        sys.stdout.write("""\nExternal merge complete, delete "%s"? (y/n) """ % other_file)
+        delete = sys.stdin.readline().strip()
+
+        if delete == "y":
+            os.remove(other_file)
+            print """"%s" deleted.""" % other_file
+            break
+        elif delete == "n":
+            print """Keeping file "%s".""" % other_file
+            break
+        else:
+            print "Unknown answer, please try again"
+
 def mergeConfFiles(pkg, fn, noreplace, conduit, has_prog):
     if noreplace:
         local_file = fn
@@ -161,9 +176,11 @@ def mergeConfFiles(pkg, fn, noreplace, conduit, has_prog):
             print "Choosing RPM's default action."
         elif answer == "m" and has_prog["meld"]:
             os.system("""meld '%s' '%s'""" % (other_file, final_file))
+            mergeComplete(noreplace, other_file)
             break
         elif answer == "v" and has_prog["vimdiff"]:
             os.system("""vimdiff '%s' '%s'""" % (final_file, other_file))
+            mergeComplete(noreplace, other_file)
             break
         else:
             print "Unknown answer, please try again"
