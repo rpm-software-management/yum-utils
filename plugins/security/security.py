@@ -318,7 +318,16 @@ class UpdateinfoCommand:
                     n = sn + " " + n
             print "    %*u %s notice(s)" % (maxsize, counts[T], n)
             if T == 'security' and len(sev_counts) != 1:
-                for sn in sorted(sev_counts):
+                def _sev_sort_key(key):
+                    # We want these in order, from "highest" to "lowest".
+                    # Anything unknown is "higher". meh.
+                    return {'Critical' : "zz1",
+                            'Important': "zz2",
+                            'Moderate' : "zz3",
+                            'Low'      : "zz4",
+                            }.get(key, key)
+
+                for sn in sorted(sev_counts, key=_sev_sort_key):
                     args = (maxsize, sev_counts[sn],sn or '?', outT['security'])
                     print "        %*u %s %s notice(s)" % args
         _check_running_kernel(base, md_info, _msg)
