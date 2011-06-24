@@ -343,7 +343,9 @@ class PackageCleanup(YumUtilBase):
             self._remove_old_kernels(opts.kernelcount, opts.keepdevel)
             self.run_with_package_names.add('yum-utils')
             if hasattr(self, 'doUtilBuildTransaction'):
-                self.doUtilBuildTransaction()
+                errc = self.doUtilBuildTransaction()
+                if errc:
+                    sys.exit(errc)
             else:
                 try:
                     self.buildTransaction()
@@ -392,7 +394,9 @@ class PackageCleanup(YumUtilBase):
             self.run_with_package_names.add('yum-utils')
 
             if hasattr(self, 'doUtilBuildTransaction'):
-                self.doUtilBuildTransaction()
+                errc = self.doUtilBuildTransaction()
+                if errc:
+                    sys.exit(errc)
             else:
                 try:
                     self.buildTransaction()

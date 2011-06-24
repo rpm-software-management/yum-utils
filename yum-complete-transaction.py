@@ -208,7 +208,9 @@ class YumCompleteTransaction(YumUtilBase):
 
         current_count = len(self.tsInfo)
         if hasattr(self, 'doUtilBuildTransaction'):
-            self.doUtilBuildTransaction(unfinished_transactions_check=False)
+            errc = self.doUtilBuildTransaction(unfinished_transactions_check=False)
+            if errc:
+                sys.exit(errc)
         else:
             try:
                 self.buildTransaction(unfinished_transactions_check=False)

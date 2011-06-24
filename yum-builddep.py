@@ -98,7 +98,9 @@ class YumBuildDep(YumUtilBase):
             sys.exit(1)
 
         if hasattr(self, 'doUtilBuildTransaction'):
-            self.doUtilBuildTransaction()
+            errc = self.doUtilBuildTransaction()
+            if errc:
+                sys.exit(errc)
         else:
             try:
                 self.buildTransaction()

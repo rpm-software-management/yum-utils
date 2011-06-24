@@ -100,7 +100,9 @@ class DebugInfoInstall(YumUtilBase):
         
         self.debugInfo_main()
         if hasattr(self, 'doUtilBuildTransaction'):
-            self.doUtilBuildTransaction()
+            errc = self.doUtilBuildTransaction()
+            if errc:
+                sys.exit(errc)
         else:
             try:
                 self.buildTransaction()
