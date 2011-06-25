@@ -215,7 +215,6 @@ def exclude_hook(conduit):
     if not fileurl:
         raise PluginYumExit('Locklist not set')
 
-    pkgs = {}
     for ent in _read_locklist():
         neg = False
         if ent and ent[0] == '!':

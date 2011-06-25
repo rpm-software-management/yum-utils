@@ -24,7 +24,7 @@ except:
     class CliError: # Never used by yumex
         pass
 
-from yumutils.i18n import _, P_
+from yumutils.i18n import _
 
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
