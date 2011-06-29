@@ -907,6 +907,20 @@ class YumBaseQuery(yum.YumBase):
         
         return self.queryPkgFactory(pkgs)
         
+    def _at_grps(self, items):
+        #  We want to move from @foo => lists of package names here, to make
+        # a bunch of things easier. Ie. pkgs. ops. on lists of packages from
+        # groups.
+        nitems = []
+        for item in items:
+            if item and item[0] == '@':
+                for grp in self.matchGroups([item[1:]]):
+                    nitems.extend(grp.group.packages)
+                # Give warning when no matches?
+                continue
+            nitmes.append(item)
+        return nitems
+
     def runQuery(self, items):
         plain_pkgs = False
         if self.options.group:
@@ -926,6 +940,7 @@ class YumBaseQuery(yum.YumBase):
             except queryError, e:
                 self.logger.error(e)
         else:
+            items = self._at_grps(items)
             if self.options.srpm:
                 pkgs = self.matchSrcPkgs(items)
 
