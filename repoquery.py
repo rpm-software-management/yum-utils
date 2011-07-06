@@ -918,7 +918,7 @@ class YumBaseQuery(yum.YumBase):
                     nitems.extend(grp.group.packages)
                 # Give warning when no matches?
                 continue
-            nitmes.append(item)
+            nitems.append(item)
         return nitems
 
     def runQuery(self, items):
