@@ -679,7 +679,7 @@ def ysp_check_func_enter(conduit):
     opts, args = conduit.getCmdLine()
 
     ndata = not (opts.security or opts.bugfixes or
-                 opts.advisory or opts.bz or opts.cve)
+                 opts.advisory or opts.bz or opts.cve or opts.severity)
     
     ret = None
     if len(args) >= 2:
