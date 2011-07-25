@@ -151,7 +151,7 @@ if (not args and not opts.addrepo) or 'main' in args:
             # Try the old default
             fn = '/etc/yum.conf'
         ybc = yb.conf
-        writeRawConfigFile(fn, 'main', ybc.conf.yumvar,
+        writeRawConfigFile(fn, 'main', ybc.yumvar,
                            ybc.cfg.options, ybc.iteritems, ybc.optionobj,
                            only)
 
