@@ -197,13 +197,15 @@ _yu_repoquery()
             if $groupmode ; then
                 _yum_grouplist "" "$cur" 2>/dev/null
             else
-                _yum_list all "$cur" 2>/dev/null
+                declare -F _yum_atgroups &>/dev/null && \
+                    _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
             fi
             return 0
             ;;
         --provides|--obsoletes|--conflicts|--groupmember|--changelog|\
         --location|--nevra|--envra|--nvr|-s|--source)
-            _yum_list all "$cur" 2>/dev/null
+            declare -F _yum_atgroups &>/dev/null && \
+                _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
             return 0
             ;;
         --grouppkgs)
