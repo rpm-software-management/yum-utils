@@ -1,9 +1,11 @@
-.TH "yum-utils" "1" "18 March 2008" "yum-utils" ""
+.TH "yum-utils" "1" "August 2011" "yum-utils" ""
 .SH "NAME"
 yum\-utils \- tools for manipulating repositories and extended package management
 .SH "SYNOPSIS"
 .nf 
 \fBdebuginfo\-install\fR \- install debuginfo packages and their dependencies
+\fBfind-repos-of-install\fR \- report which repository the package was installed from
+\fBneeds-restarting\fR \- report process ids that started running before they or some component they use were updated
 \fBpackage\-cleanup\fR \- manage package cleanup, duplicates, orphaned packages and outstanding dependency problems
 \fBrepo\-graph\fR \- outputs a full package dependency list in dot format 
 \fBrepo\-rss\fR \- generates an RSS feed from one or more repositories
@@ -13,9 +15,16 @@ yum\-utils \- tools for manipulating repositories and extended package managemen
 \fBrepoquery\fR \- query yum repositories and get additional information on the them
 \fBreposync\fR \- synchronize a remote yum repository to a local directory using yum to retrieve packages
 \fBrepotrack\fR \- track packages and its dependencies and downloads them
+\fBshow-installed\fR \- gives a compact description of packages installed and makes use of comps groups in repositories
+\fBverifytree\fR - verify that a local yum repository is consistent
 \fByum\-builddep\fR \- installs missing dependencies to build a specified package
 \fByum\-complete\-transaction\fR \- finds incomplete or aborted yum transactions and attempts to complete them
+\fByum\-config\-manager\fR \- toggle yum repositories, add new repositories and set main yum configuration options
+\fByum\-debug\-dump\fR \- creates gzipped file containing information for debugging problems
+\fByum\-debug\-restore\fR \- replays any transactions captured in gzipped file in yum shell
+\fByum\-groups\-manager\fR \- create and edit yum's group metadata
 \fByum\-installed\fR \- print a compact package list making use of comps groups 
+\fByumdb\fR \- query or alter the yum database
 \fByumdownloader\fR \- downloads packages from yum repositories including source RPMs
 .SH "DESCRIPTION"
 .B yum\-utils
@@ -23,6 +32,6 @@ is a collection of tools and programs for managing yum repositories, installing 
 .SH "NOTES"
 See respective tools for additional help for commands without a manual page
 .SH "SEE ALSO"
-package\-cleanup(1), repo\-rss(1), repoquery(1), reposync(1), yum\-builddep(1), yum\-complete\-transaction(8), yumdownloader(1)
+debuginfo\-install(1), package\-cleanup(1), repodiff(1), repoquery(1), reposync(1), repo\-rss(1), yumdownloader(1), yum\-builddep(1), yum\-debug\-dump(1), yum\-groups\-manager(1), yumdb(8), yum\-complete\-transaction(8)
 .SH "AUTHOR"
 Shawn Starr <shawn.starr@rogers.com>
