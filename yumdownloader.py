@@ -31,6 +31,8 @@ import shutil
 import rpmUtils
 import logging
 
+rhn_source_repos = False
+
 # This is to fix Bug 469
 # To convert from a pkg to a source pkg, we have a problem in that all we have
 # is "sourcerpm", which can be a different nevra ... but just to make it fun
@@ -112,7 +114,10 @@ class YumDownloader(YumUtilBase):
 
         # Get all src repos.
         src_repos = {}
-        for repo in self.repos.findRepos('*-source'):
+        if rhn_source_repos: # RHN
+            repos_source += self.repos.findRepos('*-source-rpms')
+        repos_source = self.repos.findRepos('*-source')
+        for repo in repos_source:
             src_repos[repo.id] = False
 
         #  Find the enabled bin repos, and mark their respective *-source repo.
@@ -122,9 +127,16 @@ class YumDownloader(YumUtilBase):
                 srcrepo = '%s-source' % repo.id
                 if srcrepo in src_repos:
                     src_repos[srcrepo] = True
+                if not rhn_source_repos:
+                    continue
+                if not repo.id.endswith("-rpms"):
+                    continue
+                srcrepo = repo.id.replace('-rpms', '-source-rpms')
+                if srcrepo in src_repos:
+                    src_repos[srcrepo] = True
 
         # Toggle src repos that are set the wrong way
-        for repo in self.repos.findRepos('*-source'):
+        for repo in repos_source:
             if     repo.isEnabled() and not src_repos[repo.id]:
                 repo.close()
                 self.repos.disableRepo(repo.id)

@@ -26,6 +26,8 @@ import logging
 import rpmUtils
 import rpm
 
+rhn_source_repos = False
+
 # Copied from yumdownloader (need a yum-utils python module ;)
 # This is to fix Bug 469
 # To convert from a pkg to a source pkg, we have a problem in that all we have
@@ -118,9 +120,16 @@ class YumBuildDep(YumUtilBase):
         # enable the -source repos for enabled primary repos
         archlist = rpmUtils.arch.getArchList() + ['src']    
         for repo in self.repos.listEnabled():
-            if not repo.id.endswith('-source'):
+            issource_repo = repo.id.endswith('-source')
+            if rhn_source_repos and repo.id.endswith('-source-rpms'):
+                issource_repo = True
+            if rhn_source_repos and (not repo.id.endswith('-source-rpms') and
+                                     repo.id.endswith('-rpms')):
+                srcrepo = repo.id.replace('-rpms', '-source-rpms')
+            elif not issource_repo:
                 srcrepo = '%s-source' % repo.id
             else:
+                # Need to change the arch.
                 repo.close()
                 self.repos.disableRepo(repo.id)
                 srcrepo = repo.id
