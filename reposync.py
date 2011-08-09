@@ -162,6 +162,12 @@ def main():
     elif opts.cachedir:
         my.repos.setCacheDir(opts.cachedir)
 
+    #  Use progress bar display when downloading repo metadata
+    # and package files ... needs to be setup before .repos (ie. RHN/etc.).
+    if not opts.quiet:
+        my.repos.setProgressBar(TextMeter(fo=sys.stdout))
+    my.doRepoSetup()
+
     if len(opts.repoid) > 0:
         myrepos = []
         
@@ -182,13 +188,6 @@ def main():
         print >> sys.stderr, "Error: Can't use --norepopath with multiple repositories"
         sys.exit(1)
 
-    # Use progress bar display when downloading repo metadata
-    # and package files
-    if not opts.quiet:
-        my.repos.setProgressBar(TextMeter(fo=sys.stdout))
-
-    my.doRpmDBSetup()
-    my.doRepoSetup()
     try:
         arches = rpmUtils.arch.getArchList(opts.arch)
         if opts.source:
