@@ -2,6 +2,14 @@
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.31
 
+2011-08-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2011-08-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.31
+
 2011-08-03  Shawn Starr <shawn.starr@rogers.com>
 
 	* docs/yum-utils.1: Update yum-utils man page, to add new utils.
