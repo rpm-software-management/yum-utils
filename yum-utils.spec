@@ -677,6 +677,9 @@ fi
 /usr/lib/yum-plugins/puppetverify.*
 
 %changelog
+* Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
+- mark as 1.1.31
+
 * Thu Jan 13 2011 Tim Lauridsen <timlau@fedoraproject.org> 
 - mark as 1.1.30 
  
