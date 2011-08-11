@@ -1,3 +1,334 @@
+2011-08-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.31
+
+2011-08-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
+2011-08-10  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* yum-utils.spec: bumped yum-utils version to 1.1.31
+
+2011-08-03  Shawn Starr <shawn.starr@rogers.com>
+
+	* docs/yum-utils.1: Update yum-utils man page, to add new utils.
+
+2011-07-25  James Antill <james@and.org>
+
+	Merge branch 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils  * 'master' of
+	ssh://yum.baseurl.org/srv/projects/yum/git/yum-utils: (3 commits)
+	typo leaving .conf in ybc.conf.yumvar should just be ybc.yumvar
+	...
+
+2011-07-25  James Antill <james@and.org>
+
+	* plugins/aliases/aliases: Add some new aliases, fix chkD.
+
+2011-07-25  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-config-manager.py: typo leaving .conf in ybc.conf.yumvar
+	should just be ybc.yumvar
+
+2011-07-12  James Antill <james@and.org>
+
+	* plugins/security/security.py: Also auto-apply --security when
+	given --sec-severity for other commands.
+
+2011-07-08  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add repoquery @group completion.
+
+2011-07-08  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: Fix "nitmes" typo in previous commit.
+
+2011-07-06  James Antill <james@and.org>
+
+	* repoquery.py: Fix typo
+
+2011-06-29  James Antill <james@and.org>
+
+	* repoquery.py: Allow @foo groups as a packages selector in
+	repoquery.
+
+2011-06-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* plugins/aliases/aliases.py, plugins/security/security.py,
+	plugins/versionlock/versionlock.py: Remove some unused local
+	variables and imports flagged by pyflakes.
+
+2011-06-24  Ville Skyttä <ville.skytta@iki.fi>
+
+	* debuginfo-install.py, package-cleanup.py, yum-builddep.py,
+	yum-complete-transaction.py: Check doUtilBuildTransaction return
+	value, exit early on failure.  BZ 716267
+
+2011-06-22  James Antill <james@and.org>
+
+	* plugins/security/security.py: Try to be clever when sorting the
+	security severities.
+
+2011-06-17  Raman Gupta <raman@rocketraman.com>
+
+	* plugins/merge-conf/merge-conf.py: After (external) merge is
+	complete, give user option to delete other file
+
+2011-06-17  Raman Gupta <raman@rocketraman.com>
+
+	* plugins/merge-conf/merge-conf.py: Support meld as well as vimdiff
+	for merging  When using meld, the left side has the "other file"
+	i.e. the file with the .rpmnew or .rpmsave extension. The right side
+	has the "final file" i.e. the target file into which changes have to
+	be merged.  If the rpm action was to save the existing conf file,
+	then the left side will be the original conf file (.rpmsave) and the
+	right side will be the new rpm-based configuration. The user should
+	merge any changes they want to keep from their old .rpmsave from
+	left to right.  If the rpm action was to keep the existing conf
+	file, then the left side will be the new conf file (.rpmnew) and
+	right side will be the current local configuration. The user should
+	merge any changes in the new rpm file into their local config from
+	left to right.  Ideally these operations would be 3-way diffs
+	between the local file and the new rpm config, using the original
+	rpm config as the common merge base. However, the original rpm
+	config is not available to yum and therefore a 3-way diff is not
+	possible. Perhaps a future enhancement would be to use a .orig file,
+	if present, as the merge base for meld.  When using vimdiff, the
+	order has not changed. The first parameter to vimdiff is the "final:
+	file i.e. the target file, and the second parameter is the "other"
+	file i.e. the .rpmnew or .rpmsave file.
+
+2011-06-10  James Antill <james@and.org>
+
+	* repodiff.py: Huge speedup for large number of add/remove obsoletes
+	processing.
+
+2011-06-09  Nick Jacek <njacek@redhat.com>
+
+	* yumdownloader.py: Stops yumdownloader from attempting to download
+	the same package twice if it is available in multiple repos. BZ
+	711767
+
+2011-06-10  James Antill <james@and.org>
+
+	* docs/repodiff.1, repodiff.py: Add --compare-arch for the other
+	side of the multilib. diff. BZ 710579.
+
+2011-06-09  Nick Jacek <njacek@redhat.com>
+
+	* repodiff.py: Changed archlist set up to handle multilib. BZ 710579
+
+
+2011-06-01  James Antill <james@and.org>
+
+	* docs/repoquery.1: Add releasever and setopt docs. from yum to
+	repoquery. BZ 638542.
+
+2011-05-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* yum-utils.spec: frelling pyyaml pkg named with weird case
+
+2011-05-20  Seth Vidal <skvidal@fedoraproject.org>
+
+	* plugins/puppetverify/puppetverify.conf,
+	plugins/puppetverify/puppetverify.py, yum-utils.spec: add
+	puppetverify plugin
+
+2011-05-18  Frank Weltersbach <frankwe@live.com>
+
+	* docs/package-cleanup.1: Fix typo in package-cleanup man page. BZ
+	705617.
+
+2011-05-17  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoquery.py:     - fix rh bug: #705179     - fix fmt_queryformat not being happy
+	    with new 'output' formats passed       everywhere else.
+
+2011-04-26  James Antill <james@and.org>
+
+	* yumdownloader.py: Allow files/provides to be used in
+	yumdownloader.
+
+2011-04-26  James Antill <james@and.org>
+
+	* yumdownloader.py: Exit with code 2, if we can't download the
+	packages asked for. BZ 699469.
+
+2011-04-26  James Antill <james@and.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: try/except
+	the open, for the rpmdbv cached data (a-u-d plugin).
+
+2011-04-24  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Add yum-debug-dump completion.
+
+2011-04-24  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-debug-dump.py: Mention filename arg in yum-debug-dump usage
+	message.
+
+2011-04-24  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-debug-dump.py: Make yum-debug-dump.py executable for running
+	in-place.
+
+2011-04-24  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Use functions from recent bash-completion if
+	available.
+
+2011-04-06  James Antill <james@and.org>
+
+	* repoquery.py, yum-groups-manager.py: Convert
+	repoquery/yum-groups-manager to use preconf only. BZ 694188.
+
+2011-04-06  James Antill <james@and.org>
+
+	* package-cleanup.py: For leaf-regexp don't match libreoffice, and
+	match *-data package.
+
+2011-03-30  James Antill <james@and.org>
+
+	* yum-builddep.py: Also obey .conf.gpgcheck in builddep.
+
+2011-03-30  James Antill <james@and.org>
+
+	* yum-builddep.py: Obey .conf.localpkg_gpgcheck in builddep.
+
+2011-03-30  James Antill <james@and.org>
+
+	* docs/Makefile, docs/show-changed-rco.1, show-changed-rco.py,
+	yum-utils.spec: Add COPYRIGHT info. and docs for show-changed-rco.
+
+2011-03-29  Seth Vidal <skvidal@fedoraproject.org>
+
+	* needs-restarting.py: clean up the nulls from the delimiters in
+	proc
+
+2011-03-28  James Antill <james@and.org>
+
+	* show-changed-rco.py: Added --ignore-arch and --skip-new to
+	show-changed-rco.
+
+2011-03-15  James Antill <james@and.org>
+
+	* Makefile, yum-utils.spec: Add show-changed-rco to the install.
+
+2011-03-15  James Antill <james@and.org>
+
+	* show-changed-rco.py: Show how a new package version changes in
+	requires/conflicts/obsoletes.
+
+2011-03-15  James Antill <james@and.org>
+
+	* plugins/fs-snapshot/fs-snapshot.py: Add import yum.misc, and fix
+	kernel_inst typos. BZ 669178.
+
+2011-03-10  James Antill <james@and.org>
+
+	* yum-config-manager.py:  Port the interpreted sections code from yum's writeRawRepoFile().
+	 Also do the same thing for interpreted values, like baseurl.
+
+2011-03-10  Pierre-Yves Chibon <py@chibon.fr>
+
+	* docs/repoquery.1, repoquery.py: Fix bug in repoquery (Dot =>
+	DotPlot) and update repoquery man page.
+
+2011-03-02  James Antill <james@and.org>
+
+	* docs/yumdownloader.1: Add --archlist to yumdownload man page.
+
+2011-03-02  James Antill <james@and.org>
+
+	* plugins/fs-snapshot/fs-snapshot.py: Fix YumPluginExit =>
+	PluginYumExit typo.
+
+2011-03-01  Panu Matilainen <pmatilai@redhat.com>
+
+	* plugins/changelog/changelog.py: Avoid unnecessary po header access
+	in changelog plugin  Accessing the hdr member of package objects
+	makes yum to keep the entire header in memory forever after, causing
+	huge memory bloat when we're jumping through hoops to conserve
+	memory.
+
+2011-02-28  James Antill <james@and.org>
+
+	* plugins/local/local.conf, plugins/local/local.py: Change deltas to
+	enable_deltas and num-deltas to deltas.
+
+2011-02-26  Alexander Todorov <atodorov@otb.bg>
+
+	* plugins/local/local.conf: document newly added config options and
+	the repodir option
+
+2011-02-26  Alexander Todorov <atodorov@otb.bg>
+
+	* plugins/local/local.py: add option to enable/disable createrepo if
+	desired
+
+2011-02-26  Alexander Todorov <atodorov@otb.bg>
+
+	* plugins/local/local.py: enable delta rpms in the local repository
+
+
+2011-02-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* yum-utils.bash: Update repoquery completion with current options.
+
+
+2011-02-25  Ville Skyttä <ville.skytta@iki.fi>
+
+	* repoquery.py: Fix --level text in repoquery --help.
+
+2011-02-22  Ville Skyttä <ville.skytta@iki.fi>
+
+	* docs/show-installed.1, show-installed.py: Fix "rpm -qa" example
+	formatting for show-installed -i in --help output and man page.
+
+2011-02-16  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* plugins/auto-update-debuginfo/auto-update-debuginfo.py: Fix
+	auto-update-debuginfo plugin to not break if the is and option
+	object but no repos option (yumex)
+
+2011-02-04  James Antill <james@and.org>
+
+	* yumutils/i18n.py: Have to put the function definitions before the
+	assignments, BZ 674584
+
+2011-01-25  James Antill <james@and.org>
+
+	* plugins/fs-snapshot/fs-snapshot.py:  Hard failure when fs-snapshot can't create a snapshot. BZ 669178.
+	 Also, only show the kernel /boot warning when a kernel is within
+	 the transaction.
+
+2011-01-15  Pierre-Yves <pingou@pingoured.fr>
+
+	* repoquery.py: Update arguments  - Remove --show-dupes from --help
+	(while the argument still works) - Remove --tree-* from --help
+	(while the argument still works) - Implement the
+	--output[text|ascii-tree|dot-tree] (default to 'text') argument -
+	Implement the --level[all|any int] (default to 'all') argument The
+	combination of --requires --output=ascii-tree --level=all reproduce
+	the behavior of --tree-requires same goes for:    --whatrequires
+	--output=ascii-tree vs --tree-whatrequires    --obsoletes
+	--output=ascii-tree vs --tree-obsoletes    --conflicts
+	--output=ascii-tree vs --tree-conflicts Use the propagation of the
+	dot object to determine if it is a tree or a dot tree
+
+2011-01-21  Seth Vidal <skvidal@fedoraproject.org>
+
+	* repoclosure.py: make sure resolve_sack is empty and exists - if we
+	get a wacky, but caught error from whatProvides we don't want to
+	inadvertently give it back old/invalid results and/or traceback b/c
+	the variable doesn't exist
+
+2011-01-13  Tim Lauridsen <timlau@fedoraproject.org>
+
+	* ChangeLog: updated ChangeLog
+
 2011-01-13  Tim Lauridsen <timlau@fedoraproject.org>
 
 	* yum-utils.spec: bumped yum-utils version to 1.1.30

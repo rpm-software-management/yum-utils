@@ -2,7 +2,7 @@
 
 Summary: Utilities based around the yum package manager
 Name: yum-utils
-Version: 1.1.30
+Version: 1.1.31
 Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Tools
@@ -677,6 +677,9 @@ fi
 /usr/lib/yum-plugins/puppetverify.*
 
 %changelog
+* Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
+- mark as 1.1.31
+
 * Thu Jan 13 2011 Tim Lauridsen <timlau@fedoraproject.org> 
 - mark as 1.1.30 
  
