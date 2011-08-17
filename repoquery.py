@@ -1261,9 +1261,10 @@ def main(args):
     if opts.srpm:
         needsource = 1
     if opts.whatrequires:
-        sackops.append("whatrequires")
         if opts.output != 'text':
             pkgops.append("tree_what_requires")
+        else:
+            sackops.append("whatrequires")
     if opts.whatprovides:
         sackops.append("whatprovides")
     if opts.whatobsoletes:
