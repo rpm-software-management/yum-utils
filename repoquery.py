@@ -1008,12 +1008,12 @@ class YumBaseQuery(yum.YumBase):
 
     def fmt_whatrequires(self, name, **kw):
         pkgs = {}
-        done = [] # keep track of names we have already visited
+        done = set() # keep track of names we have already visited
 
         def require_recursive(name):
             if name in done:
                 return
-            done.append(name)
+            done.add(name)
 
             provs = [name]
                     
@@ -1054,10 +1054,21 @@ class YumBaseQuery(yum.YumBase):
 
     def fmt_requires(self, name, **kw):
         pkgs = {}
-        for pkg in self.returnByName(name):
+        done = set()
+        def require_recursive(pkg):
+            if pkg.name in done:
+                return
+            done.add(pkg.name)
+
             for req in pkg.prco("requires"):
                 for res in self.fmt_whatprovides(req):
                     pkgs[(res.name, res.pkg.arch)] = res
+                    if self.options.recursive:
+                        require_recursive(res)
+
+        for pkg in self.returnByName(name):
+            require_recursive(pkg)
+
         return pkgs.values()
 
     def fmt_location(self, name):
