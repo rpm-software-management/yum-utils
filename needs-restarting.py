@@ -40,6 +40,7 @@
 import sys
 import os
 import yum
+import yum.misc
 import glob
 import stat
 from optparse import OptionParser
@@ -87,7 +88,7 @@ def get_open_files(pid):
         line = line.replace('\n', '')
         slash = line.find('/')
         filename = line[slash:]
-        filename = filename.replace('(deleted)', '') #only mildly retarded
+        #filename = filename.replace('(deleted)', '') #only mildly retarded
         filename = filename.strip()
         if filename not in files:
             files.append(filename)
@@ -106,7 +107,7 @@ def main(args):
     if opts.useronly:
         myuid = os.getuid()
     
-    needing_restart = []
+    needing_restart = set()
 
     for pid in return_running_pids(uid=myuid):
         try:
@@ -117,12 +118,43 @@ def main(args):
         for fn in get_open_files(pid):
             if found_match:
                 break
-            
-            for pkg in my.rpmdb.searchFiles(fn):
+            just_fn = fn.replace('(deleted)', '')
+            just_fn = just_fn.strip()            
+            bogon = False
+            # if the file is in a pkg which has been updated since we started the pid - then it needs to be restarted            
+            for pkg in my.rpmdb.searchFiles(just_fn):
                 if float(pkg.installtime) > float(pid_start):
-                    needing_restart.append(pid)
+                    needing_restart.add(pid)
                     found_match = True
+                    continue
+                if just_fn in pkg.ghostlist:
+                    bogon = True
+                    break
+            
+            if bogon:
+                continue
 
+            # if the file is deleted 
+            if fn.find('(deleted)') != -1: 
+                # and it is from /*bin/* then it needs to be restarted 
+                if yum.misc.re_primary_filename(just_fn):
+                    needing_restart.add(pid)
+                    found_match = True
+                    continue
+
+                # if the file is from an old ver of an installed pkg - then assume it was just updated but the 
+                # new pkg doesn't have the same file names. Fabulous huh?!
+                my.conf.cache = False
+                for oldpkg in my.pkgSack.searchFiles(just_fn): # ghostfiles are always bogons
+                    if just_fn in oldpkg.ghostlist:
+                        continue
+                    if my.rpmdb.installed(oldpkg.name):
+                        needing_restart.add(pid)
+                        found_match = True
+                        break
+
+           
+            
     for pid in needing_restart:
         try:
             cmdline = open('/proc/' +pid+ '/cmdline', 'r').read()
