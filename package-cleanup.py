@@ -119,34 +119,6 @@ class PackageCleanup(YumUtilBase):
                                  'removing kernels')
         self.optparser.add_option_group(kernelgrp)
     
-    def _find_missing_deps(self, pkgs):
-        """find any missing dependencies for any installed package in pkgs"""
-        # XXX - move into rpmsack/rpmdb
-        
-        providers = {} # To speed depsolving, don't recheck deps that have 
-                       # already been checked
-        problems = []
-        for po in pkgs:
-            for (req,flags,ver)  in po.requires:
-                    
-                if req.startswith('rpmlib'): continue # ignore rpmlib deps
-                if (req,flags,ver) not in providers:
-                    resolve_sack = self.rpmdb.whatProvides(req,flags,ver)
-                else:
-                    resolve_sack = providers[(req,flags,ver)]
-                    
-                if len(resolve_sack) < 1:
-                    flags = yum.depsolve.flags.get(flags, flags)
-                    missing = miscutils.formatRequire(req,ver,flags)
-                    problems.append((po, "requires %s" % missing))
-                                    
-                else:
-                    # Store the resolve_sack so that we can re-use it if another
-                    # package has the same requirement
-                    providers[(req,flags,ver)] = resolve_sack
-        
-        return problems
-
     def _find_installed_duplicates(self, ignore_kernel=True):
         """find installed duplicate packages returns a dict of 
            pkgname = [[dupe1, dupe2], [dupe3, dupe4]] """
@@ -314,9 +286,9 @@ class PackageCleanup(YumUtilBase):
             self.setCacheDir()
         
         if opts.problems:
-            issues = self._find_missing_deps(self.rpmdb.returnPackages())
-            for (pkg, prob) in issues:
-                print 'Package %s %s' % (pkg.hdr.sprintf(opts.qf), prob)
+            issues = self.rpmdb.check_dependencies()
+            for prob in issues:
+                print 'Package %s' % prob
 
             if issues:
                 sys.exit(1)
