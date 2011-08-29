@@ -83,10 +83,10 @@ def get_open_files(pid):
         return files
 
     for line in maps.readlines():
-        if line.find('fd:') == -1:
+        slash = line.find('/')
+        if slash == -1 or line.find('00:') != -1: # if we don't have a '/' or if we fine 00: in the file then it's not _REALLY_ a file
             continue
         line = line.replace('\n', '')
-        slash = line.find('/')
         filename = line[slash:]
         #filename = filename.replace('(deleted)', '') #only mildly retarded
         filename = filename.strip()
