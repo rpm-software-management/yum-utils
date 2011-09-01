@@ -6,13 +6,13 @@ yum security plugin
 \fByum\fP [options] [command] [package ...]
 .SH "DESCRIPTION"
 .PP 
-This plugin extends \fByum\fP to allow lists and updates to be limited using security relevant criteria
+This plugin extends \fByum\fP to allow lists and updates to be limited using security relevant criteria.
 .PP 
-added yum \fIcommand\fPs are:
+Added yum \fIcommand\fPs are:
 .br 
 .I \fR yum update-minimal
 .PP 
-This works like the update command, but if you have the the package foo-1
+This works like the update command, but if you have the package foo-1
 installed and have foo-2 and foo-3 available with updateinfo.xml then
 update-minimal will update you to foo-3.
 .br 
@@ -22,7 +22,7 @@ update-minimal will update you to foo-3.
 .br 
 .I \fR yum updateinfo summary
 .PP 
-all of the last three take these \fIsub-command\fPs:
+All of the last three take these \fIsub-command\fPs:
 .br 
 .I \fR yum updateinfo * all
 .br 
