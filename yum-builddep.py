@@ -63,6 +63,9 @@ class YumBuildDep(YumUtilBase):
         self.logger = logging.getLogger("yum.verbose.cli.yumbuildep")                             
         # Add util commandline options to the yum-cli ones
         self.optparser = self.getOptionParser() 
+        if hasattr(rpm, 'reloadConfig'):
+            self.optparser.add_option("--target",
+                              help="set target architecture for spec parsing")
         self.main()
 
     def main(self):
@@ -179,10 +182,14 @@ class YumBuildDep(YumUtilBase):
         specnames = []
         srpms = []
         specworks = False
+        reloadworks = False
 
         # See if we can use spec files for buildrequires
         if hasattr(rpm, 'spec') and hasattr(rpm.spec, 'sourceHeader'):
             specworks = True
+        # See if we can reload rpm configuration
+        if hasattr(rpm, 'reloadConfig'):
+            reloadworks = True
 
         for arg in self.cmds:
             if arg.endswith('.src.rpm'):
@@ -225,11 +232,19 @@ class YumBuildDep(YumUtilBase):
             self.install_deps(srpm.requiresList())
     
         for name in specnames:
+            # (re)load rpm config for target if set
+            if reloadworks and opts.target:
+                rpm.reloadConfig(opts.target)
+
             try:
                 spec = rpm.spec(name)
             except ValueError:
                 self.logger.error("Bad spec: %s" % name)
                 continue
+
+            # reset default rpm config after each parse to avoid side-effects
+            if reloadworks:
+                rpm.reloadConfig()
 
             buildreqs = []
             for d in rpm.ds(spec.sourceHeader, 'requires'):
