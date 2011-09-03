@@ -311,6 +311,13 @@ _yu_builddep()
 
     _yum_complete_baseopts "$cur" "$prev" && return 0
 
+    case $prev in
+        --target)
+            declare -F _rpm_buildarchs &>/dev/null && _rpm_buildarchs
+            return 0
+            ;;
+    esac
+
     $split && return 0
 
     if [[ $cur == -* ]] ; then
