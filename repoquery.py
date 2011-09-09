@@ -719,13 +719,13 @@ class groupQuery:
             raise queryError("Invalid group query: %s" % method)
 
     # XXX temporary hack to make --group -a query work
-    def fmt_queryformat(self):
+    def fmt_queryformat(self, **kw):
         return self.fmt_nevra()
 
-    def fmt_nevra(self):
+    def fmt_nevra(self, **kw):
         return ["%s - %s" % (self.id, self.name)]
 
-    def fmt_list(self):
+    def fmt_list(self, **kw):
         pkgs = []
         for t in self.grouppkgs.split(','):
             if t == "mandatory":
@@ -741,10 +741,10 @@ class groupQuery:
             
         return pkgs
         
-    def fmt_requires(self):
+    def fmt_requires(self, **kw):
         return self.group.mandatory_packages
 
-    def fmt_info(self):
+    def fmt_info(self, **kw):
         return ["%s:\n\n%s\n" % (self.name, self.group.description)]
 
 
