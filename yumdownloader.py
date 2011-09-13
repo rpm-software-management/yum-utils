@@ -114,9 +114,9 @@ class YumDownloader(YumUtilBase):
 
         # Get all src repos.
         src_repos = {}
+        repos_source = self.repos.findRepos('*-source')
         if rhn_source_repos: # RHN
             repos_source += self.repos.findRepos('*-source-rpms')
-        repos_source = self.repos.findRepos('*-source')
         for repo in repos_source:
             src_repos[repo.id] = False
 
@@ -131,7 +131,7 @@ class YumDownloader(YumUtilBase):
                     continue
                 if not repo.id.endswith("-rpms"):
                     continue
-                srcrepo = repo.id.replace('-rpms', '-source-rpms')
+                srcrepo = repo.id[:-len('-rpms')] + '-source-rpms'
                 if srcrepo in src_repos:
                     src_repos[srcrepo] = True
 

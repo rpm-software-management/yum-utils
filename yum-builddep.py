@@ -128,7 +128,7 @@ class YumBuildDep(YumUtilBase):
                 issource_repo = True
             if rhn_source_repos and (not repo.id.endswith('-source-rpms') and
                                      repo.id.endswith('-rpms')):
-                srcrepo = repo.id.replace('-rpms', '-source-rpms')
+                srcrepo = '%s-source,%s-source-rpms' % (repo.id, repo.id[:-5])
             elif not issource_repo:
                 srcrepo = '%s-source' % repo.id
             else:
