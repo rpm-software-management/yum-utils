@@ -77,23 +77,23 @@ yum --filter-package-sizes=-1m check-update
 .PP
 To apply updates that Dan Walsh has committed use:
 .IP
-yum --filter-committers='Dan Walsh *' update
+yum --filter-committers=\(aqDan Walsh *\(aq update
 .PP
 To list updates for a specific group use:
 .IP
-yum --filter-rpm-groups='App*/Sys*' list updates
+yum --filter-rpm-groups=\(aqApp*/Sys*\(aq list updates
 .PP
 To apply updates to a specific set of groups use:
 .IP
-yum --filter-rpm-groups='App*/System,Devel*/Lib*,System Environment/Base' update
+yum --filter-rpm-groups=\(aqApp*/System,Devel*/Lib*,System Environment/Base\(aq update
 .PP
 To list updates for a set of yum groups use:
 .IP
-yum --filter-groups='PostgreSQL Database,Web Server' list updates
+yum --filter-groups=\(aqPostgreSQL Database,Web Server\(aq list updates
 .PP
 To apply updates to a specific set of yum groups use:
 .IP
-yum --filter-groups='KDE,Core,Printing Support' update
+yum --filter-groups=\(aqKDE,Core,Printing Support\(aq update
 
 .SH "SEE ALSO"
 .nf
@@ -109,7 +109,7 @@ James Antill <james.antill@redhat.com>.
 
 .SH "BUGS"
 Currently yum can't filter packages in all of the commands, so for instance
-"yum list 'yum*'" doesn't get the results filtered.
+"yum list \(aqyum*\(aq" doesn't get the results filtered.
 
 Apart from that there are no bugs, but should you find any, you should first
 consult the FAQ section on http://yum.baseurl.org/wiki/Faq and if unsuccessful

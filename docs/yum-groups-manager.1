@@ -77,11 +77,11 @@ in yum.
 
 .SH "EXAMPLES"
 .IP "Create a new group metadata file, with a group called yum containing all the packages that start with yum:"
-\fB yum-groups-manager --name YUM --save groups.xml 'yum*'\fP
+\fB yum-groups-manager --name YUM --save groups.xml \(aqyum*\(aq\fP
 .IP "After the above command, load the groups.xml data, work with the yum group, make the group not user visible, and remove the yum-skip-broken and yum-priorities packages from it:"
 \fB yum-groups-manager -n YUM --merge groups.xml --remove yum-skip-broken yum-priorities --not-user-visible\fP
 .IP "After the above commands, add a description and a translated name to the yum group:"
-\fB yum-groups-manager -n YUM --merge groups.xml --description 'This is a group with most of the yum packages in it' --translated-name 'en:yum packages'\fP
+\fB yum-groups-manager -n YUM --merge groups.xml --description \(aqThis is a group with most of the yum packages in it\(aq --translated-name \(aqen:yum packages\(aq\fP
 .SH "FILES"
 \fByum-groups-manager\fP uses the yum libraries for retrieving information and
 packages. If no configuration file is specified, the default yum

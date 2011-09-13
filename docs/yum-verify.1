@@ -53,15 +53,15 @@ yum verify-rpm
 .PP
 To verify the packages starting with the name yum, use:
 .IP
-yum verify 'yum*'
+yum verify \(aqyum*\(aq
 .PP
 To verify the binaries that are in a bin directory, use:
 .IP
-yum verify --verify-filenames='*bin/*'
+yum verify --verify-filenames=\(aq*bin/*\(aq
 .PP
 To verify all include files, Eg. for multilib problems, use:
 .IP
-yum verify-all --verify-filenames='/usr/include/*'
+yum verify-all --verify-filenames=\(aq/usr/include/*\(aq
 
 .SH "SEE ALSO"
 .nf
