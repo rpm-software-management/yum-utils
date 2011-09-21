@@ -164,6 +164,10 @@ def exclude_hook(conduit):
                                 break
     if cnt:
         conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
+    if check_obsoletes:
+        #  Atm. the update object doesn't get updated when we manually exclude
+        # things ... so delete it. This needs to be re-written.
+        conduit._base.up = None
 
 def _pkglist_to_dict(pl, priority, addArch = False):
     out = dict()
