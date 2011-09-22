@@ -7,7 +7,23 @@ import fnmatch
 import yum
 import shlex
 
+import os
+import glob
+
 parser = None
+
+# FIXME: Internal knowledge
+def _load_all_package_paths(db_path):
+    # glob the path and get a dict of pkgs to their subdir
+    glb = '%s/*/*/' % db_path
+    pkgdirs = glob.glob(glb)
+    _packages = {}
+    for d in pkgdirs:
+        if d[-1] == '/':
+            d = d[:-1]
+        pkgid = os.path.basename(d).split('-')[0]
+        _packages[pkgid] = d
+    return _packages
 
 def setup_opts():
     version = "0.0.1"
@@ -25,6 +41,7 @@ def setup_opts():
       unset?        <key> [pkg-wildcard]...
       info          [pkg-wildcard]...
       sync          [pkg-wildcard]...
+      undeleted
       shell         [filename]...
 """
     parser =  optparse.OptionParser(usage = usage_txt, version = vers_txt)
@@ -183,6 +200,14 @@ def run_cmd(yb, args, inshell=False):
                 if ykey not in ndata:
                     continue
                 print " " * 4, ykey, '=', getattr(pkg.yumdb_info, ykey)
+    elif args[0] == 'undeleted':
+        yumdb_packages = _load_all_package_paths(yb.rpmdb.yumdb.conf.db_path)
+        for pkg in sorted(yb.rpmdb.returnPackages()):
+            if pkg.pkgid in yumdb_packages:
+                del yumdb_packages[pkg.pkgid]
+        for pkgid in yumdb_packages:
+            print "%s: %s" % (pkgid, yumdb_packages[pkgid])
+
     elif args[0] == 'shell' and not inshell:
         args.pop(0)
         if args:
