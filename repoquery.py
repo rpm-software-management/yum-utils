@@ -74,6 +74,12 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'installedsize', 'archivesize', 'packagesize', 'repoid', 
               'requires', 'provides', 'conflicts', 'obsoletes',
               'relativepath', 'hdrstart', 'hdrend', 'id',
+              'checksum', 'pkgid', 'committer', 'committime',
+              'ui_evr', 'evr', 'ui_nevra', 'ui_envra',
+              'ui_from_repo', 'base_package_name', 'size', 'xattr_origin_url',
+              'repo.<attr of the repo object>',
+              'yumdb.<attr of the yumdb object>',
+              '<attr of the yum object>'
             ]
 
 def sec2isodate(timestr):
