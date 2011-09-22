@@ -77,6 +77,9 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'checksum', 'pkgid', 'committer', 'committime',
               'ui_evr', 'evr', 'ui_nevra', 'ui_envra',
               'ui_from_repo', 'base_package_name', 'size', 'xattr_origin_url',
+              'ui_evra', 'ui_nevr', 'na', 'vr', 'vra', 'evr', 'evra',
+              'nvr', 'nvra', 'nevr', 'nevra', 'envr', 'envra',
+
               'repo.<attr of the repo object>',
               'yumdb.<attr of the yumdb object>',
               '<attr of the yum object>'
