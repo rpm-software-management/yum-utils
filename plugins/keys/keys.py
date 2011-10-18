@@ -31,6 +31,15 @@ except:
 requires_api_version = '2.1'
 plugin_type = (TYPE_INTERACTIVE,)
 
+def gpgkey_fingerprint_ascii(gpg_cert, chop=4):
+    ''' Given a key_info data from getgpgkeyinfo(), return an ascii
+    fingerprint. Chop every 4 ascii values, as that is what GPG does. '''
+    fp = yum.pgpmsg.str_to_hex(gpg_cert.public_key.fingerprint())
+    if chop:
+        fp = [fp[i:i+chop] for i in range(0, len(fp), chop)]
+        fp = " ".join(fp)
+    return fp
+
 def match_keys(patterns, key, globs=True):
     for pat in patterns:
         if pat == key.keyid:
@@ -250,7 +259,7 @@ Key ID     : %s
        time.ctime(key.createts),
        gpg_cert.version, gpg_cert.user_id,
        yum.pgpmsg.algo_pk_to_str[gpg_cert.public_key.pk_algo],
-       yum.pgpmsg.str_to_hex(gpg_cert.public_key.fingerprint()),
+       gpgkey_fingerprint_ascii(gpg_cert),
        yum.pgpmsg.str_to_hex(gpg_cert.public_key.key_id()))
 
 
