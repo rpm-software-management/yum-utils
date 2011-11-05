@@ -278,8 +278,8 @@ _yu_yumdb()
 
     if [ $COMP_CWORD -le 1 ] ; then
         COMPREPLY=( $( compgen -W 'get set del rename rename-force copy search
-            exist unset info shell --version --help --noplugins --config' \
-                -- "$cur" ) )
+            exist unset info sync undeleted shell --version --help --noplugins
+            --config' -- "$cur" ) )
     fi
 } &&
 complete -F _yu_yumdb -o filenames yumdb yumdb.py
