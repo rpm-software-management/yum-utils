@@ -43,7 +43,10 @@ class DiffYum(yum.YumBase):
         # make our new repo obj
         newrepo = yum.yumRepo.YumRepository(repoid)
         newrepo.name = repoid
-        newrepo.baseurl = [baseurl]
+        if baseurl.startswith("mirror:"):
+            newrepo.mirrorlist = baseurl[len("mirror:"):]
+        else:
+            newrepo.baseurl = [baseurl]
         newrepo.basecachedir = self.dy_basecachedir
         newrepo.metadata_expire = 0
         newrepo.timestamp_check = False
