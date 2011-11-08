@@ -11,9 +11,11 @@ repositories.  \fBNote\fP that by default only source packages are compared.
 .PP 
 .SH "GENERAL OPTIONS"
 .IP "\fB\-\-old, -o\fP"
-Add a repo. as an old repo.
+Add a repo. as an old repo. Note that if you prefix the url with "mirror:" then
+the following url is treated as a mirror and not a baseurl.
 .IP "\fB\-\-new, -n\fP"
-Add a repo. as an new repo.
+Add a repo. as an new repo. Note that if you prefix the url with "mirror:" then
+the following url is treated as a mirror and not a baseurl.
 .IP "\fB\-\-archlist, -a\fP"
 Add architectures to change the default from just comparing source packages.
 Note that if you want the same as a native
@@ -25,6 +27,10 @@ Output additional data about the size of the changes.
 .IP "\fB\-\-compare-arch\fP"
 Normally packages are just compared based on their name, this flag makes the
 comparison also use the arch. So foo.i386 and foo.x86_64 are different.
+.IP "\fB\-\-simple\fP"
+Output a simple one line message for modified packages.
+.IP "\fB\-\-downgrade\fP"
+Split the data for modified packages between upgraded and downgraded packages.
 .SH "EXAMPLES"
 .IP "Compare source pkgs in two local repos:"
 \fBrepodiff --old=/tmp/repo-old --new=/tmp/repo-new\fP
@@ -32,6 +38,8 @@ comparison also use the arch. So foo.i386 and foo.x86_64 are different.
 \fBrepodiff -a x86_64 --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
 .IP "Compare x86_64 compat. binary pkgs, but also compare arch:"
 \fBrepodiff -a x86_64 --compare-arch --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
+.IP "Compare two releases of Fedora (15 => 16):"
+\fBrepodiff --old='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-15&arch=i386' --new='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-16&arch=i386' --size --simple --downgrade\fP
 .PP 
 
 .SH "SEE ALSO"
