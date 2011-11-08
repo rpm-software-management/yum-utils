@@ -180,6 +180,47 @@ def parseArgs(args):
     
     return opts
 
+def _out_mod(opts, oldpkg, pkg):
+    if opts.simple:
+        if opts.compare_arch:
+            msg = "%s: %s ->  %s" % (pkg.name, oldpkg, pkg)
+        else:
+            msg = "%s: %s-%s-%s ->  %s-%s-%s" % (pkg.name, oldpkg.name, 
+                                                 oldpkg.ver, oldpkg.rel,
+                                                 pkg.name, pkg.ver,
+                                                 pkg.rel)
+    else:
+        if opts.compare_arch:
+            msg = "%s" % pkg
+        else:
+            msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
+        dashes = "-" * len(msg) 
+        msg += "\n%s\n" % dashes
+        # get newest clog time from the oldpkg
+        # for any newer clog in pkg
+        # print it
+        oldlogs = oldpkg.changelog
+        if len(oldlogs):
+            #  Don't sort as that can screw the order up when time is the
+            # same.
+            oldtime    = oldlogs[0][0]
+            oldauth    = oldlogs[0][1]
+            oldcontent = oldlogs[0][2]
+            for (t, author, content) in  pkg.changelog:
+                if t < oldtime:
+                    break
+                if ((t == oldtime) and (author == oldauth) and
+                    (content == oldcontent)):
+                    break
+                tm = datetime.date.fromtimestamp(int(t))
+                tm = tm.strftime("%a %b %d %Y")
+                msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
+                                            to_unicode(content))
+            if opts.size:
+                msg += "\nSize Change: %s bytes\n" % sizechange
+
+    print msg
+
 def main(args):
     opts = parseArgs(args)
 
@@ -224,6 +265,8 @@ def main(args):
     total_sizechange = 0
     add_sizechange = 0
     remove_sizechange = 0
+    up_sizechange = 0
+    down_sizechange = 0
     if ygh.add:
         for pkg in sorted(ygh.add):
             if opts.compare_arch:
@@ -249,46 +292,8 @@ def main(args):
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 total_sizechange += sizechange
+            _out_mod(opts, olgpkg, pkd)
             
-            if opts.simple:
-                if opts.compare_arch:
-                    msg = "%s: %s ->  %s" % (pkg.name, oldpkg, pkg)
-                else:
-                    msg = "%s: %s-%s-%s ->  %s-%s-%s" % (pkg.name, oldpkg.name, 
-                                                         oldpkg.ver, oldpkg.rel,
-                                                         pkg.name, pkg.ver,
-                                                         pkg.rel)
-            else:
-                if opts.compare_arch:
-                    msg = "%s" % pkg
-                else:
-                    msg = "%s-%s-%s" % (pkg.name, pkg.ver, pkg.rel)
-                dashes = "-" * len(msg) 
-                msg += "\n%s\n" % dashes
-                # get newest clog time from the oldpkg
-                # for any newer clog in pkg
-                # print it
-                oldlogs = oldpkg.changelog
-                if len(oldlogs):
-                    #  Don't sort as that can screw the order up when time is the
-                    # same.
-                    oldtime    = oldlogs[0][0]
-                    oldauth    = oldlogs[0][1]
-                    oldcontent = oldlogs[0][2]
-                    for (t, author, content) in  pkg.changelog:
-                        if t < oldtime:
-                            break
-                        if ((t == oldtime) and (author == oldauth) and
-                            (content == oldcontent)):
-                            break
-                        tm = datetime.date.fromtimestamp(int(t))
-                        tm = tm.strftime("%a %b %d %Y")
-                        msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
-                                                    to_unicode(content))
-                    if opts.size:
-                        msg += "\nSize Change: %s bytes\n" % sizechange
-
-            print msg
 
     if (not ygh.add and not ygh.remove and not ygh.modified and
         not my.pkgSack.searchNevra(arch='src')):
