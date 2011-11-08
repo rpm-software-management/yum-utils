@@ -22,7 +22,15 @@ import locale
 import rpmUtils.arch
 from yum.i18n import to_unicode
 
+from urlgrabber.progress import format_number
+
 from optparse import OptionParser
+
+def bkMG(num):
+    ''' Call format_number() but deals with negative numbers. '''
+    if num >= 0:
+        return format_number(num)
+    return '-' + format_number(-num)
 
 class DiffYum(yum.YumBase):
     def __init__(self):
@@ -160,6 +168,8 @@ def parseArgs(args):
                       help="When comparing binary repos. also compare the arch of packages, to see if they are different")
     parser.add_option("-s", "--size", default=False, action='store_true',
                       help="Output size changes for any new->old packages")
+    parser.add_option("--downgrade", default=False, action='store_true',
+                      help="Output upgrade/downgrade separately")
     parser.add_option("--simple",  default=False, action='store_true',
                       help="output simple format")
     (opts, argsleft) = parser.parse_args()
@@ -265,8 +275,11 @@ def main(args):
     total_sizechange = 0
     add_sizechange = 0
     remove_sizechange = 0
+    mod_sizechange = 0
     up_sizechange = 0
     down_sizechange = 0
+    upgraded_pkgs = 0
+    downgraded_pkgs = 0
     if ygh.add:
         for pkg in sorted(ygh.add):
             if opts.compare_arch:
@@ -289,11 +302,30 @@ def main(args):
     if ygh.modified:
         print '\nUpdated Packages:\n'
         for (pkg, oldpkg) in sorted(ygh.modified):
+            if opts.downgrade and pkg.verLT(oldpkg):
+                continue
+
+            upgraded_pkgs += 1
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
-                total_sizechange += sizechange
-            _out_mod(opts, olgpkg, pkd)
-            
+                if opts.downgrade:
+                    up_sizechange += sizechange
+                else:
+                    mod_sizechange += sizechange
+            _out_mod(opts, oldpkg, pkg)
+
+        if opts.downgrade:
+            print '\nDowngraded Packages:\n'
+            for (pkg, oldpkg) in sorted(ygh.modified):
+                if pkg.verGT(oldpkg):
+                    continue
+
+                downgraded_pkgs += 1
+                if opts.size:
+                    sizechange = int(pkg.size) - int(oldpkg.size)
+                    down_sizechange += sizechange
+                _out_mod(opts, oldpkg, pkg)
+
 
     if (not ygh.add and not ygh.remove and not ygh.modified and
         not my.pkgSack.searchNevra(arch='src')):
@@ -302,11 +334,33 @@ def main(args):
     print '\nSummary:'
     print 'Added Packages: %s' % len(ygh.add)
     print 'Removed Packages: %s' % len(ygh.remove)
-    print 'Modified Packages: %s' % len(ygh.modified)
+    if not opts.downgrade:
+        print 'Upgraded Packages: %s' % upgraded_pkgs
+    else:
+        print 'Downgraded Packages: %s' % downgraded_pkgs
     if opts.size:
-        print 'Size of added packages: %s' % add_sizechange
-        print 'Size change of modified packages: %s' % total_sizechange
-        print 'Size of removed packages: %s' % remove_sizechange
+        print 'Size of added packages: %s (%s)' % (add_sizechange,
+                                                   bkMG(add_sizechange))
+
+        if not opts.downgrade:
+            msg = 'Size change of modified packages: %s (%s)'
+            print msg % (mod_sizechange, bkMG(mod_sizechange))
+
+            total_sizechange = add_sizechange +mod_sizechange -remove_sizechange
+        else:
+            msg = 'Size change of upgraded packages: %s (%s)'
+            print msg % (up_sizechange, bkMG(up_sizechange))
+            msg = 'Size change of downgraded packages: %s (%s)'
+            print msg % (down_sizechange, bkMG(down_sizechange))
+
+            total_sizechange = (add_sizechange +
+                                up_sizechange + down_sizechange -
+                                remove_sizechange)
+
+        msg = 'Size of removed packages: %s (%s)'
+        print msg % (remove_sizechange, bkMG(remove_sizechange))
+        msg = 'Size change: %s (%s)'
+        print msg % (total_sizechange, bkMG(total_sizechange))
     
       
 if __name__ == "__main__":
