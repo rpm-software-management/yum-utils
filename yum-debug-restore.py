@@ -107,11 +107,15 @@ def pkg_data2list(yb, opkgtups, opkgmaps, install_latest, ignore_arch):
     ret = []
     npkgtups = set()
     npkgmaps = {}
+    installonly = set(yb.conf.installonlypkgs)
     for po in sorted(yb.rpmdb.returnPackages()):
         arch = po.arch
         if ignore_arch:
             arch = None
         if False: pass
+        elif po.name in installonly:
+            if not po.pkgtup in opkgtups:
+                ret.append(("remove", pkgtup2str(po.pkgtup)))
         elif (po.name, arch) not in opkgmaps:
             ret.append(("remove", str(po)))
         elif po.pkgtup not in opkgtups:
@@ -129,6 +133,8 @@ def pkg_data2list(yb, opkgtups, opkgmaps, install_latest, ignore_arch):
             npkgmaps[(po.name, None)] = po
 
     for name, arch in sorted(opkgmaps):
+        if name in installonly:
+            continue # done separately
         if ignore_arch and arch is not None:
             continue
         if (name, arch) in npkgmaps:
@@ -139,6 +145,9 @@ def pkg_data2list(yb, opkgtups, opkgmaps, install_latest, ignore_arch):
             ret.append(("install", "%s.%s" % (name, arch)))
         else:
             ret.append(("install", pkgtup2str(opkgmaps[(name, arch)])))
+    for pkgtup in opkgtups:
+        if pkgtup[0] in installonly and not pkgtup in npkgtups:
+            ret.append(("install", pkgtup2str(pkgtup)))
     return ret
 
 def main():
