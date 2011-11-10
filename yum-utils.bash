@@ -299,7 +299,7 @@ _yu_repodiff()
     $split && return 0
 
     COMPREPLY=( $( compgen -W '--version --help --new --old --quiet --archlist
-        --size --simple' -- "$cur" ) )
+        --compare-arch --size --downgrade --simple' -- "$cur" ) )
 } &&
 complete -F _yu_repodiff repodiff repodiff.py
 
