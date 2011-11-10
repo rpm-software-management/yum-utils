@@ -370,6 +370,36 @@ _yu_debug_dump()
 } &&
 complete -F _yu_debug_dump -o filenames yum-debug-dump yum-debug-dump.py
 
+# yumdownloader
+_yu_yumdownloader()
+{
+    local cur prev words=() split=false
+    _yu_init_completion "$2" "$3"
+
+    _yum_complete_baseopts "$cur" "$prev" 2>/dev/null && return 0
+
+    case $prev in
+        --destdir)
+            COMPREPLY=( $( compgen -d -- "$cur" ) )
+            return 0
+            ;;
+        --archlist)
+            return 0
+            ;;
+    esac
+
+    $split && return 0
+
+    if [[ $cur == -* ]] ; then
+        COMPREPLY=( $( compgen -W '$( _yum_baseopts 2>/dev/null ) --destdir
+            --urls --resolve --source --archlist' -- "$cur" ) )
+        return 0
+    fi
+
+    _yum_list all "$cur"
+} &&
+complete -F _yu_yumdownloader -o filenames yumdownloader yumdownloader.py
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
