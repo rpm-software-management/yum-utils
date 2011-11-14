@@ -1090,6 +1090,44 @@ class YumBaseQuery(yum.YumBase):
                 loc.append("%s/%s" % (repo.urls[0], pkg['relativepath']))
         return loc
 
+    def _parseSetOpts(self, setopts):
+        """parse the setopts list handed to us and saves the results as
+           repo_setopts and main_setopts in the yumbase object"""
+
+        repoopts = {}
+        mainopts = yum.misc.GenericHolder()
+        mainopts.items = []
+
+        bad_setopt_tm = []
+        bad_setopt_ne = []
+
+        for item in setopts:
+            vals = item.split('=')
+            if len(vals) > 2:
+                bad_setopt_tm.append(item)
+                continue
+            if len(vals) < 2:
+                bad_setopt_ne.append(item)
+                continue
+            k,v = vals
+            period = k.find('.')
+            if period != -1:
+                repo = k[:period]
+                k = k[period+1:]
+                if repo not in repoopts:
+                    repoopts[repo] = yum.misc.GenericHolder()
+                    repoopts[repo].items = []
+                setattr(repoopts[repo], k, v)
+                repoopts[repo].items.append(k)
+            else:
+                setattr(mainopts, k, v)
+                mainopts.items.append(k)
+
+        self.main_setopts = mainopts
+        self.repo_setopts = repoopts
+
+        return bad_setopt_tm, bad_setopt_ne
+
 
 def main(args):
 
@@ -1218,6 +1256,9 @@ def main(args):
     parser.add_option("--search-fields", action="append", dest="searchfields",
                       default=[],
                       help="search fields to search using --search")
+    group.add_option("", "--setopt", dest="setopts", default=[],
+                     action="append",
+                     help="set arbitrary config and repo options")
                       
 
     (opts, regexs) = parser.parse_args()
@@ -1324,6 +1365,13 @@ def main(args):
         
     repoq = YumBaseQuery(pkgops, sackops, opts)
 
+    # go through all the setopts and set the global ones
+    repoq._parseSetOpts(opts.setopts)
+
+    if repoq.main_setopts:
+        for opt in repoq.main_setopts.items:
+            setattr(opts, opt, getattr(repoq.main_setopts, opt))
+
     # silence initialisation junk from modules etc unless verbose mode
     initnoise = (not opts.quiet) * 2
     repoq.preconf.releasever = opts.releasever
@@ -1334,6 +1382,20 @@ def main(args):
     repoq.preconf.debuglevel = initnoise
     repoq.preconf.init_plugins = opts.plugins
     repoq.conf
+
+    for item in  bad_setopt_tm:
+        msg = "Setopt argument has multiple values: %s"
+        repoq.logger.warning(msg % item)
+    for item in  bad_setopt_ne:
+        msg = "Setopt argument has no value: %s"
+        repoq.logger.warning(msg % item)
+    # now set  all the non-first-start opts from main from our setopts
+    if repoq.main_setopts:
+        for opt in repoq.main_setopts.items:
+            if not hasattr(repoq.conf, opt):
+                msg ="Main config did not have a %s attr. before setopt"
+                repoq.logger.warning(msg % opt)
+            setattr(repoq.conf, opt, getattr(repoq.main_setopts, opt))
 
     if opts.repofrompath:
         # setup the fake repos
