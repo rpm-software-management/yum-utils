@@ -374,6 +374,7 @@ class pkgQuery:
                 kw['dot'] = DotPlot()
         elif 'dot' not in kw.keys() or kw['dot'] is None:
             kw['dot'] = None
+        dot      = kw['dot']
         
         if str(kw['tree_level']).lower() != 'all':
             try: 
@@ -383,6 +384,15 @@ class pkgQuery:
         
         if not 'output' in kw.keys():
             kw['output'] = 'ascii-tree'
+
+        #  Level means something a bit different for dot, because we have to
+        # lookup it's packages ... but we don't for ascii. *sigh*
+        if dot is None:
+            self._tree_print_req(pkg, req, level)
+            lim = level + 1
+            if str(kw['tree_level']).lower() != 'all' and \
+                int(kw['tree_level']) < int(lim):
+                return
 
         __req2pkgs = {}
         def req2pkgs(ignore, req):
@@ -422,14 +432,9 @@ class pkgQuery:
             __req2pkgs[req] = providers
             return providers 
         
-        dot = kw['dot']
-        
         tups = getattr(pkg, prco_type)
         rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, req2pkgs)
-        if dot is None:
-            self._tree_print_req(pkg, req, level)
-            lim = level + 1
-        else:
+        if dot is not None:
             dot.addPackage(pkg, rpkgs)
             lim = level + 2
         nlevel = level + 1
@@ -458,6 +463,7 @@ class pkgQuery:
 
     def fmt_tree_obsoletes(self, **kw):
         pkg      = kw.get('pkg', self.pkg)
+        req      = kw.get('req', 'cmd line')
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
         
@@ -466,6 +472,7 @@ class pkgQuery:
                 kw['dot'] = DotPlot()
         elif 'dot' not in kw.keys() or kw['dot'] is None:
             kw['dot'] = None
+        dot      = kw['dot']
         
         if str(kw['tree_level']).lower() != 'all':
             try: 
@@ -476,6 +483,15 @@ class pkgQuery:
         if not 'output' in kw.keys():
             kw['output'] = 'ascii-tree'
         
+        #  Level means something a bit different for dot, because we have to
+        # lookup it's packages ... but we don't for ascii. *sigh*
+        if dot is None:
+            self._tree_print_req(pkg, req, level)
+            lim = level + 1
+            if str(kw['tree_level']).lower() != 'all' and \
+                int(kw['tree_level']) < int(lim):
+                return
+
         def obs2pkgs():
             if self.yb is None:
                 return []
@@ -505,10 +521,7 @@ class pkgQuery:
         else:
             reason = 'cmd line'
         rpkgs = obs2pkgs()
-        if dot is None:
-            self._tree_print_req(pkg, reason, level)
-            lim = level + 1
-        else:
+        if dot is not None:
             dot.addPackage(pkg, rpkgs)
             lim = level + 2
         all_reqs[pkg] = None
@@ -523,6 +536,7 @@ class pkgQuery:
                 self._tree_print_req(rpkg, '', nlevel)
                 continue
             self.fmt_tree_obsoletes(pkg=rpkg, level=nlevel, all_reqs=all_reqs,
+                                    req = pkg.name,
                                     tree_level = kw['tree_level'],
                                     output = kw['output'],
                                     dot = dot)
@@ -536,6 +550,7 @@ class pkgQuery:
         if kw['output'].lower() == 'dot-tree':
             if 'dot' not in kw.keys() or kw['dot'] is None:
                 kw['dot'] = DotPlot()
+        dot      = kw['dot']
 
         if str(kw['tree_level']).lower() != 'all':
             try: 
@@ -545,6 +560,15 @@ class pkgQuery:
         
         if not 'output' in kw.keys():
             kw['output'] = 'ascii-tree'
+
+        #  Level means something a bit different for dot, because we have to
+        # lookup it's packages ... but we don't for ascii. *sigh*
+        if dot is None:
+            self._tree_print_req(pkg, req, level)
+            lim = level + 1
+            if str(kw['tree_level']).lower() != 'all' and \
+                int(kw['tree_level']) < int(lim):
+                return
 
         __prov2pkgs = {}
         def prov2pkgs(prov, ignore):
@@ -584,12 +608,8 @@ class pkgQuery:
         
         tups = pkg.provides + filetupes
         rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, prov2pkgs)
-        dot = kw['dot']
         
-        if dot is None:
-            self._tree_print_req(pkg, req, level)
-            lim = level + 1
-        else:
+        if dot is not None:
             dot.addPackage(pkg, rpkgs)
             lim = level + 2
         nlevel = level + 1
