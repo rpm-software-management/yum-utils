@@ -1256,7 +1256,7 @@ def main(args):
     parser.add_option("--search-fields", action="append", dest="searchfields",
                       default=[],
                       help="search fields to search using --search")
-    group.add_option("", "--setopt", dest="setopts", default=[],
+    parser.add_option("", "--setopt", dest="setopts", default=[],
                      action="append",
                      help="set arbitrary config and repo options")
                       
@@ -1366,7 +1366,7 @@ def main(args):
     repoq = YumBaseQuery(pkgops, sackops, opts)
 
     # go through all the setopts and set the global ones
-    repoq._parseSetOpts(opts.setopts)
+    bad_setopt_tm, bad_setopt_ne = repoq._parseSetOpts(opts.setopts)
 
     if repoq.main_setopts:
         for opt in repoq.main_setopts.items:
