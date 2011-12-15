@@ -469,8 +469,8 @@ fi
 %{_bindir}/yum-builddep
 %{_bindir}/yum-config-manager
 %{_bindir}/yum-debug-dump
-%{_bindir}/yum-groups-manager
 %{_bindir}/yum-debug-restore
+%{_bindir}/yum-groups-manager
 %{_bindir}/show-installed
 %{_bindir}/show-changed-rco
 %{_sbindir}/yum-complete-transaction
@@ -487,6 +487,7 @@ fi
 %{_mandir}/man1/show-installed.1.*
 %{_mandir}/man1/yum-builddep.1.*
 %{_mandir}/man1/yum-debug-dump.1.*
+%{_mandir}/man1/yum-debug-restore.1.*
 %{_mandir}/man8/yum-complete-transaction.8.*
 %{_mandir}/man1/yum-groups-manager.1.*
 %{_mandir}/man8/yumdb.8.*

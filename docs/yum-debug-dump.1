@@ -10,10 +10,14 @@ yum-debug-dump
 lot of information useful to developers trying to debug a problem.
 .PP
 By default it will output a file to the current working directory named
-yum_debug_dump.txt.gz. This file contains no private information but does
+yum_debug_dump-<hostname>-<time>.txt.gz. This file contains no private
+information but does
 contain a complete list of all packages you have installed, all packages
 available in any repository, important configuration and system information.
 You can view this file using the 'zless' command.
+.PP 
+You can use the coresponding program \fByum-debug-restore\fP to act on this file
+and restore a set of packages (much like dump/restore).
 .PP 
 .SH "FILES"
 As yum-debug-dump uses YUM libraries for retrieving all the information, it
@@ -29,6 +33,7 @@ to use. Consult YUM documentation for details:
 .PP 
 .SH "SEE ALSO"
 .nf
+.I yum-debug-restore (1)
 .I yum.conf (5)
 http://yum.baseurl.org/
 .fi 

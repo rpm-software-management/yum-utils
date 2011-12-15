@@ -1,0 +1,62 @@
+.\" yum-debug-dump
+.TH "yum-debug-restore" "1" "15 December 2011" "James Antill" ""
+.SH "NAME"
+yum-debug-restore
+.SH "SYNOPSIS"
+\fByum-debug-restore\fP
+.SH "DESCRIPTION"
+.PP 
+\fByum-debug-restore\fP is a program which takes a gzipped file created by
+\fByum-debug-dump\fP and acts on the information about installed packages
+contained within.
+.PP
+
+.SH "GENERAL OPTIONS"
+.IP "\fB\-\-output\fP"
+Output the commands that would be run to stdout.
+.IP "\fB\-\-shell=<file>\fP"
+Output the commands that would be run to a file.
+.IP "\fB\-\-install-latest\fP"
+Ask yum to install the latest version of the given packages, instead of the
+version that was installed in the debug-dump file.
+.IP "\fB\-\-ignore-arch\fP"
+Ignore the architecture of the packages, so you can "restore" an i386 debug-dump
+on an x86_64 machine.
+.IP "\fB\-\-filter-types=[install,remove,update,downgrade]\fP"
+Only perform the given types of commands, so you can filter to just upgrades
+and installs.
+
+.SH "FILES"
+As yum-debug-restore uses YUM libraries for retrieving all the information, it
+relies on YUM configuration for its default values like which repositories
+to use. Consult YUM documentation for details:
+.PP
+.nf 
+/etc/yum.conf
+/etc/yum/repos.d/
+/var/cache/yum/
+.fi 
+
+.PP 
+.SH "SEE ALSO"
+.nf
+.I yum-debug-dump (1)
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi 
+
+.PP 
+.SH "AUTHORS"
+.nf 
+See the Authors file included with this program.
+.fi 
+
+.PP 
+.SH "BUGS"
+There are of course no bugs, but should you find any, you should first
+consult the FAQ section on http://yum.baseurl.org/wiki/Faq and if unsuccessful
+in finding a resolution contact the mailing list: yum-devel@lists.baseurl.org.
+To file a bug use http://bugzilla.redhat.com for Fedora/RHEL/Centos
+related bugs and http://yum.baseurl.org/report for all other bugs.
+
+.fi
