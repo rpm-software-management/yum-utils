@@ -96,7 +96,7 @@ def parseArgs():
     parser.add_option("-c", "--config", default='/etc/yum.conf',
         help='config file to use (defaults to /etc/yum.conf)')
     parser.add_option("-a", "--arch", default=None,
-        help='act as if running the specified arch (default: current arch, note: does not override $releasever)')
+        help='act as if running the specified arch (default: current arch, note: does not override $releasever. x86_64 is a superset for i*86.)')
     parser.add_option("--source", default=False, dest="source", action="store_true",
                       help='operate on source packages')
     parser.add_option("-r", "--repoid", default=[], action='append',
