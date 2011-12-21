@@ -254,12 +254,23 @@ class PackageCleanup(YumUtilBase):
         else:
             kver = runningkernel
             krel = ""
-        remove = kernels[count:]
+
+        #  This is roughly what we want, but when there are multiple packages
+        # we want to keep N of each.
+        # remove = kernels[count:]
+        kern_name_map = {}
+        for kern in kernels:
+            if kern.name not in kern_name_map:
+                kern_name_map[kern.name] = []
+            kern_name_map[kern.name].append(kern)
+        remove = []
+        for kern in kern_name_map.values():
+            remove.extend(kern[count:])
         
         toremove = []
         # Remove running kernel from remove list
         for kernel in remove:
-            if kernel.version == kver and krel.startswith(kernel.release):
+            if kernel.version == kver and kernel.release == krel:
                 print "Not removing kernel %s-%s because it is the running kernel" % (kver,krel)
             else:
                 toremove.append(kernel)
