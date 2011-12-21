@@ -100,7 +100,7 @@ _yu_repo_graph()
             return 0
             ;;
         --repoid)
-            _yum_repolist all "$cur" 2>/dev/null
+            _yum_helper repolist all "$cur" 2>/dev/null
             return 0
             ;;
         -c)
@@ -136,7 +136,7 @@ _yu_repo_rss()
 
     COMPREPLY=( $( compgen -W '--help -f -l -t -d -r --tempcache -g -a -c' \
         -- "$2" ) )
-    [[ $2 == -* ]] || _yum_repolist all "$2" 2>/dev/null || return 0
+    [[ $2 == -* ]] || _yum_helper repolist all "$2" 2>/dev/null || return 0
 } &&
 complete -F _yu_repo_rss -o filenames repo-rss repo-rss.py
 
@@ -155,7 +155,7 @@ _yu_repoclosure()
             return 0
             ;;
         -l|--lookaside|-r|--repoid)
-            _yum_repolist all "$cur" 2>/dev/null
+            _yum_helper repolist all "$cur" 2>/dev/null
             return 0
             ;;
         -p|--pkg)
@@ -163,7 +163,7 @@ _yu_repoclosure()
             return 0
             ;;
         -g|--group)
-            _yum_grouplist "" "$cur" 2>/dev/null
+            _yum_helper groups list all "$cur" 2>/dev/null
             return 0
             ;;
     esac
@@ -195,7 +195,7 @@ _yu_repoquery()
             ;;
         -l|--list|-i|--info|-R|--requires)
             if $groupmode ; then
-                _yum_grouplist "" "$cur" 2>/dev/null
+                _yum_helper groups list all "$cur" 2>/dev/null
             else
                 declare -F _yum_atgroups &>/dev/null && \
                     _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
@@ -219,15 +219,15 @@ _yu_repoquery()
             return 0
             ;;
         --repoid)
-            _yum_repolist all "$cur" 2>/dev/null
+            _yum_helper repolist all "$cur" 2>/dev/null
             return 0
             ;;
         --enablerepo)
-            _yum_repolist disabled "$cur" 2>/dev/null
+            _yum_helper repolist disabled "$cur" 2>/dev/null
             return 0
             ;;
         --disablerepo)
-            _yum_repolist enabled "$cur" 2>/dev/null
+            _yum_helper repolist enabled "$cur" 2>/dev/null
             return 0
             ;;
         -c|--config)
