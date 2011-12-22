@@ -190,7 +190,7 @@ _yu_repoquery()
     case $prev in
         -h|--help|--version|--qf|--queryformat|--resolve|--archlist|\
         --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
-        --repofrompath|--level|--search-fields|--setopt)
+        --repofrompath|--level|--setopt)
             return 0
             ;;
         -f|--file)
@@ -240,6 +240,10 @@ _yu_repoquery()
             ;;
         --output)
             COMPREPLY=( $( compgen -W 'text ascii-tree dot-tree' -- "$cur" ) )
+            return 0
+            ;;
+        --search-fields)
+            COMPREPLY=( $( compgen -W 'name summary description' -- "$cur" ) )
             return 0
             ;;
     esac
