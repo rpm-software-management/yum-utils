@@ -190,7 +190,7 @@ _yu_repoquery()
     case $prev in
         -h|--help|--version|--qf|--queryformat|--resolve|--archlist|\
         --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
-        --repofrompath|--level|--setopt)
+        --repofrompath|--setopt)
             return 0
             ;;
         -f|--file)
@@ -236,6 +236,10 @@ _yu_repoquery()
             ;;
         -c|--config)
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
+            return 0
+            ;;
+        --level)
+            COMPREPLY=( $( compgen -W '{1..9} all' -- "$cur" ) )
             return 0
             ;;
         --output)
