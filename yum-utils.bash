@@ -188,9 +188,8 @@ _yu_repoquery()
     done
 
     case $prev in
-        -h|--help|--version|--qf|--queryformat|--resolve|--archlist|\
-        --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
-        --repofrompath|--setopt)
+        -h|--help|--version|--qf|--queryformat|--archlist|--repofrompath|\
+        --setopt)
             return 0
             ;;
         -f|--file)
@@ -204,12 +203,6 @@ _yu_repoquery()
                 declare -F _yum_atgroups &>/dev/null && \
                     _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
             fi
-            return 0
-            ;;
-        --provides|--obsoletes|--conflicts|--groupmember|--changelog|\
-        --location|--nevra|--envra|--nvr|-s|--source)
-            declare -F _yum_atgroups &>/dev/null && \
-                _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
             return 0
             ;;
         --grouppkgs)
@@ -254,15 +247,21 @@ _yu_repoquery()
 
     $split && return 0
 
-    COMPREPLY=( $( compgen -W '--version --help --list --info --file
-        --queryformat --groupmember --all --requires --provides --obsoletes
-        --conflicts --changelog --location --nevra --envra --nvr --source
-        --srpm --resolve --exactdeps --recursive --whatprovides --whatrequires
-        --whatobsoletes --whatconflicts --group --grouppkgs --archlist
-        --pkgnarrow --installed --show-duplicates --repoid --enablerepo
-        --disablerepo --repofrompath --plugins --quiet --verbose --cache
-        --tempcache --querytags --config --level --output --search
-        --search-fields --setopt' -- "$cur" ) )
+    if [[ $cur == -* ]] ; then
+        COMPREPLY=( $( compgen -W '--version --help --list --info --file
+            --queryformat --groupmember --all --requires --provides --obsoletes
+            --conflicts --changelog --location --nevra --envra --nvr --source
+            --srpm --resolve --exactdeps --recursive --whatprovides
+            --whatrequires --whatobsoletes --whatconflicts --group --grouppkgs
+            --archlist --pkgnarrow --installed --show-duplicates --repoid
+            --enablerepo --disablerepo --repofrompath --plugins --quiet
+            --verbose --cache --tempcache --querytags --config --level --output
+            --search --search-fields --setopt' -- "$cur" ) )
+        return 0
+    fi
+
+    declare -F _yum_atgroups &>/dev/null && \
+        _yum_atgroups "$cur" || _yum_list all "$cur" 2>/dev/null
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
