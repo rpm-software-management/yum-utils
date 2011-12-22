@@ -188,9 +188,13 @@ _yu_repoquery()
     done
 
     case $prev in
-        -h|--help|--version|-f|--file|--qf|--queryformat|--resolve|--archlist|\
+        -h|--help|--version|--qf|--queryformat|--resolve|--archlist|\
         --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
         --repofrompath|--level|--search-fields|--setopt)
+            return 0
+            ;;
+        -f|--file)
+            COMPREPLY=( $( compgen -f -o plusdirs -- "$cur" ) )
             return 0
             ;;
         -l|--list|-i|--info|-R|--requires)
