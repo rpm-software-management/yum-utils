@@ -190,7 +190,7 @@ _yu_repoquery()
     case $prev in
         -h|--help|--version|-f|--file|--qf|--queryformat|--resolve|--archlist|\
         --whatprovides|--whatrequires|--whatobsoletes|--whatconflicts|\
-        --repofrompath|--level|--search-fields)
+        --repofrompath|--level|--search-fields|--setopt)
             return 0
             ;;
         -l|--list|-i|--info|-R|--requires)
@@ -250,7 +250,7 @@ _yu_repoquery()
         --pkgnarrow --installed --show-duplicates --repoid --enablerepo
         --disablerepo --repofrompath --plugins --quiet --verbose --cache
         --tempcache --querytags --config --level --output --search
-        --search-fields' -- "$cur" ) )
+        --search-fields --setopt' -- "$cur" ) )
 } &&
 complete -F _yu_repoquery -o filenames repoquery repoquery.py
 
