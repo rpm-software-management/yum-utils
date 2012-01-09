@@ -190,7 +190,7 @@ def parseArgs(args):
     
     return opts
 
-def _out_mod(opts, oldpkg, pkg):
+def _out_mod(opts, oldpkg, pkg, sizechange):
     if opts.simple:
         if opts.compare_arch:
             msg = "%s: %s ->  %s" % (pkg.name, oldpkg, pkg)
@@ -306,13 +306,14 @@ def main(args):
                 continue
 
             upgraded_pkgs += 1
+            sizechange = None
             if opts.size:
                 sizechange = int(pkg.size) - int(oldpkg.size)
                 if opts.downgrade:
                     up_sizechange += sizechange
                 else:
                     mod_sizechange += sizechange
-            _out_mod(opts, oldpkg, pkg)
+            _out_mod(opts, oldpkg, pkg, sizechange)
 
         if opts.downgrade:
             print '\nDowngraded Packages:\n'
@@ -321,10 +322,11 @@ def main(args):
                     continue
 
                 downgraded_pkgs += 1
+                sizechange = None
                 if opts.size:
                     sizechange = int(pkg.size) - int(oldpkg.size)
                     down_sizechange += sizechange
-                _out_mod(opts, oldpkg, pkg)
+                _out_mod(opts, oldpkg, pkg, sizechange)
 
 
     if (not ygh.add and not ygh.remove and not ygh.modified and
