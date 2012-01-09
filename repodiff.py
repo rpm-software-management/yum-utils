@@ -227,7 +227,7 @@ def _out_mod(opts, oldpkg, pkg):
                 msg += "* %s %s\n%s\n\n" % (tm, to_unicode(author),
                                             to_unicode(content))
             if opts.size:
-                msg += "\nSize Change: %s bytes\n" % sizechange
+                msg += "\nSize change: %s bytes\n" % sizechange
 
     print msg
 
