@@ -277,6 +277,7 @@ def main():
 
         download_list.sort(sortPkgObj)
         n = 0
+        exit_code = 0
         for pkg in download_list:
             n = n + 1
             repo = my.repos.getRepo(pkg.repoid)
@@ -322,6 +323,7 @@ def main():
             except yum.Errors.RepoError, e:
                 my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e)))
                 local_size += sz
+                exit_code = 1
                 continue
 
             local_size += sz
@@ -337,12 +339,14 @@ def main():
                     else:
                         my.logger.warning('Removing %s due to failed signature check: %s' % (os.path.basename(remote), error))
                     os.unlink(path)
+                    exit_code = 1
                     continue
 
             if not os.path.exists(local) or not os.path.samefile(path, local):
                 shutil.copy2(path, local)
 
     my.closeRpmDB()
+    sys.exit(exit_code)
 
 if __name__ == "__main__":
     main()
