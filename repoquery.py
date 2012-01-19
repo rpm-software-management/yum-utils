@@ -325,12 +325,13 @@ class pkgQuery:
         print "%s%s [%s]" % (indent, str(req), str(val))
 
     # These are common helpers for the --tree-* options...
-    @staticmethod
-    def _tree_print_req(req, val, level):
+    def _tree_print_req(self, req, val, level):
         indent = ''
         if level:
             indent = ' |  ' * (level - 1) + ' \_  '
-        print "%s%s [%s]" % (indent, str(req), str(val))
+        self.pkg = req
+        self.name = req.name
+        print "%s%s [%s]" % (indent, self.fmt_queryformat(), str(val))
     def _tree_pkg2uniq(self, pkg):
         """ Turn a pkg into a "unique" req."""
         if self.yb and self.yb.conf.showdupesfromrepos:
