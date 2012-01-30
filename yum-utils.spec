@@ -1,3 +1,6 @@
+%define package_yum_updatesd 1
+
+
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Summary: Utilities based around the yum package manager
@@ -130,6 +133,7 @@ This plugin allows repositories to have different priorities.
 Packages in a repository with a lower priority can't be overridden by packages
 from a repository with a higher priority even if repo has a later version.
 
+%if %{package_yum_updatesd}
 %package -n yum-plugin-refresh-updatesd
 Summary: Tell yum-updatesd to check for updates when yum exits
 Group: System Environment/Base
@@ -143,6 +147,7 @@ Requires: yum-updatesd
 yum-refresh-updatesd tells yum-updatesd to check for updates when yum exits.
 This way, if you run 'yum update' and install all available updates, puplet
 will almost instantly update itself to reflect this.
+%endif
 
 %package -n yum-plugin-merge-conf
 Summary: Yum plugin to merge configuration changes when installing packages
@@ -397,7 +402,6 @@ plugins="\
  tsflags \
  downloadonly \
  priorities \
- refresh-updatesd \
  merge-conf \
  security \
  upgrade-helper \
@@ -417,6 +421,12 @@ plugins="\
  ps \
  puppetverify \
 "
+
+%if %{package_yum_updatesd}
+plugins="$plugins \
+ refresh-updatesd \
+"
+%endif
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
@@ -546,11 +556,13 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
 /usr/lib/yum-plugins/priorities.*
 
+%if %{package_yum_updatesd}
 %files -n yum-plugin-refresh-updatesd
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
 /usr/lib/yum-plugins/refresh-updatesd.*
+%endif
 
 %files -n yum-plugin-merge-conf
 %defattr(-, root, root)
