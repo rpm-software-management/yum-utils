@@ -36,6 +36,8 @@ Scan for duplicates in the local RPM database.
 .IP "\fB\-\-cleandupes\fP"
 Scan for duplicates in the local RPM database and clean out the
 older versions.
+.IP "\fB\-\-count <COUNT>\fP"
+Number of kernel packages to keep on the system (default 2)
 .PP 
 .SH "LEAVES OPTIONS" 
 .IP "\fB\-\-all\fP"
@@ -49,8 +51,6 @@ When listing leaf nodes do not list development packages.
 When listing leaf nodes do not list packages with files in bin directories.
 .PP 
 .SH "OLDKERNELS OPTIONS" 
-.IP "\fB\-\-count <COUNT>\fP"
-Number of kernel packages to keep on the system (default 2)
 .IP "\fB\-\-keepdevel\fP"
 Do not remove kernel-devel packages when removing kernels
 
