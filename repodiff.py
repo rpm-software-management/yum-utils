@@ -56,6 +56,7 @@ class DiffYum(yum.YumBase):
         else:
             newrepo.baseurl = [baseurl]
         newrepo.basecachedir = self.dy_basecachedir
+        newrepo.base_persistdir = self.dy_basecachedir
         newrepo.metadata_expire = 0
         newrepo.timestamp_check = False
         # add our new repo
