@@ -194,6 +194,21 @@ def main():
     if opts.conffile is not None:
         yb.preconf.fn = opts.conffile
 
+    # setup the fake repos
+    for repo in opts.repofrompath or []:
+        tmp = tuple(repo.split(','))
+        if len(tmp) != 2:
+            yb.logger.error("Error: Bad repofrompath argument: %s" %repo)
+            continue
+        repoid,repopath = tmp
+        if repopath[0] == '/':
+            baseurl = 'file://' + repopath
+        else:
+            baseurl = repopath
+        yb.add_enable_repo(repoid, baseurls=[baseurl],
+                           basecachedir=yb.conf.cachedir)
+        yb.logger.info("Added %s repo from %s" % (repoid, repopath))
+
     if opts.cache:
         yb.conf.cache = 1
     elif not yb.setCacheDir():
