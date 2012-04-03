@@ -26,6 +26,7 @@ Use a temp dir for storing/accessing yum-cache.
 Path to download packages to: defaults to current directory.
 .IP "\fB\-g, \-\-gpgcheck\fP"
 Remove packages that fail GPG signature checking after downloading.
+exit status is '1' if at least one package was removed.
 .IP "\fB\-u, \-\-urls\fP"
 Just list urls of what would be downloaded, don't download.
 .IP "\fB\-l, \-\-plugins\fP"
