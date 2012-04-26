@@ -25,7 +25,6 @@ import fnmatch
 import time
 import os
 import os.path
-import exceptions
 import urlparse
 
 from optparse import OptionParser
@@ -123,7 +122,7 @@ convertmap = { 'date': sec2date,
                'h':  size2h,
              }
 
-class queryError(exceptions.Exception):
+class queryError(Exception):
     def __init__(self, value=None):
         Exception.__init__(self)
         self.value = value
@@ -856,6 +855,8 @@ class YumBaseQuery(yum.YumBase):
                     pkgs = self.pkgSack.returnNewestByNameArch(**kwargs)
                 except yum.Errors.PackageSackError:
                     pkgs = []
+                except yum.Errors.RepoError, e:
+                    raise queryError(e)
         else:
             what = self.options.pkgnarrow
             ygh = self.doPackageLists(what, **kwargs)
