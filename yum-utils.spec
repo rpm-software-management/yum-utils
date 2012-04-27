@@ -1,5 +1,8 @@
+%if 0%{?rhel}
+%define package_yum_updatesd 0
+%else
 %define package_yum_updatesd 1
-
+%endif
 
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
