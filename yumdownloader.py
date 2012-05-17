@@ -94,9 +94,6 @@ class YumDownloader(YumUtilBase):
             
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup(opts)
-        # Setup source repos
-        if opts.source:
-            self.setupSourceRepos()
         # Do the real action
         self.exit_code = self.downloadPackages(opts)
         
@@ -143,14 +140,6 @@ class YumDownloader(YumUtilBase):
             if not repo.isEnabled() and     src_repos[repo.id]:
                 self.logger.info('Enabling %s repository' % repo.id)
                 repo.enable()
-                # Setup the repo, without a cache
-                repo.setup(0)
-                try:
-                    # Setup pkgSack with 'src' in the archlist
-                    self._getSacks(archlist=archlist, thisrepo=repo.id)
-                except yum.Errors.YumBaseError, msg:
-                    self.logger.critical(str(msg))
-                    sys.exit(1)
         
     def downloadPackages(self,opts):
         
@@ -291,6 +280,9 @@ class YumDownloader(YumUtilBase):
         """do a default setup for all the normal/necessary yum components,
            really just a shorthand for testing"""
         try:
+            # Setup source repos
+            if opts.source:
+                self.setupSourceRepos()
             self._getRepos(doSetup = True)
             # if '--source' is used the add src to the archlist
             if opts.source:
@@ -305,13 +297,6 @@ class YumDownloader(YumUtilBase):
         except yum.Errors.YumBaseError, msg:
             self.logger.critical(str(msg))
             sys.exit(1)
-
-    def _removeEnabledSourceRepos(self):
-        ''' Disable all enabled *-source repos.'''
-        for repo in self.repos.listEnabled():
-            if repo.id.endswith('-source'):
-                repo.close()
-                self.repos.disableRepo(repo.id)
 
     def addCmdOptions(self):
         # this if for compability with old API (utils.py from yum < 3.2.23)
