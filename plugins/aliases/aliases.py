@@ -44,7 +44,7 @@ class AliasedCommand:
 
     def doCheck(self, base, basecmd, extcmds):
         if recursive: # shouldn't happen
-            raise PluginYumExit('And error has occured for %s, please create a bug report')
+            raise PluginYumExit('And error has occurred for %s, please create a bug report')
 
         raise PluginYumExit('%s is an alias not a command, however recursive processing is turned off')
     doCommand = doCheck

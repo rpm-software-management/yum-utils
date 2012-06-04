@@ -37,7 +37,7 @@ kernelVariants = ["bigmem", "enterprise", "smp", "hugemem", "PAE",
                   "guest", "hypervisor", "xen0", "xenU", "xen"]
 
 def getRunningKernel():
-    # Taken from the installonlyn.py plugin writen by Jeremy Katz
+    # Taken from the installonlyn.py plugin written by Jeremy Katz
     # Copyright 2005  Red Hat, Inc. 
     # Modified by Jack Neely to return a kernel provides tuple
     """This takes the output of uname and figures out the (version, release)

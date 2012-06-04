@@ -166,7 +166,7 @@ class RepoClosure(yum.YumBase):
 
         for pkg in pkgs:
             if pkg.repoid in self.lookaside:
-                # don't attempt to resolve dependancy issues for
+                # don't attempt to resolve dependency issues for
                 # packages from lookaside repositories
                 continue
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):

@@ -299,7 +299,7 @@ class YumDownloader(YumUtilBase):
             sys.exit(1)
 
     def addCmdOptions(self):
-        # this if for compability with old API (utils.py from yum < 3.2.23)
+        # this if for compatibility with old API (utils.py from yum < 3.2.23)
         if hasattr(self,'getOptionGroup'): # check if the group option API is available
             group = self.getOptionGroup()
         else:

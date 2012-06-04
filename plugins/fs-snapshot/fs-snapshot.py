@@ -21,7 +21,7 @@ This plugin creates a snapshot before any yum update or yum remove operation on
 any btrfs filesystem that is affected by the update/remove operation.
 
 This is a giant hammer.  Please be aware that if you rollback to a previous
-snapshot that any other changes that occured to the filesystem after the
+snapshot that any other changes that occurred to the filesystem after the
 snapshot takes place will not be in the snapshot.  You of course can mount the
 newer version elsewhere and copy the new versions of the files back to your
 rolled-back snapshot.  You have been warned.
