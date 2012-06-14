@@ -19,6 +19,7 @@ sys.path.insert(0,'/usr/share/yum-cli')
 
 import yum
 from yum.misc import setup_locale
+from yum.i18n import exception2msg
 import yum.Errors
 from utils import YumUtilBase
 
@@ -152,6 +153,7 @@ class YumBuildDep(YumUtilBase):
                     sys.exit(1)
 
     def install_deps(self, deplist):
+        errors = set()
         for dep in deplist:
             self.logger.debug(' REQ:  %s' % dep)                
             if dep.startswith("rpmlib("): 
@@ -164,10 +166,13 @@ class YumBuildDep(YumUtilBase):
                 pkg = self.returnPackageByDep(dep)
                 self.logger.info(' --> %s' % pkg)
                 self.install(pkg)
-                
             except yum.Errors.YumBaseError, e:
-                self.logger.error("Error: %s" % e)
-                sys.exit(1)
+                errors.add(exception2msg(e))
+
+        if errors:
+            for i in sorted(errors):
+                self.logger.error("Error: %s" % i)
+            sys.exit(1)
 
     # go through each of the pkgs, figure out what they are/where they are 
     # if they are not a local package then run
