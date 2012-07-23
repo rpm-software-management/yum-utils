@@ -77,12 +77,12 @@ def get_open_files(pid):
     files = []
     smaps = '/proc/%s/smaps' % pid
     try:
-        maps = open(smaps, 'r')
+        maps = open(smaps, 'r').readlines()
     except (IOError, OSError), e:
         print "Could not open %s" % smaps
         return files
 
-    for line in maps.readlines():
+    for line in maps:
         slash = line.find('/')
         if slash == -1 or line.find('00:') != -1: # if we don't have a '/' or if we fine 00: in the file then it's not _REALLY_ a file
             continue
