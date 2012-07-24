@@ -161,6 +161,12 @@ def exclude_hook(conduit):
                                 conduit.delPackage(po)
                                 cnt += 1
                                 conduit.info(3," --> %s from %s excluded (priority)" % (po,po.repoid))
+                                # Remove all occurances of this package
+                                for p in conduit.getPackages(repo):
+                                    if p.name==po.name:
+                                        conduit.delPackage(p)
+                                        cnt += 1
+                                        conduit.info(3," --> %s from %s excluded (priority)" % (p,p.repoid))
                                 break
     if cnt:
         conduit.info(2, '%d packages excluded due to repository priority protections' % cnt)
