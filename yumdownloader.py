@@ -99,45 +99,20 @@ class YumDownloader(YumUtilBase):
         
     def setupSourceRepos(self):
         # enable the -source repos for enabled primary repos
-        archlist = rpmUtils.arch.getArchList() + ['src']    
-        # Ok, we have src and bin repos. What we want to do here is:
-        #
-        # 1. _enable_ source repos for which the bin repos are enabled.
-        # 2. _disable_ the _other_ src repos.
-        #
-        # ...also we don't want to disable the src repos. for #1 and then
-        # re-enable them as then we get annoying messages and call .close() on
-        # them losing the primarydb data etc.
 
-        # Get all src repos.
-        src_repos = {}
-        repos_source = self.repos.findRepos('*-source')
-        if rhn_source_repos: # RHN
-            repos_source += self.repos.findRepos('*-source-rpms')
-        for repo in repos_source:
-            src_repos[repo.id] = False
+        enabled = {}
+        for repo in self.repos.findRepos('*'):
+            enabled[repo.id] = repo.isEnabled()
 
-        #  Find the enabled bin repos, and mark their respective *-source repo.
-        # as good.
-        for repo in self.repos.listEnabled():
-            if repo.id not in src_repos:
-                srcrepo = '%s-source' % repo.id
-                if srcrepo in src_repos:
-                    src_repos[srcrepo] = True
-                if not rhn_source_repos:
-                    continue
-                if not repo.id.endswith("-rpms"):
-                    continue
-                srcrepo = repo.id[:-len('-rpms')] + '-source-rpms'
-                if srcrepo in src_repos:
-                    src_repos[srcrepo] = True
+        for repo in self.repos.findRepos('*'):
+            if repo.id.endswith('-source'):
+                primary = repo.id[:-7]
+            elif rhn_source_repos and repo.id.endswith('-source-rpms'):
+                primary = repo.id[:-12] + '-rpms'
+            else:
+                continue
 
-        # Toggle src repos that are set the wrong way
-        for repo in repos_source:
-            if     repo.isEnabled() and not src_repos[repo.id]:
-                repo.close()
-                self.repos.disableRepo(repo.id)
-            if not repo.isEnabled() and     src_repos[repo.id]:
+            if not repo.isEnabled() and enabled.get(primary):
                 self.logger.info('Enabling %s repository' % repo.id)
                 repo.enable()
         
