@@ -192,52 +192,30 @@ class YumDownloader(YumUtilBase):
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
             sys.exit(1)
+        if opts.urls:
+            for pkg in toDownload:
+                print urljoin(pkg.repo.urls[0], pkg.relativepath)
+            return 0
 
-        exit_code = 0
+        # create dest dir
+        if not os.path.exists(opts.destdir):
+            os.makedirs(opts.destdir)
+
+        # set localpaths
         for pkg in toDownload:
-            n,a,e,v,r = pkg.pkgtup
-            packages =  self.pkgSack.searchNevra(n,e,v,r,a)
-            packages.sort()
-            last = None
-            for download in packages:
-                if download.pkgtup == last :
-                    continue
-                last = download.pkgtup
-                repo = self.repos.getRepo(download.repoid)
-                remote = download.returnSimple('relativepath')
-                if opts.urls:
-                    url = urljoin(repo.urls[0]+'/',remote)
-                    self.logger.info('%s' % url)
-                    continue
-                local = os.path.basename(remote)
-                if not os.path.exists(opts.destdir):
-                    os.makedirs(opts.destdir)
-                local = os.path.join(opts.destdir, local)
-                if (os.path.exists(local) and 
-                    os.path.getsize(local) == int(download.returnSimple('packagesize'))):
-                    self.logger.error("%s already exists and appears to be complete" % local)
-                    continue
-                # Disable cache otherwise things won't download
-                repo.cache = 0
-                download.localpath = local # Hack: to set the localpath we want.
-                try:
-                    checkfunc = (self.verifyPkg, (download, 1), {})
-                    path = repo.getPackage(download, checkfunc=checkfunc)
-                except IOError, e:
-                    self.logger.error("Cannot write to file %s. Error was: %s" % (local, e))
-                    exit_code = 2
-                    continue
-                except RepoError, e:
-                    self.logger.error("Could not download/verify pkg %s: %s" % (download, e))
-                    exit_code = 2
-                    continue
-    
-                if not os.path.exists(local) or not os.path.samefile(path, local):
-                    progress = TextMeter()
-                    progress.start(basename=os.path.basename(local),
-                                   size=os.stat(path).st_size)
-                    shutil.copy2(path, local)
-                    progress.end(progress.size)
+            rpmfn = os.path.basename(pkg.remote_path)
+            pkg.localpath = os.path.join(opts.destdir, rpmfn)
+            pkg.repo.copy_local = True
+            pkg.repo.cache = 0
+
+        # use downloader from YumBase
+        exit_code = 0
+        probs = self.downloadPkgs(toDownload)
+        if probs:
+            exit_code = 2
+            for key in probs:
+                for error in probs[key]:
+                    self.logger.error('%s: %s', key, error)
         return exit_code
                     
     def _groupPackages(self,pkglist):

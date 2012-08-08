@@ -276,74 +276,45 @@ def main():
             urlgrabber.progress.text_meter_total_size(remote_size)
 
         download_list.sort(sortPkgObj)
-        n = 0
-        exit_code = 0
+        if opts.urls:
+            for pkg in download_list:
+                print urljoin(pkg.repo.urls[0], pkg.relativepath)
+            return 0
+
+        # create dest dir
+        if not os.path.exists(local_repo_path):
+            os.makedirs(local_repo_path)
+
+        # set localpaths
         for pkg in download_list:
-            n = n + 1
-            repo = my.repos.getRepo(pkg.repoid)
-            remote = pkg.returnSimple('relativepath')
-            local = local_repo_path + '/' + remote
-            localdir = os.path.dirname(local)
-            if not os.path.exists(localdir):
-                os.makedirs(localdir)
+            rpmfn = os.path.basename(pkg.remote_path)
+            pkg.localpath = os.path.join(local_repo_path, rpmfn)
+            pkg.repo.copy_local = True
+            pkg.repo.cache = 0
 
-            sz = int(pkg.returnSimple('packagesize'))
-            if os.path.exists(local) and os.path.getsize(local) == sz:
-                
-                if not opts.quiet:
-                    my.logger.error("[%s: %-5d of %-5d ] Skipping existing %s" % (repo.id, n, len(download_list), remote))
-                continue
-    
-            if opts.urls:
-                baseurl = None
-                if repo.urls[0][-1] != '/':
-                    baseurl = repo.urls[0] + '/'
-                else:
-                    baseurl = repo.urls[0]
-                    url = urljoin(baseurl,remote)
-                    print '%s' % url
-                continue
-    
-            # make sure the repo subdir is here before we go on.
-            if not os.path.exists(local_repo_path):
-                try:
-                    os.makedirs(local_repo_path)
-                except IOError, e:
-                    my.logger.error("Could not make repo subdir: %s" % e)
-                    my.closeRpmDB()
-                    sys.exit(1)
-            
-            # Disable cache otherwise things won't download            
-            repo.cache = 0
-            if not opts.quiet:
-                my.logger.info( '[%s: %-5d of %-5d ] Downloading %s' % (repo.id, n, len(download_list), remote))
-            pkg.localpath = local # Hack: to set the localpath we want.
-            try:
-                path = repo.getPackage(pkg)
-            except yum.Errors.RepoError, e:
-                my.logger.error("Could not retrieve package %s. Error was %s" % (pkg, str(e)))
-                local_size += sz
-                exit_code = 1
-                continue
+        # use downloader from YumBase
+        exit_code = 0
+        probs = my.downloadPkgs(download_list)
+        if probs:
+            exit_code = 1
+            for key in probs:
+                for error in probs[key]:
+                    self.logger.error('%s: %s', key, error)
 
-            local_size += sz
-            if hasattr(urlgrabber.progress, 'text_meter_total_size'):
-                urlgrabber.progress.text_meter_total_size(remote_size, local_size)
-            if opts.gpgcheck:
+        if opts.gpgcheck:
+            for pkg in download_list:
                 result, error = my.sigCheckPkg(pkg)
                 if result != 0:
+                    rpmfn = os.path.basename(pkg.remote_path)
                     if result == 1:
-                        my.logger.warning('Removing %s, due to missing GPG key.' % os.path.basename(remote))
+                        my.logger.warning('Removing %s, due to missing GPG key.' % rpmfn)
                     elif result == 2:
-                        my.logger.warning('Removing %s due to failed signature check.' % os.path.basename(remote))
+                        my.logger.warning('Removing %s due to failed signature check.' % rpmfn)
                     else:
-                        my.logger.warning('Removing %s due to failed signature check: %s' % (os.path.basename(remote), error))
-                    os.unlink(path)
+                        my.logger.warning('Removing %s due to failed signature check: %s' % rpmfn)
+                    os.unlink(pkg.localpath)
                     exit_code = 1
                     continue
-
-            if not os.path.exists(local) or not os.path.samefile(path, local):
-                shutil.copy2(path, local)
 
     my.closeRpmDB()
     sys.exit(exit_code)
