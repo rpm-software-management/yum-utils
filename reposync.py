@@ -47,7 +47,7 @@ from yum.constants import *
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
-from urlgrabber.progress import TextMeter
+from urlgrabber.progress import TextMeter, TextMultiFileMeter
 import urlgrabber
 
 # for yum 2.4.X compat
@@ -165,7 +165,7 @@ def main():
     #  Use progress bar display when downloading repo metadata
     # and package files ... needs to be setup before .repos (ie. RHN/etc.).
     if not opts.quiet:
-        my.repos.setProgressBar(TextMeter(fo=sys.stdout))
+        my.repos.setProgressBar(TextMeter(fo=sys.stdout), TextMultiFileMeter(fo=sys.stdout))
     my.doRepoSetup()
 
     if len(opts.repoid) > 0:
