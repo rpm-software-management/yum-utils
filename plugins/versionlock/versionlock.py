@@ -170,6 +170,7 @@ class VersionLockCommand:
             if not count:
                 os.unlink(tmpfilename)
                 return 1, ['Error: versionlock delete: no matches']
+            os.chmod(tmpfilename, 0644)
             os.rename(tmpfilename, filename)
             return 0, ['versionlock deleted: ' + str(count)]
 
