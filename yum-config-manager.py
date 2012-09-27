@@ -153,7 +153,7 @@ if (not args and not opts.addrepo) or 'main' in args:
         ybc = yb.conf
         writeRawConfigFile(fn, 'main', ybc.yumvar,
                            ybc.cfg.options, ybc.iteritems, ybc.optionobj,
-                           only)
+                           only=yb.main_setopts.items)
 
 if opts.enable or opts.disable:
     opts.save = True
