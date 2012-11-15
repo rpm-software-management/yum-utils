@@ -111,18 +111,6 @@ Requires: yum >= 3.0
 This plugin allows you to specify optional transaction flags on the yum
 command line
 
-%package -n yum-plugin-downloadonly
-Summary: Yum plugin to add downloadonly command option
-Group: System Environment/Base
-Provides: yum-downloadonly = %{version}-%{release}
-Obsoletes: yum-downloadonly < 1.1.20-0
-Conflicts: yum-downloadonly < 1.1.20-0
-Requires: yum >= 3.0
-
-%description -n yum-plugin-downloadonly
-This plugin adds a --downloadonly flag to yum so that yum will only download
-the packages and not install/update them.
-
 %package -n yum-plugin-priorities
 Summary: plugin to give priorities to packages from different repos
 Group: System Environment/Base
@@ -403,7 +391,6 @@ plugins="\
  protectbase \
  versionlock \
  tsflags \
- downloadonly \
  priorities \
  merge-conf \
  security \
@@ -546,12 +533,6 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
 /usr/lib/yum-plugins/tsflags.*
-
-%files -n yum-plugin-downloadonly
-%defattr(-, root, root)
-%doc COPYING
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
-/usr/lib/yum-plugins/downloadonly.*
 
 %files -n yum-plugin-priorities
 %defattr(-, root, root)

@@ -28,7 +28,6 @@ plugins/ps/ps.py
 plugins/auto-update-debuginfo/auto-update-debuginfo.py
 plugins/show-leaves/show-leaves.py
 plugins/list-data/list-data.py
-plugins/downloadonly/downloadonly.py
 plugins/allowdowngrade/allowdowngrade.py
 plugins/tsflags/tsflags.py
 plugins/merge-conf/merge-conf.py
