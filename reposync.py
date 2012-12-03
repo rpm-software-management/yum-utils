@@ -198,6 +198,7 @@ def main():
         # maybe this shouldn't be entirely fatal
         sys.exit(1)
     
+    exit_code = 0
     for repo in my.repos.listEnabled():
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
 
@@ -293,7 +294,6 @@ def main():
             pkg.repo.cache = 0
 
         # use downloader from YumBase
-        exit_code = 0
         probs = my.downloadPkgs(download_list)
         if probs:
             exit_code = 1
