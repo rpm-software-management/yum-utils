@@ -153,14 +153,20 @@ def main():
         opts.tempcache = True
 
     if opts.tempcache:
-        cachedir = getCacheDir()
-        if cachedir is None:
+        if not my.setCacheDir(force=True):
             print >> sys.stderr, "Error: Could not make cachedir, exiting"
             sys.exit(50)
-            
-        my.repos.setCacheDir(cachedir)
+        my.conf.uid = 1 # force locking of user cache
     elif opts.cachedir:
         my.repos.setCacheDir(opts.cachedir)
+
+    # Lock if they've not given an explicit cachedir
+    if not opts.cachedir:
+        try:
+            my.doLock()
+        except yum.Errors.LockError, e:
+            print >> sys.stderr, "Error: %s" % e
+            sys.exit(50)
 
     #  Use progress bar display when downloading repo metadata
     # and package files ... needs to be setup before .repos (ie. RHN/etc.).
