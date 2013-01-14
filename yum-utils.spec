@@ -286,7 +286,7 @@ This plugin allows the user to run arbitrary actions immediately following a
 transaction when specified packages are changed.
 
 %package -n yum-NetworkManager-dispatcher
-Summary: NetworkManager script which tells yum to check it's cache on network change
+Summary: NetworkManager script which tells yum to check its cache on network change
 Group: System Environment/Base
 Requires: yum >= 3.2.17
 
