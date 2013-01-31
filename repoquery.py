@@ -425,6 +425,8 @@ class pkgQuery:
                     providers = matches.keys()
 
 
+            except yum.Errors.RepoError:
+                raise
             except yum.Errors.YumBaseError, err:
                 print >>sys.stderr, "No package provides %s" % req
                 return []
@@ -595,6 +597,8 @@ class pkgQuery:
                         arequirers = [pkg for pkg in areqs
                                       if pkg.pkgtup not in skip]
 
+            except yum.Errors.RepoError:
+                raise
             except yum.Errors.YumBaseError, err:
                 print >>sys.stderr, "No package provides %s" % str(prov)
                 return []
@@ -879,6 +883,8 @@ class YumBaseQuery(yum.YumBase):
             matches = yum.YumBase.searchPackageProvides(self, [str(depstring)])
             provider = matches.keys()
             # provider.extend(yum.YumBase.returnPackagesByDep(self, depstring))
+        except yum.Errors.RepoError:
+            raise
         except yum.Errors.YumBaseError, err:
             self.logger.error("No package provides %s" % depstring)
         return self.queryPkgFactory(provider)
@@ -1501,10 +1507,15 @@ def main(args):
     except (yum.Errors.RepoError, yum.Errors.GroupsError), e:
         repoq.logger.error(e)
         sys.exit(1)
+
     try:
         repoq.runQuery(regexs)
+    except yum.Errors.RepoError, e:
+        repoq.logger.error(e)
+        sys.exit(1)
     except queryError, e:
         repoq.logger.error(e)
+        sys.exit(1)
 
 if __name__ == "__main__":
     misc.setup_locale()
