@@ -146,7 +146,7 @@ def _reposetup(conduit):
              if repo.id == "_local"]
     if lrepo:
         lrepo = lrepo[0]
-        os.unlink("%s/cachecookie" % lrepo.cachedir)
+        yum.misc.unlink_f("%s/cachecookie" % lrepo.cachedir)
         return
 
     conf_fname = '/etc/yum.repos.d/_local.repo'

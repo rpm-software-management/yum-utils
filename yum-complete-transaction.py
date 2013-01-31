@@ -93,7 +93,7 @@ except ImportError:
         return to_complete_items
 
 class YumCompleteTransaction(YumUtilBase):
-    NAME = 'yum-complete-transactions'
+    NAME = 'yum-complete-transaction'
     VERSION = '1.0'
     USAGE = """
     yum-complete-transaction: completes unfinished yum transactions which occur due to error, failure

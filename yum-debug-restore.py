@@ -232,10 +232,8 @@ def main():
         sys.exit(0)
 
     # Want to do the transaction, hacky method
-    if xtra_args:
-        os.system("yum shell %s %s" % (" ".join(xtra_args), fo.name))
-    else:
-        os.system("yum shell %s" % fo.name)
+    xtra_args.append('--setopt=installonly_limit=0')
+    os.system("yum shell %s %s" % (" ".join(xtra_args), fo.name))
 
 if __name__ == "__main__":
     main()

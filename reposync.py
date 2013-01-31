@@ -47,7 +47,7 @@ from yum.constants import *
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
-from urlgrabber.progress import TextMeter
+from urlgrabber.progress import TextMeter, TextMultiFileMeter
 import urlgrabber
 
 # for yum 2.4.X compat
@@ -153,19 +153,25 @@ def main():
         opts.tempcache = True
 
     if opts.tempcache:
-        cachedir = getCacheDir()
-        if cachedir is None:
+        if not my.setCacheDir(force=True):
             print >> sys.stderr, "Error: Could not make cachedir, exiting"
             sys.exit(50)
-            
-        my.repos.setCacheDir(cachedir)
+        my.conf.uid = 1 # force locking of user cache
     elif opts.cachedir:
         my.repos.setCacheDir(opts.cachedir)
+
+    # Lock if they've not given an explicit cachedir
+    if not opts.cachedir:
+        try:
+            my.doLock()
+        except yum.Errors.LockError, e:
+            print >> sys.stderr, "Error: %s" % e
+            sys.exit(50)
 
     #  Use progress bar display when downloading repo metadata
     # and package files ... needs to be setup before .repos (ie. RHN/etc.).
     if not opts.quiet:
-        my.repos.setProgressBar(TextMeter(fo=sys.stdout))
+        my.repos.setProgressBar(TextMeter(fo=sys.stdout), TextMultiFileMeter(fo=sys.stdout))
     my.doRepoSetup()
 
     if len(opts.repoid) > 0:
@@ -198,6 +204,7 @@ def main():
         # maybe this shouldn't be entirely fatal
         sys.exit(1)
     
+    exit_code = 0
     for repo in my.repos.listEnabled():
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
 
@@ -293,7 +300,6 @@ def main():
             pkg.repo.cache = 0
 
         # use downloader from YumBase
-        exit_code = 0
         probs = my.downloadPkgs(download_list)
         if probs:
             exit_code = 1

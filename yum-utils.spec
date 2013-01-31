@@ -5,6 +5,7 @@
 %endif
 
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%define pluginhome /usr/lib/yum-plugins
 
 Summary: Utilities based around the yum package manager
 Name: yum-utils
@@ -110,18 +111,6 @@ Requires: yum >= 3.0
 %description -n yum-plugin-tsflags
 This plugin allows you to specify optional transaction flags on the yum
 command line
-
-%package -n yum-plugin-downloadonly
-Summary: Yum plugin to add downloadonly command option
-Group: System Environment/Base
-Provides: yum-downloadonly = %{version}-%{release}
-Obsoletes: yum-downloadonly < 1.1.20-0
-Conflicts: yum-downloadonly < 1.1.20-0
-Requires: yum >= 3.0
-
-%description -n yum-plugin-downloadonly
-This plugin adds a --downloadonly flag to yum so that yum will only download
-the packages and not install/update them.
 
 %package -n yum-plugin-priorities
 Summary: plugin to give priorities to packages from different repos
@@ -298,7 +287,7 @@ This plugin allows the user to run arbitrary actions immediately following a
 transaction when specified packages are changed.
 
 %package -n yum-NetworkManager-dispatcher
-Summary: NetworkManager script which tells yum to check it's cache on network change
+Summary: NetworkManager script which tells yum to check its cache on network change
 Group: System Environment/Base
 Requires: yum >= 3.2.17
 
@@ -403,7 +392,6 @@ plugins="\
  protectbase \
  versionlock \
  tsflags \
- downloadonly \
  priorities \
  merge-conf \
  security \
@@ -431,14 +419,14 @@ plugins="$plugins \
 "
 %endif
 
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/usr/lib/yum-plugins/
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/%pluginhome
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
 
 cd plugins
 for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
-    install -m 644 $plug/*.py $RPM_BUILD_ROOT/usr/lib/yum-plugins/
-    %{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/usr/lib/yum-plugins', 1)"
+    install -m 644 $plug/*.py $RPM_BUILD_ROOT/%pluginhome
+    %{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/%pluginhome', 1)"
 done
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
@@ -516,7 +504,7 @@ fi
 %defattr(-, root, root)
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/changelog.conf
 %doc COPYING
-/usr/lib/yum-plugins/changelog.*
+%{pluginhome}/changelog.*
 %{_mandir}/man1/yum-changelog.1.*
 %{_mandir}/man5/yum-changelog.conf.5.*
 
@@ -524,20 +512,20 @@ fi
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fastestmirror.conf
-/usr/lib/yum-plugins/fastestmirror*.*
+%{pluginhome}/fastestmirror*.*
 
 %files -n yum-plugin-protectbase
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/protectbase.conf
-/usr/lib/yum-plugins/protectbase.*
+%{pluginhome}/protectbase.*
 
 %files -n yum-plugin-versionlock
 %defattr(-, root, root)
 %doc plugins/versionlock/README COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.conf
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/versionlock.list
-/usr/lib/yum-plugins/versionlock.*
+%{pluginhome}/versionlock.*
 %{_mandir}/man1/yum-versionlock.1.*
 %{_mandir}/man5/yum-versionlock.conf.5.*
 
@@ -545,87 +533,81 @@ fi
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tsflags.conf
-/usr/lib/yum-plugins/tsflags.*
-
-%files -n yum-plugin-downloadonly
-%defattr(-, root, root)
-%doc COPYING
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/downloadonly.conf
-/usr/lib/yum-plugins/downloadonly.*
+%{pluginhome}/tsflags.*
 
 %files -n yum-plugin-priorities
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/priorities.conf
-/usr/lib/yum-plugins/priorities.*
+%{pluginhome}/priorities.*
 
 %if %{package_yum_updatesd}
 %files -n yum-plugin-refresh-updatesd
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/refresh-updatesd.conf
-/usr/lib/yum-plugins/refresh-updatesd.*
+%{pluginhome}/refresh-updatesd.*
 %endif
 
 %files -n yum-plugin-merge-conf
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
-/usr/lib/yum-plugins/merge-conf.*
+%{pluginhome}/merge-conf.*
 
 %files -n yum-plugin-security
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
-/usr/lib/yum-plugins/security.*
+%{pluginhome}/security.*
 %{_mandir}/man8/yum-security.8.*
 
 %files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/upgrade-helper.conf
-/usr/lib/yum-plugins/upgrade-helper.*
+%{pluginhome}/upgrade-helper.*
 
 %files -n yum-plugin-aliases
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/aliases.conf
 %config(noreplace) %{_sysconfdir}/yum/aliases.conf
-/usr/lib/yum-plugins/aliases.*
+%{pluginhome}/aliases.*
 %{_mandir}/man1/yum-aliases.1.*
 
 %files -n yum-plugin-list-data
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/list-data.conf
-/usr/lib/yum-plugins/list-data.*
+%{pluginhome}/list-data.*
 %{_mandir}/man1/yum-list-data.1.*
 
 %files -n yum-plugin-filter-data
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/filter-data.conf
-/usr/lib/yum-plugins/filter-data.*
+%{pluginhome}/filter-data.*
 %{_mandir}/man1/yum-filter-data.1.*
 
 %files -n yum-plugin-tmprepo
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/tmprepo.conf
-/usr/lib/yum-plugins/tmprepo.*
+%{pluginhome}/tmprepo.*
 
 %files -n yum-plugin-verify
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/verify.conf
-/usr/lib/yum-plugins/verify.*
+%{pluginhome}/verify.*
 %{_mandir}/man1/yum-verify.1.*
 
 %files -n yum-plugin-keys
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/keys.conf
-/usr/lib/yum-plugins/keys.*
+%{pluginhome}/keys.*
 
 %files -n yum-NetworkManager-dispatcher
 %defattr(-, root, root)
@@ -635,13 +617,13 @@ fi
 %files -n yum-plugin-remove-with-leaves
 %defattr(-, root, root)
 %doc COPYING
-/usr/lib/yum-plugins/remove-with-leaves.*
+%{pluginhome}/remove-with-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
 
 %files -n yum-plugin-post-transaction-actions
 %defattr(-, root, root)
 %doc COPYING
-/usr/lib/yum-plugins/post-transaction-actions.*
+%{pluginhome}/post-transaction-actions.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/post-transaction-actions.conf
 %doc plugins/post-transaction-actions/sample.action
 # Default *.action file dropping dir.
@@ -650,19 +632,19 @@ fi
 %files -n yum-plugin-rpm-warm-cache
 %defattr(-, root, root)
 %doc COPYING
-/usr/lib/yum-plugins/rpm-warm-cache.*
+%{pluginhome}/rpm-warm-cache.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/rpm-warm-cache.conf
 
 %files -n yum-plugin-auto-update-debug-info
 %defattr(-, root, root)
 %doc COPYING
-/usr/lib/yum-plugins/auto-update-debuginfo.*
+%{pluginhome}/auto-update-debuginfo.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/auto-update-debuginfo.conf
 
 %files -n yum-plugin-show-leaves
 %defattr(-, root, root)
 %doc COPYING
-/usr/lib/yum-plugins/show-leaves.*
+%{pluginhome}/show-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/show-leaves.conf
 
 %files -n yum-plugin-local
@@ -670,13 +652,13 @@ fi
 %doc COPYING
 %ghost %{_sysconfdir}/yum.repos.d/_local.repo
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/local.conf
-/usr/lib/yum-plugins/local.*
+%{pluginhome}/local.*
 
 %files -n yum-plugin-fs-snapshot
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/fs-snapshot.conf
-/usr/lib/yum-plugins/fs-snapshot.*
+%{pluginhome}/fs-snapshot.*
 %{_mandir}/man1/yum-fs-snapshot.1.*
 %{_mandir}/man5/yum-fs-snapshot.conf.5.*
 
@@ -684,13 +666,13 @@ fi
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ps.conf
-/usr/lib/yum-plugins/ps.*
+%{pluginhome}/ps.*
 
 %files -n yum-plugin-puppetverify
 %defattr(-, root, root)
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/puppetverify.conf
-/usr/lib/yum-plugins/puppetverify.*
+%{pluginhome}/puppetverify.*
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
