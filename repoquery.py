@@ -1370,7 +1370,6 @@ def main(args):
         needgroup = 1
     if opts.installed:
         opts.pkgnarrow = 'installed'
-        opts.disablerepos = ['*']
 
     if opts.nevra:
         pkgops.append("nevra")
@@ -1470,6 +1469,13 @@ def main(args):
     if opts.show_dupes:
         repoq.conf.showdupesfromrepos = True
             
+
+    if opts.pkgnarrow == 'installed':
+        # Just use a blunt hammer here, to make everyone sane:
+        opts.repoid = []
+        opts.disablerepos = ['*']
+        opts.enablerepos  = []
+
     if opts.repoid:
         found_repos = set()
         for repo in repoq.repos.findRepos('*'):
