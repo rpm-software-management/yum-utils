@@ -188,7 +188,7 @@ class YumDownloader(YumUtilBase):
             # Add newly added packages to the toDownload list
             for pkg in self.tsInfo.getMembers():
                 if not pkg in toDownload:
-                    toDownload.append(pkg)
+                    toDownload.append(pkg.po)
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
             sys.exit(1)
