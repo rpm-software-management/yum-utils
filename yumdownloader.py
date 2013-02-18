@@ -187,7 +187,7 @@ class YumDownloader(YumUtilBase):
             self.resolveDeps()
             # Add newly added packages to the toDownload list
             for pkg in self.tsInfo.getMembers():
-                if not pkg in toDownload:
+                if pkg.ts_state in ('i', 'u') and pkg.po not in toDownload:
                     toDownload.append(pkg.po)
         if len(toDownload) == 0:
             self.logger.error('Nothing to download')
