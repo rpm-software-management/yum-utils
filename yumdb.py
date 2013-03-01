@@ -116,8 +116,8 @@ def run_cmd(yb, args, inshell=False):
                 delattr(pkg.yumdb_info, ykey)
             print pkg
             print " " * 4, ykey, '<unset>'
-    elif args[0] == 'search' and len(args) > 2:
-        args.pop(0)
+    elif args[0] in ('search', 'search-q', 'search-quiet') and len(args) > 2:
+        cmd = args.pop(0)
         ykey = args.pop(0)
         done = False
         # Maybe need some API so we don't have to load everything?
@@ -132,10 +132,11 @@ def run_cmd(yb, args, inshell=False):
                     break
             if not found:
                 continue
-            if done: print ''
+            if done and cmd == 'search': print ''
             done = True
             print pkg
-            print " " * 4, ykey, '=', yval
+            if cmd == 'search':
+                print " " * 4, ykey, '=', yval
     elif args[0] in ['exist?', 'exist', 'exists'] and len(args) > 1:
         args.pop(0)
         ykey = args.pop(0)
