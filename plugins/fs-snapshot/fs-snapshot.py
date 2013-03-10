@@ -80,7 +80,7 @@ def inspect_volume_lvm(conduit, volume):
         # convert /dev/mapper name to /dev/vg/lv for use with LVM2 tools
         # - 'dmsetup splitname' will collapse any escaped characters
         p = Popen(["/sbin/dmsetup", "splitname", "--separator", "/",
-                   "--noheadings",
+                   "--noheadings", "-c",
                    "-o", "vg_name,lv_name", device], stdout=PIPE, stderr=PIPE)
         err = p.wait()
         if err:
