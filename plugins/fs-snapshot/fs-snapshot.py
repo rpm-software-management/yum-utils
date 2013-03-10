@@ -62,6 +62,9 @@ def kernel_supports_dm_snapshot_merge():
         dm_snapshot_merge_checked = 1
     return dm_snapshot_merge_support
 
+def is_thin_volume(volume):
+    return volume["segtype"] == "thin"
+
 def inspect_volume_lvm(conduit, volume):
     """
     If volume is an LVM logical volume:
@@ -92,12 +95,14 @@ def inspect_volume_lvm(conduit, volume):
     # Check if device is managed by lvm
     # - FIXME filter out snapshot (and other) LVs; for now just rely
     #   on 'lvcreate' to prevent snapshots of unsupported LV types
-    p = Popen(["/sbin/lvs", device], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/lvs", "--noheadings", "-o", "segtype", device], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if not err:
+        volume["segtype"] = p.communicate()[0].strip()
+
         # FIXME allow creating snapshot LVs even if kernel doesn't
         # support snapshot-merge based system rollback? make configurable?
-        if not kernel_supports_dm_snapshot_merge():
+        if not is_thin_volume(volume) and not kernel_supports_dm_snapshot_merge():
             conduit.error(1, "fs-snapshot: skipping volume: %s, "
                           "kernel doesn't support snapshot-merge" % device)
             return 0
@@ -223,16 +228,18 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
       has enough free space to accommodate a snapshot LV.
     - Also assumes user has configured 'lvcreate_size_args'.
     """
-    lvcreate_size_args = conduit.confString('lvm', 'lvcreate_size_args',
-                                            default=None)
-    if not lvcreate_size_args:
-        conduit.error(1, "fs-snapshot: 'lvcreate_size_args' was not provided "
-                      "in the '[lvm]' section of the config file")
-        return 1
+    if not is_thin_volume(volume):
+        lvcreate_size_args = conduit.confString('lvm', 'lvcreate_size_args',
+                                                default=None)
 
-    if not lvcreate_size_args.startswith("-L") and not lvcreate_size_args.startswith("-l"):
-        conduit.error(1, "fs-snapshot: 'lvcreate_size_args' did not use -L or -l")
-        return 1
+        if not lvcreate_size_args:
+            conduit.error(1, "fs-snapshot: 'lvcreate_size_args' was not provided "
+                          "in the '[lvm]' section of the config file")
+            return 1
+
+        if not lvcreate_size_args.startswith("-L") and not lvcreate_size_args.startswith("-l"):
+            conduit.error(1, "fs-snapshot: 'lvcreate_size_args' did not use -L or -l")
+            return 1
 
     device = volume["device"]
     if device.count('/') != 3:
@@ -259,7 +266,8 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
                  (mntpnt, device, snap_lvname))
     # Create snapshot LV
     lvcreate_cmd = ["/sbin/lvcreate", "-s", "-n", snap_lvname]
-    lvcreate_cmd.extend(lvcreate_size_args.split())
+    if not is_thin_volume(volume):
+        lvcreate_cmd.extend(lvcreate_size_args.split())
     lvcreate_cmd.append(device)
     p = Popen(lvcreate_cmd, stdout=PIPE, stderr=PIPE)
     err = p.wait()

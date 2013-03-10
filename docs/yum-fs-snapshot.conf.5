@@ -28,7 +28,8 @@ created for filesystems built on LVM logical volumes.
 .IP lvcreate_size_args
 This is the space delimited lvcreate argument list that is used to
 specify the size of the snapshot LV.  Valid lvcreate size options are -l
-or -L.  If not specified then LVM snapshots will not be created.
+or -L.  If not specified then LVM snapshots will not be created for
+volumes that are not thinly provisioned.
 .SH AUTHOR
 .RS
 Josef Bacik <josef@toxicpanda.com>
