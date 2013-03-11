@@ -287,7 +287,7 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
         return 1
     return 2
 
-def pretrans_hook(conduit):
+def create_snapshots(conduit):
     """
     This runs before the transaction starts.  Try to snapshot anything and
     everything that is snapshottable, since we do not know what an RPM will
@@ -304,3 +304,11 @@ def pretrans_hook(conduit):
         elif rc == 2 and hasattr(conduit, 'registerPackageName'):
             # A snapshot was successfully created
             conduit.registerPackageName("yum-plugin-fs-snapshot")
+
+def pretrans_hook(conduit):
+    create_snapshots(conduit)
+
+def posttrans_hook(conduit):
+    create_snapshots_in_post = conduit.confBool('main', 'create_snapshots_in_post', default=0)
+    if create_snapshots_in_post:
+        create_snapshots(conduit)
