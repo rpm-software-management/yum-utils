@@ -221,6 +221,14 @@ def _create_btrfs_snapshot(conduit, snapshot_tag, volume):
         return 1
     return 2
 
+def add_lvm_tag_to_snapshot(conduit, tag, snap_volume):
+    p = Popen(["/sbin/lvchange", "--addtag", tag, snap_volume],
+              stdout=PIPE, stderr=PIPE)
+    err = p.wait()
+    if err:
+        conduit.error(1, "fs-snapshot: couldn't add tag to snapshot: %s" %
+                      snap_volume)
+
 def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     """
     Create LVM snapshot LV and tag it with $snapshot_tag.
@@ -278,13 +286,15 @@ def _create_lvm_snapshot(conduit, snapshot_tag, volume):
     # Add tag ($snapshot_tag) to snapshot LV
     # - should help facilitate merge of all snapshot LVs created
     #   by a yum transaction, e.g.: lvconvert --merge @snapshot_tag
-    p = Popen(["/sbin/lvchange", "--addtag", snapshot_tag, snap_device],
-              stdout=PIPE, stderr=PIPE)
-    err = p.wait()
-    if err:
-        conduit.error(1, "fs-snapshot: couldn't add tag to snapshot: %s" %
-                      snap_device)
+    if add_lvm_tag_to_snapshot(conduit, snapshot_tag, snap_device):
         return 1
+    if conduit._base.__plugin_fs_snapshot_post_snapshot_tag == snapshot_tag:
+        # Add tag to allow other tools (e.g. snapper) to link pre
+        # and post snapshot LVs together
+        pre_snap_lv_name = "%s_%s" % (device, conduit._base.__plugin_fs_snapshot_pre_snapshot_tag)
+        pre_snapshot_tag = "yum_fs_snapshot_pre_lv_name=" + pre_snap_lv_name
+        if add_lvm_tag_to_snapshot(conduit, pre_snapshot_tag, snap_device):
+            return 1
     return 2
 
 def create_snapshots(conduit):
@@ -295,6 +305,10 @@ def create_snapshots(conduit):
     """
     # common snapshot tag format: yum_${year}${month}${day}${hour}${minute}${sec}
     snapshot_tag = "yum_" + time.strftime("%Y%m%d%H%M%S")
+    if not conduit._base.__plugin_fs_snapshot_pre_snapshot_tag:
+        conduit._base.__plugin_fs_snapshot_pre_snapshot_tag = snapshot_tag
+    else:
+        conduit._base.__plugin_fs_snapshot_post_snapshot_tag = snapshot_tag
 
     volumes = get_volumes(conduit)
     for volume in volumes:
@@ -306,6 +320,8 @@ def create_snapshots(conduit):
             conduit.registerPackageName("yum-plugin-fs-snapshot")
 
 def pretrans_hook(conduit):
+    conduit._base.__plugin_fs_snapshot_pre_snapshot_tag = None
+    conduit._base.__plugin_fs_snapshot_post_snapshot_tag = None
     create_snapshots(conduit)
 
 def posttrans_hook(conduit):
