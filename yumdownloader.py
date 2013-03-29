@@ -22,6 +22,7 @@ import yum
 from yum.misc import setup_locale
 from yum.packages import parsePackages
 from yum.Errors import RepoError
+from yum.i18n import exception2msg
 from utils import YumUtilBase
 
 from urlparse import urljoin
@@ -79,7 +80,7 @@ class YumDownloader(YumUtilBase):
         try:
             opts = self.doUtilConfigSetup()
         except yum.Errors.RepoError, e:
-            self.logger.error(str(e))
+            self.logger.error(exception2msg(e))
             sys.exit(50)
                 
         # Check if there is anything to do.
@@ -153,7 +154,7 @@ class YumDownloader(YumUtilBase):
                     installable = self.returnPackagesByDep(pkg)
                     installable = yum.misc.unique(installable)
                 except yum.Errors.YumBaseError, msg:
-                    self.logger.error(str(msg))
+                    self.logger.error(exception2msg(msg))
                     continue
 
             if not installable: # doing one at a time, apart from groups
@@ -248,7 +249,7 @@ class YumDownloader(YumUtilBase):
                 archlist = rpmUtils.arch.getArchList()
             self._getSacks(archlist=archlist)
         except yum.Errors.YumBaseError, msg:
-            self.logger.critical(str(msg))
+            self.logger.critical(exception2msg(msg))
             sys.exit(1)
 
     def addCmdOptions(self):
