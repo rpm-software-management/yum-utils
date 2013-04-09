@@ -53,6 +53,8 @@ class DiffYum(yum.YumBase):
         newrepo.name = repoid
         if baseurl.startswith("mirror:"):
             newrepo.mirrorlist = baseurl[len("mirror:"):]
+        elif baseurl.startswith("/"):
+            newrepo.baseurl = ["file:" + baseurl]
         else:
             newrepo.baseurl = [baseurl]
         newrepo.basecachedir = self.dy_basecachedir
