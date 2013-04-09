@@ -99,9 +99,13 @@ class VersionLockCommand:
             if not pkgs:
                 pkgs = base.pkgSack.returnPackages(patterns=extcmds)
 
+            done = set()
+            for ent in _read_locklist():
+                (n, v, r, e, a) = splitFilename(ent)
+                done.add((n, a, e, v, r))
+
             fo = open(filename, 'a')
             count = 0
-            done = set()
             for pkg in pkgs:
                 #  We ignore arch, so only add one entry for foo-1.i386 and
                 # foo-1.x86_64.
