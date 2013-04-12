@@ -1438,7 +1438,8 @@ def main(args):
                 baseurl = repopath
                 
             repoq.add_enable_repo(repoid, baseurls=[baseurl], 
-                    basecachedir=repoq.conf.cachedir)
+                                  basecachedir=repoq.conf.cachedir,
+                                  timestamp_check=False)
             if not opts.quiet:
                 repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
