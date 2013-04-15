@@ -56,6 +56,23 @@ def _read_locklist():
         raise PluginYumExit('Unable to read version lock configuration: %s' % e)
     return locklist
 
+def _match(ent, patterns):
+    # there should be an API for this in Yum
+    (n, v, r, e, a) = splitFilename(ent)
+    for name in (
+        '%s' % n,
+        '%s.%s' % (n, a),
+        '%s-%s' % (n, v),
+        '%s-%s-%s' % (n, v, r),
+        '%s-%s-%s.%s' % (n, v, r, a),
+        '%s:%s-%s-%s.%s' % (e, n, v, r, a),
+        '%s-%s:%s-%s.%s' % (n, e, v, r, a),
+    ):
+        for pat in patterns:
+            if fnmatch.fnmatch(name, pat):
+                return True
+    return False
+
 class VersionLockCommand:
     created = 1247693044
 
@@ -159,12 +176,7 @@ class VersionLockCommand:
             out = os.fdopen(out, 'w', -1)
             count = 0
             for ent in _read_locklist():
-                found = False
-                for match in extcmds:
-                    if fnmatch.fnmatch(ent, match):
-                        found = True
-                        break
-                if found:
+                if _match(ent, extcmds):
                     print "Deleting versionlock for:", ent
                     count += 1
                     continue
