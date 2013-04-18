@@ -1,3 +1,6 @@
+# need functions from yum.bash
+type -t _yum >/dev/null || . $(pkg-config --variable=completionsdir bash-completion)/yum
+
 # bash completion for yum-utils
 
 _yu_init_completion()
