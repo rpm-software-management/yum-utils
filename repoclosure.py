@@ -298,6 +298,8 @@ def main():
                 req = '%s %s' % (req, v)
             
             my.logger.info('     %s' % req)
+    if baddeps:
+        sys.exit(1)
 
 if __name__ == "__main__":
     try:
