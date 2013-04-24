@@ -52,6 +52,7 @@ class DebugInfoInstall(YumUtilBase):
                         action="store_true",
                         help="Turn off automatic installation/update of the yum debuginfo plugin")
 
+        self.done = set()
         self.main()
 
     def doUtilConfigSetup(self, *args, **kwargs):
@@ -117,6 +118,9 @@ class DebugInfoInstall(YumUtilBase):
         sys.exit(self.doUtilTransaction())
 
     def di_try_install(self, po):
+        if po in self.done:
+            return
+        self.done.add(po)
         if po.name.endswith('-debuginfo'): # Wildcard matches produce this
             return
         di_name = '%s-debuginfo' % po.name
