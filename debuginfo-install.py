@@ -53,7 +53,11 @@ class DebugInfoInstall(YumUtilBase):
                         help="Turn off automatic installation/update of the yum debuginfo plugin")
 
         self.done = set()
-        self.main()
+        try:
+            self.main()
+        except yum.Errors.YumBaseError, e:
+            print e
+            sys.exit(1)
 
     def doUtilConfigSetup(self, *args, **kwargs):
         """ We override this to get our extra option out. """
