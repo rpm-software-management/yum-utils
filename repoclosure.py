@@ -306,6 +306,4 @@ if __name__ == "__main__":
         main()
     except (yum.Errors.YumBaseError, ValueError), e:
         print >> sys.stderr, str(e)
-        sys.exit(1)
-        
-        
+        sys.exit(2)
