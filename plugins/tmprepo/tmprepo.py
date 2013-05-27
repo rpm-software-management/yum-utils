@@ -133,7 +133,7 @@ def add_repomd_repo(base, repomd):
     AutoCleanupDir(trepo_data)
     trepo_name = os.path.basename(os.path.dirname(os.path.dirname(repomd)))
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
-    repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    repoid     = "T-%0.4s-%x" % (trepo_name, int(time.time()))
     pgpgcheck, rgpgcheck = rpgpgcheck, rrgpgcheck
     if repomd.startswith("file:"):
         pgpgcheck, rgpgcheck = lpgpgcheck, lrgpgcheck
