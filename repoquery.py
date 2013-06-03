@@ -1499,6 +1499,12 @@ def main(args):
                 repo.enable()
 
     try:
+        repoq.doLock()
+    except yum.Errors.LockError, e:
+        repoq.logger.error(e)
+        sys.exit(50)
+
+    try:
         if not hasattr(repoq, 'arch'):
             repoq.doSackSetup(archlist=archlist)
         elif archlist is not None:
