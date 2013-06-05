@@ -340,8 +340,9 @@ def main(args):
     print 'Added Packages: %s' % len(ygh.add)
     print 'Removed Packages: %s' % len(ygh.remove)
     if not opts.downgrade:
-        print 'Upgraded Packages: %s' % upgraded_pkgs
+        print 'Modified Packages: %s' % len(ygh.modified)
     else:
+        print 'Upgraded Packages: %s' % upgraded_pkgs
         print 'Downgraded Packages: %s' % downgraded_pkgs
     if opts.size:
         print 'Size of added packages: %s (%s)' % (add_sizechange,
