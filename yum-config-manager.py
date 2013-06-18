@@ -161,7 +161,8 @@ if opts.enable or opts.disable:
         only = ['enabled']
 
 if args:
-    repos = yb.repos.findRepos(','.join(args))
+    repos = yb.repos.findRepos(','.join(args),
+                               name_match=True, ignore_case=True)
 else:
     repos = yb.repos.listEnabled()
 

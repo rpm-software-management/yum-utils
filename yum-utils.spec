@@ -17,7 +17,8 @@ Source: http://yum.baseurl.org/download/yum-utils/%{name}-%{version}.tar.gz
 URL: http://yum.baseurl.org/download/yum-utils/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-Requires: yum >= 3.2.29
+# For new findRepos() API.
+Requires: yum >= 3.4.3-96
 Requires: python-kitchen
 BuildRequires: python-devel >= 2.4
 BuildRequires: gettext
