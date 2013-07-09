@@ -276,7 +276,7 @@ class PackageCleanup(YumUtilBase):
                 toremove.append(kernel)
         
             
-        # Now extend the list with all kernel-devel pacakges that either
+        # Now extend the list with all kernel-devel packages that either
         # have no matching kernel installed or belong to a kernel that is to
         # be removed
         if not keepdevel: 

@@ -3370,7 +3370,7 @@
 2008-08-04  James Antill <james@and.org>
 
 	* yum-builddep.py: Allow yum-builddep to use "extras"
-	(installed/not-available pacakges
+	(installed/not-available packages
 
 2008-08-04  James Antill <james@and.org>
 

@@ -166,7 +166,7 @@ class DebugInfoInstall(YumUtilBase):
                                 self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
 
         for pkgname in u:
-            self.logger.critical('Could not find a pacakge for: %s' % pkgname)
+            self.logger.critical('Could not find a package for: %s' % pkgname)
 
         #  This is kinda hacky, accessing the option from the plugins code
         # but I'm not sure of a better way of doing it
