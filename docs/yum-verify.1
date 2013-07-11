@@ -6,7 +6,7 @@ yum verify plugin
 \fByum\fP [options] verify [package ...]
 .SH "DESCRIPTION"
 .PP 
-This plugin extends \fByum\fP with some commands that give verification information on the installed system, much like rpm -V. You can change how the verification is done and which files it applies to.
+This plugin extends \fByum\fP with some commands that give verification information on the installed system, much like rpm \-V. You can change how the verification is done and which files it applies to.
 .PP 
 added yum \fIcommand\fPs are:
 .br 
@@ -29,7 +29,7 @@ output. It removes all false matches due to multilib and ignores changes to
 configuration files by default.
 .IP
 .IP "\fBverify-rpm\fP"
-Is meant to be 100% compatible with rpm -V output, and any differences should be
+Is meant to be 100% compatible with rpm \-V output, and any differences should be
 considered as bugs.
 .IP
 .IP "\fBverify-all\fP"
@@ -39,15 +39,15 @@ Is used to list all the differences, including some that rpm itself will ignore.
 These are the options added to yum that are available in the verify commands.
 They are:
 .PP 
-.IP "\fB\--verify-filenames\fP"
+.IP "\fB\-\-verify\-filenames\fP"
 This option is used to limit the filenames that the packages will perform
 verification.
-.IP "\fB\--verify-configuration-files\fP"
+.IP "\fB\-\-verify\-configuration\-files\fP"
 This option is only useful in the generic verify command, and will
 enable/disable verification of files that are tagged as configuration files.
 .SH "EXAMPLES"
 .PP
-To do the same as rpm -Va, use:
+To do the same as rpm \-Va, use:
 .IP
 yum verify-rpm
 .PP
@@ -57,11 +57,11 @@ yum verify \(aqyum*\(aq
 .PP
 To verify the binaries that are in a bin directory, use:
 .IP
-yum verify --verify-filenames=\(aq*bin/*\(aq
+yum verify \-\-verify\-filenames=\(aq*bin/*\(aq
 .PP
 To verify all include files, Eg. for multilib problems, use:
 .IP
-yum verify-all --verify-filenames=\(aq/usr/include/*\(aq
+yum verify-all \-\-verify\-filenames=\(aq/usr/include/*\(aq
 
 .SH "SEE ALSO"
 .nf

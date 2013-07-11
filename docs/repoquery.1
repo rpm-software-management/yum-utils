@@ -5,7 +5,7 @@ repoquery \- query information from Yum repositories
 .SH "SYNOPSIS"
 \fBrepoquery\fP [options] <item ...>
 .br
-\fBrepoquery\fP -a [options] 
+\fBrepoquery\fP \-a [options]
 .SH "DESCRIPTION"
 .PP 
 \fBrepoquery\fP is a program for querying information from YUM repositories
@@ -18,7 +18,7 @@ List valid queryformat tags and exit..
 Report program version and exit.
 .IP "\fB\-\-repoid=<repo>\fP"
 Specify which repository to query. Using this option disables all repositories
-not explicitly enabled with --repoid option (can be used multiple times). By
+not explicitly enabled with \-\-repoid option (can be used multiple times). By
 default repoquery uses whatever repositories are enabled in YUM configuration.
 .IP "\fB\-\-enablerepo=<repo>\fP"
 In addition to the default set, query the given additional repository, even if
@@ -30,7 +30,7 @@ configuration.  Can be used multiple times.
 Specify a path or url to a repository (same path as in a baseurl) to add to
 the repositories for this query. This option can be used multiple times. If
 you want to view only the pkgs from this repository combine this with
---repoid. The repoid for the repository is specified by <repoid>.
+\-\-repoid. The repoid for the repository is specified by <repoid>.
 .IP "\fB\-\-plugins\fP"
 Enable YUM plugin support.
 .IP "\fB\-q, \-\-query\fP"
@@ -64,13 +64,13 @@ config just use: \-\-setopt=option=value for repo options use: \-\-setopt=repoid
 .PP 
 .SH "PACKAGE QUERY OPTIONS" 
 .IP "\fB\-i, \-\-info\fP"
-Show general information about package similarly to "rpm -qi"
+Show general information about package similarly to "rpm \-qi"
 .IP "\fB\-l, \-\-list\fP"
 List files in package.
 .IP "\fB\-R, \-\-requires\fP"
 List package dependencies.
 .IP "\fB\-\-resolve\fP"
-When used with --requires, resolve capabilities to originating packages.
+When used with \-\-requires, resolve capabilities to originating packages.
 .IP "\fB\-\-provides\fP"
 List capabilities package provides.
 .IP "\fB\-\-obsoletes\fP"
@@ -81,7 +81,7 @@ List capabilities conflicting with package.
 List package changelog.
 .IP "\fB\-\-location\fP"
 Show a location where the package could be downloaded from.
-For example: \fBwget `repoquery --location yum`\fP
+For example: \fBwget `repoquery \-\-location yum`\fP
 .IP "\fB\-s, \-\-source\fP"
 Show package source RPM name. 
 .IP "\fB\-\-srpm\fP"
@@ -95,16 +95,16 @@ Use name-epoch:version-release.architecture output format (default)
 .IP "\fB\-\-envra\fP"
 Use epoch:name-version-release.architecture output format 
 (easier to parse than nevra)
-.IP "\fB\--qf=FORMAT, \-\-queryformat=FORMAT\fP"
+.IP "\fB\-\-qf=FORMAT, \-\-queryformat=FORMAT\fP"
 Specify custom output format for queries. You can add ":date", ":day" and
 ":isodate" to all the tags that are a time, and you can add ":k", ":m", ":g",
 ":t" and ":h" to sizes. You can also specify field width as in
 sprintf (Eg. %-20{name})
 .IP "\fB\-\-output [text|ascii-tree|dot-tree]\fP"
-Output format which can be used with --requires/--whatrequires/--obsoletes/--conflicts.
+Output format which can be used with \-\-requires/\-\-whatrequires/\-\-obsoletes/\-\-conflicts.
 Default output is 'text'.
 .IP "\fB\-\-level [all|any int]\fP"
-In combination with --output ascii-tree|dot-tree this option specifies the
+In combination with \-\-output ascii-tree|dot-tree this option specifies the
 number of level to print on the tree. Default level is 'all'.
 .PP 
 
@@ -123,14 +123,14 @@ Query all packages that provide CAPABILITY.
 .IP "\fB\-\-whatrequires CAPABILITY\fP"
 Query all packages that require CAPABILITY.
 .IP "\fB\-\-alldeps\fP"
-When used with --whatrequires, look for non-explicit dependencies in
+When used with \-\-whatrequires, look for non-explicit dependencies in
 addition to explicit ones (e.g. files and Provides in addition to
 package names).  This is the default.
 .IP "\fB\-\-exactdeps\fP"
-When used with --whatrequires, search for dependencies only exactly as given.
-This is effectively the opposite of --alldeps.
+When used with \-\-whatrequires, search for dependencies only exactly as given.
+This is effectively the opposite of \-\-alldeps.
 .IP "\fB\-\-recursive\fP"
-When used with --whatrequires, and --requires --resolve, query packages
+When used with \-\-whatrequires, and \-\-requires \-\-resolve, query packages
 recursively.
 .IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
 Limit the query to packages of given architecture(s). Valid values are all
@@ -169,17 +169,17 @@ Query groups instead of packages.
 .IP "List all packages whose name contains 'perl':"
 \fBrepoquery \(aq*perl*\(aq\fP
 .IP "List all packages depending on openssl:"
-\fBrepoquery --whatrequires openssl\fP 
+\fBrepoquery \-\-whatrequires openssl\fP
 .IP "List all package names and the repository they come from, nicely formatted:"
-\fBrepoquery -a --qf "%-20{repoid} %{name}"\fP
+\fBrepoquery \-a \-\-qf "%-20{repoid} %{name}"\fP
 .IP "List name and summary of all available updates (if any), nicely formatted:"
-\fBrepoquery -a --pkgnarrow=updates --qf "%{name}:\\n%{summary}\\n"\fP
+\fBrepoquery \-a \-\-pkgnarrow=updates \-\-qf "%{name}:\\n%{summary}\\n"\fP
 .IP "List optional packages in base group:"
-\fBrepoquery -g --grouppkgs=optional -l base\fP
+\fBrepoquery \-g \-\-grouppkgs=optional \-l base\fP
 .IP "List build requirements from 'anaconda' source rpm:"
-\fBrepoquery --requires anaconda.src\fP
+\fBrepoquery \-\-requires anaconda.src\fP
 .IP "List packages which BuildRequire gail-devel"
-\fBrepoquery --archlist=src --whatrequires gail-devel\fP
+\fBrepoquery \-\-archlist=src \-\-whatrequires gail-devel\fP
   NB: This command will only work if you have repositories enabled which include srpms.
 
 .\"TODO: Add more examples...
@@ -205,7 +205,7 @@ of the following:
 .br
 \fBepoch:name-ver-rel.arch\fP
 .IP
-For example: \fBrepoquery -l kernel-2.4.1-10.i686\fP
+For example: \fBrepoquery \-l kernel-2.4.1-10.i686\fP
 .br
 Additionally wildcards (shell-style globs) can be used.
 

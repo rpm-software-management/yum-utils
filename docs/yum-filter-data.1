@@ -16,52 +16,52 @@ is treated as a match.
 These are the options added to yum that are available in the "list updates", 
 "info updates", "check-update" and "update" commands. They are:
 .PP 
-.IP "\fB\--filter-vendors\fP"
+.IP "\fB\-\-filter\-vendors\fP"
 This option includes packages which have a vendor which matches one of the
 passed vendor wildcard strings, or is unknown. Note that vendors can have
 spaces in their value, so "," is the only way to specify multiple vendors as one
 option argument.
-.IP "\fB\--filter-rpm-groups\fP"
+.IP "\fB\-\-filter\-rpm\-groups\fP"
 This option includes packages which have a group which matches one of the
 passed rpm group wildcard strings, or is unknown. Note that rpm groups can have
 spaces in their value, so "," is the only way to specify multiple rpm groups as
 one option argument.
-.IP "\fB\--filter-packagers\fP"
+.IP "\fB\-\-filter\-packagers\fP"
 This option includes packages which have a packager which matches one of the
 passed packager wildcard strings, or is unknown. Note that vendors can have
 spaces in their value, so "," is the only way to specify multiple packagers as
 one option argument.
-.IP "\fB\--filter-licenses\fP"
+.IP "\fB\-\-filter\-licenses\fP"
 This option includes packages which have a license which matches one of the
 passed license wildcard strings, or is unknown. Note that licenses can have
 spaces in their value, so "," is the only way to specify multiple licenses as
 one option argument.
-.IP "\fB\--filter-arches\fP"
+.IP "\fB\-\-filter\-arches\fP"
 This option includes packages which have a arch which matches one of the
 passed arch wildcard strings, or is unknown.
-.IP "\fB\--filter-committers\fP"
+.IP "\fB\-\-filter\-committers\fP"
 This option includes packages which have a committer which matches one of the
 passed committer wildcard strings, or is unknown. Note that committers can have
 spaces in their value, so "," is the only way to specify multiple committers as
 one option argument. Also, committer values are so loosely formed that they 
 could contain commas too, it is recommended to not do that but you can work
 around it by using "?".
-.IP "\fB\--filter-buildhosts\fP"
+.IP "\fB\-\-filter\-buildhosts\fP"
 This option includes packages which have a buildhost which matches one of the
 passed buildhost wildcard strings, or is unknown.
-.IP "\fB\--filter-urls\fP"
+.IP "\fB\-\-filter\-urls\fP"
 This option includes packages which have a url which matches one of the
 passed url wildcard strings, or is unknown.
-.IP "\fB\--filter-package-sizes\fP"
+.IP "\fB\-\-filter\-package\-sizes\fP"
 This option includes packages which have a packagesize which is within one of
 the passed packagesize ranges, or is unknown.
-.IP "\fB\--filter-archive-sizes\fP"
+.IP "\fB\-\-filter\-archive\-sizes\fP"
 This option includes packages which have a archivesize which is within one of
 the passed archivesize ranges, or is unknown.
-.IP "\fB\--filter-installed-sizes\fP"
+.IP "\fB\-\-filter\-installed\-sizes\fP"
 This option includes packages which have a installedsize which is within one of
 the passed installedsize ranges, or is unknown.
-.IP "\fB\--filter-groups\fP"
+.IP "\fB\-\-filter\-groups\fP"
 This option includes packages which are in a yum group which matches one of the
 passed yum group id strings, or is unknown. Note that yum groups can have
 spaces in their value, so "," is the only way to specify multiple yum groups as
@@ -73,27 +73,27 @@ one option argument.
 .PP
 To list all updates that are 1 MB or less use:
 .IP
-yum --filter-package-sizes=-1m check-update
+yum \-\-filter\-package\-sizes=-1m check-update
 .PP
 To apply updates that Dan Walsh has committed use:
 .IP
-yum --filter-committers=\(aqDan Walsh *\(aq update
+yum \-\-filter\-committers=\(aqDan Walsh *\(aq update
 .PP
 To list updates for a specific group use:
 .IP
-yum --filter-rpm-groups=\(aqApp*/Sys*\(aq list updates
+yum \-\-filter\-rpm\-groups=\(aqApp*/Sys*\(aq list updates
 .PP
 To apply updates to a specific set of groups use:
 .IP
-yum --filter-rpm-groups=\(aqApp*/System,Devel*/Lib*,System Environment/Base\(aq update
+yum \-\-filter\-rpm\-groups=\(aqApp*/System,Devel*/Lib*,System Environment/Base\(aq update
 .PP
 To list updates for a set of yum groups use:
 .IP
-yum --filter-groups=\(aqPostgreSQL Database,Web Server\(aq list updates
+yum \-\-filter\-groups=\(aqPostgreSQL Database,Web Server\(aq list updates
 .PP
 To apply updates to a specific set of yum groups use:
 .IP
-yum --filter-groups=\(aqKDE,Core,Printing Support\(aq update
+yum \-\-filter\-groups=\(aqKDE,Core,Printing Support\(aq update
 
 .SH "SEE ALSO"
 .nf

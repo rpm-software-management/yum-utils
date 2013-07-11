@@ -3,28 +3,28 @@
 .SH "NAME"
 repodiff \- list differences between two or more Yum repositories
 .SH "SYNOPSIS"
-\fBrepodiff\fP --old=old_repo_baseurl --new=new_repo_baseurl
+\fBrepodiff\fP \-\-old=old_repo_baseurl \-\-new=new_repo_baseurl
 .SH "DESCRIPTION"
 .PP 
 \fBrepodiff\fP is a program which will list differences between two sets of 
 repositories.  \fBNote\fP that by default only source packages are compared.
 .PP 
 .SH "GENERAL OPTIONS"
-.IP "\fB\-\-old, -o\fP"
+.IP "\fB\-\-old, \-o\fP"
 Add a repo. as an old repo. Note that if you prefix the url with "mirror:" then
 the following url is treated as a mirror and not a baseurl.
-.IP "\fB\-\-new, -n\fP"
+.IP "\fB\-\-new, \-n\fP"
 Add a repo. as an new repo. Note that if you prefix the url with "mirror:" then
 the following url is treated as a mirror and not a baseurl.
-.IP "\fB\-\-archlist, -a\fP"
+.IP "\fB\-\-archlist, \-a\fP"
 Add architectures to change the default from just comparing source packages.
 Note that if you want the same as a native
 "x86_64" architecture machine you just need to pass "x86_64" (this is different
 from earlier versions where you needed to specify
 "x86_64,athlon,i686,i586,i486,i386,noarch" and you still got "src").
-.IP "\fB\-\-size, -s\fP"
+.IP "\fB\-\-size, \-s\fP"
 Output additional data about the size of the changes.
-.IP "\fB\-\-compare-arch\fP"
+.IP "\fB\-\-compare\-arch\fP"
 Normally packages are just compared based on their name, this flag makes the
 comparison also use the arch. So foo.i386 and foo.x86_64 are different.
 .IP "\fB\-\-simple\fP"
@@ -33,13 +33,13 @@ Output a simple one line message for modified packages.
 Split the data for modified packages between upgraded and downgraded packages.
 .SH "EXAMPLES"
 .IP "Compare source pkgs in two local repos:"
-\fBrepodiff --old=/tmp/repo-old --new=/tmp/repo-new\fP
+\fBrepodiff \-\-old=/tmp/repo-old \-\-new=/tmp/repo-new\fP
 .IP "Compare x86_64 compat. binary pkgs in two remote repos, and two local one:"
-\fBrepodiff -a x86_64 --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
+\fBrepodiff \-a x86_64 \-\-old=http://example.com/repo1-old \-\-old=/tmp/repo-old \-\-new=http://example.com/repo1-new \-\-new=/tmp/repo-new\fP
 .IP "Compare x86_64 compat. binary pkgs, but also compare arch:"
-\fBrepodiff -a x86_64 --compare-arch --old=http://example.com/repo1-old --old=/tmp/repo-old --new=http://example.com/repo1-new --new=/tmp/repo-new\fP
+\fBrepodiff \-a x86_64 \-\-compare\-arch \-\-old=http://example.com/repo1-old \-\-old=/tmp/repo-old \-\-new=http://example.com/repo1-new \-\-new=/tmp/repo-new\fP
 .IP "Compare two releases of Fedora (15 => 16):"
-\fBrepodiff --old='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-15&arch=i386' --new='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-16&arch=i386' --size --simple --downgrade\fP
+\fBrepodiff \-\-old='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-15&arch=i386' \-\-new='mirror:https://mirrors.fedoraproject.org/metalink?repo=fedora-source-16&arch=i386' \-\-size \-\-simple \-\-downgrade\fP
 .PP 
 
 .SH "SEE ALSO"

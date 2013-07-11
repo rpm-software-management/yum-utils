@@ -1,7 +1,7 @@
 .\" reposync
 .TH "reposync" "1" "27 April 2007" "" ""
 .SH "NAME"
-reposync - synchronize yum repositories to a local directory
+reposync \- synchronize yum repositories to a local directory
 .SH "SYNOPSIS"
 \fBreposync\fP [options]
 .SH "DESCRIPTION"
@@ -31,21 +31,21 @@ exit status is '1' if at least one package was removed.
 Just list urls of what would be downloaded, don't download.
 .IP "\fB\-l, \-\-plugins\fP"
 Enable yum plugin support.
-.IP "\fB\-n, \-\-newest-only\fP"
+.IP "\fB\-n, \-\-newest\-only\fP"
 Download only newest packages per-repo.
 .IP "\fB\-q, \-\-quiet\fP"
 Output as little information as possible.
 .SH "EXAMPLES"
 .IP "Sync all packages from the 'updates' repo to the current directory:"
-\fB reposync --repoid=updates\fP
+\fB reposync \-\-repoid=updates\fP
 .IP "Sync only the newest packages from the 'updates' repo to the current directory:"
-\fB reposync -n --repoid=updates\fP
+\fB reposync \-n \-\-repoid=updates\fP
 .IP "Sync packages from the 'updates' and 'extras' repos to the current directory:"
-\fB reposync --repoid=updates --repoid=extras\fP
+\fB reposync \-\-repoid=updates \-\-repoid=extras\fP
 .IP "Sync all packages from the 'updates' repo to the \fBrepos\fP directory:"
-\fB reposync -p repos --repoid=updates\fP
+\fB reposync \-p repos \-\-repoid=updates\fP
 .IP "Sync all packages from the 'updates' repo to the \fBrepos\fP directory excluding x86_64 arch. Edit \fI/etc/yum.conf\fR adding option \fBexclude=*.x86_64\fR. Then: 
-\fBreposync -p repos --repoid=updates\fP
+\fBreposync \-p repos \-\-repoid=updates\fP
 .SH "FILES"
 \fBreposync\fP uses the yum libraries for retrieving information and
 packages. If no configuration file is specified, the default yum

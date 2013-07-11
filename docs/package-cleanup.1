@@ -56,14 +56,14 @@ Do not remove kernel-devel packages when removing kernels
 
 .SH "EXAMPLES"
 .IP "List all dependency problems:"
-\fBpackage-cleanup --problems\fP
+\fBpackage-cleanup \-\-problems\fP
 .IP "List all packages that are not in any Yum repository:"
-\fBpackage-cleanup --orphans\fP 
+\fBpackage-cleanup \-\-orphans\fP
 .IP "Remove old kernels keeping 3 and leaving old kernel-devel packages installed:"
-\fBpackage-cleanup --oldkernels --count=3 --keepdevel\fP
+\fBpackage-cleanup \-\-oldkernels \-\-count=3 \-\-keepdevel\fP
 .PP 
 .IP "List all leaf packages with no files in a bin directory whose name begins with either 'perl' or 'python':"
-\fBpackage-cleanup --leaves --exclude-bin --leaf-regex="^(perl)|(python)"\fP
+\fBpackage-cleanup \-\-leaves \-\-exclude\-bin \-\-leaf\-regex="^(perl)|(python)"\fP
 .PP
 .SH "FILES"
 As package-cleanup uses YUM libraries for retrieving all the information, it

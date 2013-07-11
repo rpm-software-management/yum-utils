@@ -26,9 +26,9 @@ last form creates a new alias.
 .PP 
 .SH Explanation of alias to final result conversion
 .PP 
-When you type an aliased command, like "yum --disableexcludes UPT lsu" using
+When you type an aliased command, like "yum \-\-disableexcludes UPT lsu" using
 the default aliases, the yum-aliases plugin first takes the first "command", by
-skipping over any options, and then looks up the result (in this case "UPT" is converted to "--enablerepo=updates-testing"). If there is a match, then it will
+skipping over any options, and then looks up the result (in this case "UPT" is converted to "\-\-enablerepo=updates-testing"). If there is a match, then it will
 replace the aliased "command" in the argument list and try again (again
 skipping over any options). By convention, in the default aliases list, alias
 "commands" that are in all CAPS only add options so you can join together a
@@ -49,19 +49,19 @@ yum
 .B alias
 rm remove
 .PP
-To always add the --skip-broken --disableexcludes=all --obsoletes options to
+To always add the \-\-skip\-broken \-\-disableexcludes=all \-\-obsoletes options to
 the update command (but leaving the upgrade option alone), you could use:
 .IP
 yum
 .B alias
-update \\update  --skip-broken --disableexcludes=all --obsoletes
+update \\update  \-\-skip\-broken \-\-disableexcludes=all \-\-obsoletes
 .PP
 To override the default "up" alias to use the above update command, and never
 ask for confirmation, you could use:
 .IP
 yum
 .B alias
-up update -y
+up update \-y
 .br
 
 
