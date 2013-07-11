@@ -1,0 +1,57 @@
+.\" repoclosure
+.TH "repoclosure" "1" "13 January 2013" "" ""
+.SH "NAME"
+repoclosure \- display a list of unresolved dependencies for a yum repository
+.SH "SYNOPSIS"
+\fBrepoclosure\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fBrepoclosure\fP is a program that reads package metadata from one or more yum
+repositories, checks all dependencies, and displays a list of packages with
+unresolved dependencies.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-c CONFIG, \-\-config=CONFIG\fP"
+Config file to use (defaults to /etc/yum.conf).
+.IP "\fB\-a ARCH, \-\-arch=ARCH\fP"
+Check packages of the given archs, can be specified multiple times (default:
+current arch).
+.IP "\fB\-\-basearch=BASEARCH\fP"
+Set the basearch for yum to run as.
+.IP "\fB\-b, \-\-builddeps\fP"
+Check build dependencies only (needs source repos enabled).
+.IP "\fB\-l LOOKASIDE, \-\-lookaside=LOOKASIDE\fP"
+Specify a lookaside repo id to query, can be specified multiple times.
+.IP "\fB\-r REPOID, \-\-repoid=REPOID\fP"
+Specify repo ids to query, can be specified multiple times (default is
+all enabled).
+.IP "\fB\-t, \-\-tempcache\fP"
+Use a temp dir for storing/accessing yum-cache.
+.IP "\fB\-q, \-\-quiet\fP"
+Run quietly: no warnings printed to stderr.
+.IP "\fB\-n, \-\-newest\fP"
+Check only the newest packages in the repos.
+.IP "\fB\-\-repofrompath=REPOID,PATH/URL\fP"
+Specify a path or url to a repository (same path as in a baseurl) to add to
+the repositories for this query. This option can be used multiple times. If
+you want to view only the pkgs from this repository combine this with
+\-\-repoid. The repoid for the repository is specified by REPOID.
+.IP "\fB\-p PKG, \-\-pkg=PKG\fP"
+Check closure for this package only
+.IP "\fB\-g GROUP, \-\-group=GROUP\fP"
+Check closure for packages in this group only
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

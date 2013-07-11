@@ -1,0 +1,51 @@
+.\" find-repos-of-install
+.TH "find-repos-of-install" "1" "13 January 2013" "" ""
+.SH "NAME"
+find-repos-of-install \- report which Yum repository a package was installed from
+.SH "SYNOPSIS"
+\fBfind-repos-of-install\fP [options] package1 [package2...]
+.SH "DESCRIPTION"
+.PP
+\fBfind-repos-of-install\fP is a program which reports the Yum repository that
+a specified package was installed from.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-\-version\fP"
+Report program version and exit.
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-\-repoid=REPOID\fP"
+Specify repo ids to query, can be specified multiple times (default is
+all enabled).
+.IP "\fB\-\-enablerepo=ENABLEREPOS\fP"
+In addition to the default set, query the given additional repository, even if
+it is disabled in YUM configuration.  Can be used multiple times.
+.IP "\fB\-\-disablerepo=DISABLEREPOS\fP"
+Do not query the given repository, even if it is enabled in YUM
+configuration.  Can be used multiple times.
+.IP "\fB\-\-repofrompath=REPOID,PATH/URL\fP"
+Specify a path or url to a repository (same path as in a baseurl) to add to
+the repositories for this query. This option can be used multiple times. If
+you want to view only the pkgs from this repository combine this with
+\-\-repoid. The repoid for the repository is specified by REPOID.
+.IP "\fB\-C, \-\-cache\fP"
+Tells repoquery to run entirely from YUM cache - does not download any metadata
+or update the cache. Queries in this mode can fail or give partial/incorrect
+results if the cache isn't fully populated beforehand with eg "yum makecache".
+.IP "\fB\-\-tempcache\fP"
+Use a temp dir for storing/accessing yum-cache.
+.IP "\fB\-\-sync2yumdb\fP"
+Sync anything that is found to the yumdb, if available.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH AUTHORS
+.nf
+See the Authors file included with this program.
+.fi

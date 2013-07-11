@@ -1,0 +1,39 @@
+.\" yum-config-manager
+.TH "yum-config-manager" "1" "13 January 2013" "" ""
+.SH "NAME"
+yum-config-manager \- manage yum configuration options and yum repositories
+.SH "SYNOPSIS"
+\fByum-config-manager\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fByum-config-manager\fP is a program that can manage main yum configuration
+options, toggle which repositories are enabled or disabled, and add new
+repositories.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-\-save\fP"
+Save the current options (useful with \-\-setopt).
+.IP "\fB\-\-enable\fP"
+Enable the specified repos (automatically saves).
+.IP "\fB\-\-disable\fP"
+Disable the specified repos (automatically saves).
+.IP "\fB\-\-add\-repo=ADDREPO\fP"
+Add (and enable) the repo from the specified file or url.
+.SH "ADDITIONAL OPTIONS"
+Yum-config-manager inherits all other options from yum. See the yum(8)
+man page for more information.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

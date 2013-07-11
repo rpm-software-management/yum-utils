@@ -1,0 +1,44 @@
+.\" repotrack
+.TH "repotrack" "1" "13 January 2013" "" ""
+.SH "NAME"
+repotrack \- track a package and its dependencies and download them
+.SH "SYNOPSIS"
+\fBrepotrack\fP [options] package1 [package2...]
+.SH "DESCRIPTION"
+.PP
+\fBrepotrack\fP is a program for keeping track of a particular package and its
+dependencies. It will download one or more packages and all dependencies.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-c CONFIG, \-\-config=CONFIG\fP"
+Config file to use (defaults to /etc/yum.conf).
+.IP "\fB\-a ARCH, \-\-arch=ARCH\fP"
+Act as if running the specified arch (default: current arch).
+.IP "\fB\-r REPOID, \-\-repoid=REPOID\fP"
+Specify repo ids to query, can be specified multiple times (default is
+all enabled).
+.IP "\fB\-t, \-\-tempcache\fP"
+Use a temp dir for storing/accessing yum-cache.
+.IP "\fB\-p DESTDIR, \-\-download_path=DESTDIR\fP"
+Path to download packages to.
+.IP "\fB\-u, \-\-urls\fP"
+Instead of downloading RPMs, list the URLs that would be downloaded.
+.IP "\fB\-n, \-\-newest\fP"
+Toggle downloading only the newest packages (defaults to newest-only).
+.IP "\fB\-q, \-\-quiet\fP"
+Output as little information as possible.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

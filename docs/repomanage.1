@@ -1,0 +1,38 @@
+.\" repomanage
+.TH "repomanage" "1" "13 January 2013" "" ""
+.SH "NAME"
+repomanage \- list the newest or oldest RPM packages in a directory
+.SH "SYNOPSIS"
+\fBrepomanage\fP [options] directory
+.SH "DESCRIPTION"
+.PP
+\fBrepomanage\fP is a program to manage a directory of RPM packages. It
+displays a list of the newest or oldest packages in a directory for easy
+piping to xargs or similar programs.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-o, \-\-old\fP"
+Print the oldest packages.
+.IP "\fB\-n, \-\-new\fP"
+Print the newest packages.
+.IP "\fB\-s, \-\-space\fP"
+Space-separated instead of newline-separated output.
+.IP "\fB\-k KEEP, \-\-keep=KEEP\fP"
+Newest N packages to keep - defaults to 1.
+.IP "\fB\-c, \-\-nocheck\fP"
+Do not check package payload signatures/digests.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

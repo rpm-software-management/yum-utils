@@ -1,0 +1,33 @@
+.\" verifytree
+.TH "verifytree" "1" "13 January 2013" "" ""
+.SH "NAME"
+verifytree \- verify that a local yum repository is consistent
+.SH "SYNOPSIS"
+\fBverifytree\fP [options] directory
+.SH "DESCRIPTION"
+.PP
+\fBverifytree\fP is a program that verifies whether a local yum repository is
+consistent.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-a, \-\-checkall\fP"
+Check all packages in the repository.
+.IP "\fB\-t TESTOPIA, \-\-testopia=TESTOPIA\fP"
+Report results to the given testopia run number.
+.IP "\fB\-r, \-\-treeinfo\fP"
+Check the checksums of listed files in a .treeinfo file, if available.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

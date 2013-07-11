@@ -1,0 +1,29 @@
+.\" needs-restarting
+.TH "needs-restarting" "1" "13 January 2013" "" ""
+.SH "NAME"
+needs-restarting \- report running processes that have been updated
+.SH "SYNOPSIS"
+\fBneeds-restarting\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fBneeds-restarting\fP is a program that reports a list of process ids that
+started running before they or some component that they use were updated.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-u, \-\-useronly\fP"
+Show processes for my userid only.
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi

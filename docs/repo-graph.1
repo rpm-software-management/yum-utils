@@ -1,0 +1,32 @@
+.\" repo-graph
+.TH "repo-graph" "1" "13 January 2013" "" ""
+.SH "NAME"
+repo-graph \- output a full package dependency graph in dot format
+.SH "SYNOPSIS"
+\fBrepo-graph\fP [options]
+.SH "DESCRIPTION"
+.PP
+\fBrepo-graph\fP is a program that generates a full package dependency list
+from a yum repository and outputs it in dot format.
+.PP
+.SH "OPTIONS"
+.IP "\fB\-h, \-\-help\fP"
+Display a help message, and then quit.
+.IP "\fB\-\-repoid=REPOID\fP"
+Specify repo ids to query, can be specified multiple times (default is
+all enabled).
+.IP "\fB\-c CONFIG\fP"
+Config file to use (defaults to /etc/yum.conf).
+
+.PP
+.SH "SEE ALSO"
+.nf
+.I yum.conf (5)
+http://yum.baseurl.org/
+.fi
+
+.PP
+.SH "AUTHORS"
+.nf
+See the Authors file included with this program.
+.fi
