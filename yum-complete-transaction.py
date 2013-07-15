@@ -115,7 +115,8 @@ class YumCompleteTransaction(YumUtilBase):
         else:
             self.optparser_grp = self.optparser
         self.addCmdOptions()
-        self.main()
+        try: self.main()
+        finally: self.unlock()
 
     def clean_up_ts_files(self, timestamp, path, disable=False):
 
