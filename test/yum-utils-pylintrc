@@ -101,7 +101,7 @@ include-ids=yes
 # written in a file name "pylint_global.[txt|html]".
 files-output=no
 
-# Tells wether to display a full report or only the messages
+# Tells whether to display a full report or only the messages
 reports=yes
 
 # Python expression which should return a note less than 10 (10 is the highest
@@ -187,7 +187,7 @@ bad-functions=input
 # 
 [VARIABLES]
 
-# Tells wether we should check for unused import in __init__ files.
+# Tells whether we should check for unused import in __init__ files.
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
@@ -202,7 +202,7 @@ additional-builtins=
 # 
 [TYPECHECK]
 
-# Tells wether missing members accessed in mixin class should be ignored. A
+# Tells whether missing members accessed in mixin class should be ignored. A
 # mixin class is detected if its name ends with "mixin" (case insensitive).
 ignore-mixin-members=yes
 

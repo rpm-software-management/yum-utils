@@ -204,7 +204,7 @@ def main():
             sys.exit(50)
 
     if not loaded_files and opts.remove:
-        yb.logger.error("Can't remove package(s) when we havn't loaded any")
+        yb.logger.error("Can't remove package(s) when we haven't loaded any")
         sys.exit(50)
 
     group = None
@@ -213,7 +213,7 @@ def main():
     if group is None and opts.name:
         group = comps.return_group(opts.name)
     if group is None and opts.remove:
-        yb.logger.error("Can't remove package(s) from non-existant group")
+        yb.logger.error("Can't remove package(s) from non-existent group")
         sys.exit(50)
 
     if group is None:
