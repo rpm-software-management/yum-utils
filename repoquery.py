@@ -1502,11 +1502,11 @@ def main(args):
             for repo in repoq.repos.findRepos(repo_match):
                 repo.enable()
 
-    try:
-        repoq.doLock()
-    except yum.Errors.LockError, e:
+    while True:
+        try: repoq.doLock(); break
+        except yum.Errors.LockError, e: pass
         repoq.logger.error(e)
-        sys.exit(50)
+        time.sleep(2)
 
     try:
         if not hasattr(repoq, 'arch'):
