@@ -102,7 +102,7 @@ class ChangeLogCommand:
         return ['changelog', 'ChangeLog']
 
     def getUsage(self):
-        return "<date>|<number>|all [PACKAGE|all|installed|updates|extras|obsoletes|recent]"
+        return "[<date>|<number>|all] [PACKAGE|all|installed|updates|extras|obsoletes|recent]"
 
     def getSummary(self):
         return """\
@@ -211,6 +211,15 @@ Display changelog data, since a specified time, on a group of packages"""
                 except ValueError, e:
                     msg = "Argument -- %s -- is not valid: %s" % (since, to_str(e))
                     raise PluginYumExit(msg)
+
+                if self._since_dto == dateutil_parser.parse('garbage', fuzzy=True):
+                    # 'since' was a package name, not a date
+                    extcmds.insert(0, since)
+
+                    # assume since="all"
+                    self._since_all = True
+                    self._since_dto = None
+                    self._since_tt  = None
 
         ypl = base.returnPkgLists(extcmds)
         self.show_data(msg, ypl.installed, 'Installed Packages')
