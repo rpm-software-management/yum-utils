@@ -1437,9 +1437,13 @@ def main(args):
             else:
                 baseurl = repopath
                 
-            repoq.add_enable_repo(repoid, baseurls=[baseurl], 
-                                  basecachedir=repoq.conf.cachedir,
-                                  timestamp_check=False)
+            try:
+                repoq.add_enable_repo(repoid, baseurls=[baseurl],
+                                      basecachedir=repoq.conf.cachedir,
+                                      timestamp_check=False)
+            except yum.Errors.DuplicateRepoError, e:
+                repoq.logger.error(e)
+                sys.exit(1)
             if not opts.quiet:
                 repoq.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
