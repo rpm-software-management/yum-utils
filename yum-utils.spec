@@ -493,6 +493,14 @@ fi
 %{_mandir}/man1/yum-groups-manager.1.*
 %{_mandir}/man8/yumdb.8.*
 %{_mandir}/man1/yumdownloader.1.*
+%{_mandir}/man1/find-repos-of-install.1.*
+%{_mandir}/man1/needs-restarting.1.*
+%{_mandir}/man1/repo-graph.1.*
+%{_mandir}/man1/repoclosure.1.*
+%{_mandir}/man1/repomanage.1.*
+%{_mandir}/man1/repotrack.1.*
+%{_mandir}/man1/verifytree.1.*
+%{_mandir}/man1/yum-config-manager.1.*
 
 %files -n yum-updateonboot
 %defattr(-, root, root)
