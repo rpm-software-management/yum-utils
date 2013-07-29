@@ -57,6 +57,13 @@ the releasever information from outside the installroot.
 Note that with the default upstream cachedir, of /var/cache/yum, using this
 option will corrupt your cache (and you can use $releasever in your cachedir
 configuration to stop this).
+.IP "\fB\-\-installroot=root\fP"
+Specifies an alternative installroot, relative to which all packages will be
+installed. Think of this like doing "chroot <root> yum" except using
+\-\-installroot allows yum to work before the chroot is created.
+Note: You may also want to use the option \-\-releasever=/ when creating the
+installroot as otherwise the $releasever value is taken from the rpmdb within
+the installroot (and thus. will be empty, before creation).
 .IP "\fB\-\-setopt=option=value\fP"
 Set any config option in yum config or repo files. For options in the global 
 config just use: \-\-setopt=option=value for repo options use: \-\-setopt=repoid.option=value

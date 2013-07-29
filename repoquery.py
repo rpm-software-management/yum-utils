@@ -1284,6 +1284,7 @@ def main(args):
     parser.add_option("--search-fields", action="append", dest="searchfields",
                       default=[],
                       help="search fields to search using --search")
+    parser.add_option("--installroot", default="/", help="set install root")
     parser.add_option("", "--setopt", dest="setopts", default=[],
                      action="append",
                      help="set arbitrary config and repo options")
@@ -1408,6 +1409,7 @@ def main(args):
         repoq.preconf.fn = opts.conffile
     repoq.preconf.debuglevel = initnoise
     repoq.preconf.init_plugins = opts.plugins
+    repoq.preconf.root = opts.installroot
     repoq.conf
 
     for item in  bad_setopt_tm:
