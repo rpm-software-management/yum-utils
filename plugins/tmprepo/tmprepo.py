@@ -91,7 +91,7 @@ def add_dir_repo(base, trepo, cleanup):
         os.chmod(trepo_data, 0755)
     trepo_name = os.path.basename(os.path.dirname(trepo_path))
     tmp_fname  = "%s/tmp-%s.repo" % (trepo_data, trepo_name)
-    repoid     = "T-%4.4s-%x" % (trepo_name, int(time.time()))
+    repoid     = "T-%0.4s-%x" % (trepo_name, int(time.time()))
     tpc = 'true'
     if not lpgpgcheck:
         tpc = 'false'
