@@ -1508,6 +1508,8 @@ def main(args):
         try: repoq.doLock(); break
         except yum.Errors.LockError, e: pass
         repoq.logger.error(e)
+        if repoq.conf.exit_on_lock:
+            sys.exit(50)
         time.sleep(2)
 
     try:
