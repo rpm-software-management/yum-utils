@@ -305,7 +305,7 @@ def main():
             exit_code = 1
             for key in probs:
                 for error in probs[key]:
-                    self.logger.error('%s: %s', key, error)
+                    my.logger.error('%s: %s', key, error)
 
         if opts.gpgcheck:
             for pkg in download_list:
