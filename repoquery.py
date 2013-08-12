@@ -1410,7 +1410,11 @@ def main(args):
     repoq.preconf.debuglevel = initnoise
     repoq.preconf.init_plugins = opts.plugins
     repoq.preconf.root = opts.installroot
-    repoq.conf
+    try:
+        repoq.conf
+    except YumBaseError, e:
+        repoq.logger.error(e)
+        sys.exit(1)
 
     for item in  bad_setopt_tm:
         msg = "Setopt argument has multiple values: %s"
