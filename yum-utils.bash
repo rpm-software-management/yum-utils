@@ -246,6 +246,10 @@ _yu_repoquery()
             COMPREPLY=( $( compgen -W 'name summary description' -- "$cur" ) )
             return 0
             ;;
+        --installroot)
+            COMPREPLY=( $( compgen -d -- "$cur" ) )
+            return 0
+            ;;
     esac
 
     $split && return 0
@@ -259,7 +263,7 @@ _yu_repoquery()
             --archlist --pkgnarrow --installed --show-duplicates --repoid
             --enablerepo --disablerepo --repofrompath --plugins --quiet
             --verbose --cache --tempcache --querytags --config --level --output
-            --search --search-fields --setopt' -- "$cur" ) )
+            --search --search-fields --setopt --installroot' -- "$cur" ) )
         return 0
     fi
 
