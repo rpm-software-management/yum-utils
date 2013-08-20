@@ -130,6 +130,11 @@ def main():
     
     parser.add_option("-a","--checkall",action="store_true",default=False,
             help="Check all packages in the repo")
+    parser.add_option("--nocomps", "--nogroups",action="store_true",
+                      default=False,
+            help="Do not read and check comps")
+    parser.add_option("--noplugins",action="store_true",default=False,
+            help="Do not load any plugins")
     parser.add_option("-t","--testopia",action="store",type="int",
             help="Report results to the given testopia run number")
     parser.add_option("-r","--treeinfo", action="store_true", default=False,
@@ -159,6 +164,8 @@ def main():
     basedir = url.replace('file://', '') # for a normal path thing
 
     my = yum.YumBase()
+    if opts.noplugins:
+        my.preconf.init_plugins = False
     my.conf.cachedir = getCacheDir()
     my.repos.disableRepo('*')
     newrepo = yum.yumRepo.YumRepository(repoid)
@@ -211,25 +218,26 @@ def main():
     else:
         report('REPODATA','PASSED')
 
-    print "Checking groups (comps.xml):"
-    try:
-        print "  verifying comps.xml with yum"
-        b = my.comps.compscount
-    except Errors.GroupsError, e:
-        print '  comps file missing or unparseable'
-        report('COMPS','FAILED')
-        retval = retval | BAD_COMPS
-
-    if not (retval & BAD_COMPS):
-        print "  verifying comps.xml grammar with xmllint"
-        comps = newrepo.getGroups()
-        r = os.system("xmllint --noout --nowarning --relaxng %s %s" % 
-            (SCHEMA,comps))
-        if r != 0:
-            retval = retval | BAD_COMPS
+    if not opts.nocomps:
+        print "Checking groups (comps.xml):"
+        try:
+            print "  verifying comps.xml with yum"
+            b = my.comps.compscount
+        except Errors.GroupsError, e:
+            print '  comps file missing or unparseable'
             report('COMPS','FAILED')
-        else:
-            report('COMPS','PASSED')
+            retval = retval | BAD_COMPS
+
+        if not (retval & BAD_COMPS):
+            print "  verifying comps.xml grammar with xmllint"
+            comps = newrepo.getGroups()
+            r = os.system("xmllint --noout --nowarning --relaxng %s %s" % 
+                (SCHEMA,comps))
+            if r != 0:
+                retval = retval | BAD_COMPS
+                report('COMPS','FAILED')
+            else:
+                report('COMPS','PASSED')
 
     # if we've got a .treeinfo file and we are told to check it, then do so
     tr_path = basedir + '/.treeinfo'
@@ -243,7 +251,7 @@ def main():
     if opts.checkall:
         print "Checking all packages"
         sack = my.pkgSack
-    elif not (retval & BAD_COMPS):
+    elif not (retval & BAD_COMPS or opts.nocomps):
         print "Checking mandatory @core packages"
         group = my.comps.return_group('core')
         for pname in group.mandatory_packages:
