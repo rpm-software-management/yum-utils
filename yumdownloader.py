@@ -96,6 +96,9 @@ class YumDownloader(YumUtilBase):
         if not self.setCacheDir():
             self.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
+
+        # override all pkgdirs
+        self.conf.downloaddir = opts.destdir
             
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup(opts)
@@ -202,14 +205,8 @@ class YumDownloader(YumUtilBase):
                 print urljoin(pkg.repo.urls[0], pkg.relativepath)
             return 0
 
-        # create dest dir
-        if not os.path.exists(opts.destdir):
-            os.makedirs(opts.destdir)
-
         # set localpaths
         for pkg in toDownload:
-            rpmfn = os.path.basename(pkg.remote_path)
-            pkg.localpath = os.path.join(opts.destdir, rpmfn)
             pkg.repo.copy_local = True
             pkg.repo.cache = 0
 
