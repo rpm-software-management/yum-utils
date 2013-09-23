@@ -350,6 +350,7 @@ repo. removes it (and can thus. be reinstalled/downgraded/etc.).
 Summary: Yum plugin to automatically snapshot your filesystems during updates
 Group: System Environment/Base
 Requires: yum >= 3.2.22
+Requires: btrfs-progs
 
 %description -n yum-plugin-fs-snapshot
 When this plugin is installed it will automatically snapshot any
