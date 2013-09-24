@@ -198,9 +198,8 @@ def _create_btrfs_snapshot(conduit, snapshot_tag, volume):
     """
     Runs the commands necessary for a snapshot.  Basically its just
 
-    btrfsctl -c /dir/to/snapshot    #this syncs the fs
-    btrfsctl -s /dir/to/snapshot/${snapshot_tag}
-                /dir/to/snapshot
+    btrfs filesystem sync /dir/to/snapshot    #this syncs the fs
+    btrfs subvolume snapshot /dir/to/snapshot /dir/to/snapshot/${snapshot_tag}
 
     and then we're done.
     """
@@ -212,11 +211,11 @@ def _create_btrfs_snapshot(conduit, snapshot_tag, volume):
 
     snapname = mntpnt + snapshot_tag
     conduit.info(1, "fs-snapshot: snapshotting " + mntpnt + ": " + snapname)
-    p = Popen(["/sbin/btrfsctl", "-c", mntpnt], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/btrfs", "filesystem", "sync", mntpnt], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if err:
         return 1
-    p = Popen(["/sbin/btrfsctl", "-s", snapname, mntpnt], stdout=PIPE, stderr=PIPE)
+    p = Popen(["/sbin/btrfs", "subvolume", "snapshot", mntpnt, snapname], stdout=PIPE, stderr=PIPE)
     err = p.wait()
     if err:
         return 1
