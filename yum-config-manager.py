@@ -9,6 +9,8 @@ from utils import YumUtilBase
 import logging
 
 from iniparse import INIConfig
+import yum.config
+import yum.yumRepo
 
 from yum.parser import varReplace
 
@@ -197,13 +199,16 @@ if opts.addrepo:
         if url.endswith('.repo'): # this is a .repo file - fetch it, put it in our reposdir and enable it
             destname = os.path.basename(url)
             destname = myrepodir + '/' + destname
-            # this sucks - but take the first repo we come to that's enabled
-            # and steal it's grabber object - it could be proxy-laden but that's the risk we take
-            # grumbledy grumble
-            grabber = yb.repos.listEnabled()[0].grabfunc            
+
+            # dummy grabfunc, using [main] options
+            repo = yum.yumRepo.YumRepository('dummy')
+            repo.baseurl = ['http://dummy']
+            repo.populate(yum.config.ConfigParser(), None, yb.conf)
+            grabber = repo.grabfunc; del repo
+
             print 'grabbing file %s to %s' % (url, destname)
             try:
-                result  = grabber.urlgrab(url, filename=destname, copy_local=True)
+                result  = grabber.urlgrab(url, filename=destname, copy_local=True, reget=None)
             except (IOError, OSError, yum.Errors.YumBaseError), e:
                 logger.error('Could not fetch/save url %s to file %s: %s'  % (url, destname, e))
                 continue
