@@ -21,6 +21,7 @@ import yum
 from yum.misc import setup_locale
 
 from utils import YumUtilBase
+from yum.constants import TS_REMOVE_STATES
 
 import logging
 import os
@@ -204,6 +205,12 @@ class YumCompleteTransaction(YumUtilBase):
             if action == 'erase':
                 (e, m, u) = self.rpmdb.matchPackageNames([pkgspec])
                 for pkg in e:
+                    pkgtuple = (pkg.name, pkg.arch, pkg.epoch, pkg.ver, pkg.rel)
+                    # Skip processing if already marked as the one to be removed.
+                    # This will elimate issue with tx_member removal when package 
+                    # marked as: 'ud' out of of "install" journal's entry
+                    if self.tsInfo.getMembersWithState(pkgtuple, TS_REMOVE_STATES):
+                        continue
                     self.remove(po=pkg)
 
 
