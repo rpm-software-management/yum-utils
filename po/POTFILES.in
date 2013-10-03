@@ -34,7 +34,6 @@ plugins/merge-conf/merge-conf.py
 plugins/aliases/aliases.py
 plugins/protectbase/protectbase.py
 plugins/versionlock/versionlock.py
-plugins/security/security.py
 plugins/nofsync/nofsync.py
 plugins/tmprepo/tmprepo.py
 plugins/priorities/priorities.py

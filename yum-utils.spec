@@ -155,20 +155,6 @@ This yum plugin adds the "--merge-conf" command line option. With this option,
 Yum will ask you what to do with config files which have changed on updating a
 package.
 
-%package -n yum-plugin-security
-Summary: Yum plugin to enable security filters
-Group: System Environment/Base
-Provides: yum-security = %{version}-%{release}
-Obsoletes: yum-security < 1.1.20-0
-Conflicts: yum-security < 1.1.20-0
-Requires: yum >= 3.2.18
-
-%description -n yum-plugin-security
-This plugin adds the options --security, --cve, --bz and --advisory flags
-to yum and the list-security and info-security commands.
-The options make it possible to limit list/upgrade of packages to specific
-security relevant ones. The commands give you the security information.
-
 %package -n yum-plugin-upgrade-helper
 Summary: Yum plugin to help upgrades to the next distribution version
 Group: System Environment/Base
@@ -396,7 +382,6 @@ plugins="\
  tsflags \
  priorities \
  merge-conf \
- security \
  upgrade-helper \
  aliases \
  list-data \
@@ -564,13 +549,6 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/merge-conf.conf
 %{pluginhome}/merge-conf.*
-
-%files -n yum-plugin-security
-%defattr(-, root, root)
-%doc COPYING
-%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/security.conf
-%{pluginhome}/security.*
-%{_mandir}/man8/yum-security.8.*
 
 %files -n yum-plugin-upgrade-helper
 %defattr(-, root, root)

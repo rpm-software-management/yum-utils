@@ -5,7 +5,7 @@ DOCS = repoquery package-cleanup repo-rss yumdownloader yum-builddep yum-changel
        find-repos-of-install needs-restarting repo-graph repoclosure \
        repomanage repotrack verifytree yum-config-manager
 DOCS5 = yum-changelog.conf yum-versionlock.conf yum-fs-snapshot.conf
-DOCS8 = yum-security yum-complete-transaction yumdb
+DOCS8 = yum-complete-transaction yumdb
 
 all:
 	echo "Nothing to do"
