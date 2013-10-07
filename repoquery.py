@@ -1412,7 +1412,7 @@ def main(args):
     repoq.preconf.root = opts.installroot
     try:
         repoq.conf
-    except YumBaseError, e:
+    except yum.Errors.YumBaseError, e:
         repoq.logger.error(e)
         sys.exit(1)
 
