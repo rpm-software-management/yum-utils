@@ -44,6 +44,7 @@ import yum.misc
 import glob
 import stat
 from optparse import OptionParser
+from yum.Errors import RepoError
 
 def parseargs(args):
     usage = """
@@ -79,7 +80,7 @@ def get_open_files(pid):
     try:
         maps = open(smaps, 'r').readlines()
     except (IOError, OSError), e:
-        print "Could not open %s" % smaps
+        print >>sys.stderr, "Could not open %s" % smaps
         return files
 
     for line in maps:
@@ -159,7 +160,7 @@ def main(args):
         try:
             cmdline = open('/proc/' +pid+ '/cmdline', 'r').read()
         except OSError, e:
-            print "Couldn't access process information for %s: %s" % (pid, str(e))
+            print >>sys.stderr, "Couldn't access process information for %s: %s" % (pid, str(e))
             continue
         # proc cmdline is null-delimited so clean that up
         cmdline = cmdline.replace('\000', ' ')
@@ -168,4 +169,8 @@ def main(args):
     return 0
     
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    try:
+        sys.exit(main(sys.argv))
+    except RepoError, e:
+        print >>sys.stderr, e
+        sys.exit(1)
