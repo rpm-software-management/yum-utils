@@ -859,8 +859,6 @@ class YumBaseQuery(yum.YumBase):
                     pkgs = self.pkgSack.returnNewestByNameArch(**kwargs)
                 except yum.Errors.PackageSackError:
                     pkgs = []
-                except (yum.Errors.RepoError, yum.Errors.MiscError), e:
-                    raise queryError(e)
         else:
             what = self.options.pkgnarrow
             ygh = self.doPackageLists(what, **kwargs)
@@ -1535,10 +1533,7 @@ def main(args):
 
     try:
         repoq.runQuery(regexs)
-    except yum.Errors.RepoError, e:
-        repoq.logger.error(e)
-        sys.exit(1)
-    except queryError, e:
+    except (yum.Errors.RepoError, yum.Errors.MiscError, queryError), e:
         repoq.logger.error(e)
         sys.exit(1)
 
