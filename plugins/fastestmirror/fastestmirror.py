@@ -216,7 +216,7 @@ def postreposetup_hook(conduit):
             def includeCheck(mirror):
                 if filter(lambda exp: re.search(exp, host(mirror)),
                           include_only.replace(',', ' ').split()):
-                    conduit.info(2, "Including mirror: %s" % host(mirror))
+                    conduit.info(3, "Including mirror: %s" % host(mirror))
                     return True
                 return False
             repomirrors[str(repo)] = filter(includeCheck,repomirrors[str(repo)])
@@ -225,7 +225,7 @@ def postreposetup_hook(conduit):
                 def excludeCheck(mirror):
                     if filter(lambda exp: re.search(exp, host(mirror)),
                               exclude.replace(',', ' ').split()):
-                        conduit.info(2, "Excluding mirror: %s" % host(mirror))
+                        conduit.info(3, "Excluding mirror: %s" % host(mirror))
                         return False
                     return True
                 repomirrors[str(repo)] = filter(excludeCheck,repomirrors[str(repo)])
