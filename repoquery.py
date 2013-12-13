@@ -61,6 +61,7 @@ Size        : %{installedsize}
 Packager    : %{packager}
 Group       : %{group}
 URL         : %{url}
+License     : %{license}
 Repository  : %{repoid}
 Summary     : %{summary}
 Source      : %{sourcerpm}
