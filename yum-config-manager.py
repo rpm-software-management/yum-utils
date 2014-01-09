@@ -124,7 +124,8 @@ group.add_option("--add-repo", default=[], dest='addrepo', action='append',
           help='add (and enable) the repo from the specified file or url')
 try:
     opts = yb.doUtilConfigSetup()
-except yum.Errors.RepoError, e:
+    yb.repos
+except yum.Errors.YumBaseError, e:
     logger.error(str(e))
     sys.exit(50)
 
