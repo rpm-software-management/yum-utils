@@ -37,6 +37,7 @@ _yu_repomanage()
         return 0
     fi
 
+    local IFS=$'\n'
     COMPREPLY=( $( compgen -d -- "$cur" ) )
 } &&
 complete -F _yu_repomanage -o filenames repomanage repomanage.py
@@ -88,6 +89,7 @@ _yu_verifytree()
         return 0
     fi
 
+    local IFS=$'\n'
     COMPREPLY=( $( compgen -d -- "$cur" ) )
 } &&
 complete -F _yu_verifytree -o filenames verifytree verifytree.py
@@ -107,6 +109,7 @@ _yu_repo_graph()
             return 0
             ;;
         -c)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
             return 0
             ;;
@@ -128,10 +131,12 @@ _yu_repo_rss()
             return 0
             ;;
         -f)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.xml' -- "$cur" ) )
             return 0
             ;;
         -c)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
             return 0
             ;;
@@ -154,6 +159,7 @@ _yu_repoclosure()
             return 0
             ;;
         -c|--config)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
             return 0
             ;;
@@ -196,6 +202,7 @@ _yu_repoquery()
             return 0
             ;;
         -f|--file)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -- "$cur" ) )
             return 0
             ;;
@@ -231,6 +238,7 @@ _yu_repoquery()
             return 0
             ;;
         -c|--config)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
             return 0
             ;;
@@ -247,6 +255,7 @@ _yu_repoquery()
             return 0
             ;;
         --installroot)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -d -- "$cur" ) )
             return 0
             ;;
@@ -283,10 +292,12 @@ _yu_yumdb()
             return 0
             ;;
         -c|--config)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -X '!*.conf' -- "$cur" ) )
             return 0
             ;;
         shell)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -f -o plusdirs -- "$cur" ) )
             return 0
             ;;
@@ -343,6 +354,7 @@ _yu_builddep()
         return 0
     fi
 
+    local IFS=$'\n'
     COMPREPLY=( $( compgen -f -o plusdirs -X "!*.spec" -- "$cur" ) )
     [[ $cur != */* && $cur != ~* ]] && _yum_list all "$cur" 2>/dev/null
 } &&
@@ -384,6 +396,7 @@ _yu_debug_dump()
         return 0
     fi
 
+    local IFS=$'\n'
     COMPREPLY=( $( compgen -f -o plusdirs -- "$cur" ) )
 } &&
 complete -F _yu_debug_dump -o filenames yum-debug-dump yum-debug-dump.py
@@ -398,6 +411,7 @@ _yu_yumdownloader()
 
     case $prev in
         --destdir)
+            local IFS=$'\n'
             COMPREPLY=( $( compgen -d -- "$cur" ) )
             return 0
             ;;
