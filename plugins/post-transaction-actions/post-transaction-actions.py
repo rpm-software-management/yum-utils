@@ -35,8 +35,6 @@ import shlex
 requires_api_version = '2.4'
 plugin_type = (TYPE_CORE,)
 
-_just_installed = {} # pkgtup = po
-
 def parse_actions(ddir, conduit):
     """read in .action files from ddir path. 
        store content in a list of tuples"""
@@ -59,12 +57,6 @@ def parse_actions(ddir, conduit):
                         action_tuples.append((a_key, a_state, a_command))
 
     return action_tuples
-
-def _get_installed_po(rpmdb, pkgtup):
-    (n,a,e,v,r) = pkgtup
-    if pkgtup in _just_installed:
-        return _just_installed[pkgtup]
-    return rpmdb.searchNevra(name=n, arch=a, epoch=e, ver=v, rel=r)[0]
 
 def _convert_vars(txmbr, command):
     """converts %options on the command to their values from the package it
@@ -101,7 +93,6 @@ def posttrans_hook(conduit):
     action_tuples = parse_actions(action_dir, conduit)
     commands_to_run = {}
     ts = conduit.getTsInfo()
-    rpmdb = conduit.getRpmDB()
     all = ts.getMembers()
     removes = ts.getMembersWithState(output_states=TS_REMOVE_STATES)
     installs = ts.getMembersWithState(output_states=TS_INSTALL_STATES)
@@ -129,11 +120,10 @@ def posttrans_hook(conduit):
 
             for txmbr in pkgset:
                 matched = False
-                if txmbr.output_state in TS_INSTALL_STATES:
-                    thispo = _get_installed_po(rpmdb, txmbr.pkgtup)
-                else:
-                    continue
-        
+
+                # Get package object from yum.transactioninfo.TransactionMember
+                thispo = txmbr.po
+
                 if not yum.misc.re_glob(a_k):
                     if a_k in thispo.filelist + thispo.dirlist + thispo.ghostlist:
                         thiscommand = _convert_vars(txmbr, a_c)
