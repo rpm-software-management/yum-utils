@@ -129,8 +129,10 @@ def posttrans_hook(conduit):
 
             for txmbr in pkgset:
                 matched = False
-                #print '%s - %s' % txmbr.name, txmbr.ts_state
-                if txmbr.po.state in TS_INSTALL_STATES:
+                thispo = txmbr.po
+                if txmbr.output_state in TS_INSTALL_STATES:
+                    # thispo is AvailablePackage; filelist access could trigger download
+                    # of the filelist.  Since it's installed now, use rpmdb data instead.
                     thispo = _get_installed_po(rpmdb, txmbr.pkgtup)
         
                 if not yum.misc.re_glob(a_k):
