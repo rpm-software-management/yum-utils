@@ -129,10 +129,9 @@ def posttrans_hook(conduit):
 
             for txmbr in pkgset:
                 matched = False
-                if txmbr.output_state in TS_INSTALL_STATES:
+                #print '%s - %s' % txmbr.name, txmbr.ts_state
+                if txmbr.po.state in TS_INSTALL_STATES:
                     thispo = _get_installed_po(rpmdb, txmbr.pkgtup)
-                else:
-                    continue
         
                 if not yum.misc.re_glob(a_k):
                     if a_k in thispo.filelist + thispo.dirlist + thispo.ghostlist:
