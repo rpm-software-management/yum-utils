@@ -86,7 +86,10 @@ class DebugInfoInstall(YumUtilBase):
         for repo in self.repos.listEnabled():
             repos[repo.id] = repo
         for repoid in repos:
-            di = '%s-debuginfo' % repoid
+            if repoid.endswith('-rpms'):
+                di = repoid[:-5] + '-debug-rpms'
+            else:
+                di = '%s-debuginfo' % repoid
             if di in repos:
                 continue
             repo = repos[repoid]
