@@ -100,8 +100,13 @@ class YumDownloader(YumUtilBase):
         # override all pkgdirs
         self.conf.downloaddir = opts.destdir
             
+        if opts.source:
+            # Setup source repos
+            self.arch.archlist.append('src')
+            self.setupSourceRepos()
+
         # Setup yum (Ts, RPM db, Repo & Sack)
-        self.doUtilYumSetup(opts)
+        self.doUtilYumSetup()
         # Do the real action
         self.exit_code = self.downloadPackages(opts)
         
@@ -230,29 +235,6 @@ class YumDownloader(YumUtilBase):
                 pkgGroups[na].append(po)
         return pkgGroups
             
-    # sligly modified from the one in YumUtilBase    
-    def doUtilYumSetup(self,opts):
-        """do a default setup for all the normal/necessary yum components,
-           really just a shorthand for testing"""
-        try:
-            # Setup source repos
-            if opts.source:
-                self.setupSourceRepos()
-            self._getRepos(doSetup = True)
-            # if '--source' is used the add src to the archlist
-            if opts.source:
-                archlist = rpmUtils.arch.getArchList() + ['src']    
-            elif opts.archlist:
-                archlist = []
-                for a in opts.archlist.split(','):
-                    archlist.extend(rpmUtils.arch.getArchList(a))
-            else:
-                archlist = rpmUtils.arch.getArchList()
-            self._getSacks(archlist=archlist)
-        except yum.Errors.YumBaseError, msg:
-            self.logger.critical(exception2msg(msg))
-            sys.exit(1)
-
     def addCmdOptions(self):
         # this if for compatibility with old API (utils.py from yum < 3.2.23)
         if hasattr(self,'getOptionGroup'): # check if the group option API is available
