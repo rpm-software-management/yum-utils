@@ -92,6 +92,10 @@ class YumBuildDep(YumUtilBase):
             self.logger.error("Error: You must be root to install packages")
             sys.exit(1)
 
+        # Use source rpms
+        self.arch.archlist.append('src')
+        self.setupSourceRepos()
+
         # Setup yum (Ts, RPM db, Repo & Sack)
         self.doUtilYumSetup()
         # Do the real action
@@ -122,7 +126,6 @@ class YumBuildDep(YumUtilBase):
         
     def setupSourceRepos(self):
         # enable the -source repos for enabled primary repos
-        archlist = rpmUtils.arch.getArchList() + ['src']    
         for repo in self.repos.listEnabled():
             issource_repo = repo.id.endswith('-source')
             if rhn_source_repos and repo.id.endswith('-source-rpms'):
@@ -133,24 +136,13 @@ class YumBuildDep(YumUtilBase):
             elif not issource_repo:
                 srcrepo = '%s-source' % repo.id
             else:
-                # Need to change the arch.
-                repo.close()
-                self.repos.disableRepo(repo.id)
-                srcrepo = repo.id
+                continue
             
             for r in self.repos.findRepos(srcrepo):
                 if r in self.repos.listEnabled():
                     continue
                 self.logger.info('Enabling %s repository' % r.id)
                 r.enable()
-                # Setup the repo, without a cache
-                r.setup(0)
-                # Setup pkgSack with 'src' in the archlist
-                try:
-                    self._getSacks(archlist=archlist,thisrepo=r.id)
-                except yum.Errors.RepoError, e:
-                    print "Could not setup repo %s: %s" % (r.id, e)
-                    sys.exit(1)
 
     def install_deps(self, deplist):
         errors = set()
@@ -213,7 +205,6 @@ class YumBuildDep(YumUtilBase):
 
         toActOn = []     
         if srcnames:
-            self.setupSourceRepos()
             pkgs = self.pkgSack.returnPackages(patterns=srcnames)
             exact, match, unmatch = yum.packages.parsePackages(pkgs, srcnames, casematch=1)
             srpms += exact + match
