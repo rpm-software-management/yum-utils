@@ -82,15 +82,14 @@ def inspect_volume_lvm(conduit, volume):
     if device.startswith("/dev/mapper/"):
         # convert /dev/mapper name to /dev/vg/lv for use with LVM2 tools
         # - 'dmsetup splitname' will collapse any escaped characters
-        p = Popen(["/sbin/dmsetup", "splitname", "--separator", " ",
+        p = Popen(["/sbin/dmsetup", "splitname", "--separator", "/",
                    "--noheadings", "-c",
-                   device], stdout=PIPE, stderr=PIPE)
+                   "-o", "vg_name,lv_name", device], stdout=PIPE, stderr=PIPE)
         err = p.wait()
         if err:
             return 0
         output = p.communicate()[0]
-        device = "/".join(output.split()[:2])
-        device = device.replace("/dev/mapper/", "/dev/")
+        device = output.strip().replace("/dev/mapper/", "/dev/")
         volume["device"] = device
 
     # Check if device is managed by lvm
