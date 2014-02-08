@@ -355,7 +355,8 @@ _yu_builddep()
     fi
 
     local IFS=$'\n'
-    COMPREPLY=( $( compgen -f -o plusdirs -X "!*.spec" -- "$cur" ) )
+    COMPREPLY=( $( compgen -f -o plusdirs -X "!*.sp@(ec|m)" -- "$cur" ) )
+    COMPREPLY+=( $( compgen -f -o plusdirs -X "!*.?(no)src.rpm" -- "$cur" ) )
     [[ $cur != */* && $cur != ~* ]] && _yum_list all "$cur" 2>/dev/null
 } &&
 complete -F _yu_builddep -o filenames yum-builddep yum-builddep.py
