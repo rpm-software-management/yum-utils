@@ -179,7 +179,15 @@ def main():
         
         # find the ones we want
         for glob in opts.repoid:
-            myrepos.extend(my.repos.findRepos(glob))
+            add_repos = my.repos.findRepos(glob)
+            if not add_repos:
+                print >> sys.stderr, "Warning: cannot find repository %s" % glob
+                continue
+            myrepos.extend(add_repos)
+
+        if not myrepos:
+            print >> sys.stderr, "No repositories found"
+            sys.exit(1)
         
         # disable them all
         for repo in my.repos.repos.values():
