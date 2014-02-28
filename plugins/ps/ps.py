@@ -61,7 +61,7 @@ class PSCommand:
         return ['ps']
 
     def getUsage(self):
-        return "[all|updates|restart] [pkgs...]"
+        return "[all|updates|restarts] [pkgs...]"
 
     def getSummary(self):
         return "List processes, which are packages"
