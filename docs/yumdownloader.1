@@ -20,7 +20,7 @@ When downloading RPMs, resolve dependencies and also download the required packa
 .IP "\fB\-\-source\fP"
 Instead of downloading the binary RPMs, download the source RPMs.
 .IP "\fB\-\-archlist=ARCH1[,ARCH2...]\fP"
-Limit the query to packages of given architecture(s). Valid values are all
+Limit the query to packages of given and compatible architectures. Valid values are all
 architectures known to rpm/yum such as 'i386' and 'src' for
 source RPMS. Note that repoquery will now change yum's "arch" to the first
 value in the archlist. So "\-\-archlist=i386,i686" will change yum's canonical
