@@ -250,7 +250,7 @@ class YumDownloader(YumUtilBase):
         group.add_option("--source", default=False, dest="source", action="store_true",
           help='operate on source packages')
         group.add_option("--archlist",
-          help="only download packages of certain architecture(s)")        
+          help="only download packages of given and compatible architectures")
 
 if __name__ == '__main__':
     setup_locale()
