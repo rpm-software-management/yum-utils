@@ -421,6 +421,10 @@ install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/p
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum.repos.d
 touch $RPM_BUILD_ROOT%{_sysconfdir}/yum.repos.d/_local.repo
 
+%check
+# To execute: ./test/test-all
+# Tests are not suitable for running at build time
+# because they require networking and a populated /var/cache/yum
 
 %clean
 rm -rf $RPM_BUILD_ROOT
