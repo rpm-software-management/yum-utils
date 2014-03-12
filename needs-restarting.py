@@ -98,15 +98,16 @@ def get_open_files(pid):
 def main(args):
     (opts, args)  = parseargs(args)
 
+    myuid = os.geteuid()
+    if myuid and not opts.useronly:
+        print >>sys.stderr, "Please run as root or with --useronly option"
+        sys.exit(1)
+
     my = yum.YumBase()
     my.preconf.init_plugins=False
     if hasattr(my, 'setCacheDir'):
         my.setCacheDir()
     my.conf.cache = True
-    
-    myuid = None
-    if opts.useronly:
-        myuid = os.getuid()
     
     needing_restart = set()
 
