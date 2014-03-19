@@ -45,6 +45,8 @@ import glob
 import stat
 from optparse import OptionParser
 from yum.Errors import RepoError
+sys.path.insert(0,'/usr/share/yum-cli')
+import utils
 
 def parseargs(args):
     usage = """
@@ -111,9 +113,10 @@ def main(args):
     
     needing_restart = set()
 
+    boot_time = utils.get_boot_time()
     for pid in return_running_pids(uid=myuid):
         try:
-            pid_start = os.stat('/proc/' + pid)[stat.ST_CTIME]
+            pid_start = utils.get_process_time(int(pid), boot_time)['start_time']
         except OSError, e:
             continue
         found_match = False
