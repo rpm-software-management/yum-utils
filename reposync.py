@@ -277,7 +277,6 @@ def main():
                         my.logger.error("Unable to fetch metadata: %s" % e)
                 
         remote_size = 0
-        local_size  = 0
         if not opts.urls:
             for pkg in download_list:
                 remote = pkg.returnSimple('relativepath')
