@@ -42,7 +42,6 @@ from urlparse import urljoin
 
 import yum
 import yum.Errors
-from yum.misc import getCacheDir
 from yum.packageSack import ListPackageSack
 import rpmUtils.arch
 import logging
