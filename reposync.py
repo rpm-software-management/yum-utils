@@ -40,6 +40,8 @@ import stat
 from optparse import OptionParser
 from urlparse import urljoin
 
+from yumutils.i18n import _
+
 import yum
 import yum.Errors
 from yum.packageSack import ListPackageSack
@@ -83,47 +85,47 @@ def localpkgs(directory):
     return cache
 
 def parseArgs():
-    usage = """
+    usage = _("""
     Reposync is used to synchronize a remote yum repository to a local 
     directory using yum to retrieve the packages.
     
     %s [options]
-    """ % sys.argv[0]
+    """) % sys.argv[0]
 
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--config", default='/etc/yum.conf',
-        help='config file to use (defaults to /etc/yum.conf)')
+        help=_('config file to use (defaults to /etc/yum.conf)'))
     parser.add_option("-a", "--arch", default=None,
-        help='act as if running the specified arch (default: current arch, note: does not override $releasever. x86_64 is a superset for i*86.)')
+        help=_('act as if running the specified arch (default: current arch, note: does not override $releasever. x86_64 is a superset for i*86.)'))
     parser.add_option("--source", default=False, dest="source", action="store_true",
-                      help='operate on source packages')
+                      help=_('operate on source packages'))
     parser.add_option("-r", "--repoid", default=[], action='append',
-        help="specify repo ids to query, can be specified multiple times (default is all enabled)")
+        help=_("specify repo ids to query, can be specified multiple times (default is all enabled)"))
     parser.add_option("-e", "--cachedir",
-        help="directory in which to store metadata")
+        help=_("directory in which to store metadata"))
     parser.add_option("-t", "--tempcache", default=False, action="store_true",
-        help="Use a temp dir for storing/accessing yum-cache")
+        help=_("Use a temp dir for storing/accessing yum-cache"))
     parser.add_option("-d", "--delete", default=False, action="store_true",
-        help="delete local packages no longer present in repository")
+        help=_("delete local packages no longer present in repository"))
     parser.add_option("-p", "--download_path", dest='destdir',
-        default=os.getcwd(), help="Path to download packages to: defaults to current dir")
+        default=os.getcwd(), help=_("Path to download packages to: defaults to current dir"))
     parser.add_option("--norepopath", dest='norepopath', default=False, action="store_true",
-        help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
+        help=_("Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)"))
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
-        help="Remove packages that fail GPG signature checking after downloading")
+        help=_("Remove packages that fail GPG signature checking after downloading"))
     parser.add_option("-u", "--urls", default=False, action="store_true",
-        help="Just list urls of what would be downloaded, don't download")
+        help=_("Just list urls of what would be downloaded, don't download"))
     parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true",
-        help="Download only newest packages per-repo")
+        help=_("Download only newest packages per-repo"))
     parser.add_option("-q", "--quiet", default=False, action="store_true",
-        help="Output as little as possible")
+        help=_("Output as little as possible"))
     parser.add_option("-l", "--plugins", default=False, action="store_true",
-        help="enable yum plugin support")
+        help=_("enable yum plugin support"))
     parser.add_option("-m", "--downloadcomps", default=False, action="store_true",
-        help="also download comps.xml")
+        help=_("also download comps.xml"))
     parser.add_option("", "--download-metadata", dest="downloadmd",
         default=False, action="store_true",
-        help="download all the non-default metadata")
+        help=_("download all the non-default metadata"))
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -135,11 +137,11 @@ def main():
         try:
             os.makedirs(opts.destdir)
         except OSError, e:
-            print >> sys.stderr, "Error: Cannot create destination dir %s" % opts.destdir
+            print >> sys.stderr, _("Error: Cannot create destination dir %s") % opts.destdir
             sys.exit(1)
 
     if not os.access(opts.destdir, os.W_OK) and not opts.urls:
-        print >> sys.stderr, "Error: Cannot write to  destination dir %s" % opts.destdir
+        print >> sys.stderr, _("Error: Cannot write to  destination dir %s") % opts.destdir
         sys.exit(1)
 
     my = RepoSync(opts=opts)
@@ -152,7 +154,7 @@ def main():
 
     if opts.tempcache:
         if not my.setCacheDir(force=True, reuse=False):
-            print >> sys.stderr, "Error: Could not make cachedir, exiting"
+            print >> sys.stderr, _("Error: Could not make cachedir, exiting")
             sys.exit(50)
         my.conf.uid = 1 # force locking of user cache
     elif opts.cachedir:
@@ -163,7 +165,7 @@ def main():
         try:
             my.doLock()
         except yum.Errors.LockError, e:
-            print >> sys.stderr, "Error: %s" % e
+            print >> sys.stderr, _("Error: %s") % e
             sys.exit(50)
 
     #  Use progress bar display when downloading repo metadata
@@ -179,12 +181,12 @@ def main():
         for glob in opts.repoid:
             add_repos = my.repos.findRepos(glob)
             if not add_repos:
-                print >> sys.stderr, "Warning: cannot find repository %s" % glob
+                print >> sys.stderr, _("Warning: cannot find repository %s") % glob
                 continue
             myrepos.extend(add_repos)
 
         if not myrepos:
-            print >> sys.stderr, "No repositories found"
+            print >> sys.stderr, _("No repositories found")
             sys.exit(1)
 
         # disable them all
@@ -197,7 +199,7 @@ def main():
 
     # --norepopath can only be sensibly used with a single repository:
     if len(my.repos.listEnabled()) > 1 and opts.norepopath:
-        print >> sys.stderr, "Error: Can't use --norepopath with multiple repositories"
+        print >> sys.stderr, _("Error: Can't use --norepopath with multiple repositories")
         sys.exit(1)
 
     try:
@@ -206,7 +208,7 @@ def main():
             arches += ['src']
         my.doSackSetup(arches)
     except yum.Errors.RepoError, e:
-        print >> sys.stderr, "Error setting up repositories: %s" % e
+        print >> sys.stderr, _("Error setting up repositories: %s") % e
         # maybe this shouldn't be entirely fatal
         sys.exit(1)
 
