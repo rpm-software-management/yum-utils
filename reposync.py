@@ -131,7 +131,7 @@ def parseArgs():
 
 
 def main():
-    (opts, junk) = parseArgs()
+    (opts, dummy) = parseArgs()
     
     if not os.path.exists(opts.destdir) and not opts.urls:
         try:
