@@ -49,7 +49,7 @@ from urlgrabber.progress import TextMeter, TextMultiFileMeter
 import urlgrabber
 
 # for yum 2.4.X compat
-def sortPkgObj(pkg1 ,pkg2):
+def sortPkgObj(pkg1, pkg2):
     """sorts a list of yum package objects by name"""
     if pkg1.name > pkg2.name:
         return 1
@@ -57,7 +57,7 @@ def sortPkgObj(pkg1 ,pkg2):
         return 0
     else:
         return -1
-        
+
 class RepoSync(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
@@ -79,7 +79,7 @@ def localpkgs(directory):
             for pkg in subcache.keys():
                 cache[pkg] = subcache[pkg]
         elif stat.S_ISREG(st.st_mode) and name.endswith(".rpm"):
-            cache[name] = { 'path': fn, 'size': st.st_size, 'device': st.st_dev }
+            cache[name] = {'path': fn, 'size': st.st_size, 'device': st.st_dev}
     return cache
 
 def parseArgs():
@@ -101,28 +101,28 @@ def parseArgs():
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
     parser.add_option("-e", "--cachedir",
         help="directory in which to store metadata")
-    parser.add_option("-t", "--tempcache", default=False, action="store_true", 
+    parser.add_option("-t", "--tempcache", default=False, action="store_true",
         help="Use a temp dir for storing/accessing yum-cache")
     parser.add_option("-d", "--delete", default=False, action="store_true",
         help="delete local packages no longer present in repository")
-    parser.add_option("-p", "--download_path", dest='destdir', 
+    parser.add_option("-p", "--download_path", dest='destdir',
         default=os.getcwd(), help="Path to download packages to: defaults to current dir")
     parser.add_option("--norepopath", dest='norepopath', default=False, action="store_true",
         help="Don't add the reponame to the download path. Can only be used when syncing a single repository (default is to add the reponame)")
     parser.add_option("-g", "--gpgcheck", default=False, action="store_true",
         help="Remove packages that fail GPG signature checking after downloading")
-    parser.add_option("-u", "--urls", default=False, action="store_true", 
+    parser.add_option("-u", "--urls", default=False, action="store_true",
         help="Just list urls of what would be downloaded, don't download")
-    parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true", 
+    parser.add_option("-n", "--newest-only", dest='newest', default=False, action="store_true",
         help="Download only newest packages per-repo")
-    parser.add_option("-q", "--quiet", default=False, action="store_true", 
+    parser.add_option("-q", "--quiet", default=False, action="store_true",
         help="Output as little as possible")
-    parser.add_option("-l", "--plugins", default=False, action="store_true", 
+    parser.add_option("-l", "--plugins", default=False, action="store_true",
         help="enable yum plugin support")
     parser.add_option("-m", "--downloadcomps", default=False, action="store_true",
         help="also download comps.xml")
-    parser.add_option("","--download-metadata", dest="downloadmd", 
-        default=False, action="store_true", 
+    parser.add_option("", "--download-metadata", dest="downloadmd",
+        default=False, action="store_true",
         help="download all the non-default metadata")
     (opts, args) = parser.parse_args()
     return (opts, args)
@@ -130,18 +130,18 @@ def parseArgs():
 
 def main():
     (opts, dummy) = parseArgs()
-    
+
     if not os.path.exists(opts.destdir) and not opts.urls:
         try:
             os.makedirs(opts.destdir)
         except OSError, e:
             print >> sys.stderr, "Error: Cannot create destination dir %s" % opts.destdir
             sys.exit(1)
-    
+
     if not os.access(opts.destdir, os.W_OK) and not opts.urls:
         print >> sys.stderr, "Error: Cannot write to  destination dir %s" % opts.destdir
         sys.exit(1)
-        
+
     my = RepoSync(opts=opts)
     my.doConfigSetup(fn=opts.config, init_plugins=opts.plugins)
 
@@ -174,7 +174,7 @@ def main():
 
     if len(opts.repoid) > 0:
         myrepos = []
-        
+
         # find the ones we want
         for glob in opts.repoid:
             add_repos = my.repos.findRepos(glob)
@@ -186,11 +186,11 @@ def main():
         if not myrepos:
             print >> sys.stderr, "No repositories found"
             sys.exit(1)
-        
+
         # disable them all
         for repo in my.repos.repos.values():
             repo.disable()
-        
+
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
@@ -203,13 +203,13 @@ def main():
     try:
         arches = rpmUtils.arch.getArchList(opts.arch)
         if opts.source:
-            arches +=  ['src']
+            arches += ['src']
         my.doSackSetup(arches)
     except yum.Errors.RepoError, e:
         print >> sys.stderr, "Error setting up repositories: %s" % e
         # maybe this shouldn't be entirely fatal
         sys.exit(1)
-    
+
     exit_code = 0
     for repo in my.repos.listEnabled():
         reposack = ListPackageSack(my.pkgSack.returnPackages(repoid=repo.id))
@@ -218,7 +218,7 @@ def main():
             download_list = reposack.returnNewestByNameArch()
         else:
             download_list = list(reposack)
-        
+
         if opts.norepopath:
             local_repo_path = opts.destdir
         else:
@@ -253,7 +253,7 @@ def main():
 
             if opts.downloadcomps:
                 wanted_types = ['group']
-            
+
             if opts.downloadmd:
                 wanted_types = repo.repoXML.fileTypes()
 
@@ -266,14 +266,14 @@ def main():
 
                 try:
                     resultfile = repo.retrieveMD(ftype)
-                    basename  = os.path.basename(resultfile)
+                    basename = os.path.basename(resultfile)
                     if ftype == 'group' and opts.downloadcomps: # for compat with how --downloadcomps saved the comps file always as comps.xml
                         basename = 'comps.xml'
                     shutil.copyfile(resultfile, "%s/%s" % (local_repo_path, basename))
-                except yum.Errors.RepoMDError,e :
+                except yum.Errors.RepoMDError, e:
                     if not opts.quiet:
                         my.logger.error("Unable to fetch metadata: %s" % e)
-                
+
         remote_size = 0
         if not opts.urls:
             for pkg in download_list:
@@ -332,4 +332,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
