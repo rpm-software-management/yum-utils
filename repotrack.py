@@ -38,16 +38,6 @@ from yum.constants import *
 from yum.packages import parsePackages
 from yum.packageSack import ListPackageSack
 
-# for yum 2.4.X compat
-def sortPkgObj(pkg1 ,pkg2):
-    """sorts a list of yum package objects by name"""
-    if pkg1.name > pkg2.name:
-        return 1
-    elif pkg1.name == pkg2.name:
-        return 0
-    else:
-        return -1
-        
 class RepoTrack(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
@@ -224,7 +214,7 @@ def main():
         this_sack.addList(download_list)
         download_list = this_sack.returnNewestByNameArch()
         
-    download_list.sort(sortPkgObj)
+    download_list.sort(key=lambda pkg: pkg.name)
     for pkg in download_list:
         repo = my.repos.getRepo(pkg.repoid)
         remote = pkg.returnSimple('relativepath')

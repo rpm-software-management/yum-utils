@@ -20,7 +20,7 @@ BuildArch: noarch
 # For new findRepos() API.
 Requires: yum >= 3.4.3-96
 Requires: python-kitchen
-BuildRequires: python-devel >= 2.4
+BuildRequires: python-devel
 BuildRequires: gettext
 BuildRequires: intltool
 Provides: yum-utils-translations = %{version}-%{release}

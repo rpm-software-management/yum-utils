@@ -50,16 +50,6 @@ import logging
 from urlgrabber.progress import TextMeter, TextMultiFileMeter
 import urlgrabber
 
-# for yum 2.4.X compat
-def sortPkgObj(pkg1, pkg2):
-    """sorts a list of yum package objects by name"""
-    if pkg1.name > pkg2.name:
-        return 1
-    elif pkg1.name == pkg2.name:
-        return 0
-    else:
-        return -1
-
 class RepoSync(yum.YumBase):
     def __init__(self, opts):
         yum.YumBase.__init__(self)
@@ -289,7 +279,7 @@ def main():
         if hasattr(urlgrabber.progress, 'text_meter_total_size'):
             urlgrabber.progress.text_meter_total_size(remote_size)
 
-        download_list.sort(sortPkgObj)
+        download_list.sort(key=lambda pkg: pkg.name)
         if opts.urls:
             for pkg in download_list:
                 print urljoin(pkg.repo.urls[0], pkg.relativepath)
