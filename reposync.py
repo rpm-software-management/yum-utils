@@ -153,7 +153,7 @@ def main():
         opts.tempcache = True
 
     if opts.tempcache:
-        if not my.setCacheDir(force=True):
+        if not my.setCacheDir(force=True, reuse=False):
             print >> sys.stderr, "Error: Could not make cachedir, exiting"
             sys.exit(50)
         my.conf.uid = 1 # force locking of user cache
