@@ -451,4 +451,4 @@ def config_hook(conduit):
 
     parser.add_option('--verify-configuration-files', action="store",
                       type="string",
-                      help='Verify files tagged as configuration files')
+                      help='Enable/disable verification of files tagged as configuration files')
