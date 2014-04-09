@@ -197,7 +197,11 @@ class YumDownloader(YumUtilBase):
                 self.tsInfo.addInstall(po)
                 self.localPackages.append(po)
             # Resolve dependencies
-            self.resolveDeps()
+            result, resultmsgs = self.resolveDeps()
+            if result == 1:
+                for msg in resultmsgs:
+                    self.logger.critical(msg)
+                self.logger.critical('Dependency resolution failed, some packages will not be downloaded.')
             # Add newly added packages to the toDownload list
             for pkg in self.tsInfo.getMembers():
                 if pkg.ts_state in ('i', 'u') and pkg.po not in toDownload:
