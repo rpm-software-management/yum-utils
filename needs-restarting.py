@@ -118,7 +118,7 @@ def main(args):
     for pid in return_running_pids(uid=myuid):
         try:
             pid_start = utils.get_process_time(int(pid), boot_time)['start_time']
-        except OSError, e:
+        except (OSError, IOError), e:
             continue
         found_match = False
         for fn in get_open_files(pid):
