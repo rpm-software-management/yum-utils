@@ -7,6 +7,7 @@ import yum
 sys.path.insert(0,'/usr/share/yum-cli')
 from utils import YumUtilBase
 import logging
+import fnmatch
 
 from iniparse import INIConfig
 import yum.config
@@ -99,6 +100,11 @@ def writeRawConfigFile(filename, section_id, yumvar,
     fp.write(str(ini))
     fp.close()
 
+def match_repoid(repoid, repo_setopts):
+    for i in repo_setopts:
+        if fnmatch.fnmatch(repoid, i):
+            return True
+
 NAME = 'yum-config-manager'
 VERSION = '1.0'
 USAGE = '"yum-config-manager [options] [section]'
@@ -178,7 +184,7 @@ if not opts.addrepo:
             repo.disable()
         print repo.dump()
         if (opts.save and
-            (only or (hasattr(yb, 'repo_setopts') and repo.id in yb.repo_setopts))):
+            (only or (hasattr(yb, 'repo_setopts') and match_repoid(repo.id, yb.repo_setopts)))):
             writeRawConfigFile(repo.repofile, repo.id, repo.yumvar,
                                repo.cfg.options, repo.iteritems, repo.optionobj,
                                only)
