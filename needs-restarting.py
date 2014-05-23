@@ -80,7 +80,8 @@ def get_open_files(pid):
     files = []
     smaps = '/proc/%s/smaps' % pid
     try:
-        maps = open(smaps, 'r')
+        with open(smaps, 'r') as maps_f:
+            maps = maps_f.readlines()
     except (IOError, OSError), e:
         print >>sys.stderr, "Could not open %s" % smaps
         return files
@@ -95,7 +96,6 @@ def get_open_files(pid):
         filename = filename.strip()
         if filename not in files:
             files.append(filename)
-    maps.close()
     return files
 
 def main(args):
