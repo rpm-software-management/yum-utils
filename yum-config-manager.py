@@ -172,6 +172,11 @@ if opts.enable or opts.disable:
 if args:
     repos = yb.repos.findRepos(','.join(args),
                                name_match=True, ignore_case=True)
+elif hasattr(yb, 'repo_setopts') and yb.repo_setopts:
+    repos =yb.repos.findRepos(','.join(yb.repo_setopts.keys()),
+                               name_match=True, ignore_case=True)
+
+
 else:
     repos = yb.repos.listEnabled()
 
