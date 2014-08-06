@@ -164,7 +164,7 @@ def main(args):
     for pid in needing_restart:
         try:
             cmdline = open('/proc/' +pid+ '/cmdline', 'r').read()
-        except OSError, e:
+        except (OSError, IOError), e:
             print >>sys.stderr, "Couldn't access process information for %s: %s" % (pid, str(e))
             continue
         # proc cmdline is null-delimited so clean that up
