@@ -93,6 +93,17 @@ def _convert_vars(txmbr, command):
     result = varReplace(command, vardict)
     return result
             
+
+def pretrans_hook(conduit):
+    # Prefetch filelist for packages to be removed,
+    # otherwise for updated packages headers will not be available
+    ts = conduit.getTsInfo()
+    removes = ts.getMembersWithState(output_states=TS_REMOVE_STATES)
+
+    for txmbr in removes:
+        txmbr.po.filelist
+
+
 def posttrans_hook(conduit):
     # we have provides/requires for everything
     # we do not have filelists for erasures
