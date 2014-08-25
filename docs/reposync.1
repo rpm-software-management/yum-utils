@@ -20,10 +20,18 @@ Also download .src.rpm files.
 .IP "\fB\-r REPOID, \-\-repoid=REPOID\fP"
 Specify repo ids to query, can be specified multiple times (default is
 all enabled).
+.IP "\fB\-e\ CACHEDIR, \-\-cachedir CACHEDIR\fP",
+Directory in which to store metadata.
 .IP "\fB\-t, \-\-tempcache\fP"
 Use a temp dir for storing/accessing yum-cache.
+.IP "\fB\-d, \-\-delete\fP"
+Delete local packages no longer present in repository.
 .IP "\fB\-p DESTDIR, \-\-download_path=DESTDIR\fP"
 Path to download packages to: defaults to current directory.
+.IP "\fB\-\-norepopath\fP"
+Don't add the reponame to the download path.
+Can only be used when syncing a single repository (default is
+to add the reponame).
 .IP "\fB\-g, \-\-gpgcheck\fP"
 Remove packages that fail GPG signature checking after downloading.
 exit status is '1' if at least one package was removed.
@@ -31,6 +39,8 @@ exit status is '1' if at least one package was removed.
 Just list urls of what would be downloaded, don't download.
 .IP "\fB\-l, \-\-plugins\fP"
 Enable yum plugin support.
+.IP "\fB\-m, \-\-downloadcomps\fP"
+Also download comps.xml.
 .IP "\fB\-n, \-\-newest\-only\fP"
 Download only newest packages per-repo.
 .IP "\fB\-q, \-\-quiet\fP"
