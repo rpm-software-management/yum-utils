@@ -51,7 +51,7 @@ def parse_actions(ddir, conduit):
                 line = line.strip()
                 if line and line[0] != "#":
                     try:
-                        (a_key, a_state, a_command) = line.split(':')
+                        (a_key, a_state, a_command) = line.split(':', 2)
                     except ValueError,e:
                         conduit.error(2,'Bad Action Line: %s' % line)
                         continue
