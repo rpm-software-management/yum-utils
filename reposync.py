@@ -283,7 +283,7 @@ def main():
         if opts.urls:
             for pkg in download_list:
                 print urljoin(pkg.repo.urls[0], pkg.relativepath)
-            return 0
+            continue
 
         # create dest dir
         if not os.path.exists(local_repo_path):
