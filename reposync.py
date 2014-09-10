@@ -291,10 +291,13 @@ def main():
 
         # set localpaths
         for pkg in download_list:
-            rpmfn = os.path.basename(pkg.remote_path)
+            rpmfn = pkg.remote_path
             pkg.localpath = os.path.join(local_repo_path, rpmfn)
             pkg.repo.copy_local = True
             pkg.repo.cache = 0
+            localdir = os.path.dirname(pkg.localpath)
+            if not os.path.exists(localdir):
+                os.makedirs(localdir)
 
         # use downloader from YumBase
         probs = my.downloadPkgs(download_list)
