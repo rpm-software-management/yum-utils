@@ -45,6 +45,10 @@ Produce verbose output.
 Tells repoquery to run entirely from YUM cache - does not download any metadata
 or update the cache. Queries in this mode can fail or give partial/incorrect
 results if the cache isn't fully populated beforehand with eg "yum makecache".
+.IP "\fB\-\-nolock\fP"
+Disable locking the yum cache. This is needed as any yum API caller can alter
+the repo. metadata cache, unless it is locked. This automatically enables the
+--cache and --tempcache options, to try to lower the riskiness.
 .IP "\fB\-\-tempcache\fP"
 Create and use a private cache instead of the main YUM cache. This is used
 by default when run as non-root user.

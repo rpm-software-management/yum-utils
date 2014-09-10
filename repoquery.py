@@ -1257,6 +1257,8 @@ def main(args):
                       help="run from cache only")
     parser.add_option("--tempcache", action="store_true",
                       help="use private cache (default when used as non-root)")
+    parser.add_option("--nolock", action="store_true",
+                      help="disable locking (can only be used when running from cached tempcache)")
     parser.add_option("--querytags", action="store_true",
                       help="list available tags in queryformat queries")
     parser.add_option("-c", "--config", dest="conffile",
@@ -1465,6 +1467,11 @@ def main(args):
             repoq.repos.setProgressBar(TextMeter(fo=sys.stdout))
             repoq.repos.callback = output.CacheProgressCallback()
             repoq.repos.setFailureCallback(freport)
+
+    if opts.nolock and not opts.tempcache:
+        opts.tempcache = True
+    if opts.nolock and not opts.cache:
+        opts.cache = True
     
     if not repoq.setCacheDir(opts.tempcache):
         repoq.logger.error("Error: Could not make cachedir, exiting")
@@ -1507,7 +1514,7 @@ def main(args):
             for repo in repoq.repos.findRepos(repo_match):
                 repo.enable()
 
-    while True:
+    while not opts.nolock:
         try: repoq.doLock(); break
         except yum.Errors.LockError, e: pass
         repoq.logger.error(e)
