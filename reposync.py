@@ -282,7 +282,10 @@ def main():
         download_list.sort(key=lambda pkg: pkg.name)
         if opts.urls:
             for pkg in download_list:
-                print urljoin(pkg.repo.urls[0], pkg.relativepath)
+                remote = pkg.returnSimple('relativepath')
+                local = os.path.join(local_repo_path, remote)
+                if not (os.path.exists(local) and my.verifyPkg(local, pkg, False)):
+                    print urljoin(pkg.repo.urls[0], pkg.relativepath)
             continue
 
         # create dest dir
