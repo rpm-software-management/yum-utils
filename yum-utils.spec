@@ -681,6 +681,7 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/copr.conf
 %{pluginhome}/copr.*
+%{_mandir}/man8/yum-copr.8.*
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
