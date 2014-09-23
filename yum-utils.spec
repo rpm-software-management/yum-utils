@@ -363,6 +363,15 @@ Requires: puppet
 %description -n yum-plugin-puppetverify
 Supplies checksums for files in packages from puppet's state file. 
 
+%package -n yum-plugin-copr
+Summary: Yum plugin to add copr command
+Group: System Environment/Base
+Provides: yum-copr = %{version}-%{release}
+Requires: yum >= 3.4.3
+
+%description -n yum-plugin-copr
+This plugin adds the command copr, for adding/listing/searching copr repos.
+
 %prep
 %setup -q
 
@@ -398,6 +407,7 @@ plugins="\
  fs-snapshot \
  ps \
  puppetverify \
+ copr \
 "
 
 %if %{package_yum_updatesd}
@@ -665,6 +675,12 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/puppetverify.conf
 %{pluginhome}/puppetverify.*
+
+%files -n yum-plugin-copr
+%defattr(-, root, root)
+%doc COPYING
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/copr.conf
+%{pluginhome}/copr.*
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
