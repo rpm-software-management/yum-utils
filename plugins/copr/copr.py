@@ -30,10 +30,10 @@ import requests
 import urllib
 
 from yum.i18n import _
-from yum.plugins import TYPE_CORE
+from yum.plugins import TYPE_INTERACTIVE
 
 requires_api_version = '2.5'
-plugin_type = TYPE_CORE
+plugin_type = (TYPE_INTERACTIVE,)
 
 yes = set([_('yes'), _('y')])
 no = set([_('no'), _('n'), ''])
