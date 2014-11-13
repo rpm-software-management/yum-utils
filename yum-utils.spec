@@ -368,6 +368,7 @@ Summary: Yum plugin to add copr command
 Group: System Environment/Base
 Provides: yum-copr = %{version}-%{release}
 Requires: yum >= 3.4.3
+Requires: python-requests
 
 %description -n yum-plugin-copr
 This plugin adds the command copr, for adding/listing/searching copr repos.
