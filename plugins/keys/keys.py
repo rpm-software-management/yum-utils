@@ -150,10 +150,12 @@ class KeysListCommand:
         if gpgme is not None:
             base.repos.doSetup() # Without this repo.cachedir is empty *sigh*
             for repo in base.repos.listEnabled():
-                if hasattr(repo, 'gpgcadir'):
-                    gpgdir = repo.gpgcadir
-                else:
-                    gpgdir = '%s/gpgdir' % repo.cachedir
+              if hasattr(repo, 'gpgcadir'):
+                  gpgdirs = [repo.gpgcadir, repo.gpgdir]
+              else:
+                  gpgdirs = ['%s/gpgdir' % repo.cachedir]
+
+              for gpgdir in gpgdirs:
                 if not os.path.exists(gpgdir):
                     continue
 
