@@ -146,8 +146,11 @@ if opts.enable and opts.disable:
     logger.error("Error: Trying to enable and disable repos.")
     opts.enable = opts.disable = False
 if opts.enable and not args:
-    logger.error("Error: Trying to enable already enabled repos.")
+    logger.error("Error: please specify repos to enable (\* to enable all).")
     opts.enable = False
+if opts.disable and not args:
+    logger.error("Error: please specify repos to disable (\* to disable all).")
+    opts.disable = False
 
 only = None
 
