@@ -155,10 +155,13 @@ if (not args and not opts.addrepo) or 'main' in args:
     print yb.fmtSection('main')
     print yb.conf.dump()
     if opts.save and hasattr(yb, 'main_setopts') and yb.main_setopts:
-        fn = '/etc/yum/yum.conf'
+        fn = opts.conffile
         if not os.path.exists(fn):
-            # Try the old default
-            fn = '/etc/yum.conf'
+            if fn == '/etc/yum/yum.conf':
+                # Try the old default
+                fn = '/etc/yum.conf'
+            else:
+                raise yum.Errors.ConfigError("Error accessing file for config %s" % fn)
         ybc = yb.conf
         writeRawConfigFile(fn, 'main', ybc.yumvar,
                            ybc.cfg.options, ybc.iteritems, ybc.optionobj,
