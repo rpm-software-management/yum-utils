@@ -21,7 +21,6 @@ from os import utime, walk, path
 
 requires_api_version = '2.3'
 plugin_type = (TYPE_CORE,)
-base_dir = 'var/lib/rpm/'
 mtab = '/etc/mtab'
 
 def should_touch():
@@ -34,12 +33,12 @@ def should_touch():
         return line and line.startswith('overlay /')
     return False
 
-def init_hook(conduit):
+def prereposetup_hook(conduit):
     if not should_touch():
         return
-    ir = conduit.getConf().installroot
+    rpmdb_path = conduit.getRpmDB()._rpmdbpath
     try:
-        for root, _, files in walk(path.join(ir, base_dir)):
+        for root, _, files in walk(rpmdb_path):
             for f in files:
                 p = path.join(root, f)
                 with open(p, 'a'):
