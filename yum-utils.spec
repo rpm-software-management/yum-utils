@@ -373,6 +373,15 @@ Requires: python-requests
 %description -n yum-plugin-copr
 This plugin adds the command copr, for adding/listing/searching copr repos.
 
+%package -n yum-plugin-ovl
+Summary: Yum plugin to work around overlayfs issues
+Group: System Environment/Base
+Provides: yum-ovl = %{version}-%{release}
+Requires: yum >= 3.4.3
+
+%description -n yum-plugin-ovl
+This plugin touches rpmdb files to work around overlayfs issues.
+
 %prep
 %setup -q
 
@@ -409,6 +418,7 @@ plugins="\
  ps \
  puppetverify \
  copr \
+ ovl \
 "
 
 %if %{package_yum_updatesd}
@@ -683,6 +693,12 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/copr.conf
 %{pluginhome}/copr.*
 %{_mandir}/man8/yum-copr.8.*
+
+%files -n yum-plugin-ovl
+%defattr(-, root, root)
+%doc COPYING
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ovl.conf
+%{pluginhome}/ovl.*
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
