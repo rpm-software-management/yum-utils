@@ -145,7 +145,7 @@ class YumBuildDep(YumUtilBase):
                 self.logger.info('Enabling %s repository' % r.id)
                 r.enable()
 
-    def install_deps(self, deplist):
+    def install_deps(self, deplist, opts):
         errors = set()
         for dep in deplist:
             self.logger.debug(' REQ:  %s' % dep)                
@@ -165,7 +165,8 @@ class YumBuildDep(YumUtilBase):
         if errors:
             for i in sorted(errors):
                 self.logger.error("Error: %s" % i)
-            sys.exit(1)
+            if not opts.tolerant:
+                sys.exit(1)
 
     # go through each of the pkgs, figure out what they are/where they are 
     # if they are not a local package then run
@@ -226,7 +227,7 @@ class YumBuildDep(YumUtilBase):
 
         for srpm in toActOn:
             self.logger.info('Getting requirements for %s' % srpm)
-            self.install_deps(srpm.requiresList())
+            self.install_deps(srpm.requiresList(), opts)
     
         for name in specnames:
             # (re)load rpm config for target if set
@@ -248,7 +249,7 @@ class YumBuildDep(YumUtilBase):
                 buildreqs.append(d.DNEVR()[2:])
                 
             self.logger.info('Getting requirements for %s' % name)
-            self.install_deps(buildreqs)
+            self.install_deps(buildreqs, opts)
             
 if __name__ == '__main__':
     setup_locale()
