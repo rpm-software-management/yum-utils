@@ -79,6 +79,9 @@ class PackageCleanup(YumUtilBase):
         dupegrp.add_option("--cleandupes", default=False, 
                     dest="cleandupes", action="store_true",
                     help='Scan for duplicates in your rpmdb and remove older ')
+        dupegrp.add_option("--removenewestdupes", default=False, 
+                    dest="removenewestdupes", action="store_true",
+                    help='Remove the newest dupes instead of the oldest dupes.')
         dupegrp.add_option("--noscripts", default=False,
                     dest="noscripts", action="store_true",
                     help="disable rpm scriptlets from running when cleaning duplicates")
@@ -172,7 +175,7 @@ class PackageCleanup(YumUtilBase):
             
         return results
 
-    def _remove_old_dupes(self):
+    def _remove_dupes(self, newest=False):
         """add older duplicate pkgs to be removed in the transaction"""
         dupedict = self._find_installed_duplicates()
 
@@ -180,7 +183,11 @@ class PackageCleanup(YumUtilBase):
         for (name,dupelists) in dupedict.items():
             for dupelist in dupelists:
                 dupelist.sort()
-                for lowpo in dupelist[0:-1]:
+                if newest:
+                    plist = dupelist[1:]
+                else:
+                    plist = dupelist[0:-1]
+                for lowpo in plist:
                     removedupes.append(lowpo)
 
         for po in removedupes:
@@ -373,7 +380,7 @@ class PackageCleanup(YumUtilBase):
                 sys.exit(1)
             if opts.noscripts:
                 self.conf.tsflags.append('noscripts')
-            self._remove_old_dupes()
+            self._remove_dupes(opts.removenewestdupes)
             self.run_with_package_names.add('yum-utils')
 
             if hasattr(self, 'doUtilBuildTransaction'):
