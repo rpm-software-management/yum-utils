@@ -4,6 +4,7 @@ from os import walk, path, fstat
 requires_api_version = '2.3'
 plugin_type = (TYPE_CORE,)
 mtab = '/etc/mtab'
+VERBOSE_DEBUGLEVEL = 3
 
 
 def _stat_ino_fp(fp):
@@ -48,22 +49,6 @@ def do_detect_copy_up(files):
     return len(diff) - num_files
 
 
-def raw_copy_up(files):
-    """
-    Induce a copy-up by opening R/W
-    """
-    return for_each_file(files, _stat_ino_fp, 'ab')
-
-
-def should_be_verbose(cmd):
-    """
-    If the debuglevel is > 2 then be verbose
-    """
-    if not hasattr(cmd, 'debuglevel'):
-        return False
-    return cmd.debuglevel > 2
-
-
 def should_touch():
     """ 
     Touch the files only once we've verified that
@@ -85,9 +70,7 @@ def prereposetup_hook(conduit):
 
     try:
         files = list(get_file_list(rpmdb_path))
-        if should_be_verbose(conduit.getCmdLine()[0]):
-            conduit.info(1, "ovl: Copying up (%i) files from OverlayFS lower layer" % do_detect_copy_up(files))
-        else:
-            raw_copy_up(files)
+        copied_num = do_detect_copy_up(files)
+        conduit.info(VERBOSE_DEBUGLEVEL, "ovl: Copying up (%i) files from OverlayFS lower layer" % copied_num)
     except Exception as e:
         conduit.error(1, "ovl: Error while doing RPMdb copy-up:\n%s" % e)
