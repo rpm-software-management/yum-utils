@@ -73,6 +73,8 @@ querytags = [ 'name', 'version', 'release', 'epoch', 'arch', 'summary',
               'vendor', 'group', 'license', 'buildtime', 'filetime',
               'installedsize', 'archivesize', 'packagesize', 'repoid', 
               'requires', 'provides', 'conflicts', 'obsoletes',
+              'weak_requires', 'info_requires',
+              'weak_reverse_requires', 'info_reverse_requires', 
               'relativepath', 'hdrstart', 'hdrend', 'id',
               'checksum', 'pkgid', 'committer', 'committime',
               'ui_evr', 'evr', 'ui_nevra', 'ui_envra',
@@ -266,18 +268,42 @@ class pkgQuery:
         return self._translated_qf[self.qf] % self
 
     def fmt_requires(self, **kw):
-        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+        if self.yb.options.output in ("ascii-tree", "dot-tree",
+                                      "ascii-tree+", "dot-tree+"):
             self.fmt_tree_requires(output = self.yb.options.output,
                                 tree_level = self.yb.options.tree_level,
                                 dot = self.yb.options.dot)
         else:
             return "\n".join(self.prco('requires'))
 
+    def fmt_weak_requires(self, **kw):
+        if self.yb.options.output in ("ascii-tree", "dot-tree",
+                                      "ascii-tree+", "dot-tree+"):
+            self.fmt_tree_weak_requires(output = self.yb.options.output,
+                                tree_level = self.yb.options.tree_level,
+                                dot = self.yb.options.dot)
+        else:
+            return "\n".join(self.prco('weak_requires'))
+    def fmt_recommends(self, **kw):
+        return self.fmt_weak_requires(**kw)
+
+    def fmt_info_requires(self, **kw):
+        if self.yb.options.output in ("ascii-tree", "dot-tree",
+                                      "ascii-tree+", "dot-tree+"):
+            self.fmt_tree_info_requires(output = self.yb.options.output,
+                                tree_level = self.yb.options.tree_level,
+                                dot = self.yb.options.dot)
+        else:
+            return "\n".join(self.prco('info_requires'))
+    def fmt_suggests(self, **kw):
+        return self.fmt_info_requires(**kw)
+
     def fmt_provides(self, **kw):
         return "\n".join(self.prco('provides'))
 
     def fmt_conflicts(self, **kw):
-        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+        if self.yb.options.output in ("ascii-tree", "dot-tree",
+                                      "ascii-tree+", "dot-tree+"):
             self.fmt_tree_conflicts(output = self.yb.options.output,
                                 tree_level = self.yb.options.tree_level,
                                 dot = self.yb.options.dot)
@@ -285,12 +311,23 @@ class pkgQuery:
             return "\n".join(self.prco('conflicts'))
 
     def fmt_obsoletes(self, **kw):
-        if self.yb.options.output in ("ascii-tree", "dot-tree"):
+        if self.yb.options.output in ("ascii-tree", "dot-tree",
+                                      "ascii-tree+", "dot-tree+"):
             self.fmt_tree_obsoletes(output = self.yb.options.output,
                                 tree_level = self.yb.options.tree_level,
                                 dot = self.yb.options.dot)
         else:
             return "\n".join(self.prco('obsoletes'))
+
+    def fmt_weak_reverse_requires(self, **kw):
+        return "\n".join(self.prco('weak_reverse_requires'))
+    def fmt_supplements(self, **kw):
+        return self.fmt_weak_reverse_requires(**kw)
+
+    def fmt_info_reverse_requires(self, **kw):
+        return "\n".join(self.prco('info_reverse_requires'))
+    def fmt_enhances(self, **kw):
+        return self.fmt_info_reverse_requires(**kw)
 
     def fmt_list(self, **kw):
         return "\n".join(self.files())
@@ -370,7 +407,7 @@ class pkgQuery:
         level    = kw.get('level', 0)
         all_reqs = kw.get('all_reqs', {})
         
-        if kw['output'].lower() == 'dot-tree':
+        if kw['output'].lower() in ('dot-tree', 'dot-tree+'):
             if 'dot' not in kw.keys() or kw['dot'] is None:
                 kw['dot'] = DotPlot()
         elif 'dot' not in kw.keys() or kw['dot'] is None:
@@ -436,6 +473,11 @@ class pkgQuery:
             return providers 
         
         tups = getattr(pkg, prco_type)
+        if kw['output'].lower() in ('ascii-tree+', 'dot-tree+'):
+            if prco_type in ("info_requires",):
+                tups.extend(getattr(pkg, "weak_requires"))
+            if prco_type in ("info_requires", "weak_requires"):
+                tups.extend(getattr(pkg, "requires"))
         rpkgs, loc_reqs = self._tree_maybe_add_pkgs(all_reqs, tups, req2pkgs)
         if dot is not None:
             dot.addPackage(pkg, rpkgs)
@@ -461,6 +503,10 @@ class pkgQuery:
         
     def fmt_tree_requires(self, **kw):
         return self._fmt_tree_prov('requires', **kw)
+    def fmt_tree_weak_requires(self, **kw):
+        return self._fmt_tree_prov('weak_requires', **kw)
+    def fmt_tree_info_requires(self, **kw):
+        return self._fmt_tree_prov('info_requires', **kw)
     def fmt_tree_conflicts(self, **kw):
         return self._fmt_tree_prov('conflicts', **kw)
 
@@ -705,6 +751,11 @@ class instPkgQuery(pkgQuery):
             
     def prco(self, what, **kw):
         prcodict = {}
+        what = {"weak_requires" : "recommends",
+                "info_requires" : "suggests",
+                "weak_reverse_requires" : "supplements",
+                "info_reverse_requires" : "enhances"}.get(what, what)
+
         # rpm names are without the trailing s :)
         what = what[:-1]
 
@@ -1088,7 +1139,7 @@ class YumBaseQuery(yum.YumBase):
                 pkgs.append(pkg)
         return self.queryPkgFactory(pkgs)
 
-    def fmt_requires(self, name, **kw):
+    def fmt_requires(self, name, requires="requires", **kw):
         pkgs = {}
         done = set()
         def require_recursive(pkg):
@@ -1096,7 +1147,7 @@ class YumBaseQuery(yum.YumBase):
                 return
             done.add(pkg.name)
 
-            for req in pkg.prco("requires"):
+            for req in pkg.prco(requires):
                 for res in self.fmt_whatprovides(req):
                     pkgs[(res.name, res.pkg.arch)] = res
                     if self.options.recursive:
@@ -1106,6 +1157,22 @@ class YumBaseQuery(yum.YumBase):
             require_recursive(pkg)
 
         return pkgs.values()
+
+    def fmt_weak_requires(self, name, **kw):
+        return self.fmt_requires(name, requires="weak_requires", **kw)
+    def fmt_recommends(self, name, **kw):
+        return self.fmt_requires(name, requires="recommends", **kw)
+
+    def fmt_info_requires(self, name, **kw):
+        return self.fmt_requires(name, requires="info_requires", **kw)
+    def fmt_suggests(self, name, **kw):
+        return self.fmt_requires(name, requires="suggests", **kw)
+
+    def fmt_weak_reverse_requires(self, name, **kw):
+        return self.fmt_requires(name, requires="weak_reverse_requires", **kw)
+
+    def fmt_info_reverse_requires(self, name, **kw):
+        return self.fmt_requires(name, requires="info_reverse_requires", **kw)
 
     def fmt_location(self, name):
         loc = []
@@ -1184,6 +1251,44 @@ def main(args):
                       help="query all packages/groups")
     parser.add_option("-R", "--requires", action="store_true",
                       help="list package dependencies")
+    parser.add_option("--weak-requires", action="store_true",
+                      help="list package weak dependencies")
+    parser.add_option("--recommends", action="store_true",
+                      dest="weak_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--weak-reverse-requires", action="store_true",
+                      help="list package weak reverse dependencies")
+    parser.add_option("--reverse-weak-requires", action="store_true",
+                      dest="weak_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--rev-weak-requires", action="store_true",
+                      dest="weak_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--weak-rev-requires", action="store_true",
+                      dest="weak_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--supplements", action="store_true",
+                      dest="weak_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--info-requires", action="store_true",
+                      help="list package informational dependencies")
+    parser.add_option("--suggests", action="store_true",
+                      dest="info_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--info-reverse-requires", action="store_true",
+                      help="list package informational reverse dependencies")
+    parser.add_option("--reverse-info-requires", action="store_true",
+                      dest="info_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--rev-info-requires", action="store_true",
+                      dest="info_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--info-rev-requires", action="store_true",
+                      dest="info_reverse_requires",
+                      help=SUPPRESS_HELP)
+    parser.add_option("--enhances", action="store_true",
+                      dest="info_reverse_requires",
+                      help=SUPPRESS_HELP)
     parser.add_option("--provides", action="store_true",
                       help="list capabilities this package provides")
     parser.add_option("--obsoletes", action="store_true",
@@ -1278,7 +1383,7 @@ def main(args):
     parser.add_option("--level", dest="tree_level", default="all",
                       help="levels to display (can be any number or 'all', default to 'all')")
     parser.add_option("--output", dest="output", default="text",
-                      help="output format to use (can be text|ascii-tree|dot-tree, default to 'text')")
+                      help="output format to use (can be text|ascii-tree|dot-tree|ascii-tree+|dot-tree+, default to 'text')")
     parser.add_option("--search", action="store_true",
                       dest="search", default=False,
                       help="Use yum's search to return pkgs")
@@ -1316,6 +1421,26 @@ def main(args):
             sackops.append("requires")
         else:
             pkgops.append("requires")
+    if opts.info_requires:
+        if opts.resolve:
+            sackops.append("info_requires")
+        else:
+            pkgops.append("info_requires")
+    if opts.weak_requires:
+        if opts.resolve:
+            sackops.append("weak_requires")
+        else:
+            pkgops.append("weak_requires")
+    if opts.info_reverse_requires:
+        if opts.resolve:
+            sackops.append("info_reverse_requires")
+        else:
+            pkgops.append("info_reverse_requires")
+    if opts.weak_reverse_requires:
+        if opts.resolve:
+            sackops.append("weak_reverse_requires")
+        else:
+            pkgops.append("weak_reverse_requires")
     if opts.provides:
         pkgops.append("provides")
     if opts.obsoletes:

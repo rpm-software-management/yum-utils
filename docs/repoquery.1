@@ -80,8 +80,16 @@ Show general information about package similarly to "rpm \-qi"
 List files in package.
 .IP "\fB\-R, \-\-requires\fP"
 List package dependencies.
+.IP "\fB\-R, \-\-weak\-requires\fP"
+List package weak dependencies.
+.IP "\fB\-R, \-\-info\-requires\fP"
+List package informational dependencies.
+.IP "\fB\-R, \-\-weak\-reverse\-requires\fP"
+List package weak reverse dependencies.
+.IP "\fB\-R, \-\-info\-reverse\-requires\fP"
+List package informational reverse dependencies.
 .IP "\fB\-\-resolve\fP"
-When used with \-\-requires, resolve capabilities to originating packages.
+When used with \-\-requires/\-\-weak\-requires/etc, resolve capabilities to originating packages.
 .IP "\fB\-\-provides\fP"
 List capabilities package provides.
 .IP "\fB\-\-obsoletes\fP"
@@ -111,12 +119,13 @@ Specify custom output format for queries. You can add ":date", ":day" and
 ":isodate" to all the tags that are a time, and you can add ":k", ":m", ":g",
 ":t" and ":h" to sizes. You can also specify field width as in
 sprintf (Eg. %-20{name})
-.IP "\fB\-\-output [text|ascii-tree|dot-tree]\fP"
-Output format which can be used with \-\-requires/\-\-whatrequires/\-\-obsoletes/\-\-conflicts.
+.IP "\fB\-\-output [text|ascii-tree|ascii-tree+|dot-tree|dot-tree+]\fP"
+Output format which can be used with \-\-requires/\-\-weak-requires/\-\-whatrequires/\-\-obsoletes/\-\-conflicts. The variants with a + suffix are used for weak dependencies and will merge the stronger variants into the output.
 Default output is 'text'.
 .IP "\fB\-\-level [all|any int]\fP"
-In combination with \-\-output ascii-tree|dot-tree this option specifies the
-number of level to print on the tree. Default level is 'all'.
+In combination with \-\-output ascii-tree|dot-tree|ascii-tree+|dot-tree+ this
+option specifies the number of level to print on the tree.
+ Default level is 'all'.
 .PP 
 
 .SH "PACKAGE SELECTION OPTIONS" 
