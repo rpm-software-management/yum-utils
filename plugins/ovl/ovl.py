@@ -3,7 +3,6 @@ from os import walk, path, fstat
 
 requires_api_version = '2.3'
 plugin_type = (TYPE_CORE,)
-mtab = '/etc/mtab'
 VERBOSE_DEBUGLEVEL = 3
 
 
@@ -49,23 +48,7 @@ def do_detect_copy_up(files):
     return len(diff) - num_files
 
 
-def should_touch():
-    """ 
-    Touch the files only once we've verified that
-    we're on overlay mount
-    """
-    if not path.exists(mtab):
-        return False
-    with open(mtab, 'r') as f:
-        line = f.readline()
-        return line.startswith('overlay / overlay')
-    return False
-
-
 def prereposetup_hook(conduit):
-    if not should_touch():
-        return
-
     rpmdb_path = conduit.getRpmDB()._rpmdbpath
 
     try:
