@@ -1,0 +1,37 @@
+.TH "yum\-ovl" "1" "September 2015" "Red Hat" "User Manual"
+.
+.SH "NAME"
+yum\-ovl \- Performs an initial copy\-up of yum(8) package database\.
+.
+.SH "OPTIONS"
+\fB\-d\fR \fIdebug\-level\fR If debug level is \fI2\fR and more, print out the number of files copied up from the lower layer
+.
+.SH "DESCRIPTION"
+Opening a file on OverlayFS in read\-only mode causes the file from
+.br
+lower layer to be opened, then later on, if the same file is opened 
+.br
+in write mode, a copy-up into the upper    layer    takes    place, 
+.br
+resulting into a \fBnew\fR file being opened\.
+.br
+Since yum(8) needs to open the \fBRPMdb\fR first read-only, and then
+.br
+also with write access, we need to copy-up the files beforehand to 
+.br
+make sure that the access is consistent.
+.
+.SH "FILES"
+\fI/usr/lib/yum\-plugins/ovl\.py\fR Plugin itself
+.
+.P
+\fI/etc/yum/pluginconf\.d/ovl\.conf\fR Configuration file allowing to enable/disable the plugin
+.
+.SH "AUTHOR"
+Pavel Odvody \fIpodvody@redhat\.com\fR
+.
+.SH "LICENSE"
+2015, Red Hat, Licensed under GPLv2+
+.
+.SH "SEE ALSO"
+yum(1) yum(8) rpmdb(8)
