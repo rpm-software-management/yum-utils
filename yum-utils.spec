@@ -699,6 +699,7 @@ fi
 %doc COPYING
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ovl.conf
 %{pluginhome}/ovl.*
+%{_mandir}/man1/yum-ovl.1.*
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 
