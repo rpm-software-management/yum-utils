@@ -47,9 +47,8 @@ def do_detect_copy_up(files):
     diff = set(lower + upper)
     return len(diff) - num_files
 
-
-def prereposetup_hook(conduit):
-    rpmdb_path = conduit.getRpmDB()._rpmdbpath
+def init_hook(conduit):
+    rpmdb_path = conduit._base.rpmdb._rpmdbpath
 
     try:
         files = list(get_file_list(rpmdb_path))
