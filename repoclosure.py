@@ -20,6 +20,7 @@
 #   dependencies in all packages for resolution. Print out the list of
 #   packages with unresolved dependencies
 
+import fnmatch
 import sys
 import os
 
@@ -32,6 +33,19 @@ import rpmUtils.arch
 import rpmUtils.updates
 from yum.constants import *
 from yum.packageSack import ListPackageSack
+
+
+def filter_repos(patterns, repolist):
+    matching = []
+    for patternspec in patterns:
+        for pattern in patternspec.split(","):
+            pattern = pattern.strip()
+            for repo in list(repolist):
+                if fnmatch.fnmatch(repo, pattern):
+                    matching.append(repo)
+                    repolist.remove(repo)
+    return matching
+
 
 def parseArgs():
     usage = """
@@ -234,16 +248,19 @@ def main():
             my.repos.enableRepo(newrepo.id)
             my.logger.info( "Added %s repo from %s" % (repoid,repopath))
 
-    if opts.repoid:
-        for repo in my.repos.repos.values():
-            if ((repo.id not in opts.repoid) and
-                (repo.id not in opts.lookaside)):
-                repo.disable()
-            else:
-                repo.enable()
+    all_repoids = [r.id for r in my.repos.repos.values()]
+    lookaside_repos = filter_repos(opts.lookaside, all_repoids)
 
-    if opts.lookaside:
-        my.lookaside = opts.lookaside
+    if opts.repoid:
+        specified_repos = filter_repos(opts.repoid, all_repoids)
+        for repo in my.repos.repos.values():
+            if repo.id in specified_repos + lookaside_repos:
+                repo.enable()
+            else:
+                repo.disable()
+
+    if lookaside_repos:
+        my.lookaside = lookaside_repos
 
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
