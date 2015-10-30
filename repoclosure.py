@@ -20,6 +20,7 @@
 #   dependencies in all packages for resolution. Print out the list of
 #   packages with unresolved dependencies
 
+import fnmatch
 import sys
 import os
 
@@ -33,12 +34,25 @@ import rpmUtils.updates
 from yum.constants import *
 from yum.packageSack import ListPackageSack
 
+
+def filter_repos(patterns, repolist):
+    matching = []
+    for patternspec in patterns:
+        for pattern in patternspec.split(","):
+            pattern = pattern.strip()
+            for repo in list(repolist):
+                if fnmatch.fnmatch(repo, pattern):
+                    matching.append(repo)
+                    repolist.remove(repo)
+    return matching
+
+
 def parseArgs():
     usage = """
-    Read in the metadata of a series of repositories and check all the   
+    Read in the metadata of a series of repositories and check all the
     dependencies in all packages for resolution. Print out the list of
     packages with unresolved dependencies
-    
+
     %s [-c <config file>] [-a <arch>] [-l <lookaside>] [-r <repoid>] [-r <repoid2>]
     """ % sys.argv[0]
     parser = OptionParser(usage=usage)
@@ -47,7 +61,7 @@ def parseArgs():
     parser.add_option("-a", "--arch", default=[], action='append',
         help='check packages of the given archs, can be specified multiple ' +
              'times (default: current arch)')
-    parser.add_option("--basearch", default=None, 
+    parser.add_option("--basearch", default=None,
                       help="set the basearch for yum to run as")
     parser.add_option("-b", "--builddeps", default=False, action="store_true",
         help='check build dependencies only (needs source repos enabled)')
@@ -55,9 +69,9 @@ def parseArgs():
         help="specify a lookaside repo id to query, can be specified multiple times")
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
-    parser.add_option("-t", "--tempcache", default=False, action="store_true", 
+    parser.add_option("-t", "--tempcache", default=False, action="store_true",
         help="Use a temp dir for storing/accessing yum-cache")
-    parser.add_option("-q", "--quiet", default=0, action="store_true", 
+    parser.add_option("-q", "--quiet", default=0, action="store_true",
                       help="quiet (no output to stderr)")
     parser.add_option("-n", "--newest", default=0, action="store_true",
                       help="check only the newest packages in the repos")
@@ -89,25 +103,25 @@ class RepoClosure(yum.YumBase):
         if hasattr(self.repos, 'sqlite'):
             self.repos.sqlite = False
             self.repos._selectSackType()
-    
+
     def evrTupletoVer(self,tup):
         """convert an evr tuple to a version string, return None if nothing
         to convert"""
-    
+
         e, v, r = tup
 
         if v is None:
             return None
-    
+
         val = v
         if e is not None:
             val = '%s:%s' % (e, v)
-    
+
         if r is not None:
             val = '%s-%s' % (val, r)
-    
+
         return val
-    
+
     def readMetadata(self):
         self.doRepoSetup()
         archs = []
@@ -131,7 +145,7 @@ class RepoClosure(yum.YumBase):
             pkgs = self.pkgSack.returnNewestByNameArch()
             mypkgSack = ListPackageSack(pkgs)
             pkgtuplist = mypkgSack.simplePkgList()
-            
+
             # toss out any of the obsoleted pkgs so we can't depsolve with them
             self.up = rpmUtils.updates.Updates([], pkgtuplist)
             self.up.rawobsoletes = mypkgSack.returnObsoletes()
@@ -147,7 +161,7 @@ class RepoClosure(yum.YumBase):
             # we've deleted items so remake the pkgs
             pkgs = self.pkgSack.returnNewestByNameArch()
             pkgtuplist = mypkgSack.simplePkgList()
-        
+
         if self.builddeps:
             pkgs = filter(lambda x: x.arch == 'src', pkgs)
 
@@ -171,23 +185,23 @@ class RepoClosure(yum.YumBase):
                 continue
             for (req, flags, (reqe, reqv, reqr)) in pkg.returnPrco('requires'):
                 if req.startswith('rpmlib'): continue # ignore rpmlib deps
-            
+
                 ver = self.evrTupletoVer((reqe, reqv, reqr))
                 if (req,flags,ver) in resolved:
                     continue
-                
+
                 resolve_sack = [] # make it empty
                 try:
                     resolve_sack = self.whatProvides(req, flags, ver)
                 except yum.Errors.RepoError, e:
                     pass
-            
+
                 if len(resolve_sack) < 1:
                     if pkg not in unresolved:
                         unresolved[pkg] = []
                     unresolved[pkg].append((req, flags, ver))
                     continue
-                    
+
                 if newest:
                     resolved_by_newest = False
                     for po in resolve_sack:# look through and make sure all our answers are newest-only
@@ -195,20 +209,20 @@ class RepoClosure(yum.YumBase):
                             resolved_by_newest = True
                             break
 
-                    if resolved_by_newest:                    
+                    if resolved_by_newest:
                         resolved[(req,flags,ver)] = 1
                     else:
                         if pkg not in unresolved:
                             unresolved[pkg] = []
                         unresolved[pkg].append((req, flags, ver))
-                        
+
         return unresolved
-    
+
 
 def main():
     (opts, cruft) = parseArgs()
-    my = RepoClosure(arch=opts.arch, 
-                     config=opts.config, 
+    my = RepoClosure(arch=opts.arch,
+                     config=opts.config,
                      builddeps=opts.builddeps,
                      pkgonly=opts.pkg,
                      grouponly=opts.group,
@@ -221,9 +235,9 @@ def main():
             if repopath.startswith('http') or repopath.startswith('ftp') or repopath.startswith('file:'):
                 baseurl = repopath
             else:
-                repopath = os.path.abspath(repopath)                
+                repopath = os.path.abspath(repopath)
                 baseurl = 'file://' + repopath
-                
+
             newrepo = yum.yumRepo.YumRepository(repoid)
             newrepo.name = repopath
             newrepo.baseurl = baseurl
@@ -233,24 +247,27 @@ def main():
             my.repos.add(newrepo)
             my.repos.enableRepo(newrepo.id)
             my.logger.info( "Added %s repo from %s" % (repoid,repopath))
-    
-    if opts.repoid:
-        for repo in my.repos.repos.values():
-            if ((repo.id not in opts.repoid) and
-                (repo.id not in opts.lookaside)):
-                repo.disable()
-            else:
-                repo.enable()
 
-    if opts.lookaside:
-        my.lookaside = opts.lookaside
+    all_repoids = [r.id for r in my.repos.repos.values()]
+    lookaside_repos = filter_repos(opts.lookaside, all_repoids)
+
+    if opts.repoid:
+        specified_repos = filter_repos(opts.repoid, all_repoids)
+        for repo in my.repos.repos.values():
+            if repo.id in specified_repos + lookaside_repos:
+                repo.enable()
+            else:
+                repo.disable()
+
+    if lookaside_repos:
+        my.lookaside = lookaside_repos
 
     if os.geteuid() != 0 or opts.tempcache:
         cachedir = getCacheDir()
         if cachedir is None:
             my.logger.error("Error: Could not make cachedir, exiting")
             sys.exit(50)
-            
+
         my.repos.setCacheDir(cachedir)
 
     if not opts.quiet:
@@ -271,7 +288,7 @@ def main():
         num = len(my.pkgSack.returnNewestByNameArch())
     else:
         num = len(my.pkgSack)
-        
+
     repos = my.repos.listEnabled()
 
     if not opts.quiet:
@@ -279,24 +296,24 @@ def main():
         for repo in repos:
             my.logger.info('   %s' % repo)
         my.logger.info('Num Packages in Repos: %s' % num)
-    
+
     pkgs = baddeps.keys()
-    
+
     def sortbyname(a,b):
         return cmp(a.__str__(),b.__str__())
-    
+
     pkgs.sort(sortbyname)
-    
+
     for pkg in pkgs:
         my.logger.info('package: %s from %s\n  unresolved deps: ' % (pkg, pkg.repoid))
         for (n, f, v) in baddeps[pkg]:
             req = '%s' % n
-            if f: 
+            if f:
                 flag = LETTERFLAGS[f]
                 req = '%s %s'% (req, flag)
             if v:
                 req = '%s %s' % (req, v)
-            
+
             my.logger.info('     %s' % req)
     if baddeps:
         sys.exit(1)
