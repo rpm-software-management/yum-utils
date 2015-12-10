@@ -111,7 +111,7 @@ def exclude_hook(conduit):
     if check_obsoletes and not conduit._base.conf.obsoletes:
         check_obsoletes = False
     if check_obsoletes:
-        obsoletes = conduit._base.up.rawobsoletes
+        obsoletes = conduit._base.pkgSack.returnObsoletes()
 
     # Build a dictionary with package priorities. Either with arch or
     # archless, based on the user's settings.
