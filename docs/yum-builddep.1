@@ -4,17 +4,28 @@
 yum-builddep \- install missing dependencies for building an RPM package
 .SH "SYNOPSIS"
 \fByum-builddep\fP package
-.SH "DESCRIPTION"
 .PP 
+\fByum-builddep\fP /path/to/local/package.src.rpm
+.PP
+\fByum-builddep\fP /path/to/local/package.spec
+.SH "DESCRIPTION"
+.PP
 \fByum-builddep\fP is a program which installs the RPMs needed to build
 the specified package.  The source RPM for the specified package must
 be available in a Yum repository (which will be automatically enabled, if it is
 disabled) or it can be a local source RPM or a spec file.
 .PP 
+Note, that only the BuildRequires information within the SRPM header information is used to determine build dependencies. This will specifically omit any dependencies that are required only for specific architectures.
+.PP
 .SH "EXAMPLES"
 .IP "Download and install all the RPMs needed to build the kernel RPM:"
-\fByum-builddep kernel\fP
+\fByumdownloader --source kernel && rpm2cpio kernel*src.rpm | cpio -i kernel.spec && \\ \fP
+.br
+\fByum-builddep kernel.spec\fP
 .PP 
+The kernel includes specific BuildRequires dependencies for different architectures. In order to make sure that those dependencies are downloaded and installed, the SRPM should be downloaded, the .spec file extracted from it and used to determine the full dependency list.
+.PP
+
 .SH "FILES"
 As yum-builddep uses YUM libraries for retrieving all the information, it
 relies on YUM configuration for its default values like which repositories
