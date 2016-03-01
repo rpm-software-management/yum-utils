@@ -148,9 +148,12 @@ class DebugInfoInstall(YumUtilBase):
         # add that debuginfo to the ts
         # look through that pkgs' deps
         # add all the debuginfos for the pkgs providing those deps
+        installonly_added = set()
         for pkgglob in self.cmds:
             e, m, u = self.rpmdb.matchPackageNames([pkgglob])
-            for po in e + m:
+            for po in sorted(e + m, reverse=True):
+                if po.name in installonly_added:
+                    continue
                 try:
                     self.di_try_install(po)
                 except yum.Errors.InstallError, e:
@@ -167,6 +170,8 @@ class DebugInfoInstall(YumUtilBase):
                                 self.di_try_install(deppo)
                             except yum.Errors.InstallError, e:
                                 self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
+                if po.name in self.conf.installonlypkgs:
+                    installonly_added.add(po.name)
 
         for pkgname in u:
             self.logger.critical('Could not find a package for: %s' % pkgname)
