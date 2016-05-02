@@ -18,6 +18,8 @@ import yum
 import sys
 import os
 from yum.misc import getCacheDir, checksum
+import tempfile
+from urlgrabber import grabber
 import urlparse
 from yum import Errors
 from optparse import OptionParser
@@ -48,7 +50,7 @@ case_numbers = {'REPODATA': 56, 'CORE_PACKAGES': 57, 'COMPS': 58,
                 'BOOT_IMAGES': 59}
 
 # URL for the RELAX NG schema for comps
-SCHEMA = 'http://cvs.fedoraproject.org/viewcvs/*checkout*/comps/comps.rng'
+SCHEMA = 'https://git.fedorahosted.org/cgit/comps.git/plain/comps.rng'
 
 def testopia_create_run(plan):
     '''Create a run of the given test plan. Returns the run ID.'''
@@ -231,8 +233,20 @@ def main():
         if not (retval & BAD_COMPS):
             print "  verifying comps.xml grammar with xmllint"
             comps = newrepo.getGroups()
-            r = os.system("xmllint --noout --nowarning --relaxng %s %s" % 
-                (SCHEMA,comps))
+            # xmllint doesn't support https for --relaxng so we must download
+            # the schema ourselves
+            ug = grabber.URLGrabber()
+            temp = tempfile.NamedTemporaryFile()
+            try:
+                ug.urlgrab(SCHEMA, temp.name)
+            except grabber.URLGrabError, e:
+                print '  failed to download comps schema:', str(e)
+                r = 1
+            else:
+                r = os.system("xmllint --noout --nowarning --relaxng %s %s" %
+                              (temp.name, comps))
+            finally:
+                temp.close()
             if r != 0:
                 retval = retval | BAD_COMPS
                 report('COMPS','FAILED')
