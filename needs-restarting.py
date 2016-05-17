@@ -60,6 +60,8 @@ def parseargs(args):
       help='show processes for my userid only')
     parser.add_option("-r", "--reboothint", default=False, action="store_true",
       help='give additional recommendation if reboot is required')
+    parser.add_option("-s", "--services", default=False, action="store_true",
+      help='list the affected systemd services only')
     
     (opts, args) = parser.parse_args(args)
     return (opts, args)
@@ -100,6 +102,31 @@ def get_open_files(pid):
         if filename not in files:
             files.append(filename)
     return files
+
+def get_service(pid):
+    """Return the systemd service to which the process belongs.
+
+    More details:
+    http://0pointer.de/blog/projects/systemd-for-admins-2.html
+    https://www.freedesktop.org/wiki/Software/systemd/FrequentlyAskedQuestions/
+    """
+
+    fname = '/proc/%s/cgroup' % pid
+    try:
+        with open(fname, 'r') as f:
+            groups = f.readlines()
+    except (IOError, OSError), e:
+        print >>sys.stderr, "Could not open %s" % fname
+        return None
+
+    for line in groups:
+        line = line.replace('\n', '')
+        hid, hsub, cgroup = line.split(':')
+        if hsub == 'name=systemd':
+            name = cgroup.split('/')[-1]
+            if name.endswith('.service'):
+                return name
+    return None
 
 def main(args):
     (opts, args)  = parseargs(args)
@@ -177,6 +204,13 @@ def main(args):
 
            
             
+    if opts.services:
+        names = set([get_service(pid) for pid in needing_restart])
+        for name in names:
+            if name is not None:
+                print name
+        return 0
+
     for pid, pkgnames in needing_restart.iteritems():
         if opts.reboothint and pkgnames & set(rebootpkgs):
             needreboot = True
