@@ -46,6 +46,7 @@ import stat
 from optparse import OptionParser
 from yum.Errors import RepoError
 sys.path.insert(0,'/usr/share/yum-cli')
+import output
 import utils
 
 def parseargs(args):
@@ -57,6 +58,8 @@ def parseargs(args):
     
     parser.add_option("-u", "--useronly", default=False, action="store_true",
       help='show processes for my userid only')
+    parser.add_option("-r", "--reboothint", default=False, action="store_true",
+      help='give additional recommendation if reboot is required')
     
     (opts, args) = parser.parse_args(args)
     return (opts, args)
@@ -111,8 +114,16 @@ def main(args):
     if hasattr(my, 'setCacheDir'):
         my.setCacheDir()
     my.conf.cache = True
+    term = output.YumTerm()
+
+    # follow reboot recommendations from https://access.redhat.com/solutions/27943
+    needreboot = False
+    rebootpkgs = ["kernel", "kernel-smp", "kernel-xen-hypervisor",
+                  "kernel-PAE", "kernel-xen0", "kernel-xenU", "kernel-xen",
+                  "kernel-xen-guest", "glibc", "glibc-common", "krb5-libs",
+                  "hal", "dbus", "xen", "udev", "linux-firmware", "systemd"]
     
-    needing_restart = set()
+    needing_restart = dict()
 
     boot_time = utils.get_boot_time()
     for pid in return_running_pids(uid=myuid):
@@ -130,7 +141,7 @@ def main(args):
             # if the file is in a pkg which has been updated since we started the pid - then it needs to be restarted            
             for pkg in my.rpmdb.searchFiles(just_fn):
                 if float(pkg.installtime) > float(pid_start):
-                    needing_restart.add(pid)
+                    needing_restart.setdefault(pid, set()).add(pkg.name)
                     found_match = True
                     continue
                 if just_fn in pkg.ghostlist:
@@ -144,8 +155,13 @@ def main(args):
             if fn.find('(deleted)') != -1: 
                 # and it is from /*bin/* then it needs to be restarted 
                 if yum.misc.re_primary_filename(just_fn):
-                    needing_restart.add(pid)
+                    pkgnames = needing_restart.setdefault(pid, set())
                     found_match = True
+                    for oldpkg in my.pkgSack.searchFiles(just_fn):
+                        if just_fn in oldpkg.ghostlist:
+                            continue
+                        pkgnames.add(oldpkg.name)
+                        break
                     continue
 
                 # if the file is from an old ver of an installed pkg - then assume it was just updated but the 
@@ -155,13 +171,15 @@ def main(args):
                     if just_fn in oldpkg.ghostlist:
                         continue
                     if my.rpmdb.installed(oldpkg.name):
-                        needing_restart.add(pid)
+                        needing_restart.setdefault(pid, set()).add(oldpkg.name)
                         found_match = True
                         break
 
            
             
-    for pid in needing_restart:
+    for pid, pkgnames in needing_restart.iteritems():
+        if opts.reboothint and pkgnames & set(rebootpkgs):
+            needreboot = True
         try:
             cmdline = open('/proc/' +pid+ '/cmdline', 'r').read()
         except (OSError, IOError), e:
@@ -171,6 +189,14 @@ def main(args):
         cmdline = cmdline.replace('\000', ' ')
         print '%s : %s' % (pid, cmdline)
         
+    if needreboot:
+        print ''
+        print term.FG_COLOR['red'] + term.MODE['bold'] + '  Caution!'
+        print '  Kernel or core library packages have been updated!'
+        print '  Reboot required!'
+        print '  See https://access.redhat.com/solutions/27943 for details.'
+        print term.MODE['normal']
+
     return 0
     
 if __name__ == "__main__":
