@@ -170,7 +170,7 @@ class DebugInfoInstall(YumUtilBase):
                                 self.di_try_install(deppo)
                             except yum.Errors.InstallError, e:
                                 self.logger.critical('Could not find debuginfo pkg for dependency package %s' % deppo)
-                if po.name in self.conf.installonlypkgs:
+                if self.allowedMultipleInstalls(po):
                     installonly_added.add(po.name)
 
         for pkgname in u:
