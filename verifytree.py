@@ -47,8 +47,8 @@ plan_number = 13
 case_numbers = {'REPODATA': 56, 'CORE_PACKAGES': 57, 'COMPS': 58, 
                 'BOOT_IMAGES': 59}
 
-# URL for the RELAX NG schema for comps
-SCHEMA = 'http://cvs.fedoraproject.org/viewcvs/*checkout*/comps/comps.rng'
+# RELAX NG schema for comps shipped with yum
+SCHEMA = '/usr/share/doc/yum/comps.rng'
 
 def testopia_create_run(plan):
     '''Create a run of the given test plan. Returns the run ID.'''
