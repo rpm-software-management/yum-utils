@@ -47,8 +47,22 @@ plan_number = 13
 case_numbers = {'REPODATA': 56, 'CORE_PACKAGES': 57, 'COMPS': 58, 
                 'BOOT_IMAGES': 59}
 
-# RELAX NG schema for comps shipped with yum
-SCHEMA = '/usr/share/doc/yum/comps.rng'
+def get_schema_path():
+    """Return the local path to the RELAX NG comps schema."""
+    # Depending on whether our distro uses versioned or unversioned docdirs
+    # (the former is true for Fedora < 20, see bug 998579), the schema file
+    # should be provided by yum at either of the following locations:
+    paths = ['/usr/share/doc/yum%s/comps.rng' % s
+             for s in ('', '-' + yum.__version__)]
+    for path in paths:
+        # Better than os.path.exists() as this also ensures we can actually
+        # read the file
+        try:
+            with open(path):
+                return path
+        except IOError:
+            continue
+    raise IOError(paths)
 
 def testopia_create_run(plan):
     '''Create a run of the given test plan. Returns the run ID.'''
@@ -230,9 +244,19 @@ def main():
 
         if not (retval & BAD_COMPS):
             print "  verifying comps.xml grammar with xmllint"
-            comps = newrepo.getGroups()
-            r = os.system("xmllint --noout --nowarning --relaxng %s %s" % 
-                (SCHEMA,comps))
+            try:
+                schema = get_schema_path()
+            except IOError as e:
+                print '  could not read schema file, paths tried:'
+                for path in e.args[0]:
+                    print '    ' + path
+                print ('  make sure you have the latest version of yum '
+                       'properly installed')
+                r = 1
+            else:
+                comps = newrepo.getGroups()
+                r = os.system("xmllint --noout --nowarning --relaxng %s %s" %
+                    (schema, comps))
             if r != 0:
                 retval = retval | BAD_COMPS
                 report('COMPS','FAILED')
