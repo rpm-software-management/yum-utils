@@ -48,6 +48,11 @@ from yum.Errors import RepoError
 sys.path.insert(0,'/usr/share/yum-cli')
 import utils
 
+# For which package updates we should recommend a reboot
+# Taken from https://access.redhat.com/solutions/27943
+REBOOTPKGS = ['kernel', 'glibc', 'linux-firmware', 'systemd', 'udev',
+              'openssl-libs', 'gnutls', 'dbus']
+
 def parseargs(args):
     usage = """
     needs-restarting: Report a list of process ids of programs that started 
@@ -57,6 +62,9 @@ def parseargs(args):
     
     parser.add_option("-u", "--useronly", default=False, action="store_true",
       help='show processes for my userid only')
+    parser.add_option("-r", "--reboothint", default=False, action="store_true",
+      help=('only report whether a full reboot is required (returns 1) or not '
+            '(returns 0)'))
     parser.add_option("-s", "--services", default=False, action="store_true",
       help='list the affected systemd services only')
     
@@ -139,9 +147,30 @@ def main(args):
         my.setCacheDir()
     my.conf.cache = True
     
-    needing_restart = set()
-
     boot_time = utils.get_boot_time()
+
+    if opts.reboothint:
+        needing_reboot = set()
+        for pkg in my.rpmdb.searchNames(REBOOTPKGS):
+            if float(pkg.installtime) > float(boot_time):
+                needing_reboot.add(pkg)
+        if needing_reboot:
+            print 'Core libraries or services have been updated:'
+            for pkg in needing_reboot:
+                print '  %s ->' % pkg.name, pkg.printVer()
+            print
+            print 'Reboot is required to ensure that your system benefits',
+            print 'from these updates.'
+            print
+            print 'More information:'
+            print 'https://access.redhat.com/solutions/27943'
+            return 1
+        else:
+            print 'No core libraries or services have been updated.'
+            print 'Reboot is probably not necessary.'
+            return 0
+
+    needing_restart = set()
     for pid in return_running_pids(uid=myuid):
         try:
             pid_start = utils.get_process_time(int(pid), boot_time)['start_time']
