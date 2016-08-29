@@ -1,0 +1,53 @@
+.TH pkgtorrent-service 8 "09 MARCH 2016" ""
+.SH NAME
+.B pkgtorrent-service(8)
+Is a python WSGI web application that can generate BitTorrent files for binary files available from the web server.
+.SH SYNOPSIS
+The program should installed on a site local
+.B yum
+mirror and must be configured before use. See \fBpkgtorrent-service.conf(5)\fR for more information.
+.SH USAGE
+The primary use case for this service is implemented in \fByum-torrent(1)\fR.
+.PP
+There is a secondary interface to assist with simple file downloads involving a single path.
+.SH EXAMPLE
+.RS
+.nf
+$ curl http://example.com/\fBpath/to/large/file\fR > \fBfile\fR
+.fi
+.RE
+.PP
+can be converted to using BitTorrent with:
+.PP
+.RS
+.nf
+$ curl http://example.com/\fBpath\fR/torrent_service/single/\fBpath/to/large/file\fR > \fBfile\fR.torrent
+$ btclient \fBfile\fR.torrent
+.fi
+.RE
+.PP
+Note the repetition of \fBpath\fR before the service name, and the addition of \fBtorrent_service/single\fR to pass control to the single file mode.
+Simple file mode supports simple globbing, so you can specify ...\fB/directory/*.foo\fR.
+If the path resolves to only one file, the multi-file support in the .torrent file is skipped, making the downloaded file easier to handle.
+.SH INPUT FILES
+.IP /var/lib/torrent_service/trackers
+The service needs to include one or more BitTorrent tracker servers.
+The format is one "announce" URL per line. Example:
+.B http://example.com:6969/announce
+This text file is scanned each minute for updates.
+.SH OUTPUT FILES
+The service makes extensive use of cache files. The files are relatively small. It is recommended you periodically clean these caches for files not used in the past month or so.
+.IP /var/cache/torrent_service/info/\fBinput_digest\fR
+This directory caches \fIinfo_hashes\fR for the previously requested path digests.
+These are used with the current list of trackers to generate .torrent files in constant time.
+.IP /var/cache/torrent_service/pieces/path/to/file/\fIblocksize\fR
+Every file within a torrent is represented by a list of SHA1 digests, one for each \fIblocksize\fR of the file.
+The SHA1 list is expensive to generate.
+The same binaries may be downloaded in different permutations by different clients.
+The cache is invalidated if the original file has a different mtime is a different size.
+.SH BUGS
+Single file mode should be called simple.
+.SH AUTHOR
+Matthew Almond <malmond@fb.com>
+.SH SEE ALSO
+.BR pkgtorrent-service.conf(5)

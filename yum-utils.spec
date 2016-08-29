@@ -29,9 +29,9 @@ Provides: yum-utils-translations = %{version}-%{release}
 %description
 yum-utils is a collection of utilities and examples for the yum package
 manager. It includes utilities by different authors that make yum easier and
-more powerful to use. These tools include: debuginfo-install, 
-find-repos-of-install, needs-restarting, package-cleanup, repoclosure, 
-repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
+more powerful to use. These tools include: debuginfo-install,
+find-repos-of-install, needs-restarting, package-cleanup, pkgtorrent,
+repoclosure, repodiff, repo-graph, repomanage, repoquery, repo-rss, reposync,
 repotrack, show-installed, show-changed-rco, verifytree, yumdownloader,
 yum-builddep, yum-complete-transaction, yum-config-manager, yum-debug-dump,
 yum-debug-restore and yum-groups-manager.
@@ -392,6 +392,27 @@ Requires: yum >= 3.4.3
 %description -n yum-plugin-ovl
 This plugin touches rpmdb files to work around overlayfs issues.
 
+%package -n yum-plugin-pkgtorrent
+Summary: Yum plugin to download packages via bittorrent
+Group: System Environment/Base
+Requires: yum >= 3.2.27
+
+%description -n yum-plugin-pkgtorrent
+pkgtorrent is a plugin for yum and solves scalability issues when a large
+number of systems try to download rpm packages in bursts. This circumstance is
+commonly encountered when using configuration management, e.g. Chef.
+
+%package -n pkgtorrentservice
+Summary: WSGI service to create bittorrent files on demand
+Group: System Environment/Base
+Requires: yum >= 3.2.27
+# wsgi meta dep?
+
+%description -n pkgtorrentservice
+This WSGI program builds arbitary bittorrent files on demand. This is the server
+side component to yum-plugin-pkgtorrent. It can also be used outside of yum
+for static files available via http.
+
 %prep
 %setup -q
 
@@ -441,13 +462,22 @@ plugins="$plugins \
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/%pluginhome
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pre-actions
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/sites-available
+mkdir -p $RPM_BUILD_ROOT/var/www/cgi-bin
+mkdir -p $RPM_BUILD_ROOT/var/cache/yum_torrent
+mkdir -p $RPM_BUILD_ROOT/var/cache/torrent_service
 
 cd plugins
 for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/%pluginhome
-    %{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/%pluginhome', 1)"
 done
+install -m 644 pkgtorrent/client/yum-torrent.py $RPM_BUILD_ROOT/%pluginhome
+%{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/%pluginhome', 1)"
+install -m 644 pkgtorrent/client/yum-torrent.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
+install -m 644 pkgtorrent/server/pkgtorrent-service.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/sites-available/
+install -m 644 pkgtorrent/server/pkgtorrent-service.py $RPM_BUILD_ROOT/var/www/cgi-bin/
+%{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/var/www/cgi-bin', 1)"
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
 install -m 644 versionlock/versionlock.list $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
 # need for for the ghost in files section of yum-plugin-local
@@ -721,6 +751,20 @@ fi
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/ovl.conf
 %{pluginhome}/ovl.*
 %{_mandir}/man1/yum-ovl.1.*
+
+%files -n yum-plugin-pkgtorrent
+%defattr(-, root, root)
+%doc COPYING
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/yum-torrent.conf
+%{pluginhome}/yum-torrent.*
+/var/cache/yum_torrent
+
+%files -n pkgtorrentservice
+%defattr(-, root, root)
+%doc COPYING
+%config(noreplace) %{_sysconfdir}/httpd/sites-available/pkgtorrent-service.conf
+/var/www/cgi-bin/pkgtorrent-service.py*
+/var/cache/torrent_service
 
 %changelog
 * Thu Aug 10 2011 Tim Lauridsen <timlau@fedoraproject.org> 

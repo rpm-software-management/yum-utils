@@ -1,0 +1,29 @@
+.TH pkgtorrent-service.conf 5 "09 MARCH 2016" "" "File Formats"
+.SH NAME
+.B pkgtorrent-service.conf(5)
+is an example Apache 2 configuration file for the \fBpkgtorrent-service(8)\fR.
+.SH SYNOPSIS
+The default configuration maps the name
+.B torrent_service
+in any "subdirectory" of the web server root to the WSGI program.
+The service cannot be installed in web server root because all multi-file torrents contain a concept of a name, which is expanded to a directory name when unpacked.
+The service generates .torrent files which populates the
+.B url-list
+metadata with the URL prefix to the
+.B torrent_service
+name. All files within the torrent are relative to this prefix.
+The
+.B pkgtorrent-service(8)
+has been tested extensively with Apache 2 and mod_wsgi, but should work equally well with any other WSGI capable web server.
+.PP
+To use this configuration with Apache 2, install and enable
+.B mod_wsgi
+then enable this "site" using:
+.PP
+.RS
+.B a2ensite pkgtorrent-service.conf
+.RS
+.SH AUTHOR
+Matthew Almond <malmond@fb.com>
+.SH SEE ALSO
+.BR pkgtorrent-service(8)

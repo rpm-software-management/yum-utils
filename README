@@ -48,6 +48,10 @@ allows you to track only certain packages and their dependencies from a
 remote repository. Useful if you only want a few things out of another
 repository.
 
+pkgtorrent:
+allows you to offload work on your local yum mirror by synthesizing BitTorrent
+swarms transparently.
+
 -- Authors --
 
 Various people have made a contribution to this collection:
@@ -69,3 +73,6 @@ Maintainer of yum-utils - fixer of a lot of misc utils.
 
 - Valentina Mukhamedzhanova
 Maintainer of yum-utils.
+
+- Matthew Almond
+Author of pkgtorrent
