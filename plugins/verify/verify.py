@@ -287,6 +287,7 @@ Verify packages and display data on bad verifications"""
         
     def show_data(self, base, msg, pkgs, name):
         done = False
+        problem_found = False
         mcb = lambda x: base.matchcallback(x, [])
         for (pkg, results) in self.filter_data(msg, pkgs):
             if not done:
@@ -310,11 +311,13 @@ Verify packages and display data on bad verifications"""
                     (hib, hie) = ("", "")
                 done_prob = False
                 for problem in sorted(results[fname]):
+                    problem_found = True
                     if not done_prob and problem.file_types:
                         tags = ", ".join(problem.file_types)
                         msg("    Tags: " + hib + tags + hie)
                     self.show_problem(base, msg, problem, done_prob)
                     done_prob = True
+        return problem_found
 
     def doCommand(self, base, basecmd, extcmds):
         global _verify_configs
@@ -360,10 +363,10 @@ Verify packages and display data on bad verifications"""
             # nevr() match
             
         ypl = base.returnPkgLists(subgroup + extcmds)
-        self.show_data(base, msg, ypl.installed, 'Installed Packages')
-        self.show_data(base, msg, ypl.extras,    'Extra Packages')
+        result = (self.show_data(base, msg, ypl.installed, 'Installed Packages')
+                  or self.show_data(base, msg, ypl.extras,    'Extra Packages'))
 
-        return 0, [basecmd + ' done']
+        return result, [basecmd + ' done']
 
     def needTs(self, base, basecmd, extcmds):
         if not len(extcmds) or extcmds[0] != 'extras':
