@@ -6,7 +6,7 @@ yum verify plugin
 \fByum\fP [options] verify [package ...]
 .SH "DESCRIPTION"
 .PP 
-This plugin extends \fByum\fP with some commands that give verification information on the installed system, much like rpm \-V. You can change how the verification is done and which files it applies to.
+This plugin extends \fByum\fP with some commands that give verification information on the installed system, much like rpm \-V. You can change how the verification is done and which files it applies to. In case any mismatches are found, the exit status is set to 1.
 .PP 
 added yum \fIcommand\fPs are:
 .br 
@@ -17,7 +17,7 @@ added yum \fIcommand\fPs are:
 .I \fR * verify-all
 .br 
 .PP 
-all of which take the same arguments as the list yum command, obviously you can
+all of which take the same arguments as the list yum command. You can
 only verify packages that are installed on the system.
 .PP
 .br 
@@ -29,8 +29,7 @@ output. It removes all false matches due to multilib and ignores changes to
 configuration files by default.
 .IP
 .IP "\fBverify-rpm\fP"
-Is meant to be 100% compatible with rpm \-V output, and any differences should be
-considered as bugs.
+Does the same checks as rpm \-V.
 .IP
 .IP "\fBverify-all\fP"
 Is used to list all the differences, including some that rpm itself will ignore.
