@@ -107,7 +107,7 @@ def match_repoid(repoid, repo_setopts):
 
 NAME = 'yum-config-manager'
 VERSION = '1.0'
-USAGE = '"yum-config-manager [options] [section]'
+USAGE = 'yum-config-manager [options] [section ...]'
 
 yum.misc.setup_locale()
 

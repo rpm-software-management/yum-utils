@@ -3,20 +3,38 @@
 .SH "NAME"
 yum-config-manager \- manage yum configuration options and yum repositories
 .SH "SYNOPSIS"
-\fByum-config-manager\fP [options]
+\fByum-config-manager\fP [options] [section ...]
 .SH "DESCRIPTION"
 .PP
 \fByum-config-manager\fP is a program that can manage main yum configuration
 options, toggle which repositories are enabled or disabled, and add new
 repositories.
 .PP
+Unless \-\-add-repo is used, the program will output the current configuration
+of the selected sections, and optionally save it back to the corresponding
+files.
+.PP
+By default, if no positional arguments are specified, the program will select
+the [main] section and each enabled repository.
+You can override this by specifying your own list of sections as arguments
+(these may also include disabled repositories).
+A section can either be main or a repoid.
+.PP
 .SH "OPTIONS"
 .IP "\fB\-h, \-\-help\fP"
 Display a help message, and then quit.
+.IP "\fB\-\-setopt=option=value\fP"
+Set any config option in yum config or repo files. For options in the global
+config just use: \-\-setopt=option=value for repo options use: \-\-setopt=repoid.option=value.
+The latter form accepts wildcards in repoid that will be expanded to the
+selected sections.
+If repoid contains no wildcard, it will automatically be selected; this is
+useful if you are addressing a disabled repo, in which case you don't have to
+additionally pass it as an argument.
 .IP "\fB\-\-save\fP"
 Save the current options (useful with \-\-setopt).
 .IP "\fB\-\-enable\fP"
-Enable the specified repos (automatically saves). To enable all repositories run 'yum-config-manager --enable \\*".
+Enable the specified repos (automatically saves). To enable all repositories run "yum-config-manager --enable \\*".
 .IP "\fB\-\-disable\fP"
 Disable the specified repos (automatically saves). To disable all repositories run "yum-config-manager --disable \\*".
 .IP "\fB\-\-add\-repo=ADDREPO\fP"
@@ -24,6 +42,36 @@ Add (and enable) the repo from the specified file or url.
 .SH "ADDITIONAL OPTIONS"
 Yum-config-manager inherits all other options from yum. See the yum(8)
 man page for more information.
+
+.SH "EXAMPLES"
+Show the configuration of [main] and the repos foo and bar:
+.IP
+\fByum-config-manager main foo bar\fP
+.PP
+Enable the repos foo and bar:
+.IP
+\fByum-config-manager --enable foo bar\fP
+.PP
+Change a global option:
+.IP
+\fByum-config-manager --setopt=installonly_limit=5 --save\fP
+.PP
+Change a repo option of the repo foo (works even if foo is disabled):
+.IP
+\fByum-config-manager --setopt=foo.skip_if_unavailable=1 --save\fP
+.PP
+Change a repo option of more repos at once:
+.IP
+\fByum-config-manager --setopt=\\*.skip_if_unavailable=1 --save foo bar baz\fP
+.PP
+Change a repo option of all the enabled repos:
+.IP
+\fByum-config-manager --setopt=\\*.skip_if_unavailable=1 --save\fP
+.PP
+Change a repo option of all the configured (that is, enabled and disabled)
+repos:
+.IP
+\fByum-config-manager --setopt=\\*.skip_if_unavailable=1 --save \\*\fP
 
 .PP
 .SH "SEE ALSO"
