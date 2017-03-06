@@ -107,7 +107,7 @@ def match_repoid(repoid, repo_setopts):
 
 NAME = 'yum-config-manager'
 VERSION = '1.0'
-USAGE = '"yum-config-manager [options] [section]'
+USAGE = 'yum-config-manager [options] [section ...]'
 
 yum.misc.setup_locale()
 
@@ -178,13 +178,17 @@ if opts.enable or opts.disable:
 if args:
     repos = yb.repos.findRepos(','.join(args),
                                name_match=True, ignore_case=True)
-elif hasattr(yb, 'repo_setopts') and yb.repo_setopts:
-    repos =yb.repos.findRepos(','.join(yb.repo_setopts.keys()),
-                               name_match=True, ignore_case=True)
-
-
 else:
     repos = yb.repos.listEnabled()
+
+# Automatically select repos specified within --setopt (but only for exact
+# matches without wildcards).  This way users don't have to specify disabled
+# repos twice on the cmdline.
+if hasattr(yb, 'repo_setopts') and yb.repo_setopts:
+    ids = set(yb.repo_setopts.keys()) & set(yb.repos.repos.keys())
+    ids -= set([r.id for r in repos])
+    repos += yb.repos.findRepos(','.join(ids),
+                                name_match=True, ignore_case=True)
 
 if not opts.addrepo:
     for repo in sorted(repos):
