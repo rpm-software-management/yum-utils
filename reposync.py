@@ -320,7 +320,7 @@ def main():
                     elif result == 2:
                         my.logger.warning('Removing %s due to failed signature check.' % rpmfn)
                     else:
-                        my.logger.warning('Removing %s due to failed signature check: %s' % rpmfn)
+                        my.logger.warning('Removing %s due to failed signature check: %s' % (rpmfn, error))
                     os.unlink(pkg.localpath)
                     exit_code = 1
                     continue
