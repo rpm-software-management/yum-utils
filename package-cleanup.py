@@ -176,10 +176,12 @@ class PackageCleanup(YumUtilBase):
         return results
 
     def _remove_dupes(self, newest=False):
-        """add older duplicate pkgs to be removed in the transaction"""
-        dupedict = self._find_installed_duplicates()
+        """add duplicate pkgs to be removed in the transaction,
+           return a dict of excluded dupes and their requiring packages"""
 
-        removedupes = []
+        # Find dupes
+        dupedict = self._find_installed_duplicates()
+        removedupes = set()
         for (name,dupelists) in dupedict.items():
             for dupelist in dupelists:
                 dupelist.sort()
@@ -188,10 +190,36 @@ class PackageCleanup(YumUtilBase):
                 else:
                     plist = dupelist[0:-1]
                 for lowpo in plist:
-                    removedupes.append(lowpo)
+                    removedupes.add(lowpo)
 
+        # Exclude any such dupes that would pull other installed packages into
+        # the removal transaction (to prevent us from accidentally removing a
+        # huge part of a working system) by performing a dry transaction(s)
+        # first.
+        excluded = {}
+        while True:
+            for po in removedupes:
+                self.remove(po)
+            changed = False
+            for txmbr in self.tsInfo.getMembers():
+                requiredby = self._checkRemove(txmbr)
+                if requiredby:
+                    removedupes.remove(txmbr.po)
+                    excluded[txmbr.po] = requiredby
+                    # Do another round, to cover any transitive deps within
+                    # removedupes, for example: if foo requires bar requires
+                    # baz and removedupes contains bar and baz, then
+                    # _checkRemove(baz) won't return bar.
+                    changed = True
+            del self.tsInfo
+            if not changed:
+                break
+
+        # Mark the dupes for removal
         for po in removedupes:
             self.remove(po)
+
+        return excluded
 
 
     def _should_show_leaf(self, po, leaf_regex, exclude_devel, exclude_bin):
@@ -380,7 +408,13 @@ class PackageCleanup(YumUtilBase):
                 sys.exit(1)
             if opts.noscripts:
                 self.conf.tsflags.append('noscripts')
-            self._remove_dupes(opts.removenewestdupes)
+            excluded = self._remove_dupes(opts.removenewestdupes)
+            for po, requiredby in excluded.iteritems():
+                count = len(requiredby)
+                print ('Not removing %s because it is required by %s '
+                       'installed package%s' %
+                       (po.hdr.sprintf(opts.qf), count,
+                        's' if count > 1 else ''))
             self.run_with_package_names.add('yum-utils')
 
             if hasattr(self, 'doUtilBuildTransaction'):
@@ -397,9 +431,20 @@ class PackageCleanup(YumUtilBase):
 
             if len(self.tsInfo) < 1:
                 print 'No duplicates to remove'
-                sys.exit(0)
-                
-            sys.exit(self.doUtilTransaction())
+                errc = 0
+            else:
+                errc = self.doUtilTransaction()
+
+            if excluded:
+                self.logger.warn(
+                    'Warning: Some duplicates were not removed because they '
+                    'are required by installed packages.\n'
+                    'You can try --cleandupes with%s --removenewestdupes, '
+                    'or review them with --dupes and remove manually.' %
+                    ('out' if opts.removenewestdupes else '')
+                )
+
+            sys.exit(errc)
 
     
 if __name__ == '__main__':
