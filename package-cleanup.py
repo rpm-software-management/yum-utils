@@ -81,7 +81,7 @@ class PackageCleanup(YumUtilBase):
                     help='Scan for duplicates in your rpmdb and remove older ')
         dupegrp.add_option("--removenewestdupes", default=False, 
                     dest="removenewestdupes", action="store_true",
-                    help='Remove the newest dupes instead of the oldest dupes.')
+                    help='Remove the newest dupes instead of the oldest dupes when cleaning duplicates.')
         dupegrp.add_option("--noscripts", default=False,
                     dest="noscripts", action="store_true",
                     help="disable rpm scriptlets from running when cleaning duplicates")
