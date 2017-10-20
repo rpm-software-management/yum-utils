@@ -73,6 +73,26 @@ class YumDebugDump(yum.YumBase):
 
     def dump_repos(self):
         msg = "%%%%REPOS\n"
+
+        # Set up the sacks first, to capture and log any broken repos.  We
+        # cannot yet call returnPackages() from this loop as that would lead to
+        # a KeyError if some repo got disabled by pkgSack due to
+        # skip_if_unavailable=true in a previous iteration.
+        #
+        # A failure means remaining repos were not processed, so we have to
+        # retry the whole process ourselves by calling pkgSack again.  Since
+        # the worst case scenario is that all the repos are broken, we have to
+        # do this at least as many times as there are enabled repos.
+        for repo in sorted(self.repos.listEnabled()):
+            try:
+                self.pkgSack
+            except Errors.RepoError, e:
+                msg += "Error accessing repo %s: %s\n" % (e.repo, str(e))
+                self.repos.disableRepo(e.repo.id)
+            else:
+                break
+
+        # Dump the packages now
         for repo in sorted(self.repos.listEnabled()):
             try:
                 msg += '%%%s - %s\n' % (repo.id, repo.urls[0])
