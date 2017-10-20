@@ -47,6 +47,10 @@ def _best_convert_pkg2srcpkgs(self, opts, pkg):
     if not opts.source or pkg.arch == 'src':
         return [pkg]
 
+    if pkg.sourcerpm is None:
+        self.logger.error('No source RPM found for %s' % str(pkg))
+        return []
+
     (n,v,r,e,a) = rpmUtils.miscutils.splitFilename(pkg.sourcerpm)
     src = self.pkgSack.searchNevra(name=n, ver=v, rel=r, arch='src')
     if src == []:
