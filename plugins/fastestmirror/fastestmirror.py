@@ -146,7 +146,7 @@ def _len_non_ftp(urls):
         num += 1
     return num
 
-def postreposetup_hook(conduit):
+def prereposetup_hook(conduit):
     """
     This function is called after Yum has initiliazed all the repository information.
 
@@ -255,7 +255,7 @@ def read_timedhosts():
     communicate with other functions.
 
     This function is referred by:
-        - L{postreposetup_hook()}
+        - L{prereposetup_hook()}
 
     @param timedhosts : A list of time intervals to reach different hosts
     corresponding to the mirrors. The index of the list are hostnames.
@@ -281,7 +281,7 @@ def write_timedhosts():
     communicate with other functions.
 
     This function is referred by:
-        - L{postreposetup_hook()}
+        - L{prereposetup_hook()}
 
     @param timedhosts : A list of time intervals to reach different hosts
     corresponding to the mirrors. The index of the list are hostnames.
@@ -359,7 +359,7 @@ class FastestMirror:
             - L{FastestMirror._poll_mirrors()}
 
         This function is referred by:
-            - L{postreposetup_hook()}
+            - L{prereposetup_hook()}
             - L{main()}
 
         @rtype: List
