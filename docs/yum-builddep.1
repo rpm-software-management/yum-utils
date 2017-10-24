@@ -17,6 +17,10 @@ disabled) or it can be a local source RPM or a spec file.
 .PP 
 Note, that only the BuildRequires information within the SRPM header information is used to determine build dependencies. This will specifically omit any dependencies that are required only for specific architectures.
 .PP
+.SH "GENERAL OPTIONS"
+.IP "\fB\--target ARCH\fP"
+Set target architecture for spec parsing.
+.PP
 .SH "EXAMPLES"
 .IP "Download and install all the RPMs needed to build the kernel RPM:"
 \fByumdownloader --source kernel && rpm2cpio kernel*src.rpm | cpio -i kernel.spec && \\ \fP
