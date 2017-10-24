@@ -67,6 +67,13 @@ class YumBuildDep(YumUtilBase):
         if hasattr(rpm, 'reloadConfig'):
             self.optparser.add_option("--target",
                               help="set target architecture for spec parsing")
+            self.optparser.add_option(
+                "--define",
+                action="append",
+                default=[],
+                metavar="'MACRO EXPR'",
+                help="define the rpm MACRO with value EXPR for spec parsing",
+            )
         self.main()
 
     def main(self):
@@ -229,10 +236,27 @@ class YumBuildDep(YumUtilBase):
             self.logger.info('Getting requirements for %s' % srpm)
             self.install_deps(srpm.requiresList(), opts)
     
+        # Parse macro defines
+        macros = []
+        error = False
+        for define in opts.define:
+            words = define.split(None, 1)
+            if len(words) == 1:
+                self.logger.error('Error: No EXPR given for MACRO %%%s'
+                                  % words[0])
+                error = True
+                continue
+            macros.append(words)
+        if error:
+            sys.exit(1)
+
         for name in specnames:
             # (re)load rpm config for target if set
             if reloadworks and opts.target:
                 rpm.reloadConfig(opts.target)
+
+            for macro in macros:
+                rpm.addMacro(*macro)
 
             try:
                 spec = rpm.spec(name)
