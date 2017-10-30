@@ -278,7 +278,14 @@ def main():
     elif not (retval & BAD_COMPS or opts.nocomps):
         print "Checking mandatory @core packages"
         group = my.comps.return_group('core')
-        for pname in group.mandatory_packages:
+        if group is not None:
+            pkgs = group.mandatory_packages
+        else:
+            print "  @core group not found"
+            retval = retval | BAD_COMPS
+            report('COMPS','FAILED')
+            pkgs = []
+        for pname in pkgs:
             # FIXME: this pulls from pkgSack, which (I guess) is populated 
             # based on the arch etc. of the current host.. so you can't check
             # the x86_64 repo from an i386 machine, f'rinstance.
