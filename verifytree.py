@@ -237,7 +237,8 @@ def main():
         try:
             print "  verifying comps.xml with yum"
             b = my.comps.compscount
-        except Errors.GroupsError, e:
+            comps = newrepo.getGroups()
+        except (Errors.GroupsError, Errors.RepoMDError):
             print '  comps file missing or unparseable'
             report('COMPS','FAILED')
             retval = retval | BAD_COMPS
@@ -254,7 +255,6 @@ def main():
                        'properly installed')
                 r = 1
             else:
-                comps = newrepo.getGroups()
                 r = os.system("xmllint --noout --nowarning --relaxng %s %s" %
                     (schema, comps))
             if r != 0:
