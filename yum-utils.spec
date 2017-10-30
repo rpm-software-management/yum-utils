@@ -261,6 +261,16 @@ This plugin removes any unused dependencies that were brought in by an install
 but would not normally be removed. It helps to keep a system clean of unused
 libraries and packages.
 
+%package -n yum-plugin-pre-transaction-actions
+Summary: Yum plugin to run arbitrary commands when certain pkgs are acted on
+Group: System Environment/Base
+Provides: yum-pre-transaction-actions = %{version}-%{release}
+Requires: yum >= 3.2.19
+
+%description -n yum-plugin-pre-transaction-actions
+This plugin allows the user to run arbitrary actions prior to a transaction
+when specified packages are changed.
+
 %package -n yum-plugin-post-transaction-actions
 Summary: Yum plugin to run arbitrary commands when certain pkgs are acted on
 Group: System Environment/Base
@@ -409,6 +419,7 @@ plugins="\
  verify \
  keys \
  remove-with-leaves \
+ pre-transaction-actions \
  post-transaction-actions \
  rpm-warm-cache \
  auto-update-debuginfo \
@@ -428,6 +439,7 @@ plugins="$plugins \
 %endif
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/%pluginhome
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pre-actions
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
 
 cd plugins
@@ -632,6 +644,15 @@ fi
 %doc COPYING
 %{pluginhome}/remove-with-leaves.*
 %config(noreplace) %{_sysconfdir}/yum/pluginconf.d/remove-with-leaves.conf
+
+%files -n yum-plugin-pre-transaction-actions
+%defattr(-, root, root)
+%doc COPYING
+%{pluginhome}/pre-transaction-actions.*
+%config(noreplace) %{_sysconfdir}/yum/pluginconf.d/pre-transaction-actions.conf
+%doc plugins/pre-transaction-actions/sample.action
+# Default *.action file dropping dir.
+%dir %{_sysconfdir}/yum/pre-actions
 
 %files -n yum-plugin-post-transaction-actions
 %defattr(-, root, root)
