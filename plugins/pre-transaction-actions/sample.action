@@ -19,3 +19,8 @@ zsh:install:touch /tmp/zsh-installed-also
 /bin/z*h:install:touch /tmp/bin-zsh-installed
 z*h:any:touch /tmp/bin-zsh-any
 
+# each action is expanded once for each matching package, and no action is
+# executed twice per transaction, for example
+*:install:echo $repoid >>/tmp/repos
+# will write each repo only once to /tmp/repos, even if multiple packages from
+# the same repo are going to be installed

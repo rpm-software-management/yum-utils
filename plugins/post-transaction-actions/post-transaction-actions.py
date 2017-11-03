@@ -156,7 +156,6 @@ def posttrans_hook(conduit):
                         if c_string.match(name):
                             thiscommand = _convert_vars(txmbr, a_c)
                             commands_to_run[thiscommand] = 1
-                            matched = True
                             break
                 
                 if matched:
