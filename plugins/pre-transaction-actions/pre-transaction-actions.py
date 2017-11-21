@@ -120,24 +120,19 @@ def pretrans_hook(conduit):
                 c_string = re.compile(restring)
 
             for txmbr in pkgset:
-                matched = False
                 thispo = txmbr.po
         
                 if not yum.misc.re_glob(a_k):
                     if a_k in thispo.filelist + thispo.dirlist + thispo.ghostlist:
                         thiscommand = _convert_vars(txmbr, a_c)
                         commands_to_run[thiscommand] = 1
-                        matched = True
+                        break
                 else:
                     for name in thispo.filelist + thispo.dirlist + thispo.ghostlist:
                         if c_string.match(name):
                             thiscommand = _convert_vars(txmbr, a_c)
                             commands_to_run[thiscommand] = 1
-                            matched = True
                             break
-                
-                if matched:
-                    break
             continue
         
         if a_k.find('/') == -1: # pkgspec
