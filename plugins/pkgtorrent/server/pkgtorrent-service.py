@@ -212,6 +212,7 @@ def create_torrent(environ, start_response):
         prefixes.add(splitpath[0])
 
         valid_cache = False
+        padding = None
         if os.path.exists(cachepath):
             try:
                 data = pickle.load(open(cachepath))

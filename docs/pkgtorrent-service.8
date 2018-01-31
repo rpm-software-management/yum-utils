@@ -26,7 +26,7 @@ $ btclient \fBfile\fR.torrent
 .fi
 .RE
 .PP
-Note the repetition of \fBpath\fR before the service name, and the addition of \fBtorrent_service/single\fR to pass control to the single file mode.
+Note the repetition of \fBpath\fR before the service name, and the addition of \fBtorrent_service/single\fR to pass control to the single path mode.
 Simple file mode supports simple globbing, so you can specify ...\fB/directory/*.foo\fR.
 If the path resolves to only one file, the multi-file support in the .torrent file is skipped, making the downloaded file easier to handle.
 .SH INPUT FILES
@@ -44,7 +44,7 @@ These are used with the current list of trackers to generate .torrent files in c
 Every file within a torrent is represented by a list of SHA1 digests, one for each \fIblocksize\fR of the file.
 The SHA1 list is expensive to generate.
 The same binaries may be downloaded in different permutations by different clients.
-The cache is invalidated if the original file has a different mtime is a different size.
+The cache is invalidated if the original file has a different mtime or is a different size.
 .SH BUGS
 Single file mode should be called simple.
 .SH AUTHOR

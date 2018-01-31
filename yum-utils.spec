@@ -451,6 +451,7 @@ plugins="\
  puppetverify \
  copr \
  ovl \
+ pkgtorrent/client \
 "
 
 %if %{package_yum_updatesd}
@@ -462,7 +463,7 @@ plugins="$plugins \
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/ $RPM_BUILD_ROOT/%pluginhome
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pre-actions
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/yum/post-actions
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/sites-available
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d
 mkdir -p $RPM_BUILD_ROOT/var/www/cgi-bin
 mkdir -p $RPM_BUILD_ROOT/var/cache/yum_torrent
 mkdir -p $RPM_BUILD_ROOT/var/cache/torrent_service
@@ -472,10 +473,8 @@ for plug in $plugins; do
     install -m 644 $plug/*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
     install -m 644 $plug/*.py $RPM_BUILD_ROOT/%pluginhome
 done
-install -m 644 pkgtorrent/client/yum-torrent.py $RPM_BUILD_ROOT/%pluginhome
 %{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/%pluginhome', 1)"
-install -m 644 pkgtorrent/client/yum-torrent.conf $RPM_BUILD_ROOT/%{_sysconfdir}/yum/pluginconf.d/
-install -m 644 pkgtorrent/server/pkgtorrent-service.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/sites-available/
+install -m 644 pkgtorrent/server/pkgtorrent-service.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
 install -m 644 pkgtorrent/server/pkgtorrent-service.py $RPM_BUILD_ROOT/var/www/cgi-bin/
 %{__python} -c "import compileall; compileall.compile_dir('$RPM_BUILD_ROOT/var/www/cgi-bin', 1)"
 install -m 644 aliases/aliases $RPM_BUILD_ROOT/%{_sysconfdir}/yum/aliases.conf
@@ -762,7 +761,7 @@ fi
 %files -n pkgtorrentservice
 %defattr(-, root, root)
 %doc COPYING
-%config(noreplace) %{_sysconfdir}/httpd/sites-available/pkgtorrent-service.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/pkgtorrent-service.conf
 /var/www/cgi-bin/pkgtorrent-service.py*
 /var/cache/torrent_service
 

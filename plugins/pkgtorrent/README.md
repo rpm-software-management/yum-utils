@@ -20,7 +20,7 @@ The name is pkgtorrent because the service is not specific to RPM or yum.
   following features:
  * Accepts a single positional torrent filename parameter
  * Downloads to the current working directory
- * Supports http://bittorrent.org/beps/bep_0019.htm (everything using
+ * Supports http://bittorrent.org/beps/bep_0019.html (everything using
    libtorrent should)
 
 ### Server
