@@ -68,4 +68,4 @@ See the man pages:
 * pkgtorrent-service.conf(5)
 
 ## License
-pkgtorrent is BSD-licensed. We also provide an additional patent grant.
+pkgtorrent is GPLv2-licensed.
