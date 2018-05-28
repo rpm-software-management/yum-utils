@@ -16,22 +16,17 @@ This allows you to protect packages from being updated by newer versions.
 The plugin provides a command "versionlock" which allows you to view and edit
 the list of locked packages easily.
 .br
-.I  \fR yum versionlock add <package-wildcard>...
-.PP
+.IP "\fByum versionlock add <package-wildcard>...\fR"
 Add a versionlock for all of the packages in the rpmdb matching the given
 wildcards.
-.I  \fR yum versionlock exclude <package-wildcard>...
-.PP
-Add a exclude (within versionlock) for the latest versions of the
-packages in the available repos. matching the given wildcards.
-.I  \fR yum versionlock list
-.PP
+.IP "\fByum versionlock exclude <package-wildcard>...\fR"
+Opposite; disallow currently available versions of the packages matching the
+given wildcards.
+.IP "\fByum versionlock list\fR"
 List the current versionlock entries.
-.I  \fR yum versionlock delete <entry-wildcard>...
-.PP
+.IP "\fByum versionlock delete <entry-wildcard>...\fR"
 Remove any matching versionlock entries.
-.I  \fR yum versionlock clear
-.PP
+.IP "\fByum versionlock clear\fR"
 Remove all versionlock entries.
 
 .SH FILES
