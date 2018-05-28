@@ -24,6 +24,10 @@ Opposite; disallow currently available versions of the packages matching the
 given wildcards.
 .IP "\fByum versionlock list\fR"
 List the current versionlock entries.
+.IP "\fByum versionlock status\fR"
+List any available updates that are currently blocked by versionlock.
+That is, for each entry in the lock list, print the newest package available
+in the repos unless it is the particular locked/excluded version.
 .IP "\fByum versionlock delete <entry-wildcard>...\fR"
 Remove any matching versionlock entries.
 .IP "\fByum versionlock clear\fR"

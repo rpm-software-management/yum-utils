@@ -42,6 +42,9 @@ _version_lock_excluder_B_nevr = set()
 # _version_lock_excluder_pkgtup = set()
 
 fileurl = None
+show_hint = True
+follow_obsoletes = False
+no_exclude = False
 
 def _read_locklist():
     locklist = []
@@ -73,6 +76,68 @@ def _match(ent, patterns):
                 return True
     return False
 
+def _get_updates(base):
+    """Return packages that update or obsolete anything in our locklist.
+
+    Returns a dict of locked_name->X, where X is either a package object or a
+    list of them.  If it's the former, it's the updating package.  If it's the
+    latter, it's the obsoleting packages (since multiple packages may obsolete
+    the same name).
+    """
+
+    updates = {}
+
+    # Read in the locked versions
+    locks = {}
+    for ent in _read_locklist():
+        (n, v, r, e, a) = splitFilename(ent)
+        if e and e[0] == '!':
+            e = e[1:]
+        elif e == '':
+            e = '0'
+        locks.setdefault(n, []).append((e, v, r))
+
+    # Process regular updates
+    #
+    # We are using searchNames() + packagesNewestByName() here instead of just
+    # returnNewestByName() because the former way is much, much faster for big
+    # name lists.
+    #
+    # The problem with returnNewestByName() is that it may easily end up
+    # querying all the packages in pkgSack which is terribly slow (takes
+    # seconds); all it takes is a "-" in a package name and more than
+    # PATTERNS_MAX (8 by default) package names to trigger that.
+    #
+    # Since we know that we only ever deal with names, we can just go straight
+    # to searchNames() to avoid the full query.
+    pkgs = base.pkgSack.searchNames(locks.keys())
+    for p in packagesNewestByName(pkgs):
+        name = p.name
+        evr = p.returnEVR()
+        if (evr.epoch, evr.version, evr.release) in locks[name]:
+            # This one is either the locked or excluded version, skip
+            continue
+        updates[name] = p
+
+    # Process obsoletes
+    tups = base.up.getObsoletesTuples() if follow_obsoletes else []
+    for new, old in tups:
+        nname = new[0]
+        oname = old[0]
+        if oname not in locks:
+            # Not our package, skip
+            continue
+        if nname in locks and new[2:] in locks[nname]:
+            # This one is either the locked or excluded version, skip
+            continue
+        # Only record obsoletes for any given package name
+        if oname not in updates or not isinstance(updates[oname], list):
+            updates[oname] = []
+        p = base.getPackageObject(new)
+        updates[oname].append(p)
+
+    return updates
+
 class VersionLockCommand:
     created = 1247693044
 
@@ -80,7 +145,7 @@ class VersionLockCommand:
         return ["versionlock"]
 
     def getUsage(self):
-        return '[add|exclude|list|delete|clear] [PACKAGE-wildcard]'
+        return '[add|exclude|list|status|delete|clear] [PACKAGE-wildcard]'
 
     def getSummary(self):
         return 'Control package version locks.'
@@ -93,7 +158,7 @@ class VersionLockCommand:
         if extcmds:
             if extcmds[0] not in ('add',
                                   'exclude', 'add-!', 'add!', 'blacklist',
-                                  'list', 'del', 'delete', 'clear'):
+                                  'list', 'status', 'del', 'delete', 'clear'):
                 cmd = 'add'
             else:
                 cmd = {'del'       : 'delete',
@@ -190,6 +255,19 @@ class VersionLockCommand:
             os.rename(tmpfilename, filename)
             return 0, ['versionlock deleted: ' + str(count)]
 
+        if cmd == 'status':
+            global no_exclude
+            no_exclude = True
+            updates = _get_updates(base)
+            for name, value in updates.iteritems():
+                if isinstance(value, list):
+                    value = set(p.envr + '.*' for p in value)
+                    for v in value:
+                        print '%s (replacing %s)' % (v, name)
+                    continue
+                print value.envr + '.*'
+            return 0, ['versionlock status done']
+
         assert cmd == 'list'
         for ent in _read_locklist():
             print ent
@@ -201,8 +279,12 @@ class VersionLockCommand:
 
 def config_hook(conduit):
     global fileurl
+    global follow_obsoletes
+    global show_hint
 
     fileurl = conduit.confString('main', 'locklist')
+    follow_obsoletes = conduit.confBool('main', 'follow_obsoletes', default=False)
+    show_hint = conduit.confBool('main', 'show_hint', default=True)
 
     if hasattr(conduit._base, 'registerCommand'):
         conduit.registerCommand(VersionLockCommand())
@@ -227,6 +309,9 @@ def _add_versionlock_blacklist(conduit):
     ape(None, exid + str(3), 'exclude.marked')
 
 def exclude_hook(conduit):
+    if no_exclude:
+        return
+
     conduit.info(3, 'Reading version lock configuration')
 
     if not fileurl:
@@ -250,14 +335,25 @@ def exclude_hook(conduit):
         _version_lock_excluder_n.add(n)
         _version_lock_excluder_nevr.add("%s-%s:%s-%s" % (n, e, v, r))
 
-    if (_version_lock_excluder_n and
-        conduit.confBool('main', 'follow_obsoletes', default=False)):
+    if (_version_lock_excluder_n and follow_obsoletes):
         #  If anything obsoletes something that we have versionlocked ... then
         # remove all traces of that too.
         for (pkgtup, instTup) in conduit._base.up.getObsoletesTuples():
             if instTup[0] not in _version_lock_excluder_n:
                 continue
             _version_lock_excluder_n.add(pkgtup[0].lower())
+
+    total = len(_get_updates(conduit._base)) if show_hint else 0
+    if total:
+        if total > 1:
+            suffix = 's'
+            what = 'them'
+        else:
+            suffix = ''
+            what = 'it'
+        conduit.info(2, 'Excluding %d update%s due to versionlock '
+                        '(use "yum versionlock status" to show %s)'
+                        % (total, suffix, what))
 
     if _version_lock_excluder_n:
         _add_versionlock_whitelist(conduit)

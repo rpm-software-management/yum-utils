@@ -26,7 +26,7 @@ character to the version.
 .B yum-versionlock.conf(5)
 utilizes configuration options in the form of
 .IP OPTION=VALUE
-.SH OPTION
+.SH OPTIONS
 .IP follow_obsoletes
 This option is a boolean flag which specifies if the versionlock plugin should
 look at all the obsoletes, and see if any of the packages specified have an
@@ -36,13 +36,20 @@ excluded. This option is off by default, as
 will take some time to do the obsoletes processing, and for non-rename
 obsoletes any issues you had which kept you at a specific version of a package
 should be different with another package.
-.SH OPTION
 .IP locklist
 This option is a string with points to the file which will have the versionlock
 information in it. Note that the file
 .B has
 to exist (or the versionlock plugin will make yum exit). However it can be
 empty.
+.IP show_hint
+This option is a boolean flag which specifies if the versionlock plugin should
+print a hint message whenever yum runs saying how many package updates
+available from the repos are being blocked due to versionlocks.
+This hint serves as a reminder that there are locks in effect and that you may
+want to reconsider them since newer versions of those packages have been
+released.
+Default is 1 (show the hint).
 .SH AUTHOR
 .RS
 Chitlesh Goorah <chitlesh@fedoraproject.org>
