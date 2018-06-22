@@ -224,7 +224,7 @@ if opts.addrepo:
 
             # dummy grabfunc, using [main] options
             repo = yum.yumRepo.YumRepository('dummy')
-            repo.baseurl = ['http://dummy']
+            repo.baseurl = ['http://dummy/']
             repo.populate(yum.config.ConfigParser(), None, yb.conf)
             grabber = repo.grabfunc; del repo
 
