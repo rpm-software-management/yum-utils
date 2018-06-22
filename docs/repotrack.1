@@ -19,6 +19,10 @@ Act as if running the specified arch (default: current arch).
 .IP "\fB\-r REPOID, \-\-repoid=REPOID\fP"
 Specify repo ids to query, can be specified multiple times (default is
 all enabled).
+.IP "\fB\-\-repofrompath=<repoid>,<path/url>\fP"
+Specify repoid & paths of additional repositories - unique repoid and complete
+path required, can be specified multiple times.
+Example: --repofrompath=myrepo,/path/to/repo
 .IP "\fB\-t, \-\-tempcache\fP"
 Use a temp dir for storing/accessing yum-cache.
 .IP "\fB\-p DESTDIR, \-\-download_path=DESTDIR\fP"
