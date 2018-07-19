@@ -74,6 +74,12 @@ def localpkgs(directory):
             cache[name] = {'path': fn, 'size': st.st_size, 'device': st.st_dev}
     return cache
 
+def is_subpath(path, root):
+    root = os.path.realpath(root)
+    path = os.path.realpath(os.path.join(root, path))
+    # join() is used below to ensure root ends with a slash
+    return path.startswith(os.path.join(root, ''))
+
 def parseArgs():
     usage = _("""
     Reposync is used to synchronize a remote yum repository to a local 
@@ -116,6 +122,10 @@ def parseArgs():
     parser.add_option("", "--download-metadata", dest="downloadmd",
         default=False, action="store_true",
         help=_("download all the non-default metadata"))
+    parser.add_option("", "--allow-path-traversal", default=False,
+        action="store_true",
+        help=_("Allow packages stored outside their repo directory to be synced "
+               "(UNSAFE, USE WITH CAUTION!)"))
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -215,6 +225,30 @@ def main():
             local_repo_path = opts.destdir
         else:
             local_repo_path = opts.destdir + '/' + repo.id
+
+        # Ensure we don't traverse out of local_repo_path by dropping any
+        # packages whose remote_path is absolute or contains up-level
+        # references (unless explicitly allowed).
+        # See RHBZ#1600221 for details.
+        if not opts.allow_path_traversal:
+            newlist = []
+            skipped = False
+            for pkg in download_list:
+                if is_subpath(pkg.remote_path, local_repo_path):
+                    newlist.append(pkg)
+                    continue
+                my.logger.warning(
+                    _('WARNING: skipping package %s: remote path "%s" not '
+                      'within repodir, unsafe to mirror locally')
+                    % (pkg, pkg.remote_path)
+                )
+                skipped = True
+            if skipped:
+                my.logger.info(
+                    _('You can enable unsafe remote paths by using '
+                      '--allow-path-traversal (see reposync(1) for details)')
+                )
+            download_list = newlist
 
         if opts.delete and os.path.exists(local_repo_path):
             current_pkgs = localpkgs(local_repo_path)
