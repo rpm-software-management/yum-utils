@@ -74,6 +74,12 @@ def localpkgs(directory):
             cache[name] = {'path': fn, 'size': st.st_size, 'device': st.st_dev}
     return cache
 
+def is_subpath(path, root):
+    root = os.path.realpath(root)
+    path = os.path.realpath(os.path.join(root, path))
+    # join() is used below to ensure root ends with a slash
+    return path.startswith(os.path.join(root, ''))
+
 def parseArgs():
     usage = _("""
     Reposync is used to synchronize a remote yum repository to a local 
@@ -116,6 +122,10 @@ def parseArgs():
     parser.add_option("", "--download-metadata", dest="downloadmd",
         default=False, action="store_true",
         help=_("download all the non-default metadata"))
+    parser.add_option("", "--allow-path-traversal", default=False,
+        action="store_true",
+        help=_("Allow packages stored outside their repo directory to be synced "
+               "(UNSAFE, USE WITH CAUTION!)"))
     (opts, args) = parser.parse_args()
     return (opts, args)
 
@@ -216,13 +226,36 @@ def main():
         else:
             local_repo_path = opts.destdir + '/' + repo.id
 
+        # Ensure we don't traverse out of local_repo_path by dropping any
+        # packages whose remote_path is absolute or contains up-level
+        # references (unless explicitly allowed).
+        # See RHBZ#1600221 for details.
+        if not opts.allow_path_traversal:
+            newlist = []
+            skipped = False
+            for pkg in download_list:
+                if is_subpath(pkg.remote_path, local_repo_path):
+                    newlist.append(pkg)
+                    continue
+                my.logger.warning(
+                    _('WARNING: skipping package %s: remote path "%s" not '
+                      'within repodir, unsafe to mirror locally')
+                    % (pkg, pkg.remote_path)
+                )
+                skipped = True
+            if skipped:
+                my.logger.info(
+                    _('You can enable unsafe remote paths by using '
+                      '--allow-path-traversal (see reposync(1) for details)')
+                )
+            download_list = newlist
+
         if opts.delete and os.path.exists(local_repo_path):
             current_pkgs = localpkgs(local_repo_path)
 
             download_set = {}
             for pkg in download_list:
-                remote = pkg.returnSimple('relativepath')
-                rpmname = os.path.basename(remote)
+                rpmname = os.path.basename(pkg.remote_path)
                 download_set[rpmname] = 1
 
             for pkg in current_pkgs:
@@ -269,8 +302,7 @@ def main():
         remote_size = 0
         if not opts.urls:
             for pkg in download_list:
-                remote = pkg.returnSimple('relativepath')
-                local = local_repo_path + '/' + remote
+                local = os.path.join(local_repo_path, pkg.remote_path)
                 sz = int(pkg.returnSimple('packagesize'))
                 if os.path.exists(local) and os.path.getsize(local) == sz:
                     continue
@@ -282,10 +314,9 @@ def main():
         download_list.sort(key=lambda pkg: pkg.name)
         if opts.urls:
             for pkg in download_list:
-                remote = pkg.returnSimple('relativepath')
-                local = os.path.join(local_repo_path, remote)
+                local = os.path.join(local_repo_path, pkg.remote_path)
                 if not (os.path.exists(local) and my.verifyPkg(local, pkg, False)):
-                    print urljoin(pkg.repo.urls[0], pkg.relativepath)
+                    print urljoin(pkg.repo.urls[0], pkg.remote_path)
             continue
 
         # create dest dir
@@ -294,8 +325,7 @@ def main():
 
         # set localpaths
         for pkg in download_list:
-            rpmfn = pkg.remote_path
-            pkg.localpath = os.path.join(local_repo_path, rpmfn)
+            pkg.localpath = os.path.join(local_repo_path, pkg.remote_path)
             pkg.repo.copy_local = True
             pkg.repo.cache = 0
             localdir = os.path.dirname(pkg.localpath)

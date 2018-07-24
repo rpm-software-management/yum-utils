@@ -47,6 +47,16 @@ Download all the non-default metadata
 Download only newest packages per-repo.
 .IP "\fB\-q, \-\-quiet\fP"
 Output as little information as possible.
+.IP "\fB\-\-allow-path-traversal\fP"
+Allow packages stored outside their repo directory to be synced.
+These are packages that are referenced in metadata by using absolute paths or
+up-level ".." symbols, and are normally skipped by \fBreposync\fR for security
+reasons.
+
+\fBCAUTION:\fR Using this option has potential security implications since, by
+providing malicious repodata, an attacker could make \fBreposync\fR write to
+arbitrary locations on the file system that are accessible by the user running
+it.
 .SH "EXAMPLES"
 .IP "Sync all packages from the 'updates' repo to the current directory:"
 \fB reposync \-\-repoid=updates\fP
