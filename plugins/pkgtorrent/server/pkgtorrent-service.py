@@ -22,8 +22,11 @@ except ImportError:
 # expires headers must be in en_US names, so set this once.
 locale.setlocale(locale.LC_TIME, 'en_US')
 
-# derived from https://gist.github.com/stendec/949007 by stendec365@gmail.com
-# and released under the BSD license.
+# derived from https://gist.github.com/stendec/949007
+# original doc text:
+#   Bencoding
+#   By Stendec <stendec365@gmail.com>
+#   Released under the BSD license. Do whatever.
 def bencode(o):
     if isinstance(o, unicode):
         o = o.encode('utf8')
