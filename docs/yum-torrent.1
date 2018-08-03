@@ -1,0 +1,33 @@
+.TH yum-torrent 1 "09 MARCH 2016"
+.SH NAME
+yum-torrent \- download packages via http and peer-to-peer
+.SH DESCRIPTION
+.B yum-torrent
+extends the behaviour of yum by downloading then seeding packages via BitTorrent.
+Once installed and configured, the plugin works transparently.
+.SH FILES
+.B yum-torrent
+makes extensive use of cache files. The BitTorrent client's cwd is set to the root of the cache by default.
+All generated .torrent files are guaranteed to contain files in subdirectories.
+Once a torrent download is complete the files are hard or soft linked to the path in
+.B
+/var/cache/yum
+where yum will look before starting it's own downloads, bypassing it.
+.PP
+.B yum-torrent
+will automatically clean up unused files and directories left over from previous runs.
+.PP
+.RS
+.nf
+/var/cache/yum_torrent/\fItorrenthash\fR.torrent
+/var/cache/yum_torrent/\fItorrenthash\fR.torrent.log
+/var/cache/yum_torrent/\fIpath/to/package\fR.rpm
+/var/cache/yum/\fIrepo\fR/packages/\fIpackage\fR.rpm
+.fi
+.RE
+.SH AUTHOR
+Matthew Almond <malmond@fb.com>
+.SH SEE ALSO
+yum-torrent.conf(5),
+pkgtorrent-service(8),
+pkgtorrent-service.conf(5)

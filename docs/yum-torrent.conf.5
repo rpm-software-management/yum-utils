@@ -1,0 +1,69 @@
+.TH YUM-TORRENT.CONF 5 "09 MARCH 2016" "" "File Formats"
+.SH NAME
+.B yum-torrent.conf(5)
+.SH SYNOPSIS
+.B yum-torrent.conf(5)
+is the configuration file for
+.B yum-torrent(1)
+Yum plugin to download and seed packages via BitTorrent.
+This configuration specifies which BitTorrent client to use, how to interact with it, and a number of timing parameters.
+Of particular note is the \fB{seed_time}\fR substitution.
+The benefit of using BitTorrent is partially attributable to clients contining to seed their torrents some time after they have completed their download.
+.B yum-torrent(1)
+employs an exponential decay algorithm seeded from the hostname and torrent info_hash.
+All clients will seed for at least
+.B seed_min
+After that, the number of seeders will decay as the probability of other hosts also needing the same set of packages will also decrease.
+.SH FILES
+.I /etc/yum/pluginconf.d/yum-torrent.conf
+.SH [main] OPTIONS
+.IP \fBservice\fR
+A specific relative path on the http repository where the
+.B pkgtorrent-service(8)
+is configured. See also
+.B pkgtorrent-service.conf(5)
+for more. Defaults to
+.B /yum/torrent_service
+.IP \fBclient\fR
+Fully qualified path to BitTorrent client that accepts a single positional torrent filename that will download into the current working directory.
+Required.
+.IP \fBoptions\fR
+Additional command line parameters passed to
+.B client
+on startup.
+A substitution named
+.B {seed_time}
+is available.
+This is measured in seconds and can be used to instruct the BitTorrent client to seed for a variable time once the download is completed.
+.IP \fBcomplete\fR
+The text to match anywhere from the logged stdout of the
+.B client
+signaling the package files have been downloaded.
+This allows the client to continue to run and seed the torrent file for others.
+.SH [timeouts] OPTIONS
+All the values in this section are positive integers measured in seconds.
+.IP \fBdownload\fR
+The maximum time to wait for the message
+.B complete
+to appear in the log file.
+If a download with the plugin fails for any reason
+.B yum
+will not find the downloaded rpm files in
+.B /var/cache/yum
+directory. It will fall back on the internal download mechanism.
+.IP \fBseed_min\fR
+The minimum value for \fB{seed_time}\fR. Default 900 (15 minutes).
+It is recommended you set this to the same time as your configuration management interval.
+.IP \fBseed_max\fR
+The maximum value for \fB{seed_time}\fR. Default 86400 (1 day).
+.IP \fBnullfile\fR
+Delete the padding nullfiles after this time period.
+.IP \fBcache\fR
+At the end of each run,
+.B /var/cache/yum_torrent
+is examined. Any files not touched in this time period are deleted, and empty directories are removed.
+Note: If yum is not run for an extended period, this garbage collection will not happen.
+.SH AUTHOR
+Matthew Almond <malmond@fb.com>
+.SH SEE ALSO
+.BR yum-torrent(1)
