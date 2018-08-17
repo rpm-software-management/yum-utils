@@ -8,6 +8,8 @@ sys.path.insert(0,'/usr/share/yum-cli')
 from utils import YumUtilBase
 import logging
 import fnmatch
+import tempfile
+import shutil
 
 from iniparse import INIConfig
 import yum.config
@@ -230,14 +232,19 @@ if opts.addrepo:
             grabber = repo.grabfunc; del repo
 
             print 'grabbing file %s to %s' % (url, destname)
+            f = tempfile.NamedTemporaryFile()
             try:
-                result  = grabber.urlgrab(url, filename=destname, copy_local=True, reget=None)
+                grabber.urlgrab(url, filename=f.name, copy_local=True, reget=None)
+                shutil.copy2(f.name, destname)
+                os.chmod(destname, 0o644)
             except (IOError, OSError, yum.Errors.YumBaseError), e:
                 logger.error('Could not fetch/save url %s to file %s: %s'  % (url, destname, e))
                 error = True
                 continue
             else:
-                print 'repo saved to %s' % result
+                print 'repo saved to %s' % destname
+            finally:
+                f.close()
             
         else:
             repoid = sanitize_url_to_fs(url)
