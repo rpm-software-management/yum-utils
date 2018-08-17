@@ -256,6 +256,14 @@ if opts.addrepo:
                 logger.error('Cannot add repo from %s as is a duplicate of an existing repo' % url)
                 error = True
                 continue
+
+            try:
+                yum.config.UrlOption().parse(url)
+            except ValueError, e:
+                logger.error('Cannot add repo from %s: %s' % (url, e))
+                error = True
+                continue
+
             repoout = """\n[%s]\nname=%s\nbaseurl=%s\nenabled=1\n\n""" % (repoid, reponame, url)
 
             try:
