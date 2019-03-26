@@ -87,6 +87,10 @@ def parseArgs():
         help='check as if running the specified arch (default: current arch)')
     parser.add_option("-r", "--repoid", default=[], action='append',
         help="specify repo ids to query, can be specified multiple times (default is all enabled)")
+    parser.add_option("--repofrompath", action="append",
+        help="specify repoid & paths of additional repositories - unique repoid "
+             "and complete path required, can be specified multiple times. "
+             "Example: --repofrompath=myrepo,/path/to/repo")
     parser.add_option("-t", "--tempcache", default=False, action="store_true", 
         help="Use a temp dir for storing/accessing yum-cache")
     parser.add_option("-p", "--download_path", dest='destdir', 
@@ -157,8 +161,33 @@ def main():
             repo.enable()
             my._getSacks(archlist=archlist, thisrepo=repo.id)
 
-    my.doRepoSetup()    
-    my._getSacks(archlist=archlist)
+    if opts.repofrompath:
+        for repo in opts.repofrompath:
+            tmp = tuple(repo.split(','))
+            if len(tmp) != 2:
+                my.logger.error("Error: Bad repofrompath argument: %s" %repo)
+                continue
+            repoid, repopath = tmp
+            if repopath and repopath[0] == '/':
+                baseurl = 'file://' + repopath
+            else:
+                baseurl = repopath
+            try:
+                my.add_enable_repo(repoid, baseurls=[baseurl],
+                                   basecachedir=my.conf.cachedir,
+                                   timestamp_check=False)
+            except yum.Errors.DuplicateRepoError, e:
+                my.logger.error(e)
+                sys.exit(1)
+            if not opts.quiet:
+                my.logger.info("Added %s repo from %s" % (repoid, repopath))
+
+    try:
+        my.doRepoSetup()
+        my._getSacks(archlist=archlist)
+    except yum.Errors.RepoError, e:
+        my.logger.error(e)
+        sys.exit(1)
     
     unprocessed_pkgs = {}
     final_pkgs = {}
