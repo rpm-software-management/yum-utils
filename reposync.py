@@ -172,7 +172,11 @@ def main():
     # and package files ... needs to be setup before .repos (ie. RHN/etc.).
     if not opts.quiet:
         my.repos.setProgressBar(TextMeter(fo=sys.stdout), TextMultiFileMeter(fo=sys.stdout))
-    my.doRepoSetup()
+    try:
+        my.doRepoSetup()
+    except yum.Errors.RepoError, e:
+        print >> sys.stderr, _("Error setting up repositories: %s") % e
+        sys.exit(1)
 
     if len(opts.repoid) > 0:
         myrepos = []

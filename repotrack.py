@@ -159,7 +159,11 @@ def main():
         # enable the ones we like
         for repo in myrepos:
             repo.enable()
-            my._getSacks(archlist=archlist, thisrepo=repo.id)
+            try:
+                my._getSacks(archlist=archlist, thisrepo=repo.id)
+            except yum.Errors.RepoError, e:
+                my.logger.error(e)
+                sys.exit(1)
 
     if opts.repofrompath:
         for repo in opts.repofrompath:
