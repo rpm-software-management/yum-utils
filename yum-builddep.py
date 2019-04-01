@@ -99,7 +99,7 @@ class YumBuildDep(YumUtilBase):
             self.logger.error("Error: You must be root to install packages")
             sys.exit(1)
 
-        if not all(cmd.endswith('.spec') or cmd.endswith('.src.rpm') for cmd in self.cmds):
+        if not all(cmd.endswith('.spec') or cmd.endswith('.src.rpm') or cmd.endswith('.nosrc.rpm') for cmd in self.cmds):
             # Use source rpms
             self.arch.archlist.append('src')
             self.setupSourceRepos()
@@ -198,7 +198,7 @@ class YumBuildDep(YumUtilBase):
             reloadworks = True
 
         for arg in self.cmds:
-            if arg.endswith('.src.rpm'):
+            if arg.endswith('.src.rpm') or arg.endswith('.nosrc.rpm'):
                 try:
                     srpms.append(yum.packages.YumLocalPackage(self.ts, arg))
                 except yum.Errors.MiscError, e:
