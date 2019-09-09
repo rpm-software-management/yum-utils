@@ -63,8 +63,8 @@ def parseargs(args):
     parser.add_option("-u", "--useronly", default=False, action="store_true",
       help='show processes for my userid only')
     parser.add_option("-r", "--reboothint", default=False, action="store_true",
-      help=('only report whether a full reboot is required (returns 1) or not '
-            '(returns 0)'))
+      help=('only report whether a full reboot is required (exit code 1) or '
+            'not (exit code 0)'))
     parser.add_option("-s", "--services", default=False, action="store_true",
       help='list the affected systemd services only')
     
