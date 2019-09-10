@@ -135,6 +135,27 @@ def main():
         archlist.extend(rpmUtils.arch.getArchList(opts.arch))
     else:
         archlist = rpmUtils.arch.getArchList()
+
+    if opts.repofrompath:
+        for repo in opts.repofrompath:
+            tmp = tuple(repo.split(','))
+            if len(tmp) != 2:
+                my.logger.error("Error: Bad repofrompath argument: %s" %repo)
+                continue
+            repoid, repopath = tmp
+            if repopath and repopath[0] == '/':
+                baseurl = 'file://' + repopath
+            else:
+                baseurl = repopath
+            try:
+                my.add_enable_repo(repoid, baseurls=[baseurl],
+                                   basecachedir=my.conf.cachedir,
+                                   timestamp_check=False)
+            except yum.Errors.DuplicateRepoError, e:
+                my.logger.error(e)
+                sys.exit(1)
+            if not opts.quiet:
+                my.logger.info("Added %s repo from %s" % (repoid, repopath))
         
     # do the happy tmpdir thing if we're not root
     if os.geteuid() != 0 or opts.tempcache:
@@ -160,27 +181,6 @@ def main():
         for repo in myrepos:
             repo.enable()
             my._getSacks(archlist=archlist, thisrepo=repo.id)
-
-    if opts.repofrompath:
-        for repo in opts.repofrompath:
-            tmp = tuple(repo.split(','))
-            if len(tmp) != 2:
-                my.logger.error("Error: Bad repofrompath argument: %s" %repo)
-                continue
-            repoid, repopath = tmp
-            if repopath and repopath[0] == '/':
-                baseurl = 'file://' + repopath
-            else:
-                baseurl = repopath
-            try:
-                my.add_enable_repo(repoid, baseurls=[baseurl],
-                                   basecachedir=my.conf.cachedir,
-                                   timestamp_check=False)
-            except yum.Errors.DuplicateRepoError, e:
-                my.logger.error(e)
-                sys.exit(1)
-            if not opts.quiet:
-                my.logger.info("Added %s repo from %s" % (repoid, repopath))
 
     try:
         my.doRepoSetup()
