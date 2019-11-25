@@ -25,7 +25,7 @@ By default, this plugin excludes packages from lower priority repositories
 based on the package name. If you want to exclude packages based ony the
 package name and architecture, enable the 'only_samearch' bool:
 
-only_samearch=N
+only_samearch=1
 
 You can also temporarily enable this option with the '--samearch-priorities'
 command-line option.
