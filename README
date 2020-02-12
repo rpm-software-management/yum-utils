@@ -1,3 +1,6 @@
+NOTE:  This project is *deprecated*.  Please use DNF, the successor of YUM:
+https://github.com/rpm-software-management/dnf
+
 -- Introduction --
 
 Yum-utils is a collection of utilities, plugins and examples related to
