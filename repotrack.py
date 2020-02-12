@@ -270,7 +270,7 @@ def main():
         if not opts.quiet:        
             my.logger.info('Downloading %s' % os.path.basename(remote))
         pkg.localpath = local # Hack: to set the localpath to what we want.
-        path = repo.getPackage(pkg)
+        path = repo.getPackage(pkg, copy_local=1)
 
         if not os.path.exists(local) or not os.path.samefile(path, local):
             shutil.copy2(path, local)
