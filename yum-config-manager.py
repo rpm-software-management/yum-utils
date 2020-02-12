@@ -8,6 +8,8 @@ sys.path.insert(0,'/usr/share/yum-cli')
 from utils import YumUtilBase
 import logging
 import fnmatch
+import tempfile
+import shutil
 
 from iniparse import INIConfig
 import yum.config
@@ -216,6 +218,7 @@ if opts.addrepo:
         myrepodir = yb.conf.reposdir[0]
         os.makedirs(myrepodir)
         
+    error = False
     for url in opts.addrepo:
         print 'adding repo from: %s' % url
         if url.endswith('.repo'): # this is a .repo file - fetch it, put it in our reposdir and enable it
@@ -224,18 +227,24 @@ if opts.addrepo:
 
             # dummy grabfunc, using [main] options
             repo = yum.yumRepo.YumRepository('dummy')
-            repo.baseurl = ['http://dummy']
+            repo.baseurl = ['http://dummy/']
             repo.populate(yum.config.ConfigParser(), None, yb.conf)
             grabber = repo.grabfunc; del repo
 
             print 'grabbing file %s to %s' % (url, destname)
+            f = tempfile.NamedTemporaryFile()
             try:
-                result  = grabber.urlgrab(url, filename=destname, copy_local=True, reget=None)
+                grabber.urlgrab(url, filename=f.name, copy_local=True, reget=None)
+                shutil.copy2(f.name, destname)
+                os.chmod(destname, 0o644)
             except (IOError, OSError, yum.Errors.YumBaseError), e:
                 logger.error('Could not fetch/save url %s to file %s: %s'  % (url, destname, e))
+                error = True
                 continue
             else:
-                print 'repo saved to %s' % result
+                print 'repo saved to %s' % destname
+            finally:
+                f.close()
             
         else:
             repoid = sanitize_url_to_fs(url)
@@ -245,7 +254,16 @@ if opts.addrepo:
                 thisrepo = yb.add_enable_repo(repoid, baseurl=[url], name=reponame)
             except yum.Errors.DuplicateRepoError, e:
                 logger.error('Cannot add repo from %s as is a duplicate of an existing repo' % url)
+                error = True
                 continue
+
+            try:
+                yum.config.UrlOption().parse(url)
+            except ValueError, e:
+                logger.error('Cannot add repo from %s: %s' % (url, e))
+                error = True
+                continue
+
             repoout = """\n[%s]\nname=%s\nbaseurl=%s\nenabled=1\n\n""" % (repoid, reponame, url)
 
             try:
@@ -254,9 +272,10 @@ if opts.addrepo:
                 print repoout
             except (IOError, OSError), e:
                 logger.error('Could not save repo to repofile %s: %s' % (repofile, e))
+                error = True
                 continue
             else:
                 fo.close()
-                
-            
 
+    if error:
+        sys.exit(1)
