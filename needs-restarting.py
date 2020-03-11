@@ -50,8 +50,8 @@ import utils
 
 # For which package updates we should recommend a reboot
 # Taken from https://access.redhat.com/solutions/27943
-REBOOTPKGS = ['kernel', 'glibc', 'linux-firmware', 'systemd', 'udev',
-              'openssl-libs', 'gnutls', 'dbus']
+REBOOTPKGS = ['kernel', 'kernel-rt', 'glibc', 'linux-firmware', 'systemd',
+              'udev', 'openssl-libs', 'gnutls', 'dbus']
 
 def parseargs(args):
     usage = """
